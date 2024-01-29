@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory} from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router';
 
 const routes = [
     // {
@@ -6,6 +6,10 @@ const routes = [
     //     name: 'Home',
     //     component: () => import('../views/Home.vue')
     // },
+    {
+        path: '/',
+        redirect: 'login'
+    },
     {
         path: '/login',
         name: 'Login',
@@ -29,11 +33,11 @@ const routes = [
     },
 
 
-]
+];
 
 const router = createRouter({
-    history: createWebHistory("/"),
-    routes: routes,
-})
+    history: createWebHistory('/'),
+    routes,
+});
 
 export default router;

@@ -1,0 +1,1 @@
+System.register(["./_plugin-vue_export-helper-legacy-BT9Kuy84.js","./index-legacy-0dQowT14.js"],(function(e,r){"use strict";var t,n,u;return{setters:[function(e){t=e._},function(e){n=e.o,u=e.j}],execute:function(){var r={style:{"background-color":"red"}};e("default",t({},[["render",function(e,t){return n(),u("div",r,"Page2")}]]))}}}));

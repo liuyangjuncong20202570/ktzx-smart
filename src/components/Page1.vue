@@ -1,11 +1,11 @@
 <template>
-
   <el-container>
     <!--两个按钮，靠最左-->
-    <el-header style="height:5vh;width:100%;background-color:#deebf7;display: flex;align-items: center;">
+    <el-header
+      style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
       <el-button type="primary" style="margin-left: 0.8vw;margin-right: 0.8vw;" @click="handleRoleAdd">添加</el-button>
 
-      <el-dialog :modelValue="dialogVisible"  :show-close="false" :close-on-click-modal="false" title="新增角色">
+      <el-dialog :modelValue="dialogVisible" :show-close="false" :close-on-click-modal="false" title="新增角色">
         <!-- 弹窗内容 -->
         <el-form ref="form" :model="Addform" :rules="Addrules" label-width="80px">
           <el-form-item label="角色名称" prop="name">
@@ -26,9 +26,9 @@
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="confirmAdd">确 定</el-button>
-      </span>
+          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="confirmAdd">确 定</el-button>
+        </span>
       </el-dialog>
 
       <el-button type="danger" @click="handleRoleDel">删除</el-button>
@@ -36,28 +36,27 @@
     <el-main>
       <!--生成-->
       <el-table :data="tableData" style="table-layout:auto;width: 100%;" stripe>
-        <el-table-column
-            type="selection"
-            width="55"
-        ></el-table-column>
+        <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="id" label="" width="55"></el-table-column>
-        <el-table-column prop="rolename" label="角色名称" ></el-table-column>
+        <el-table-column prop="rolename" label="角色名称"></el-table-column>
         <el-table-column prop="roletype" label="角色类型"></el-table-column>
         <el-table-column prop="homepage" label="首页"></el-table-column>
         <el-table-column label="操作">
-      <!-- 添加一个el-icon-->
+          <!-- 添加一个el-icon-->
           <!--鼠标悬浮颜色改成蓝色-->
-          <el-icon class="custom-icon" style="float:left;margin-top:2px;margin-left:3px" @click="handleRoleEdit"> <Edit/> </el-icon>
+          <el-icon class="custom-icon" style="float:left;margin-top:2px;margin-left:3px" @click="handleRoleEdit">
+            <Edit />
+          </el-icon>
 
-    </el-table-column>
+        </el-table-column>
       </el-table>
     </el-main>
 
   </el-container>
 </template>
 <script setup>
-import {reactive, ref} from "vue";
-import {Edit, Right} from '@element-plus/icons-vue'
+import { reactive, ref } from "vue";
+import { Edit, Right } from '@element-plus/icons-vue'
 
 const dialogVisible = ref(false);
 const Addform = ref({
