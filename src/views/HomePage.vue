@@ -156,14 +156,12 @@ const handleLogout = () => {
 	router.push({ name: 'Login' }); // 假设您的登录路由的名字是 'Login'
 };
 
-
-
 // 定义菜单数据
 const defaultActive = ref('/');
 
 const menus = ref([
-	{ id: '1', title: '角色管理', icon: 'message', url: '/homepage/page1', pid: '0', order: 1 },
-	{ id: '2', title: '角色授权', icon: 'option1-icon', url: '/homepage/page2', pid: '0', order: 2 },
+	{ id: '1', title: '角色管理', icon: 'message', url: '/superadminhome/rolemangt', pid: '0', order: 1 },
+	{ id: '2', title: '角色授权', icon: 'option1-icon', url: '/superadminhome/rolepurview', pid: '0', order: 2 },
 	// ... 其他顶级菜单项
 ]);
 
