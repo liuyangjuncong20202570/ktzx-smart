@@ -168,11 +168,7 @@ const handleLogout = () => {
 // 默认显示菜单
 
 const defaultActive = ref('');
-// const menus = ref([
-//   {id: '1', name: '角色管理', url: '/superadminhome/rolemangt', pid: '0', order: 1},
-//   {id: '2', name: '角色授权', url: '/superadminhome/rolepurview', pid: '0', order: 2},
-//   // ... 其他顶级菜单项
-// ]);
+
 const menus = ref([
 ]);
 const loginInfo = {
@@ -182,6 +178,7 @@ const loginInfo = {
 };
 console.log(loginInfo);
 
+const homeurl = profileStore.profilehomeurl;
 
 request.post('/homes/superadminhome',loginInfo)
     .then(res => {
@@ -190,7 +187,7 @@ request.post('/homes/superadminhome',loginInfo)
         if(res.data.length > 0){
           menus.value = res.data;
           defaultActive.value = res.data[0].url;
-          // console.log(res.data)
+          console.log(res.data)
           // console.log(111)
         }else{
           // console.log(222)
@@ -208,7 +205,9 @@ request.post('/homes/superadminhome',loginInfo)
 
 //路由导航
 const navigateTo = (url) => {
-  router.push(url);
+  console.log(homeurl+url)
+  //前面拼一个/表示绝对路径
+  router.push('/'+homeurl+url);
 };
 
 const excludedPids = ['0', '102'];

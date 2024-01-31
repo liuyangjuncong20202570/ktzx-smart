@@ -12,17 +12,17 @@ const routes = [
         component: () => import('../views/Login.vue')
     },
     {
-        path: '/:rolehome(superadminhome|otherhome)',
+        path: '/homes/:rolehome(superadminhome|otherhome)',
         name: 'Homepage',
         component: () => import('../views/HomePage.vue'),
         children: [
             {
-                path: 'rolemangt',
+                path: 'sysmangt/rolemangt',
                 name: 'Rolemangt',
                 component: () => import('../components/Rolemangt.vue')
             },
             {
-                path: 'rolepurview',
+                path: 'sysmangt/rolepurview',
                 name: 'Rolepurview',
                 component: () => import('../components/Rolepurview.vue')
             }

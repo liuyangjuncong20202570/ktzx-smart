@@ -192,11 +192,9 @@ const login = () => {
               const rolesCount = res.data.rolescount;
               if (rolesCount === 1) {
                 // 跳转至指定页面
-                const orginHomeUrl = res.data.simpleRoleList[0].homeurl;
-                console.log(orginHomeUrl.substring(orginHomeUrl.lastIndexOf('/') + 1));
-                const HomeUrl = orginHomeUrl.substring(orginHomeUrl.lastIndexOf('/') + 1);
+                const HomeUrl = res.data.simpleRoleList[0].homeurl;
                 // const userInfo ={userid: '1',catelog:'2',roleid:'1'};
-                profileStore.setProfileInfo(res.data.useid,res.data.simpleRoleList[0].roleid,res.data.catelog);
+                profileStore.setProfileInfo(res.data.useid,res.data.simpleRoleList[0].roleid,res.data.catelog,res.data.simpleRoleList[0].homeurl);
                 router.push(HomeUrl);
               } else {
                 //显示弹窗
