@@ -108,6 +108,9 @@ import {User, Lock, Edit} from '@element-plus/icons-vue'
 import {ElMessage} from 'element-plus'
 import request from '../utils/request.js'
 import router from "../router/index.js";
+import {useProfileStore} from "../stores/profileStore.js";
+
+const profileStore = useProfileStore();
 
 //构造登录表单
 const loginForm = reactive({
@@ -139,25 +142,25 @@ const handleClick = (tab, event) => {
   }
 }
 //测试数据
-const data = {
-  useid: "1",
-  catelog: "2",
-  rolescount: 2,
-  simpleRoleList: [
-    {
-      rolename: "任课教师",
-      roleid: "8",
-      homeurl: "HomePage/Page1"
-    },
-    {
-      rolename: "课程负责人",
-      roleid: "7",
-      homeurl: "HomePage/Page2"
-    }
-  ]
-};
+// const data = {
+//   useid: "1",
+//   catelog: "2",
+//   rolescount: 2,
+//   simpleRoleList: [
+//     {
+//       rolename: "任课教师",
+//       roleid: "8",
+//       homeurl: "HomePage/Page1"
+//     },
+//     {
+//       rolename: "课程负责人",
+//       roleid: "7",
+//       homeurl: "HomePage/Page2"
+//     }
+//   ]
+// };
 //默认选择第一个角色序号
-const selectedRoleId = ref(data.simpleRoleList[0].roleid);
+// const selectedRoleId = ref(data.simpleRoleList[0].roleid);
 
 
 const rules = reactive({
@@ -168,10 +171,8 @@ const rules = reactive({
   pwd: [
     {required: true, message: '请输入密码', trigger: 'blur'},
     {min: 3, max: 15, message: '密码长度在3到15个字符之间', trigger: 'blur'},
-    // { pattern: /^[a-zA-Z0-9]+$/, message: '密码只能包含字母和数字', trigger: 'blur' }
   ],
 })
-
 
 //登录
 const login = () => {
@@ -193,8 +194,10 @@ const login = () => {
                 // 跳转至指定页面
                 const orginHomeUrl = res.data.simpleRoleList[0].homeurl;
                 console.log(orginHomeUrl.substring(orginHomeUrl.lastIndexOf('/') + 1));
-
-                router.push(orginHomeUrl.substring(orginHomeUrl.lastIndexOf('/') + 1));
+                const HomeUrl = orginHomeUrl.substring(orginHomeUrl.lastIndexOf('/') + 1);
+                // const userInfo ={userid: '1',catelog:'2',roleid:'1'};
+                profileStore.setProfileInfo(res.data.useid,res.data.simpleRoleList[0].roleid,res.data.catelog);
+                router.push(HomeUrl);
               } else {
                 //显示弹窗
                 showRoleModal.value = true;
