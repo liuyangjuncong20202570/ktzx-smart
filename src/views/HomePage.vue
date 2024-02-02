@@ -73,7 +73,7 @@
               </el-row>
             </div>
           </div>
-          <!-- 使用 el-scrollbar 包裹 el-menu，设置高度为 70vh -->
+          <!-- 使用 el-scrollbar 包裹 el-menu，设置高度为 70% -->
 
           <!--页面左侧导航栏-->
           <el-scrollbar style="height: 70%">
@@ -173,14 +173,12 @@ const menus = ref([
 ]);
 const loginInfo = {
   userid: profileStore.profileid,
-  roleid:profileStore.profileroleid,
-  catelog:profileStore.profilecatelog
+  roleid: profileStore.profileroleid,
+  catelog: profileStore.profilecatelog
 };
-console.log(loginInfo);
 
 const homeurl = profileStore.profilehomeurl;
-
-request.post('/homes/superadminhome',loginInfo)
+request.post(`${homeurl}`,loginInfo)
     .then(res => {
       // 登录成功
       if (res.code === 200) {
@@ -218,6 +216,8 @@ const filteredMenus = computed(() => {
     return !excludedPids.includes(menu.pid);
   });
 });
+console.log(filteredMenus, 111);
+
 //过滤节点是否有孩子节点
 const hasChildren = (menu) => {
   return menus.value.some(child => child.pid === menu.id);

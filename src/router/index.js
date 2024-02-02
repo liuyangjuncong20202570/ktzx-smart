@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router';
 
-const rolehome =['teacherhomne','adminhome','superadminhome'];
+const rolehome =['teacherhomne','adminhome','superadminhome', 'secretariatHome'];
 const routes = [
     {
         path: '/',
@@ -12,7 +12,8 @@ const routes = [
         component: () => import('../views/Login.vue')
     },
     {
-        path: '/homes/:rolehome(superadminhome|otherhome)',
+        path: '/homes/:rolehome(' + rolehome.join('|') + ')',
+        // path: '/homes/:rolehome(superadminhome|otherhome)',
         name: 'Homepage',
         component: () => import('../views/HomePage.vue'),
         children: [
@@ -25,6 +26,16 @@ const routes = [
                 path: 'sysmangt/rolepurview',
                 name: 'Rolepurview',
                 component: () => import('../components/Rolepurview.vue')
+            },
+            {
+                path: 'sysmangt/termmangt',
+                name: 'TermManagement',
+                component: () => import('../components/Termmangt.vue')
+            },
+            {
+                path: 'sysmangt/creatteachunit',
+                name: 'CreatTeachUnit',
+                component: () => import('../components/CreatTeachUnit.vue')
             }
         ]
     },

@@ -142,23 +142,25 @@ const handleClick = (tab, event) => {
   }
 }
 //测试数据
-// const data = {
-//   useid: "1",
-//   catelog: "2",
-//   rolescount: 2,
-//   simpleRoleList: [
-//     {
-//       rolename: "任课教师",
-//       roleid: "8",
-//       homeurl: "HomePage/Page1"
-//     },
-//     {
-//       rolename: "课程负责人",
-//       roleid: "7",
-//       homeurl: "HomePage/Page2"
-//     }
-//   ]
-// };
+const data = {
+  useid: "1",
+  catelog: "2",
+  rolescount: 1,
+  simpleRoleList: [
+    {
+      rolename: "教学秘书",
+      roleid: "2",
+      homeurl: "Homes/secretariatHome"
+    }
+  ]
+};
+
+const account = {
+  username: '教学秘书',
+  pwd: '111',
+  catelog: '2',
+  loginway: '1'
+};
 //默认选择第一个角色序号
 // const selectedRoleId = ref(data.simpleRoleList[0].roleid);
 
@@ -179,6 +181,17 @@ const login = () => {
   // 验证表单输入
   proxy.$refs.ruleFormRef.validate((valid) => {
     if (valid) {
+      // if(loginForm.username === account.username && 
+      //    loginForm.pwd === account.pwd &&
+      //    loginForm.catelog === account.catelog &&
+      //    loginForm.loginway === account.loginway) router.push(data.simpleRoleList[0].homeurl);
+      // else{
+      //   ElMessage({
+      //     type: 'error',
+      //     message: '用户名或密码错误'
+      //   });
+      // }
+      
       //请求登录接口
       request.post('/login', loginForm)
           .then(res => {
@@ -200,7 +213,6 @@ const login = () => {
                 //显示弹窗
                 showRoleModal.value = true;
               }
-
             } else {
               // 登录失败
               ElMessage({
