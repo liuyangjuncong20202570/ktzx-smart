@@ -231,10 +231,8 @@ const selectedRoleId = ref(null);
 //登录验证跳转
 const confirmRole = () => {
   const selectedRole = data.simpleRoleList.find(role => role.roleid === selectedRoleId.value);
-  profileStore.setProfileInfo(data.userid, selectedRole.roleid, data.catelog, selectedRole.homeurl);
-  // console.log(selectedRole);
-  // console.log(selectedRole);
   if (selectedRole) {
+    profileStore.setProfileInfo(data.userid, selectedRole.roleid, data.catelog, selectedRole.homeurl);
     router.push(selectedRole.homeurl);
   }
   showRoleModal.value = false;
