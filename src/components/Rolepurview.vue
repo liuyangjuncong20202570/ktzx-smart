@@ -8,8 +8,10 @@
     <el-container>
       <!--左侧-->
       <el-aside style="height: 100%;width:35vw;float: left; border: 1px solid #ccc;">
-        <el-table :data="roleData" style="table-layout:auto;width: 100%;" @cell-click="getmenu" stripe>
-          <el-table-column prop="rolecode" label="" width="55"></el-table-column>
+        <el-table :data="roleData" style="table-layout:auto; width: 100%;" @cell-click="getmenu" stripe>
+          <el-table-column label="" width="55">
+            <template v-slot="row">{{ row.$index + 1 }}</template>
+          </el-table-column>
           <el-table-column prop="rolename" label="角色类型"></el-table-column>
           <el-table-column prop="remark" label="备注"></el-table-column>
         </el-table>

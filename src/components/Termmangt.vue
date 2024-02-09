@@ -7,14 +7,35 @@
             <el-button type="danger" style="margin-left: 0.8vw;">删除学期</el-button>
             <el-button type="success" style="margin-left: 0.8vw;">保存</el-button>
         </el-header>
-        <el-main>
+        <el-main style="padding: 0;">
             <div style="max-height: 100%; overflow:auto ; flex: auto">
                 <el-table :data="tableData" style="table-layout:auto; width: 100%;" stripe>
                     <el-table-column type="selection" width="55"></el-table-column>
                     <el-table-column prop="id" label="" width="55"></el-table-column>
-                    <el-table-column prop="term" label="学期"></el-table-column>
-                    <el-table-column prop="startTime" label="起始日期"></el-table-column>
-                    <el-table-column prop="endTime" label="结束日期"></el-table-column>
+                    <el-table-column prop="term" label="学期">
+                        <template #default="{ row }">
+                            <div v-if="row.editingTerm">
+                            <el-input style="width: 200px; height: 25px;" v-model="row.term" @blur="handleBlur(row, 'editingTerm')"></el-input>
+                            </div>
+                            <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingTerm')">{{ row.term }}</div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="startTime" label="起始日期">
+                        <template #default="{ row }">
+                            <div v-if="row.editingStartTime">
+                            <el-input style="width: 200px; height: 25px;" v-model="row.startTime" @blur="handleBlur(row, 'editingStartTime')"></el-input>
+                            </div>
+                            <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingStartTime')">{{ row.startTime }}</div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="endTime" label="结束日期">
+                        <template #default="{ row }">
+                            <div v-if="row.editingEndTime">
+                            <el-input style="width: 200px; height: 25px;" v-model="row.endTime" @blur="handleBlur(row, 'editingEndTime')"></el-input>
+                            </div>
+                            <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingEndTime')">{{ row.endTime }}</div>
+                        </template>
+                    </el-table-column>
                     <el-table-column label="当前学期">
                         <el-checkbox v-model="checked" />
                     </el-table-column>
@@ -22,6 +43,7 @@
             </div>
         </el-main>
         
+         111
     </div>
 </template>
 
@@ -59,7 +81,23 @@ const tableData = reactive([
         startTime: '',
         endTime: '',
     },
-])
+]);
+
+tableData.forEach(item => {
+  item.editingTerm = false;
+  item.editingStartTime = false;
+  item.editingEndTime = false;
+});
+
+const handleClick = (row, field) => {
+  row[field] = true
+  console.log(row);
+};
+
+const handleBlur = (row, field) => {
+  row[field] = false;
+  console.log(row);
+};
 </script>
 
 <style scoped>

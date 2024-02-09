@@ -185,7 +185,6 @@ request.post(`${homeurl}`,loginInfo)
         if(res.data.length > 0){
           menus.value = res.data;
           defaultActive.value = res.data[0].url;
-          console.log(res.data)
           // console.log(111)
         }else{
           // console.log(222)
@@ -203,9 +202,9 @@ request.post(`${homeurl}`,loginInfo)
 
 //路由导航
 const navigateTo = (url) => {
-  console.log(homeurl+url)
+  // console.log(homeurl+url)
   //前面拼一个/表示绝对路径
-  router.push('/'+homeurl+url);
+  router.push(homeurl+url);
 };
 
 const excludedPids = ['0', '102'];
@@ -216,7 +215,6 @@ const filteredMenus = computed(() => {
     return !excludedPids.includes(menu.pid);
   });
 });
-console.log(filteredMenus, 111);
 
 //过滤节点是否有孩子节点
 const hasChildren = (menu) => {

@@ -142,25 +142,21 @@ const handleClick = (tab, event) => {
   }
 }
 //测试数据
-const data = {
-  useid: "1",
-  catelog: "2",
-  rolescount: 1,
-  simpleRoleList: [
-    {
-      rolename: "教学秘书",
-      roleid: "2",
-      homeurl: "Homes/secretariatHome"
-    }
-  ]
-};
+// const data = {
+//   userid: "1",
+//   catelog: "2",
+//   rolescount: 1,
+//   simpleRoleList: [
+//     {
+//       rolename: "教学秘书",
+//       roleid: "2",
+//       homeurl: "Homes/secretariatHome"
+//     }
+//   ]
+// };
 
-const account = {
-  username: '教学秘书',
-  pwd: '111',
-  catelog: '2',
-  loginway: '1'
-};
+const data = reactive({});
+
 //默认选择第一个角色序号
 // const selectedRoleId = ref(data.simpleRoleList[0].roleid);
 
@@ -181,20 +177,10 @@ const login = () => {
   // 验证表单输入
   proxy.$refs.ruleFormRef.validate((valid) => {
     if (valid) {
-      // if(loginForm.username === account.username && 
-      //    loginForm.pwd === account.pwd &&
-      //    loginForm.catelog === account.catelog &&
-      //    loginForm.loginway === account.loginway) router.push(data.simpleRoleList[0].homeurl);
-      // else{
-      //   ElMessage({
-      //     type: 'error',
-      //     message: '用户名或密码错误'
-      //   });
-      // }
-      
       //请求登录接口
       request.post('/login', loginForm)
           .then(res => {
+            // console.log(res);
             // 登录成功
             if (res.code === 200) {
               // //保存令牌到本地存储
@@ -207,10 +193,12 @@ const login = () => {
                 // 跳转至指定页面
                 const HomeUrl = res.data.simpleRoleList[0].homeurl;
                 // const userInfo ={userid: '1',catelog:'2',roleid:'1'};
-                profileStore.setProfileInfo(res.data.useid,res.data.simpleRoleList[0].roleid,res.data.catelog,res.data.simpleRoleList[0].homeurl);
+                profileStore.setProfileInfo(res.data.userid,res.data.simpleRoleList[0].roleid,res.data.catelog,res.data.simpleRoleList[0].homeurl);
                 router.push(HomeUrl);
               } else {
                 //显示弹窗
+                Object.assign(data, res.data);
+                // console.log(data);
                 showRoleModal.value = true;
               }
             } else {
@@ -238,10 +226,14 @@ const login = () => {
   });
 };
 
+const selectedRoleId = ref(null);
+
 //登录验证跳转
 const confirmRole = () => {
   const selectedRole = data.simpleRoleList.find(role => role.roleid === selectedRoleId.value);
-  console.log(selectedRole);
+  profileStore.setProfileInfo(data.userid, selectedRole.roleid, data.catelog, selectedRole.homeurl);
+  // console.log(selectedRole);
+  // console.log(selectedRole);
   if (selectedRole) {
     router.push(selectedRole.homeurl);
   }
