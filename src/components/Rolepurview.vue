@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <el-container style="height: 92vh; color: grey;">
     <!--    顶部按钮-->
     <el-header
         style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
@@ -7,15 +7,17 @@
     </el-header>
     <el-container>
       <!--左侧-->
-      <el-aside style="height: calc(100vh - 104px) ;width:35vw;float: left; border: 1px solid #ccc;">
-        <el-table :data="roleData" style="table-layout:auto;width: 100%;" @cell-click="getmenu" stripe>
-          <el-table-column prop="rolecode" label="" width="55"></el-table-column>
+      <el-aside style="height: 100%;width:35vw;float: left; border: 1px solid #ccc;">
+        <el-table :data="roleData" style="table-layout:auto; width: 100%;" @cell-click="getmenu" stripe>
+          <el-table-column label="" width="55">
+            <template v-slot="row">{{ row.$index + 1 }}</template>
+          </el-table-column>
           <el-table-column prop="rolename" label="角色类型"></el-table-column>
           <el-table-column prop="remark" label="备注"></el-table-column>
         </el-table>
       </el-aside>
       <!--右侧-->
-      <el-main v-show="showmenu" style="height:calc(100vh - 104px); width:40vw; border: 1px solid #ccc;">
+      <el-main v-show="showmenu" style="height: 100%; width:40vw; border: 1px solid #ccc;">
         <!-- 表头 -->
         <el-row style="line-height: 40px; background-color: #f5f7fa; border-bottom: 1px solid #ebeef5;">
           <el-col :span="16">功能菜单</el-col>
@@ -34,11 +36,12 @@
         >
           <template #default="{ node, data }">
             <div class="custom-tree-node">
-              <span>{{ node.label }}</span>
+              <span>
+                {{ node.label }}
+              </span>
               <div class="checkbox-container">
                 <el-checkbox v-model="data.checkedView" @change="() => handleCheckChange(data, 'view')"></el-checkbox>
                 <el-checkbox v-model="data.checkedEdit" @change="() => handleCheckChange(data, 'edit')"></el-checkbox>
-
               </div>
             </div>
           </template>
@@ -127,7 +130,8 @@ const getmenu = (row) => {
           rolepurviewData.value = res.data;
           // 初始化 checkedEdit 和 checkedView
           initializeCheckStatus(rolepurviewData.value);
-          console.log(res.data);
+          // console.log(res.data);
+          console.log(rolepurviewData.value);
         }
       }).catch(error => {
     ElMessage({

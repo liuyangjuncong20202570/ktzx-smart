@@ -73,7 +73,7 @@
               </el-row>
             </div>
           </div>
-          <!-- 使用 el-scrollbar 包裹 el-menu，设置高度为 70vh -->
+          <!-- 使用 el-scrollbar 包裹 el-menu，设置高度为 70% -->
 
           <!--页面左侧导航栏-->
           <el-scrollbar style="height: 70%">
@@ -173,21 +173,18 @@ const menus = ref([
 ]);
 const loginInfo = {
   userid: profileStore.profileid,
-  roleid:profileStore.profileroleid,
-  catelog:profileStore.profilecatelog
+  roleid: profileStore.profileroleid,
+  catelog: profileStore.profilecatelog
 };
-console.log(loginInfo);
 
 const homeurl = profileStore.profilehomeurl;
-
-request.post('/homes/superadminhome',loginInfo)
+request.post(`${homeurl}`,loginInfo)
     .then(res => {
       // 登录成功
       if (res.code === 200) {
         if(res.data.length > 0){
           menus.value = res.data;
           defaultActive.value = res.data[0].url;
-          console.log(res.data)
           // console.log(111)
         }else{
           // console.log(222)
@@ -205,9 +202,9 @@ request.post('/homes/superadminhome',loginInfo)
 
 //路由导航
 const navigateTo = (url) => {
-  console.log(homeurl+url)
+  // console.log(homeurl+url)
   //前面拼一个/表示绝对路径
-  router.push('/'+homeurl+url);
+  router.push(homeurl+url);
 };
 
 const excludedPids = ['0', '102'];
@@ -218,6 +215,7 @@ const filteredMenus = computed(() => {
     return !excludedPids.includes(menu.pid);
   });
 });
+
 //过滤节点是否有孩子节点
 const hasChildren = (menu) => {
   return menus.value.some(child => child.pid === menu.id);

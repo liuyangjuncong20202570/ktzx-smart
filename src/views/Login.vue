@@ -143,22 +143,20 @@ const handleClick = (tab, event) => {
 }
 //测试数据
 // const data = {
-//   useid: "1",
+//   userid: "1",
 //   catelog: "2",
-//   rolescount: 2,
+//   rolescount: 1,
 //   simpleRoleList: [
 //     {
-//       rolename: "任课教师",
-//       roleid: "8",
-//       homeurl: "HomePage/Page1"
-//     },
-//     {
-//       rolename: "课程负责人",
-//       roleid: "7",
-//       homeurl: "HomePage/Page2"
+//       rolename: "教学秘书",
+//       roleid: "2",
+//       homeurl: "Homes/secretariatHome"
 //     }
 //   ]
 // };
+
+const data = reactive({});
+
 //默认选择第一个角色序号
 // const selectedRoleId = ref(data.simpleRoleList[0].roleid);
 
@@ -182,6 +180,7 @@ const login = () => {
       //请求登录接口
       request.post('/login', loginForm)
           .then(res => {
+            // console.log(res);
             // 登录成功
             if (res.code === 200) {
               // //保存令牌到本地存储
@@ -194,13 +193,14 @@ const login = () => {
                 // 跳转至指定页面
                 const HomeUrl = res.data.simpleRoleList[0].homeurl;
                 // const userInfo ={userid: '1',catelog:'2',roleid:'1'};
-                profileStore.setProfileInfo(res.data.useid,res.data.simpleRoleList[0].roleid,res.data.catelog,res.data.simpleRoleList[0].homeurl);
+                profileStore.setProfileInfo(res.data.userid,res.data.simpleRoleList[0].roleid,res.data.catelog,res.data.simpleRoleList[0].homeurl);
                 router.push(HomeUrl);
               } else {
                 //显示弹窗
+                Object.assign(data, res.data);
+                // console.log(data);
                 showRoleModal.value = true;
               }
-
             } else {
               // 登录失败
               ElMessage({
@@ -226,11 +226,13 @@ const login = () => {
   });
 };
 
+const selectedRoleId = ref(null);
+
 //登录验证跳转
 const confirmRole = () => {
   const selectedRole = data.simpleRoleList.find(role => role.roleid === selectedRoleId.value);
-  console.log(selectedRole);
   if (selectedRole) {
+    profileStore.setProfileInfo(data.userid, selectedRole.roleid, data.catelog, selectedRole.homeurl);
     router.push(selectedRole.homeurl);
   }
   showRoleModal.value = false;
