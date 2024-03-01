@@ -45,41 +45,31 @@
         </el-table-column>
         <el-table-column prop="rolename" label="角色名称" width="220">
           <template #default="{ row }">
-            <div v-if="row.editingRolename">
-              <el-input style="width: 200px; height: 25px;" v-model="row.rolename" @blur="handleBlur(row, 'editingRolename')"></el-input>
-            </div>
+            <el-input v-if="row.editingRolename" style="width: 190px; height: 25px;" v-model="row.rolename" @blur="handleBlur(row, 'editingRolename')"></el-input>
             <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingRolename')">{{ row.rolename }}</div>
           </template>
         </el-table-column>
         <el-table-column prop="roletype" label="角色类型" width="220">
           <template #default="{ row }">
-            <div v-if="row.editingRoletype">
-              <el-input style="width: 200px; height: 25px;" v-model="row.roletype" @blur="handleBlur(row, 'editingRoletype')"></el-input>
-            </div>
+            <el-input v-if="row.editingRoletype" style="width: 190px; height: 25px;" v-model="row.roletype" @blur="handleBlur(row, 'editingRoletype')"></el-input>
             <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingRoletype')">{{ row.roletype }}</div>
           </template>
         </el-table-column>
         <el-table-column prop="homepage" label="首页" width="220">
           <template #default="{ row }">
-            <div v-if="row.editingHomepage">
-              <el-input style="width: 200px; height: 25px;" v-model="row.homepage" @blur="handleBlur(row, 'editingHomepage')"></el-input>
-            </div>
+            <el-input v-if="row.editingHomepage" style="width: 190px; height: 25px;" v-model="row.homepage" @blur="handleBlur(row, 'editingHomepage')"></el-input>
             <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingHomepage')">{{ row.homepage }}</div>
           </template>
         </el-table-column>
         <el-table-column prop="roletype" label="首页地址" width="220">
           <template #default="{ row }">
-            <div v-if="row.editingHomeUrl">
-              <el-input style="width: 200px; height: 25px;" v-model="row.homeUrl" @blur="handleBlur(row, 'editingHomeUrl')"></el-input>
-            </div>
+            <el-input v-if="row.editingHomeUrl" style="width: 190px; height: 25px;" v-model="row.homeUrl" @blur="handleBlur(row, 'editingHomeUrl')"></el-input>
             <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingHomeUrl')">{{ row.homeUrl }}</div>
           </template>
         </el-table-column>
         <el-table-column prop="homepage" label="角色描述">
           <template #default="{ row }">
-            <div v-if="row.editingRoleDescri">
-              <el-input style="height: 25px;" v-model="row.roleDescri" @blur="handleBlur(row, 'editingRoleDescri')"></el-input>
-            </div>
+            <el-input v-if="row.editingRoleDescri" style="height: 25px;" v-model="row.roleDescri" @blur="handleBlur(row, 'editingRoleDescri')"></el-input>
             <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingRoleDescri')">{{ row.roleDescri }}</div>
           </template>
         </el-table-column>

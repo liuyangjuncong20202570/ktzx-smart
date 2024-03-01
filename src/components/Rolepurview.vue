@@ -37,6 +37,8 @@
           <template #default="{ node, data }">
             <div class="custom-tree-node">
               <span>
+                <el-icon v-if="node.data.children" color="orange"><Folder /></el-icon>
+                <el-icon v-else color="dodgerblue"><Document /></el-icon>
                 {{ node.label }}
               </span>
               <div class="checkbox-container">
@@ -52,6 +54,7 @@
 </template>
 <script setup>
 import {reactive, ref} from "vue";
+import { Document, Folder } from '@element-plus/icons-vue'
 import {Edit, Right} from '@element-plus/icons-vue'
 import request from "../utils/request.js";
 import {ElMessage} from "element-plus";
@@ -130,8 +133,8 @@ const getmenu = (row) => {
           rolepurviewData.value = res.data;
           // 初始化 checkedEdit 和 checkedView
           initializeCheckStatus(rolepurviewData.value);
-          // console.log(res.data);
-          console.log(rolepurviewData.value);
+          console.log(res.data);
+          // console.log(rolepurviewData.value);
         }
       }).catch(error => {
     ElMessage({

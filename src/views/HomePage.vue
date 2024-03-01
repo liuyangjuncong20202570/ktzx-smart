@@ -92,6 +92,12 @@
                   <span>{{ menu.name }}</span>
                 </el-menu-item>
               </template>
+              <el-menu-item @click="navigateTo('/sysmangt/termmangt')">
+                <span>学期管理</span>
+              </el-menu-item>
+              <el-menu-item @click="navigateTo('/sysmangt/creatteachunit')">
+                <span>教学单位创建</span>
+              </el-menu-item>
             </el-menu>
           </el-scrollbar>
         </el-aside>
