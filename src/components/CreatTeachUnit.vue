@@ -1,4 +1,4 @@
-<template>
+    <template>
     <div style="height: 92vh; display: flex; flex-direction: column;">
         <el-header
             style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
@@ -15,9 +15,9 @@
                     <template #default="{ node }">
                         <el-popover :visible="popVisible[node.data.label]" placement="right">
                             <el-button style="margin-top: 6px;" type="success" @click="editNode(node)">编辑</el-button><br>
-                            <el-button style="margin-top: 6px;" type="primary" @click="addSiblingNode(node)">同级新增</el-button><br>
+                            <el-button style="margin-top: 6px;" type="primary" @click="addSiblingNode(node.data)">同级新增</el-button><br>
                             <el-button style="margin-top: 6px;" type="primary" @click="addChildNode(node)">下级新增</el-button><br>
-                            <el-button style="margin-top: 6px;" type="danger" @click="popVisible[node.data.label] = false;">删除</el-button>
+                            <el-button style="margin-top: 6px;" type="danger" @click="confirmDeleteNodes(node.data)">删除</el-button>
                             <div style="text-align: right;">
                                 <el-button style="margin-top: 6px;" :type="'info'" link 
                                 @click="popVisible[node.data.label] = false;">取消</el-button>
@@ -43,7 +43,7 @@
 
 <script lang="ts" setup>
 import { Document, Folder } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import type Node from 'element-plus/es/components/tree/src/model/node'
 import type { DragEvents } from 'element-plus/es/components/tree/src/model/useDragNode'
 import type { AllowDropType,NodeDropType, } from 'element-plus/es/components/tree/src/tree.type'
@@ -127,7 +127,7 @@ const clickNode = (event, node, dom) => {
     })
     popVisible.value[node.label] = true;
     selectedNode.value = node;
-    // console.log(node);
+    // console.log(treeData.value);
 }
 
 const newNode = ref({   // 新的空节点
@@ -142,11 +142,11 @@ const hasEmptyNode = ref(false);    // 是否存在空的节点
 const addSiblingNode = (addedNode, nodes = treeData.value, parent = null) => {
     if(hasEmptyNode.value){
         ElMessage.error('请先处理未命名节点！');
-        popVisible.value[addedNode.data.label] = false;
+        popVisible.value[addedNode.label] = false;
         return false;
     }
     for(let i = 0; i < nodes.length; i ++) {    // 遍历所有元素
-        if(nodes[i].label === addedNode.data.label){
+        if(nodes[i].label === addedNode.label){
             hasEmptyNode.value = true;
             if(parent){     // 如果找到了被选中节点，并且其存在父节点，就在父节点的children中添加新节点
                 parent.children.push(newNode.value);
@@ -184,13 +184,13 @@ const blurInput = (node) => {
         tempNode.value[newName] = tempNode.value[oldName];
         delete tempNode.value[oldName];
         node.data.label = newName;
-        hasEmptyNode.value = false;     // 不存在空节点
+        hasEmptyNode.value = false;     // 若输入的数据与原数据不同则此节点不为未命名节点
     }
     inputVisible.value[node.data.label] = false;
-    console.log(popVisible.value);
-    console.log(treeData.value);
-    console.log(inputVisible.value);
-    console.log(tempNode.value);
+    // console.log(popVisible.value);
+    // console.log(treeData.value);
+    // console.log(inputVisible.value);
+    // console.log(tempNode.value);
 }
 
 const editNode = (node) => {
@@ -214,14 +214,69 @@ const addChildNode = (node) => {
     hasEmptyNode.value = true;
     newNode.value = {
         id: '',
-        label: '未命名节点',
+        label: '未命名节点',    // 未命名节点只是新增节点后没有立刻命名所生成的临时名称
     };  // 这里重新赋值一遍没有更改过的newNode是为了再添加新节点时的el-tree组件自带的treeNodeId改变否则会浏览器报错爆栈
         // 应该是会重新给newNode分配地址，然后组件在下次创建新节点时会根据地址不同分配不同的treeNodeId
+
     // console.log(popVisible.value);
     // console.log(treeData.value);
     // console.log(inputVisible.value);
     // console.log(tempNode.value);
 }
+
+const confirmDeleteNodes = (deletedNode) => {
+    ElMessageBox.confirm(
+        '选中节点及其内部所有节点将被删除，是否确定',
+        '警告',
+        {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',
+        }
+    ).then(() => {deleteNodes(deletedNode)})
+    .catch(() => {popVisible.value[deletedNode.label] = false});
+}
+
+const deleteNodes = (deletedNode, nodes = treeData.value, parent = null) => {
+    if(parent === null){
+        
+    }
+    for(let i = 0; i < nodes.length; i ++){     // 删除节点逻辑与增加同级节点相同
+        if(nodes[i].label === deletedNode.label){
+            if(parent){
+                parent.children.splice(i, 1);
+                if(parent.children.length === 0){   // 如果没有子节点了，就删除子节点字段（根据角色授权的树形结构中后端传输的数据设计）
+                    delete parent.children;
+                }
+            }
+            else{
+                treeData.value.splice(i, 1);
+            }
+            delete popVisible.value[deletedNode.label];
+            delete inputVisible.value[deletedNode.label];
+            delete tempNode.value[deletedNode.label];
+            if(deletedNode.children) deleteChildNode(deletedNode);  // 存在子节点则删除所有子节点的对应数据
+            // console.log(popVisible.value);
+            // console.log(treeData.value);
+            // console.log(inputVisible.value);
+            return true;
+        }
+        if(nodes[i].children && nodes[i].children.length > 0){
+            if(deleteNodes(deletedNode, nodes[i].children, nodes[i])) return true;
+        }
+    }
+};
+
+const deleteChildNode = (deletedNode) => {      // 递归删除子节点的对应弹框、输入框和输入框数据的数据
+    deletedNode.children.forEach((node) => {
+        delete popVisible.value[node.label];
+        delete inputVisible.value[node.label];
+        delete tempNode.value[node.label];
+        if(node.children){
+            deleteChildNode(node);
+        }
+    })
+};
 
 const treeData: any = ref([
     {

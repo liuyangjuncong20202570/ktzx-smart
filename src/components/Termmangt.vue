@@ -37,20 +37,26 @@
                         </template>
                     </el-table-column>
                     <el-table-column label="当前学期">
-                        <el-checkbox v-model="checked" />
+                        <template v-slot="row">
+                            <el-checkbox v-model="checked[row.$index]" @click="changeStatus" />
+                        </template>
                     </el-table-column>
                 </el-table>
             </div>
         </el-main>
-        
-         111
     </div>
 </template>
 
 <script setup>
-import { reactive } from "vue";
+import { onMounted, reactive, ref } from "vue";
 
-const tableData = reactive([
+onMounted(() => {
+    for(let i = 0; i < tableData.value.length; i ++){
+        checked[i] = false;
+    }
+})
+
+const tableData = ref([
     {
         id: '1',
         term: '2022年春季学期',
@@ -83,7 +89,7 @@ const tableData = reactive([
     },
 ]);
 
-tableData.forEach(item => {
+tableData.value.forEach(item => {
   item.editingTerm = false;
   item.editingStartTime = false;
   item.editingEndTime = false;
@@ -98,6 +104,14 @@ const handleBlur = (row, field) => {
   row[field] = false;
   console.log(row);
 };
+
+const changeStatus = () => {
+    Object.keys(checked.value).forEach(key => {
+        checked.value[key] = false;
+    })
+}
+
+const checked = ref({});
 </script>
 
 <style scoped>
