@@ -153,8 +153,7 @@ const handleRoleDel = () => {
         tableData.value = tableData.value.filter((row) => !selected.value.includes(row));
         ElMessage({
           type: 'success',
-          message: '删除成功',
-          duration: 800
+          message: '删除成功'
         })
       }).catch(() => {});
   }
