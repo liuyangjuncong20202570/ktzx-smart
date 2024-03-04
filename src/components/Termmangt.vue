@@ -8,46 +8,52 @@
             <el-button type="success" style="margin-left: 0.8vw;">保存</el-button>
         </el-header>
         <el-main style="padding: 0;">
-            <div style="max-height: 100%; overflow:auto ; flex: auto">
-                <el-table :data="tableData" style="table-layout:auto; width: 100%;" @select="handleSelect"
+            <div style="max-height: 100%; height: 100%; overflow:auto ; flex: auto">
+                <el-table :data="tableData" style="table-layout:auto; width: 100%; height: 100%;" @select="handleSelect"
                     @select-all="handleSelectAll" stripe>
                     <el-table-column type="selection" width="55"></el-table-column>
                     <el-table-column width="55">
                         <template v-slot="row">{{ row.$index + 1 }}</template>
                     </el-table-column>
-                    <el-table-column prop="term" label="学期">
+                    <el-table-column prop="termName" label="学期">
                         <template #default="{ row }">
-                            <div v-if="row.editingTerm">
-                                <el-input style="width: auto; height: 25px;" v-model="row.term"
-                                    @blur="handleBlur(row, 'editingTerm')"></el-input>
+                            <el-input v-if="row.editingTermName" style="width:100%; height: 25px;" v-model="row.termName"
+                                @blur="handleBlur(row, 'editingTermName')"></el-input>
+                            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingTermName')">
+                                {{row.termName }}
                             </div>
-                            <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingTerm')">{{
-                                row.term }}</div>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="startTime" label="起始日期">
+                    <el-table-column prop="beginData" label="起始日期">
                         <template #default="{ row }">
-                            <div v-if="row.editingStartTime">
-                                <el-input style="width: auto; height: 25px;" v-model="row.startTime"
-                                    @blur="handleBlur(row, 'editingStartTime')"></el-input>
+                            <el-input v-if="row.editingBeginData" style="width:100%; height: 25px;" v-model="row.beginData"
+                                @blur="handleBlur(row, 'editingBeginData')"></el-input>
+                            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingBeginData')">
+                                {{row.beginData }}
                             </div>
-                            <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingStartTime')">{{
-                                row.startTime }}</div>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="endTime" label="结束日期">
+                    <el-table-column prop="endData" label="结束日期">
                         <template #default="{ row }">
-                            <div v-if="row.editingEndTime">
-                                <el-input style="width: auto; height: 25px;" v-model="row.endTime"
-                                    @blur="handleBlur(row, 'editingEndTime')"></el-input>
+                            <el-input v-if="row.editingEndData" style="width: 100%; height: 25px;" v-model="row.endData"
+                                @blur="handleBlur(row, 'editingEndData')"></el-input>
+                            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingEndData')">
+                                {{row.endData }}
                             </div>
-                            <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingEndTime')">{{
-                                row.endTime }}</div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="remark" label="备注" width="400">
+                        <template #default="{ row }">
+                            <el-input v-if="row.editingRemark" style="width: 100%; min-width: 370px; height: 25px;" v-model="row.remark"
+                                @blur="handleBlur(row, 'editingRemark')"></el-input>
+                            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingRemark')">
+                                {{row.remark }}
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column label="当前学期">
                         <template #default="{ row }">
-                            <el-checkbox v-model="row.checked" @click="changeStatus(row)" />
+                            <el-checkbox v-model="row.isCurrentTerm" @click="changeStatus(row)" />
                         </template>
                     </el-table-column>
                 </el-table>
@@ -57,59 +63,74 @@
 </template>
 
 <script lang="ts" setup>
-import { ElMessageBox } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { onMounted, reactive, ref } from "vue";
 
-const tableData = ref([
+const tableData: any = ref([
     {
         id: '1',
-        term: '2022年春季学期',
-        startTime: '2022-02-21',
-        endTime: '2022-07-22',
+        termName: '2022年春季学期',
+        beginData: '2022-02-21',
+        endData: '2022-07-22',
+        remark: '无',
+        isCurrentTerm: false,
     },
     {
         id: '2',
-        term: '2022年秋季学期',
-        startTime: '2022-08-22',
-        endTime: '2023-01-31',
+        termName: '2022年秋季学期',
+        beginData: '2022-08-22',
+        endData: '2023-01-31',
+        remark: '无',
+        isCurrentTerm: false,
     },
     {
         id: '3',
-        term: '2023年春季学期',
-        startTime: '2023-02-20',
-        endTime: '2023-07-14',
+        termName: '2023年春季学期',
+        beginData: '2023-02-20',
+        endData: '2023-07-14',
+        remark: '无',
+        isCurrentTerm: false,
     },
     {
         id: '4',
-        term: '2023年秋季学期',
-        startTime: '2023-08-21',
-        endTime: '2024-01-25',
+        termName: '2023年秋季学期',
+        beginData: '2023-08-21',
+        endData: '2024-01-25',
+        remark: '无',
+        isCurrentTerm: false,
     },
     {
         id: '5',
-        term: '2024年春季学期',
-        startTime: '',
-        endTime: '',
+        termName: '2024年春季学期',
+        beginData: '',
+        endData: '',
+        remark: '无',
+        isCurrentTerm: true,
     },
 ]);
 
-tableData.value.forEach(item => {
-    item.editingTerm = false;
-    item.editingStartTime = false;
-    item.editingEndTime = false;
-    item.checked = false;
+onMounted(() => {
+    tableData.value.forEach(item => {   // 添加每个表格单元的编辑判定，并记录当前学期
+        item.editingTermName = false;
+        item.editingBeginData = false;
+        item.editingEndData = false;
+        item.editingRemark = false;
+        if(item.isCurrentTerm) oldCurrentTerm.value = item;
+    });
 });
 
 const addTerm = () => {
     tableData.value.push({
         id: tableData.value.length + '',
-        term: '',
-        startTime: '',
-        endTime: '',
-        editingTerm: false,
-        editingStartTime: false,
-        editingEndTime: false,
-        checked: false,
+        termName: '',
+        beginData: '',
+        endData: '',
+        remark: '',
+        isCurrentTerm: false,
+        editingTermName: false,
+        editingBeginData: false,
+        editingEndData: false,
+        editingRemark: false
     })
 };
 
@@ -117,10 +138,12 @@ const selected = ref([]);
 
 /*判定哪些行被选中*/
 const handleSelect = (selection) => {
+    // console.log(selection);
     selected.value = selection;
 };
 
 const handleSelectAll = (selection) => {
+    // console.log(selection);
     selected.value = selection;
 };
 /*****************/
@@ -156,11 +179,11 @@ const handleBlur = (row, field) => {
     // console.log(tableData.value);
 };
 
-const oldCheckedTerm = ref({});
+const oldCurrentTerm = ref({});
 
-const changeStatus = (row) => {
-    if (oldCheckedTerm.value.checked) oldCheckedTerm.value.checked = false;
-    oldCheckedTerm.value = row;
+const changeStatus = (row) => {     // 一次只允许勾选一个当前学期
+    if (oldCurrentTerm.value.isCurrentTerm) oldCurrentTerm.value.isCurrentTerm = false;
+    oldCurrentTerm.value = row;
     // console.log(tableData.value);
 }
 </script>

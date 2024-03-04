@@ -7,7 +7,7 @@
         </el-header>
 
         <el-main style="padding: 0;">
-            <div style="max-height: 100%; height: 100%; overflow:auto;">
+            <div style="max-height: 100%; height: 100%; overflow:auto; background-color:whitesmoke;">
                 <el-tree :data="treeData" draggable :props="defaultProps" node-key="id" @node-drag-start="handleDragStart"
                     @node-drag-end="handleDragEnd" @node-contextmenu="clickNode">
                     <template #default="{ node }">
@@ -62,7 +62,7 @@ const handleDragEnd = (     // 放置节点的时候触发
     dropType: NodeDropType,
     ev: DragEvents
 ) => {
-    // console.log('tree drag end:', dropNode && dropNode.label, dropType);
+    // console.log('tree drag end:', dropNode, dropType);
     if(dropType === 'none') return ;    // 没有改变节点位置
     if(parentData.value.parentNode && parentData.value.parentNode.children.length === 0){
         // 如果被拖拽节点拖拽之前的父节点在拖拽之后不存在子节点了，就删除子节点字段
@@ -82,7 +82,7 @@ const handleDragEnd = (     // 放置节点的时候触发
         deleteOldDraggingNode(draggingNode.data);
     }
     parentData.value = {parentNode: null, childrenIndex: null};
-    // console.log(treeData.value);
+    console.log(treeData.value);
 };
 
 const parentData = ref({parentNode: null, childrenIndex: null});    // 记录被拖拽节点的父节点
