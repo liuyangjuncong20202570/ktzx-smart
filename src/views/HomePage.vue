@@ -92,10 +92,10 @@
                   <span>{{ menu.name }}</span>
                 </el-menu-item>
               </template>
-              <el-menu-item @click="router.push('/homes/superadminhome/sysmangt/termmangt')">
+              <el-menu-item @click="router.push('/homes/superadminhome/sysmangt/termsmangt')">
                 <span>学期管理</span>
               </el-menu-item>
-              <el-menu-item @click="router.push('/homes/superadminhome/sysmangt/creatteachunit')">
+              <el-menu-item @click="router.push('/homes/superadminhome/sysmangt/unitsmangt')">
                 <span>教学单位创建</span>
               </el-menu-item>
             </el-menu>

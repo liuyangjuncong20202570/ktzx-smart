@@ -65,6 +65,19 @@
 <script lang="ts" setup>
 import { ElMessage, ElMessageBox } from "element-plus";
 import { onMounted, reactive, ref } from "vue";
+import request from "../utils/request";
+
+// request.get('/sysmangt/terms').then((res) => {
+//     if(res.code === 200){
+//         // tableData.value = res.data
+//         console.log(res);
+//     }
+// }).catch(() => {
+//     ElMessage({
+//         type: 'error',
+//         message: '获取学期失败'
+//     });
+// });
 
 const tableData: any = ref([
     {

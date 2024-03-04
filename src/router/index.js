@@ -28,14 +28,14 @@ const routes = [
                 component: () => import('../components/Rolepurview.vue')
             },
             {
-                path: 'sysmangt/termmangt',
-                name: 'TermManagement',
-                component: () => import('../components/Termmangt.vue')
+                path: 'sysmangt/termsmangt',
+                name: 'TermsManagement',
+                component: () => import('../components/Termsmangt.vue')
             },
             {
-                path: 'sysmangt/creatteachunit',
-                name: 'CreatTeachUnit',
-                component: () => import('../components/CreatTeachUnit.vue')
+                path: 'sysmangt/unitsmangt',
+                name: 'Unitssmangt',
+                component: () => import('../components/Unitsmangt.vue')
             }
         ]
     },
