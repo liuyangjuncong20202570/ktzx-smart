@@ -1,9 +1,12 @@
 import {createRouter, createWebHistory} from 'vue-router';
 
-const rolehome =['teacherhomne','adminhome','superadminhome', 'secretariatHome'];
+const rolehome =['teacherhomne','adminhome','superadminhome','secretariatehome'];
+//superadminhome 超级管理员首页
+//secretariatehome 教学秘书首页
+
 const routes = [
     {
-        path: '/',
+        path: '/:pathMatch(.*)*',
         redirect: '/login'
     },
     {
@@ -36,6 +39,11 @@ const routes = [
                 path: 'sysmangt/creatteachunit',
                 name: 'CreatTeachUnit',
                 component: () => import('../components/CreatTeachUnit.vue')
+            },
+            {
+                path: 'sysmangt/peoplemangt',
+                name: 'PeopleManagement',
+                component: () => import('../components/Peoplemangt.vue')
             }
         ]
     },

@@ -188,12 +188,14 @@ const login = () => {
               // //设置用户信息到 Vuex（如果使用的话）
               // store.commit('SET_USER', res.data.user);
               //处理不同角色的跳转逻辑
+              profileStore.setProfilename(loginForm.username);
               const rolesCount = res.data.rolescount;
               if (rolesCount === 1) {
                 // 跳转至指定页面
                 const HomeUrl = res.data.simpleRoleList[0].homeurl;
                 // const userInfo ={userid: '1',catelog:'2',roleid:'1'};
-                profileStore.setProfileInfo(res.data.userid,res.data.simpleRoleList[0].roleid,res.data.catelog,res.data.simpleRoleList[0].homeurl);
+                //将登录用户基本信息存储pinia
+                profileStore.setProfileInfo(res.data.userid,res.data.simpleRoleList[0].roleid,res.data.simpleRoleList[0].roleid,res.data.catelog,res.data.simpleRoleList[0].homeurl);
                 router.push(HomeUrl);
               } else {
                 //显示弹窗
@@ -232,7 +234,7 @@ const selectedRoleId = ref(null);
 const confirmRole = () => {
   const selectedRole = data.simpleRoleList.find(role => role.roleid === selectedRoleId.value);
   if (selectedRole) {
-    profileStore.setProfileInfo(data.userid, selectedRole.roleid, data.catelog, selectedRole.homeurl);
+    profileStore.setProfileInfo(data.userid, selectedRole.roleid,selectedRole.rolename,data.catelog,selectedRole.homeurl);
     router.push(selectedRole.homeurl);
   }
   showRoleModal.value = false;

@@ -21,7 +21,7 @@
             </template>
           </el-dropdown>
           <!--人名 -->
-          <el-text class="mx-1" size="large" style="color:white">管理员</el-text>
+          <el-text class="mx-1" size="large" style="color:white">{{loginInfo.username}}</el-text>
         </div>
       </el-header>
 
@@ -48,10 +48,10 @@
             </div>
             <div style="width: 88px; margin: 0 15px 0 15px">
               <el-row :gutter="0">
-                <p style="font-size:20px;margin-left:2px;line-height:0.1;">管理员</p>
+                <p style="font-size:14px;margin-left:2px;line-height:0.3;">{{loginInfo.username}}</p>
               </el-row>
               <el-row :gutter="0">
-                <p style="font-size:14px;margin-left: 2px;line-height:0.5;">超级管理员</p>
+                <p style="font-size:14px;margin-left: 2px;color:cornflowerblue;line-height:0.2;">{{loginInfo.rolename}}</p>
               </el-row>
               <el-row :gutter="0" style="height:20px;margin-top: 20px">
                 <el-col :span="5">
@@ -174,11 +174,15 @@ const menus = ref([
 const loginInfo = {
   userid: profileStore.profileid,
   roleid: profileStore.profileroleid,
-  catelog: profileStore.profilecatelog
+  catelog: profileStore.profilecatelog,
+  rolename:profileStore.profilerolename,
+  username:profileStore.profilename
 };
 
 const homeurl = profileStore.profilehomeurl;
-request.post(`${homeurl}`,loginInfo)
+// 0304：为生成侧面导航栏此处暂时写死：当前接口为：POST /homes/superadminhome
+//request.post(`${homeurl}`,loginInfo)
+request.post(`/homes/superadminhome`,loginInfo)
     .then(res => {
       // 登录成功
       if (res.code === 200) {
