@@ -35,52 +35,40 @@
     </el-header>
     <el-main style="padding: 0;">
       <!--生成-->
-      <el-table :data="tableData" style="table-layout:auto; width: 100%;" v-model="selected"
+      <el-table :data="tableData" style="height: 100%; table-layout:auto; width: 100%;" v-model="selected"
         @select="handleSelect" @select-all="handleSelectAll" stripe>
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column width="55">
-          <template v-slot="row">
-            <span>{{ row.$index + 1 }}</span>
+        <el-table-column prop="rolecode" label="角色代码" width="100">
+        </el-table-column>
+        <el-table-column prop="rolename" label="角色名称" width="150">
+          <template #default="{ row }">
+            <el-input v-if="row.editingRolename" style="width: 100%; height: 25px;" v-model="row.rolename" @blur="handleBlur(row, 'editingRolename')"></el-input>
+            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingRolename')">{{ row.rolename }}</div>
           </template>
         </el-table-column>
-        <el-table-column prop="rolename" label="角色名称" width="220">
+        <el-table-column prop="roletype" label="角色类型" width="150">
           <template #default="{ row }">
-            <div v-if="row.editingRolename">
-              <el-input style="width: 200px; height: 25px;" v-model="row.rolename" @blur="handleBlur(row, 'editingRolename')"></el-input>
-            </div>
-            <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingRolename')">{{ row.rolename }}</div>
+            <el-input v-if="row.editingRoletype" style="width: 100%; height: 25px;" v-model="row.roletype" @blur="handleBlur(row, 'editingRoletype')"></el-input>
+            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingRoletype')">{{ row.roletype }}</div>
           </template>
         </el-table-column>
-        <el-table-column prop="roletype" label="角色类型" width="220">
+        <el-table-column prop="homepage" label="首页" width="200">
           <template #default="{ row }">
-            <div v-if="row.editingRoletype">
-              <el-input style="width: 200px; height: 25px;" v-model="row.roletype" @blur="handleBlur(row, 'editingRoletype')"></el-input>
-            </div>
-            <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingRoletype')">{{ row.roletype }}</div>
+            <el-input v-if="row.editingHomepage" style="width: 100%; height: 25px;" v-model="row.homepage" @blur="handleBlur(row, 'editingHomepage')"></el-input>
+            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingHomepage')">{{ row.homepage }}</div>
           </template>
         </el-table-column>
-        <el-table-column prop="homepage" label="首页" width="220">
+        <el-table-column prop="homeurl" label="首页地址" width="220">
           <template #default="{ row }">
-            <div v-if="row.editingHomepage">
-              <el-input style="width: 200px; height: 25px;" v-model="row.homepage" @blur="handleBlur(row, 'editingHomepage')"></el-input>
-            </div>
-            <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingHomepage')">{{ row.homepage }}</div>
+            <el-input v-if="row.editingHomeUrl" style="width: 100%; height: 25px;" v-model="row.homeUrl" @blur="handleBlur(row, 'editingHomeUrl')"></el-input>
+            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingHomeUrl')">{{ row.homeurl }}</div>
           </template>
         </el-table-column>
-        <el-table-column prop="roletype" label="首页地址" width="220">
+        <el-table-column prop="remark" label="备注" min-width="250">
           <template #default="{ row }">
-            <div v-if="row.editingHomeUrl">
-              <el-input style="width: 200px; height: 25px;" v-model="row.homeUrl" @blur="handleBlur(row, 'editingHomeUrl')"></el-input>
-            </div>
-            <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingHomeUrl')">{{ row.homeUrl }}</div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="homepage" label="角色描述">
-          <template #default="{ row }">
-            <div v-if="row.editingRoleDescri">
-              <el-input style="height: 25px;" v-model="row.roleDescri" @blur="handleBlur(row, 'editingRoleDescri')"></el-input>
-            </div>
-            <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingRoleDescri')">{{ row.roleDescri }}</div>
+            <el-input v-if="row.editingRemark" style="width: 100%; height: 25px;" v-model="row.remark"
+              @blur="handleBlur(row, 'editingRemark')"></el-input>
+            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingRemark')">{{ row.remark }}</div>
           </template>
         </el-table-column>
       </el-table>
@@ -90,9 +78,7 @@
 </template>
 <script setup>
 import { reactive, ref } from "vue";
-import { Edit, Right } from '@element-plus/icons-vue'
 import request from "../utils/request.js";
-import router from "../router/index.js";
 import { ElMessage, ElMessageBox } from 'element-plus';
 
 const dialogVisible = ref(false);
@@ -102,28 +88,22 @@ const Addform = ref({
   homepagename: '',
   homepageurl: '',
 });
+
 // 添加角色
 const handleRoleAdd = () => {
-  // console.log(dialogVisible.value)
-  // dialogVisible.value = true; // 使用 .value 来设置 dialogVisible
-  // console.log(dialogVisible.value)
   tableData.value.push({
-    id: '',
+    rolecode: tableData.value.length + 1 + '',
     rolename: '',
     roletype: '',
     homepage: '',
+    homeurl: '',
+    remark: '',
     editingRolename: false,
     editingRoletype: false,
     editingHomepage: false,
     editingHomeUrl: false,
-    editingRoleDescri: false,
+    editingRemark: false,
   });
-};
-// 确定新增角色
-const confirmAdd = () => {
-  // 处理添加逻辑
-  dialogVisible.value = false; // 使用 .value 来设置 dialogVisible
-  console.log(Addform.value); // 使用 .value 来访问 Addform
 };
 
 const selected = ref([]);
@@ -163,40 +143,11 @@ const handleRoleDel = () => {
         tableData.value = tableData.value.filter((row) => !selected.value.includes(row));
         ElMessage({
           type: 'success',
-          message: '删除成功',
-          duration: 800
+          message: '删除成功'
         })
       }).catch(() => {});
   }
 };
-
-// const Addrules = reactive({
-//   name: [
-//     { required: true, message: '请输入角色名称', trigger: 'blur' },
-//     { min: 2, max: 30, message: '角色名称长度在 2 到 30 个字符', trigger: 'blur' }
-//   ],
-//   type: [
-//     { required: true, message: '请输入角色类型', trigger: 'blur' },
-//     // 更多验证规则
-//   ],
-//   homepagename: [
-//     { required: true, message: '请输入首页名称', trigger: 'blur' },
-//     // 更多验证规则
-//   ],
-//   homepageurl: [
-//     { required: true, message: '请输入首页地址', trigger: 'blur' },
-//     // 更多验证规则
-//   ],
-//   description: [
-//     { required: true, message: '请输入角色描述', trigger: 'blur' },
-//     // 更多验证规则
-//   ],
-//   permissions: [
-//     { type: 'array', required: true, message: '请至少选择一个权限', trigger: 'change' }
-//   ],
-//   // 更多验证规则
-// })
-
 
 const tableData = ref([
 // {
@@ -230,7 +181,7 @@ tableData.value.forEach(item => {   // 为每一个表格数据添加是否显�
   item.editingRoletype = false;
   item.editingHomepage = false;
   item.editingHomeUrl = false;
-  item.editingRoleDescri = false;
+  item.editingRemark = false;
 });
 
 request.get('/sysmangt/rolemangt')
@@ -238,6 +189,7 @@ request.get('/sysmangt/rolemangt')
     // 登录成功
     if (res.code === 200) {
       tableData.value = res.data;
+      console.log(res.data);
     }
   }).catch(error => {
     // 获取失败

@@ -189,6 +189,7 @@ request.post(`/homes/superadminhome`,loginInfo)
         if(res.data.length > 0){
           menus.value = res.data;
           defaultActive.value = res.data[0].url;
+          console.log(menus);
           // console.log(111)
         }else{
           // console.log(222)

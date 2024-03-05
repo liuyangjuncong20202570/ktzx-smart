@@ -37,6 +37,8 @@
           <template #default="{ node, data }">
             <div class="custom-tree-node">
               <span>
+                <el-icon v-if="node.data.children" color="orange"><Folder /></el-icon>
+                <el-icon v-else color="dodgerblue"><Document /></el-icon>
                 {{ node.label }}
               </span>
               <div class="checkbox-container">
@@ -51,10 +53,10 @@
   </el-container>
 </template>
 <script setup>
-import {reactive, ref} from "vue";
-import {Edit, Right} from '@element-plus/icons-vue'
+import { reactive, ref } from "vue";
+import { Document, Folder } from '@element-plus/icons-vue'
 import request from "../utils/request.js";
-import {ElMessage} from "element-plus";
+import { ElMessage } from "element-plus";
 
 const showmenu = ref(false);
 

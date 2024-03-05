@@ -19,8 +19,15 @@
             :expand-on-click-node="false"
             :check-on-click-node="false"
             class="tree-with-header"
-            @node-click="treeNodeClick"
-        ></el-tree>
+            @node-click="treeNodeClick">
+            <template #default="{ node }">
+              <span>
+                <el-icon v-if="node.data.children" color="orange"><Folder /></el-icon>
+                <el-icon v-else color="dodgerblue"><Document /></el-icon>
+                {{ node.data.obsname }}
+              </span>
+            </template>
+        </el-tree>
       </el-aside>
       <!--右侧-->
       <el-main v-show="showmenu" style="height: 100%; width:40vw; border: 1px solid #ccc;padding:0">
@@ -95,7 +102,7 @@
 import {reactive, ref,nextTick} from "vue";
 import request from "../utils/request.js";
 import {ElMessage} from "element-plus";
- import {Search} from '@element-plus/icons-vue';
+import {Document, Folder, Search} from '@element-plus/icons-vue';
 import{ exportTableToCSV } from "../utils/exportTableToCSV.js";
 import{ searchInTable } from "../utils/searchInTable.js";
 
@@ -127,6 +134,7 @@ request.get('/sysmangt/personnelmangt')
       // 登录成功
       if (res.code === 200) {
         obsmenulist.value = res.data;
+        console.log(obsmenulist.value);
       }
     }).catch(error => {
   // 获取失败

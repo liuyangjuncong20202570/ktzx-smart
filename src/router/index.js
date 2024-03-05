@@ -32,13 +32,13 @@ const routes = [
             },
             {
                 path: 'sysmangt/termmangt',
-                name: 'TermManagement',
-                component: () => import('../components/Termmangt.vue')
+                name: 'TermsManagement',
+                component: () => import('../components/TermMangt.vue')
             },
             {
                 path: 'sysmangt/creatteachunit',
-                name: 'CreatTeachUnit',
-                component: () => import('../components/CreatTeachUnit.vue')
+                name: 'Unitssmangt',
+                component: () => import('../components/CreateTeachUnit.vue')
             },
             {
                 path: 'sysmangt/peoplemangt',
