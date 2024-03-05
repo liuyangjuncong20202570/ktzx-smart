@@ -22,3 +22,5 @@ function exportTableToCSV(tableData, columns) {
     link.download = 'table-data.csv';  // 文件名
     link.click();
 }
+
+export { exportTableToCSV };

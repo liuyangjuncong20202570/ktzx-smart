@@ -40,13 +40,13 @@
             <el-col :span="2"><el-button style="width: 85%" @click="resetPassword">重置密码</el-button></el-col>
             <el-col :span="4"></el-col>
             <el-col :span="5">
-              <el-input v-model="search" placeholder="请输入姓名关键字" class="input-with-select">
+              <el-input v-model="searchKeyword" placeholder="请输入姓名关键字" class="input-with-select">
               </el-input></el-col>
             <el-col :span="2"><el-button style="width: 85%" type="primary"  @click="querySearch">搜索</el-button></el-col>
 
           </el-row>
 
-          <el-table :data="peoplelist" style="width: 100%" ref="tableRef">
+          <el-table :data="filteredData" style="width: 100%" ref="tableRef">
             <el-table-column type="index" label=""></el-table-column>
             <el-table-column type="selection" label=""></el-table-column>
             <el-table-column prop="username" label="用户名"></el-table-column>
@@ -69,13 +69,13 @@
             <el-col :span="2"><el-button style="width: 85%" @click="resetPassword">重置密码</el-button></el-col>
             <el-col :span="4"></el-col>
             <el-col :span="5">
-              <el-input v-model="search" placeholder="请输入姓名关键字" class="input-with-select">
+              <el-input v-model="searchKeyword" placeholder="请输入姓名关键字" class="input-with-select">
               </el-input></el-col>
             <el-col :span="2"><el-button style="width: 85%" type="primary"  @click="querySearch">搜索</el-button></el-col>
 
           </el-row>
 
-          <el-table :data="peoplelist" style="width: 100%" ref="tableRef">
+          <el-table :data="filteredData" style="width: 100%" ref="tableRef">
             <el-table-column type="index" label=""></el-table-column>
             <el-table-column type="selection" label=""></el-table-column>
             <el-table-column prop="username" label="用户名"></el-table-column>
@@ -95,8 +95,9 @@
 import {reactive, ref,nextTick} from "vue";
 import request from "../utils/request.js";
 import {ElMessage} from "element-plus";
- import {Search} from '@element-plus/icons-vue'
-import{exportTableToCSV} from "../utils/exportTableToCSV.js";
+ import {Search} from '@element-plus/icons-vue';
+import{ exportTableToCSV } from "../utils/exportTableToCSV.js";
+import{ searchInTable } from "../utils/searchInTable.js";
 
 
 //tab显示，学生-1，老师-2，默认为老师
@@ -109,6 +110,8 @@ const showmenu = ref(false);
 const obsmenulist = ref([]);
 //el-main中的师生列表
 const peoplelist = ref([]);
+
+const searchKeyword = ref('')
 
 const columns = ref([
   { prop: 'username', label: '用户名' },
@@ -133,6 +136,7 @@ request.get('/sysmangt/personnelmangt')
   });
 });
 
+
 //左侧树形展开中的属性。lable是展示的内容，children是指定递归的属性
 const defaultProps = {
   children: 'children',
@@ -151,6 +155,8 @@ const switchTab = (tab, event) => {
         if (res.code === 200) {
           showmenu.value = true;
           peoplelist.value=res.data;
+          searchKeyword.value=null;
+          filteredData.value = peoplelist.value
         }
       }).catch(error => {
     ElMessage({
@@ -160,6 +166,9 @@ const switchTab = (tab, event) => {
   });
    });
 };
+
+const filteredData = ref([peoplelist.value]);
+
 
 //左侧树节点点击事件
 const treeNodeClick = (data, node, event) => {
@@ -171,6 +180,7 @@ const treeNodeClick = (data, node, event) => {
       .then(res => {
         if (res.code === 200) {
           peoplelist.value=res.data;
+          filteredData.value = peoplelist.value
         }
       }).catch(error => {
     ElMessage({
@@ -192,10 +202,9 @@ const formatColumn = (row, column, cellValue, index) => {
   return cellValue;
 }
 
-const search = ref('')
 const tableRef = ref(null)
 const exportData = () => {
-  exportTableToCSV(peoplelist.value, columns.value);
+  exportTableToCSV(filteredData.value, columns.value);
 }
 const addData = () => {
   // 处理添加数据逻辑
@@ -214,7 +223,9 @@ const resetPassword = () => {
 }
 const querySearch = () => {
   // 处理搜索逻辑
-  console.log('搜索内容:', search.value)
+  filteredData.value = searchInTable(peoplelist.value, searchKeyword.value, 'username');  // 假设我们按 'username' 列搜索
+
+  console.log('搜索内容:', searchKeyword.value)
 }
 
 </script>
