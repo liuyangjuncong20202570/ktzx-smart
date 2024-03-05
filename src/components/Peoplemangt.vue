@@ -39,12 +39,12 @@
 <!--        老师的内容-->
         <div v-if="activeTab === '2'" style="" >
           <el-row style="">
-            <el-col :span="2"><el-button style="width: 85%" type="primary" @click="exportData">导出</el-button></el-col>
-            <el-col :span="2"><el-button style="width: 85%" type="success" @click="addData">新增</el-button></el-col>
-            <el-col :span="2"><el-button style="width: 85%" type="info" @click="importData">导入</el-button> </el-col>
-            <el-col :span="3"><el-button style="width: 85%" type="danger" @click="deleteSelected">删除选中记录</el-button></el-col>
-            <el-col :span="2"><el-button style="width: 85%" type="warning" @click="saveData">保存</el-button></el-col>
-            <el-col :span="2"><el-button style="width: 85%" @click="resetPassword">重置密码</el-button></el-col>
+            <el-col :span="2"><el-button v-blur-on-click style="width: 85%" type="primary" @click="exportData">导出</el-button></el-col>
+            <el-col :span="2"><el-button v-blur-on-click style="width: 85%" type="success" @click="addData">新增</el-button></el-col>
+            <el-col :span="2"><el-button v-blur-on-click style="width: 85%" type="info" @click="importData">导入</el-button> </el-col>
+            <el-col :span="3"><el-button v-blur-on-click style="width: 85%" type="danger" @click="deleteSelected">删除选中记录</el-button></el-col>
+            <el-col :span="2"><el-button v-blur-on-click style="width: 85%" type="warning" @click="saveData">保存</el-button></el-col>
+            <el-col :span="2"><el-button v-blur-on-click style="width: 85%" @click="resetPassword">重置密码</el-button></el-col>
             <el-col :span="4"></el-col>
             <el-col :span="5">
               <el-input v-model="searchKeyword" placeholder="请输入姓名关键字" class="input-with-select">
@@ -209,6 +209,27 @@ const formatColumn = (row, column, cellValue, index) => {
   // 如果是其他列，按原样返回
   return cellValue;
 }
+//处理行编辑
+// 用于跟踪编辑过的行
+const editedRows = ref(new Map());
+
+// 处理单元格编辑
+const handleEdit = (row, key) => {
+  // 将编辑后的行存储在Map中，以便保存时使用
+  editedRows.value.set(row.id, { ...editedRows.value.get(row.id), [key]: row[key] });
+};
+
+// 保存编辑
+const saveEdits = () => {
+  editedRows.value.forEach((value, key) => {
+    console.log(`Saving row ${key}`, value);
+    // 在这里发送一个请求来保存编辑后的数据到后端
+    // 例如：axios.post('/api/save', { id: key, ...value })
+  });
+
+  // 可选：保存后清除editedRows或者根据后端响应来更新tableData
+};
+
 
 const tableRef = ref(null)
 const exportData = () => {
@@ -239,4 +260,9 @@ const querySearch = () => {
 </script>
 
 <style scoped>
+/* 覆盖:focus状态下的样式 */
+.custom-button:focus {
+  /* 将box-shadow设为none，可以根据需要调整其他样式 */
+  box-shadow: none !important;
+}
 </style>
