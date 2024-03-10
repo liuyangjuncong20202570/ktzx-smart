@@ -99,7 +99,7 @@
 </template>
 <script setup>
 
-import {ref, reactive, getCurrentInstance} from 'vue'
+import {ref, reactive, getCurrentInstance, onMounted} from 'vue'
 import {User, Lock, Edit} from '@element-plus/icons-vue'
 import {ElMessage} from 'element-plus'
 import request from '../utils/request.js'
@@ -253,7 +253,9 @@ const confirmRole = () => {
   }
   showRoleModal.value = false;
 };
-
+onMounted(() => {
+  sessionStorage.removeItem('users');
+})
 
 
 </script>

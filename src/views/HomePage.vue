@@ -244,7 +244,6 @@ onMounted(() => {
         if (res.code === 200 && res.data.length > 0)  {
           menus.value = res.data;
           defaultActive.value = res.data[0].url;
-          // console.log(menus);
           console.log('获取菜单栏成功')
         }
       }).catch(error => {
