@@ -200,6 +200,7 @@ const login = () => {
                   homeUrl: res.data.simpleRoleList[0].homeurl
                 };
                 sessionStorage.setItem('users', JSON.stringify(userInfo));
+                sessionStorage.setItem('isLoggedIn', 'true');
                 router.push(HomeUrl);
               } else {
                 //显示弹窗
@@ -249,6 +250,7 @@ const confirmRole = () => {
       homeUrl: selectedRole.homeurl
     };
     sessionStorage.setItem('users', JSON.stringify(userInfo));
+    sessionStorage.setItem('isLoggedIn', 'true');
     router.push(selectedRole.homeurl);
   }
   showRoleModal.value = false;

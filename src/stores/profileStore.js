@@ -21,11 +21,10 @@ export const useProfileStore = defineStore('profile', () => {
     }
 
     function initProfileStore() {
-        const storedUserInfo = sessionStorage.getItem('userInfo');
+        const storedUserInfo = sessionStorage.getItem('users');
         if (storedUserInfo) {
             const userInfo = JSON.parse(storedUserInfo);
-            setProfileInfo(userInfo.userid, userInfo.roleid, userInfo.rolename, userInfo.catelog, userInfo.homeurl);
-            setProfilename(userInfo.username);
+            setProfileInfo(userInfo.userid, userInfo.username,userInfo.roleid, userInfo.rolename, userInfo.catelog, userInfo.homeurl);
         }
     }
 

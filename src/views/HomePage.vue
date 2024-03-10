@@ -152,9 +152,10 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
 
 // 清除登录信息的方法
 function clearLoginInfo() {
-  // localStorage.removeItem('token');
   // 清除其他可能存储的信息
   sessionStorage.removeItem('users');
+  sessionStorage.removeItem('isLoggedIn');
+
 }
 
 //登出的方法
@@ -227,6 +228,8 @@ onMounted(() => {
   } else {
     // 如果没有存储的用户信息，可以重定向到登录页面或显示提示信息
     sessionStorage.removeItem('users');
+    sessionStorage.removeItem('isLoggedIn');
+
     router.push({ name: 'Login' });
     // 或
     // ElMessage.error('请重新登录');
