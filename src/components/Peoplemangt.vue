@@ -260,9 +260,5 @@ const querySearch = () => {
 </script>
 
 <style scoped>
-/* 覆盖:focus状态下的样式 */
-.custom-button:focus {
-  /* 将box-shadow设为none，可以根据需要调整其他样式 */
-  box-shadow: none !important;
-}
+
 </style>

@@ -11,16 +11,27 @@ export const useProfileStore = defineStore('profile', () => {
 
 
 
-    function setProfileInfo(userid,roleid,rolename,catelog,homeurl) {
+    function setProfileInfo(userid,username,roleid,rolename,catelog,homeurl) {
         profileid.value = userid // 正确的方式来设置 ref 的值
+        profilename.value = username
         profileroleid.value = roleid
         profilecatelog.value = catelog
         profilehomeurl.value = homeurl
         profilerolename.value = rolename
     }
-    function setProfilename(username) {
-        profilename.value = username
+
+    function initProfileStore() {
+        const storedUserInfo = sessionStorage.getItem('userInfo');
+        if (storedUserInfo) {
+            const userInfo = JSON.parse(storedUserInfo);
+            setProfileInfo(userInfo.userid, userInfo.roleid, userInfo.rolename, userInfo.catelog, userInfo.homeurl);
+            setProfilename(userInfo.username);
+        }
     }
+
+    // 在store创建时初始化状态
+    initProfileStore();
+
 
     return {
         profileid,
@@ -29,7 +40,6 @@ export const useProfileStore = defineStore('profile', () => {
         profilerolename,
         profilecatelog,
         profilehomeurl,
-        setProfileInfo,
-        setProfilename
+        setProfileInfo
     }
 })

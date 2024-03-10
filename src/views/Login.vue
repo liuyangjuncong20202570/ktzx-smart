@@ -9,7 +9,7 @@
       <!--中间右边部分-->
       <el-main style="display: flex; align-items: center;">
         <!--白框-->
-        <div style="width:16vw; height:auto; margin: 0 auto; background-color:white; border-radius:10px; padding:20px;">
+        <div style="width:16vw; height:auto; margin: 0 auto; background-color:white; border-radius:10px; padding:20px;" @keyup.enter="login">
           <!--切换账号登录-->
           <el-tabs v-model="loginForm.catelog" class="demo-tabs" @tab-click="handleClick" stretch>
             <!--学生账号登录-->
@@ -39,9 +39,7 @@
                              title="选择角色" width="30%" style="border-radius:10px">
                     <el-radio-group v-model="selectedRoleId">
                       <el-radio v-for="role in data.simpleRoleList" :key="role.roleid"
-                                :label="role.roleid">{{
-                          role.rolename
-                        }}
+                                :label="role.roleid">{{role.rolename}}
                       </el-radio>
                     </el-radio-group>
                     <template #footer>
@@ -80,9 +78,7 @@
                              title="选择角色" width="30%" style="border-radius:10px">
                     <el-radio-group v-model="selectedRoleId">
                       <el-radio v-for="role in data.simpleRoleList" :key="role.roleid"
-                                :label="role.roleid">{{
-                          role.rolename
-                        }}
+                                :label="role.roleid">{{role.rolename}}
                       </el-radio>
                     </el-radio-group>
                     <template #footer>
@@ -183,19 +179,27 @@ const login = () => {
             // console.log(res);
             // 登录成功
             if (res.code === 200) {
-              // //保存令牌到本地存储
-              // localStorage.setItem('token', res.data.token);
-              // //设置用户信息到 Vuex（如果使用的话）
-              // store.commit('SET_USER', res.data.user);
               //处理不同角色的跳转逻辑
-              profileStore.setProfilename(loginForm.username);
+              // profileStore.setProfilename(loginForm.username);
               const rolesCount = res.data.rolescount;
               if (rolesCount === 1) {
                 // 跳转至指定页面
+
                 const HomeUrl = res.data.simpleRoleList[0].homeurl;
-                // const userInfo ={userid: '1',catelog:'2',roleid:'1'};
+
                 //将登录用户基本信息存储pinia
-                profileStore.setProfileInfo(res.data.userid,res.data.simpleRoleList[0].roleid,res.data.simpleRoleList[0].roleid,res.data.catelog,res.data.simpleRoleList[0].homeurl);
+                profileStore.setProfileInfo(res.data.userid,loginForm.username,res.data.simpleRoleList[0].roleid,res.data.simpleRoleList[0].rolename,res.data.catelog,res.data.simpleRoleList[0].homeurl);
+
+                //将用户信息格式化然后本地存储：0310
+                const userInfo = {
+                  userId: res.data.userid,
+                  userName: loginForm.username,
+                  roleId: res.data.simpleRoleList[0].roleid,
+                  roleName: res.data.simpleRoleList[0].rolename,
+                  catelog: res.data.catelog,
+                  homeUrl: res.data.simpleRoleList[0].homeurl
+                };
+                sessionStorage.setItem('users', JSON.stringify(userInfo));
                 router.push(HomeUrl);
               } else {
                 //显示弹窗
@@ -234,11 +238,24 @@ const selectedRoleId = ref(null);
 const confirmRole = () => {
   const selectedRole = data.simpleRoleList.find(role => role.roleid === selectedRoleId.value);
   if (selectedRole) {
-    profileStore.setProfileInfo(data.userid, selectedRole.roleid,selectedRole.rolename,data.catelog,selectedRole.homeurl);
+    profileStore.setProfileInfo(data.userid,loginForm.username,selectedRole.roleid,selectedRole.rolename,data.catelog,selectedRole.homeurl);
+    // 将用户信息格式化然后本地存储：0310
+    const userInfo = {
+      userId: data.userid,
+      userName: loginForm.username,
+      roleId:  selectedRole.roleid,
+      roleName: selectedRole.rolename,
+      catelog: data.catelog,
+      homeUrl: selectedRole.homeurl
+    };
+    sessionStorage.setItem('users', JSON.stringify(userInfo));
     router.push(selectedRole.homeurl);
   }
   showRoleModal.value = false;
 };
+
+
+
 </script>
 
 

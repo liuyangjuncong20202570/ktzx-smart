@@ -31,7 +31,7 @@
           <div
               style="width: 100%; height: auto; padding: 10px 0; background-color: #c8c9cc; display: flex; align-items: center;">
             <!--头像-->
-            <div style="width: 72px; height: 112px; margin-left: 10px;">
+            <div style="width: 76px; height: 105px; margin-left: 10px; overflow: hidden;object-fit: cover;">
               <el-upload style="width: 100%; height: 100%; display: flex;" class="avatar-uploader"
                          action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" :show-file-list="false"
                          :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
@@ -40,15 +40,14 @@
                 <!-- on-success属性是一个事件回调函数，当文件上传成功时，该函数将被调用 -->
                 <!-- before-upload属性是一个事件回调函数，当文件准备上传时，该函数将被调用 -->
                 <!-- 如果imageUrl有值，则显示这个图片，否则不显示 -->
-                <img v-if="imageUrl" :src="imageUrl" class="avatar"/>
-                <!--                <el-icon v-else style="width:72px; height: 100%" ><Plus /></el-icon>-->
+                <img v-if="imageUrl" :src="imageUrl" class="avatar" style="width: 100%; height: 120%; object-fit: cover;"/>
                 <!-- 如果imageUrl没有值，则显示提示文本-->
-                <el-text v-else size="small" style="width:72px;color:white">点击上传头像</el-text>
+                <el-text v-else size="small" style="width:72px; color:white">点击上传头像</el-text>
               </el-upload>
             </div>
             <div style="width: 88px; margin: 0 15px 0 15px">
               <el-row :gutter="0">
-                <p style="font-size:14px;margin-left:2px;line-height:0.3;">{{loginInfo.username}}</p>
+                <p style="font-size:14px;margin-left:1px;line-height:0.3;">{{loginInfo.username}}</p>
               </el-row>
               <el-row :gutter="0">
                 <p style="font-size:14px;margin-left: 2px;color:cornflowerblue;line-height:0.2;">{{loginInfo.rolename}}</p>
@@ -107,7 +106,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, computed, onMounted} from 'vue'
+import {ref, reactive,computed, onMounted,toRaw } from 'vue'
 import {useRoute, useRouter} from 'vue-router';
 import request from "../utils/request.js";
 import {ElMessage,} from 'element-plus'
@@ -123,7 +122,8 @@ const profileStore = useProfileStore();
 const route = useRoute();
 const router = useRouter(); // 获取路由实例
 
-const imageUrl = ref('')
+const imageUrl = ref('https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png')
+// const imageUrl = ref('')
 
 // 定义处理上传成功的函数
 const handleAvatarSuccess: UploadProps['onSuccess'] = (
@@ -150,85 +150,115 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
   return true
 }
 
-// 清除登录信息的方法（暂未使用）
+// 清除登录信息的方法
 function clearLoginInfo() {
-  // 如果使用 Vuex，可以调用一个 action 来清除用户状态
-  // store.dispatch('auth/logout');
-  // 如果使用 localStorage，可以清除存储的令牌
-  localStorage.removeItem('token');
+  // localStorage.removeItem('token');
   // 清除其他可能存储的信息
-  // localStorage.removeItem('userInfo');
+  sessionStorage.removeItem('users');
 }
 
+//登出的方法
 const handleLogout = () => {
   clearLoginInfo();
   router.push({name: 'Login'}); // 假设您的登录路由的名字是 'Login'
 };
 
 // 默认显示菜单
-
 const defaultActive = ref('');
 
 const menus = ref([
 ]);
-const loginInfo = {
+
+const loginInfo = reactive ({
   userid: profileStore.profileid,
   roleid: profileStore.profileroleid,
   catelog: profileStore.profilecatelog,
-  rolename:profileStore.profilerolename,
-  username:profileStore.profilename
-};
-
-const homeurl = profileStore.profilehomeurl;
-// 0304：为生成侧面导航栏此处暂时写死：当前接口为：POST /homes/superadminhome
-//request.post(`${homeurl}`,loginInfo)
-request.post(`/homes/superadminhome`,loginInfo)
-    .then(res => {
-      // 登录成功
-      if (res.code === 200) {
-        if(res.data.length > 0){
-          menus.value = res.data;
-          defaultActive.value = res.data[0].url;
-          console.log(menus);
-          // console.log(111)
-        }else{
-          // console.log(222)
-        }
-
-      }
-    }).catch(error => {
-  // 获取失败
-  ElMessage({
-    type: 'error',
-    message: '获取导航失败'
-  });
+  rolename: profileStore.profilerolename,
+  username: profileStore.profilename
 });
+//0310将homeurl修改为响应式计算属性，这样下面的profileStore中的值变了这边也会自动变，解决拼接地址存在问题情况
+const homeurl = computed(() => profileStore.profilehomeurl);
 
+// const homeurl = profileStore.profilehomeurl;
 
+const excludedPids = ['0', '102'];
+
+//过滤器
+  const filteredMenus = computed(() => {
+    return menus.value.filter(menu => {
+      // 过滤掉 excludedPids 中包含的 pid 值的菜单项
+      return !excludedPids.includes(menu.pid);
+    });
+  });
+
+//过滤节点是否有孩子节点
+  const hasChildren = (menu) => {
+    console.log('ceshi')
+    return menus.value.some(child => child.pid === menu.id);
+  };
+//获取节点的孩子节点
+  const getChildrenMenus = (parentId) => {
+    return menus.value.filter(menu => menu.pid === parentId);
+  };
 //路由导航
 const navigateTo = (url) => {
   // console.log(homeurl+url)
   //前面拼一个/表示绝对路径
-  router.push(homeurl+url);
+  router.push(homeurl.value+url);
 };
 
-const excludedPids = ['0', '102'];
-//过滤器
-const filteredMenus = computed(() => {
-  return menus.value.filter(menu => {
-    // 过滤掉 excludedPids 中包含的 pid 值的菜单项
-    return !excludedPids.includes(menu.pid);
+//钩子函数用来刷新后重新获取数据
+onMounted(() => {
+  const storedUserInfo = sessionStorage.getItem('users');
+  console.log('storeUserInfo')
+  console.log(storedUserInfo);
+  if (storedUserInfo) {
+    const userInfo = JSON.parse(storedUserInfo);
+    // 更新用户信息到Pinia
+    console.log(userInfo)
+    profileStore.setProfileInfo(userInfo.userId,userInfo.userName,userInfo.roleId, userInfo.roleName, userInfo.catelog, userInfo.homeUrl);
+    loginInfo.userid = profileStore.profileid;
+    loginInfo.username = profileStore.profilename;
+    loginInfo.roleid = profileStore.profileroleid;
+    loginInfo.rolename = profileStore.profilerolename;
+    loginInfo.catelog = profileStore.profilecatelog;
+
+    console.log(loginInfo.username);
+  } else {
+    // 如果没有存储的用户信息，可以重定向到登录页面或显示提示信息
+    sessionStorage.removeItem('users');
+    router.push({ name: 'Login' });
+    // 或
+    // ElMessage.error('请重新登录');
+  }
+  //获取完pinia中的数据后重新重定向到父页面
+  router.push(homeurl.value);
+// 0304：为生成侧面导航栏此处暂时写死：当前接口为：POST /homes/superadminhome
+// request.post(`${homeurl}`,loginInfo)
+//获取菜单栏的数据
+  console.log('logininfo',loginInfo);
+  request.post(`/homes/superadminhome`,toRaw(loginInfo))
+      .then(res => {
+        // 登录成功
+        console.log(123)
+        if (res.code === 200 && res.data.length > 0)  {
+          menus.value = res.data;
+          defaultActive.value = res.data[0].url;
+          // console.log(menus);
+          console.log('获取菜单栏成功')
+        }
+      }).catch(error => {
+    // 获取失败
+    ElMessage({
+      type: 'error',
+      message: '获取导航失败'
+    });
   });
 });
 
-//过滤节点是否有孩子节点
-const hasChildren = (menu) => {
-  return menus.value.some(child => child.pid === menu.id);
-};
-//获取节点的孩子节点
-const getChildrenMenus = (parentId) => {
-  return menus.value.filter(menu => menu.pid === parentId);
-};
+
+
+
 </script>
 
 <style scoped>
