@@ -3,7 +3,8 @@ import { ref ,computed } from 'vue'
 
 export const useProfileStore = defineStore('profile', () => {
     const profileid = ref(null) // 用户id
-    const profilename = ref(null) //用户名
+    const profilename = ref(null) //username用户名
+    const profileloginname = ref(null) //loginname用户名
     const profileroleid = ref(null) //角色id
     const profilerolename = ref(null) //角色名
     const profilecatelog = ref(null) //登录方式
@@ -11,9 +12,11 @@ export const useProfileStore = defineStore('profile', () => {
 
 
 
-    function setProfileInfo(userid,username,roleid,rolename,catelog,homeurl) {
+
+    function setProfileInfo(userid,username,loginname,roleid,rolename,catelog,homeurl) {
         profileid.value = userid // 正确的方式来设置 ref 的值
         profilename.value = username
+        profileloginname.value = loginname
         profileroleid.value = roleid
         profilecatelog.value = catelog
         profilehomeurl.value = homeurl
@@ -24,7 +27,7 @@ export const useProfileStore = defineStore('profile', () => {
         const storedUserInfo = sessionStorage.getItem('users');
         if (storedUserInfo) {
             const userInfo = JSON.parse(storedUserInfo);
-            setProfileInfo(userInfo.userid, userInfo.username,userInfo.roleid, userInfo.rolename, userInfo.catelog, userInfo.homeurl);
+            setProfileInfo(userInfo.userid, userInfo.username,userInfo.loginname,userInfo.roleid, userInfo.rolename, userInfo.catelog, userInfo.homeurl);
         }
     }
 
@@ -35,6 +38,7 @@ export const useProfileStore = defineStore('profile', () => {
     return {
         profileid,
         profilename,
+        profileloginname,
         profileroleid,
         profilerolename,
         profilecatelog,

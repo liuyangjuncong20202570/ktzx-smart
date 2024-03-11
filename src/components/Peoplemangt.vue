@@ -266,10 +266,6 @@ const exportData = () => {
   )
       .then(() => {
         exportTableToCSV(dataToExport, columns.value);
-        // ElMessage({
-        //   type: 'success',
-        //   // message: '导出成功',
-        // })
       })
       .catch(() => {
         ElMessage({

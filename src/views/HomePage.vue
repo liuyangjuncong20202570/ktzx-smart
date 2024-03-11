@@ -173,10 +173,11 @@ const menus = ref([
 
 const loginInfo = reactive ({
   userid: profileStore.profileid,
+  username:profileStore.profilename,
+  loginname: profileStore.profileloginname,
   roleid: profileStore.profileroleid,
   catelog: profileStore.profilecatelog,
   rolename: profileStore.profilerolename,
-  username: profileStore.profilename
 });
 //0310将homeurl修改为响应式计算属性，这样下面的profileStore中的值变了这边也会自动变，解决拼接地址存在问题情况
 const homeurl = computed(() => profileStore.profilehomeurl);
@@ -215,14 +216,15 @@ onMounted(() => {
     const userInfo = JSON.parse(storedUserInfo);
     // 更新用户信息到Pinia
     console.log(userInfo)
-    profileStore.setProfileInfo(userInfo.userId,userInfo.userName,userInfo.roleId, userInfo.roleName, userInfo.catelog, userInfo.homeUrl);
+    profileStore.setProfileInfo(userInfo.userId,userInfo.userName,userInfo.loginName,userInfo.roleId, userInfo.roleName, userInfo.catelog, userInfo.homeUrl);
     loginInfo.userid = profileStore.profileid;
     loginInfo.username = profileStore.profilename;
+    loginInfo.loginname = profileStore.profileloginname;
     loginInfo.roleid = profileStore.profileroleid;
     loginInfo.rolename = profileStore.profilerolename;
     loginInfo.catelog = profileStore.profilecatelog;
 
-    console.log(loginInfo.username);
+    // console.log(loginInfo.username);
   } else {
     // 如果没有存储的用户信息，可以重定向到登录页面或显示提示信息
     sessionStorage.removeItem('users');
@@ -236,8 +238,9 @@ onMounted(() => {
   router.push(homeurl.value);
 // 0304：为生成侧面导航栏此处暂时写死：当前接口为：POST /homes/superadminhome
 // request.post(`${homeurl}`,loginInfo)
+// 0311修改为teacherhome
 //获取菜单栏的数据
-  request.post(`/homes/superadminhome`,toRaw(loginInfo))
+  request.post(`/homes/teacherhome`,toRaw(loginInfo))
       .then(res => {
         // 登录成功
         if (res.code === 200 && res.data.length > 0)  {

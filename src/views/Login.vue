@@ -23,9 +23,9 @@
               </div>
               <el-form :model="loginForm" :rules="rules" ref="ruleFormRef" size="large">
 
-                <el-form-item prop="username">
-                  <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="loginForm.username"
-                            v-rules="rules.username">
+                <el-form-item prop="loginname">
+                  <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="loginForm.loginname"
+                            v-rules="rules.loginname">
                   </el-input>
                 </el-form-item>
                 <el-form-item prop="pwd">
@@ -62,9 +62,9 @@
                 </el-radio-group>
               </div>
               <el-form :model="loginForm" :rules="rules" ref="ruleFormRef" size="large">
-                <el-form-item prop="username">
-                  <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="loginForm.username"
-                            :rules="rules.username">
+                <el-form-item prop="loginname">
+                  <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="loginForm.loginname"
+                            :rules="rules.loginname">
                   </el-input>
                 </el-form-item>
                 <el-form-item prop="pwd">
@@ -110,7 +110,7 @@ const profileStore = useProfileStore();
 
 //构造登录表单
 const loginForm = reactive({
-  username: "",
+  loginname: "",
   pwd: "",
   catelog: "1",
   loginway: "1",
@@ -158,7 +158,7 @@ const data = reactive({});
 
 
 const rules = reactive({
-  username: [
+  loginname: [
     {required: true, message: '请输入用户名', trigger: 'blur'},
     {min: 3, max: 15, message: '用户名长度在3到15个字符之间', trigger: 'blur'}
   ],
@@ -180,7 +180,7 @@ const login = () => {
             // 登录成功
             if (res.code === 200) {
               //处理不同角色的跳转逻辑
-              // profileStore.setProfilename(loginForm.username);
+              // profileStore.setProfilename(loginForm.loginname);
               const rolesCount = res.data.rolescount;
               if (rolesCount === 1) {
                 // 跳转至指定页面
@@ -188,12 +188,13 @@ const login = () => {
                 const HomeUrl = res.data.simpleRoleList[0].homeurl;
 
                 //将登录用户基本信息存储pinia
-                profileStore.setProfileInfo(res.data.userid,loginForm.username,res.data.simpleRoleList[0].roleid,res.data.simpleRoleList[0].rolename,res.data.catelog,res.data.simpleRoleList[0].homeurl);
+                profileStore.setProfileInfo(res.data.userid,res.data.username,loginForm.loginname,res.data.simpleRoleList[0].roleid,res.data.simpleRoleList[0].rolename,res.data.catelog,res.data.simpleRoleList[0].homeurl);
 
                 //将用户信息格式化然后本地存储：0310
                 const userInfo = {
                   userId: res.data.userid,
-                  userName: loginForm.username,
+                  userName:res.data.username,
+                  loginName: loginForm.loginname,
                   roleId: res.data.simpleRoleList[0].roleid,
                   roleName: res.data.simpleRoleList[0].rolename,
                   catelog: res.data.catelog,
@@ -239,11 +240,12 @@ const selectedRoleId = ref(null);
 const confirmRole = () => {
   const selectedRole = data.simpleRoleList.find(role => role.roleid === selectedRoleId.value);
   if (selectedRole) {
-    profileStore.setProfileInfo(data.userid,loginForm.username,selectedRole.roleid,selectedRole.rolename,data.catelog,selectedRole.homeurl);
+    profileStore.setProfileInfo(data.userid,data.username,loginForm.loginname,selectedRole.roleid,selectedRole.rolename,data.catelog,selectedRole.homeurl);
     // 将用户信息格式化然后本地存储：0310
     const userInfo = {
       userId: data.userid,
-      userName: loginForm.username,
+      userName: data.username,
+      loginName: loginForm.loginname,
       roleId:  selectedRole.roleid,
       roleName: selectedRole.rolename,
       catelog: data.catelog,
