@@ -226,11 +226,8 @@ const handleEdit = (row, key) => {
 const saveEdits = () => {
   editedRows.value.forEach((value, key) => {
     console.log(`Saving row ${key}`, value);
-    // 在这里发送一个请求来保存编辑后的数据到后端
-    // 例如：axios.post('/api/save', { id: key, ...value })
   });
 
-  // 可选：保存后清除editedRows或者根据后端响应来更新tableData
 };
 
 
