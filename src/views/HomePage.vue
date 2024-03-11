@@ -16,6 +16,7 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item>查看详情</el-dropdown-item>
+<!--                <el-dropdown-item @click="switchRole">切换角色</el-dropdown-item>-->
                 <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -186,15 +187,14 @@ const excludedPids = ['0', '102'];
 
 //过滤器
   const filteredMenus = computed(() => {
-    return menus.value.filter(menu => {
-      // 过滤掉 excludedPids 中包含的 pid 值的菜单项
-      return !excludedPids.includes(menu.pid);
-    });
+    return menus.value
+        .filter(menu => !excludedPids.includes(menu.pid))
+        //0311加入菜单按顺序排列
+        .sort((a,b) =>a.orderno - b.orderno);
   });
 
 //过滤节点是否有孩子节点
   const hasChildren = (menu) => {
-    console.log('ceshi')
     return menus.value.some(child => child.pid === menu.id);
   };
 //获取节点的孩子节点
@@ -211,8 +211,6 @@ const navigateTo = (url) => {
 //钩子函数用来刷新后重新获取数据
 onMounted(() => {
   const storedUserInfo = sessionStorage.getItem('users');
-  console.log('storeUserInfo')
-  console.log(storedUserInfo);
   if (storedUserInfo) {
     const userInfo = JSON.parse(storedUserInfo);
     // 更新用户信息到Pinia
@@ -239,15 +237,12 @@ onMounted(() => {
 // 0304：为生成侧面导航栏此处暂时写死：当前接口为：POST /homes/superadminhome
 // request.post(`${homeurl}`,loginInfo)
 //获取菜单栏的数据
-  console.log('logininfo',loginInfo);
   request.post(`/homes/superadminhome`,toRaw(loginInfo))
       .then(res => {
         // 登录成功
-        console.log(123)
         if (res.code === 200 && res.data.length > 0)  {
           menus.value = res.data;
           defaultActive.value = res.data[0].url;
-          console.log('获取菜单栏成功')
         }
       }).catch(error => {
     // 获取失败

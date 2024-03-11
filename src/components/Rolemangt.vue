@@ -38,7 +38,7 @@
       <el-table :data="tableData" style="height: 100%; table-layout:auto; width: 100%;" v-model="selected"
         @select="handleSelect" @select-all="handleSelectAll" stripe>
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="rolecode" label="角色代码" width="100">
+        <el-table-column  prop="rolecode" label="角色代码" width="100">
         </el-table-column>
         <el-table-column prop="rolename" label="角色名称" width="150">
           <template #default="{ row }">
@@ -77,7 +77,7 @@
   </el-container>
 </template>
 <script setup>
-import { reactive, ref } from "vue";
+import { reactive, ref ,computed} from "vue";
 import request from "../utils/request.js";
 import { ElMessage, ElMessageBox } from 'element-plus';
 
@@ -198,6 +198,12 @@ request.get('/sysmangt/rolemangt')
       message: '获取角色失败'
     });
   });
+
+// 在数据加载到表格之前，对其按 rolecode 进行排序
+//涉及TableData的地方好多，暂时还没修改
+const sortedTableData = ref([...tableData.value].sort((a, b) => {
+  return a.rolecode.localeCompare(b.rolecode);
+}));
 </script>
 
 <style scoped>

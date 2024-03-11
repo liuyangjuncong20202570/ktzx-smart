@@ -2,8 +2,8 @@
   <el-container style="height: 92vh; color: grey;">
     <!--    顶部按钮-->
     <el-header
-        style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
-      <el-button type="primary" style="margin-left: 0.8vw;margin-right: 0.8vw;">保存</el-button>
+        style="height: 0; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
+<!--      <el-button type="primary" style="margin-left: 0.8vw;margin-right: 0.8vw;">保存</el-button>-->
     </el-header>
     <el-container>
       <!--左侧-->
@@ -53,7 +53,7 @@
 
           </el-row>
 
-          <el-table :data="filteredData" style="width: 100%" ref="tableRef">
+          <el-table :data="filteredData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="index" label=""></el-table-column>
             <el-table-column type="selection" label=""></el-table-column>
             <el-table-column prop="username" label="用户名"></el-table-column>
@@ -66,6 +66,7 @@
           </el-table>
 
         </div>
+        <!--学生tab-->
         <div v-if="activeTab === '1'">
           <el-row style="">
             <el-col :span="2"><el-button style="width: 85%" type="primary" @click="exportData">导出</el-button></el-col>
@@ -82,7 +83,7 @@
 
           </el-row>
 
-          <el-table :data="filteredData" style="width: 100%" ref="tableRef">
+          <el-table :data="filteredData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="index" label=""></el-table-column>
             <el-table-column type="selection" label=""></el-table-column>
             <el-table-column prop="username" label="用户名"></el-table-column>
@@ -101,7 +102,7 @@
 <script setup>
 import {reactive, ref,nextTick} from "vue";
 import request from "../utils/request.js";
-import {ElMessage} from "element-plus";
+import {ElMessage,ElMessageBox} from "element-plus";
 import {Document, Folder, Search} from '@element-plus/icons-vue';
 import{ exportTableToCSV } from "../utils/exportTableToCSV.js";
 import{ searchInTable } from "../utils/searchInTable.js";
@@ -173,6 +174,8 @@ const switchTab = (tab, event) => {
     });
   });
    });
+  selectedRows.value = [];
+
 };
 
 const filteredData = ref([peoplelist.value]);
@@ -231,9 +234,49 @@ const saveEdits = () => {
 };
 
 
-const tableRef = ref(null)
+const selectedRows = ref([]);
+
+const handleSelectionChange = (selection) => {
+  selectedRows.value = selection;
+};
+
+
 const exportData = () => {
-  exportTableToCSV(filteredData.value, columns.value);
+  // 获取选中的行
+   const dataToExport = selectedRows.value.length > 0 ? selectedRows.value : peoplelist.value;
+  // exportTableToCSV(dataToExport, columns.value);
+
+  // 检查是否有数据可导出
+  if (dataToExport.length === 0) {
+    ElMessage({
+      type: 'info',
+      message: '没有需要导出的内容',
+    });
+    return; // 退出函数，不再继续执行
+  }
+
+  ElMessageBox.confirm(
+      selectedRows.value.length > 0 ? `是否要导出所勾选的 ${selectedRows.value.length} 行记录？` : '是否要导出当前的全部记录？',
+      '提示',
+      {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'info',
+      }
+  )
+      .then(() => {
+        exportTableToCSV(dataToExport, columns.value);
+        // ElMessage({
+        //   type: 'success',
+        //   // message: '导出成功',
+        // })
+      })
+      .catch(() => {
+        ElMessage({
+          type: 'info',
+          message: '取消导出',
+        })
+      })
 }
 const addData = () => {
   // 处理添加数据逻辑
