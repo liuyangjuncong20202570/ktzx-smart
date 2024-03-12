@@ -146,16 +146,23 @@ const initialize = (nodes) => {
         node.popVisible = false;
         node.inputVisible = false;
         node.tempData = '';
+        if(node.obsname.includes('未命名节点')){
+            if(node.obsname.length > 5 && nullNodeNum.value < Number(node.obsname[6])){
+                nullNodeNum.value = Number(node.obsname[6]);
+            }
+            else if(node.obsname.length === 5 && nullNodeNum.value === 0) nullNodeNum.value ++;
+        }
         if (node.children && node.children.length > 0) {
             initialize(node.children); // 递归子节点
         }
     });
 };
 
-onMounted(() => {
+const getTreeData = () => {     // 获取树组件的数据
     request.get('/sysmangt/units').then((res) => {
         if(res.code === 200){
             treeData.value = res.data;
+            nullNodeNum.value = 0;
             initialize(treeData.value);
         }
     }).catch(() => {
@@ -164,6 +171,10 @@ onMounted(() => {
             message: '获取教学单位失败'
         });
     });
+};
+
+onMounted(() => {
+    getTreeData();
 })
 
 const openedPopNode = ref({});    // 记录哪个节点的弹出框被打开了
@@ -185,7 +196,7 @@ const createPostData = ref({    // 新建教学单位的请求体
     id: '',
     pid: '',
     obsdeep: null,
-    type: -1,
+    type: '',   // 1为同级新增，2为下级新增
     smObs: {
         obsname: '',
         remark: '',
@@ -193,10 +204,6 @@ const createPostData = ref({    // 新建教学单位的请求体
 });
 
 const addSiblingNode = (addedNode, nodes = treeData.value, parent = null) => {
-    createPostData.value.id = addedNode.id;
-    createPostData.value.pid = addedNode.pid;
-    createPostData.value.obsdeep = addedNode.obsdeep;
-    createPostData.value.type = 1;
     for(let i = 0; i < nodes.length; i ++) {    // 遍历所有元素
         if(nodes[i].obsname === addedNode.obsname){
             nullNodeNum.value += 1;
@@ -227,6 +234,21 @@ const addSiblingNode = (addedNode, nodes = treeData.value, parent = null) => {
                 });
                 // console.log(treeData.value);
             }
+            createPostData.value.id = addedNode.id;     // 请求体数据
+            createPostData.value.pid = addedNode.pid;
+            createPostData.value.obsdeep = addedNode.obsdeep;
+            createPostData.value.type = '1';
+            createPostData.value.smObs.obsname = nullNodeNum.value > 1 ? '未命名节点(' + nullNodeNum.value + ')' : '未命名节点';
+            // console.log(createPostData.value);
+
+            // request.post('/sysmangt/units/create', createPostData.value).then((res) =>{
+            //     if(res.code === 200){
+            //         getTreeData();
+            //     }
+            // }).catch(() => {
+            //     ElMessage.error('新增教学单位失败');
+            // });
+
             addedNode.popVisible = false; // 添加完毕恢复
             return true;
         }
@@ -244,7 +266,6 @@ const blurInput = (node) => {
         else{
             node.obsname = node.tempData;
             node.tempData = '';
-            nullNodeNum.value -= 1;
         }
     }
     node.inputVisible = false;
@@ -274,10 +295,20 @@ const addChildNode = (node) => {
         tempData: ''
     });
     node.popVisible = false;
-    createPostData.value.id = node.id;
+    createPostData.value.id = node.id;  // 请求体数据
     createPostData.value.pid = node.pid;
     createPostData.value.obsdeep = node.obsdeep;
-    createPostData.value.type = 0;
+    createPostData.value.type = '0';
+    createPostData.value.smObs.obsname = nullNodeNum.value > 1 ? '未命名节点(' + nullNodeNum.value + ')' : '未命名节点';
+    // request.post('/sysmangt/units/create', createPostData.value).then((res) =>{
+    //     if(res.code === 200){
+    //         getTreeData();
+    //     }
+    // }).catch(() => {
+    //     ElMessage.error('新增教学单位失败');
+    // });
+
+    // console.log(createPostData.value);
 }
 
 const confirmDeleteNodes = (deletedNode) => {
@@ -290,7 +321,6 @@ const confirmDeleteNodes = (deletedNode) => {
             type: 'warning',
         }
     ).then(() => {
-        if(nullNodeNum.value && deleteNodes.obsname.includes('未命名节点')) nullNodeNum.value -= 1;
         deleteNodes(deletedNode);
     })
     .catch(() => {deletedNode.popVisible = false});
@@ -316,186 +346,5 @@ const deleteNodes = (deletedNode, nodes = treeData.value, parent = null) => {
     }
 };
 
-const treeData: any = ref([
-    // {
-    //     id: '1',
-    //     obsname: '电气与控制工程学院',
-    //     children: [
-    //         {
-    //             id: "1-1",
-    //             obsname: '自动化系',
-    //             children: [
-    //                 {
-    //                     id: '1-1-1',
-    //                     obsname: '自动化18级',
-    //                     children:[
-    //                         {
-    //                             id: '1-1-1-1',
-    //                             obsname: '自18-1',
-    //                         },
-    //                         {
-    //                             id: '1-1-1-2',
-    //                             obsname: '自18-2',
-    //                         }
-    //                     ]
-    //                 },
-    //                 {
-    //                     id: '1-1-2',
-    //                     obsname: '自动化19级',
-    //                     children: [
-    //                         {
-    //                             id: '1-1-2-1',
-    //                             obsname: '自19-1',
-    //                         },
-    //                         {
-    //                             id: '1-1-2-2',
-    //                             obsname: '自19-2',
-    //                         },
-    //                         {
-    //                             id: '1-1-2-3',
-    //                             obsname: '自19-3',
-    //                         }
-    //                     ]
-    //                 },
-    //                 {
-    //                     id: '1-1-3',
-    //                     obsname: '自动化20级',
-    //                     children: [
-    //                         {
-    //                             id: '1-1-3-1',
-    //                             obsname: '自20-1',
-    //                         },
-    //                         {
-    //                             id: '1-1-3-2',
-    //                             obsname: '自20-2',
-    //                         },
-    //                         {
-    //                             id: '1-1-3-3',
-    //                             obsname: '自20-3',
-    //                         }
-    //                     ]
-    //                 }
-    //             ],
-    //         },
-    //     ],
-    // },
-    // {
-    //     id: '2',
-    //     obsname: '信息学院',
-    //     children: [
-    //         {
-    //             id: "2-1",
-    //             obsname: '计算机系',
-    //             children: [
-    //                 {
-    //                     id: '2-1-1',
-    //                     obsname: '计算机18级',
-    //                     children:[
-    //                         {
-    //                             id: '2-1-1-1',
-    //                             obsname: '计18-1',
-    //                         },
-    //                         {
-    //                             id: '1-1-1-2',
-    //                             obsname: '计18-2',
-    //                         }
-    //                     ]
-    //                 },
-    //                 {
-    //                     id: '2-1-2',
-    //                     obsname: '计算机19级',
-    //                     children: [
-    //                         {
-    //                             id: '2-1-2-1',
-    //                             obsname: '计19-1',
-    //                         },
-    //                         {
-    //                             id: '2-1-2-2',
-    //                             obsname: '计19-2',
-    //                         },
-    //                         {
-    //                             id: '2-1-2-3',
-    //                             obsname: '计19-3',
-    //                         }
-    //                     ]
-    //                 },
-    //                 {
-    //                     id: '2-1-3',
-    //                     obsname: '计算机20级',
-    //                     children: [
-    //                         {
-    //                             id: '2-1-3-1',
-    //                             obsname: '计20-1',
-    //                         },
-    //                         {
-    //                             id: '2-1-3-2',
-    //                             obsname: '计20-2',
-    //                         },
-    //                         {
-    //                             id: '2-1-3-3',
-    //                             obsname: '计20-3',
-    //                         }
-    //                     ]
-    //                 }
-    //             ],
-    //         },
-    //         {
-    //             id: "2-2",
-    //             obsname: '人工智能系',
-    //             children: [
-    //                 {
-    //                     id: '2-2-1',
-    //                     obsname: '人工智能18级',
-    //                     children:[
-    //                         {
-    //                             id: '2-2-1-1',
-    //                             obsname: '人工智能18-1',
-    //                         },
-    //                         {
-    //                             id: '2-2-1-2',
-    //                             obsname: '人工智能18-2',
-    //                         }
-    //                     ]
-    //                 },
-    //                 {
-    //                     id: '2-2-2',
-    //                     obsname: '人工智能19级',
-    //                     children: [
-    //                         {
-    //                             id: '2-2-2-1',
-    //                             obsname: '人工智能19-1',
-    //                         },
-    //                         {
-    //                             id: '2-2-2-2',
-    //                             obsname: '人工智能19-2',
-    //                         },
-    //                         {
-    //                             id: '2-2-2-3',
-    //                             obsname: '人工智能19-3',
-    //                         }
-    //                     ]
-    //                 },
-    //                 {
-    //                     id: '2-2-3',
-    //                     obsname: '人工智能20级',
-    //                     children: [
-    //                         {
-    //                             id: '2-2-3-1',
-    //                             obsname: '人工智能20-1',
-    //                         },
-    //                         {
-    //                             id: '2-2-3-2',
-    //                             obsname: '人工智能20-2',
-    //                         },
-    //                         {
-    //                             id: '2-2-3-3',
-    //                             obsname: '人工智能20-3',
-    //                         }
-    //                     ]
-    //                 }
-    //             ],
-    //         },
-    //     ],
-    // },
-]);
+const treeData: any = ref([]);
 </script>

@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory,onBeforeRouteLeave } from 'vue-router';
 
-const rolehome =['teacherhomne','adminhome','superadminhome','secretariatehome','academicaffairshome'];
+const rolehome =['teacherhomne','adminhome','superadminhome','secretariatehome','academicaffairshome','coursemanagerhome'];
 //superadminhome 超级管理员首页
 //secretariatehome 教学秘书首页
 //academicaffairshome 教务处首页
@@ -50,9 +50,12 @@ const routes = [
                 path: 'sysmangt/collegemangt',
                 name: 'Collegecollegemangt',
                 component: () => import('../components/Collegemangt.vue')
-            }
-
-
+            },
+            {
+                path: 'coursemangt/coursemangt',
+                name: 'CourseManagement',
+                component: () => import('../components/Coursemangt.vue')
+            },
         ]
     },
 ];

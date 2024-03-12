@@ -16,7 +16,7 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item>查看详情</el-dropdown-item>
-<!--                <el-dropdown-item @click="switchRole">切换角色</el-dropdown-item>-->
+            <!-- <el-dropdown-item @click="switchRole">切换角色</el-dropdown-item> -->
                 <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
