@@ -86,7 +86,6 @@
                       <el-button type="primary" @click="confirmRole">确认</el-button>
                     </template>
                   </el-dialog>
-
                 </el-form-item>
               </el-form>
             </el-tab-pane>
@@ -137,19 +136,7 @@ const handleClick = (tab, event) => {
     }
   }
 }
-//测试数据
-// const data = {
-//   userid: "1",
-//   catelog: "2",
-//   rolescount: 1,
-//   simpleRoleList: [
-//     {
-//       rolename: "教学秘书",
-//       roleid: "2",
-//       homeurl: "Homes/secretariatHome"
-//     }
-//   ]
-// };
+
 
 const data = reactive({});
 

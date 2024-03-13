@@ -40,9 +40,9 @@
         <div v-if="activeTab === '2'" style="" >
           <el-row style="">
             <el-col :span="2"><el-button v-blur-on-click style="width: 85%" type="primary" @click="exportData">导出</el-button></el-col>
-            <el-col :span="2"><el-button v-blur-on-click style="width: 85%" type="success" @click="addData">新增</el-button></el-col>
+            <el-col :span="2"><el-button v-blur-on-click style="width: 85%" type="success" @click="ccc">新增</el-button></el-col>
             <el-col :span="2"><el-button v-blur-on-click style="width: 85%" type="info" @click="importData">导入</el-button> </el-col>
-            <el-col :span="3"><el-button v-blur-on-click style="width: 85%" type="danger" @click="deleteSelected">删除选中记录</el-button></el-col>
+            <el-col :span="3"><el-button v-blur-on-click style="width: 85%" type="danger" @click="deleteSelected">删除</el-button></el-col>
             <el-col :span="2"><el-button v-blur-on-click style="width: 85%" type="warning" @click="saveData">保存</el-button></el-col>
             <el-col :span="2"><el-button v-blur-on-click style="width: 85%" @click="resetPassword">重置密码</el-button></el-col>
             <el-col :span="4"></el-col>
@@ -50,9 +50,10 @@
               <el-input v-model="searchKeyword" placeholder="请输入姓名关键字" class="input-with-select">
               </el-input></el-col>
             <el-col :span="2"><el-button style="width: 85%" type="primary"  @click="querySearch">搜索</el-button></el-col>
-
           </el-row>
-
+          <el-dialog :modelValue="showDialog" :show-close="false" :close-on-click-modal="false" title="添加数据">
+            <p>这是一个弹窗</p>
+          </el-dialog>
           <el-table :data="filteredData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="index" label=""></el-table-column>
             <el-table-column type="selection" label=""></el-table-column>
@@ -70,9 +71,9 @@
         <div v-if="activeTab === '1'">
           <el-row style="">
             <el-col :span="2"><el-button style="width: 85%" type="primary" @click="exportData">导出</el-button></el-col>
-            <el-col :span="2"><el-button style="width: 85%" type="success" @click="addData">新增</el-button></el-col>
+            <el-col :span="2"><el-button style="width: 85%" type="success" @click="ccc">新增</el-button></el-col>
             <el-col :span="2"><el-button style="width: 85%" type="info" @click="importData">导入</el-button> </el-col>
-            <el-col :span="3"><el-button style="width: 85%" type="danger" @click="deleteSelected">删除选中记录</el-button></el-col>
+            <el-col :span="3"><el-button style="width: 85%" type="danger" @click="deleteSelected">删除</el-button></el-col>
             <el-col :span="2"><el-button style="width: 85%" type="warning" @click="saveData">保存</el-button></el-col>
             <el-col :span="2"><el-button style="width: 85%" @click="resetPassword">重置密码</el-button></el-col>
             <el-col :span="4"></el-col>
@@ -80,8 +81,10 @@
               <el-input v-model="searchKeyword" placeholder="请输入姓名关键字" class="input-with-select">
               </el-input></el-col>
             <el-col :span="2"><el-button style="width: 85%" type="primary"  @click="querySearch">搜索</el-button></el-col>
-
           </el-row>
+          <el-dialog :modelValue="showDialog" :show-close="false" :close-on-click-modal="false"  title="添加数据">
+            <p>这是一个弹窗</p>
+          </el-dialog>
 
           <el-table :data="filteredData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="index" label=""></el-table-column>
@@ -92,7 +95,6 @@
             <el-table-column prop="catelog" label="分类" :formatter="formatColumn"></el-table-column>
             <el-table-column prop="status"  label="状态" :formatter="formatColumn" ></el-table-column>
             <el-table-column prop="obsname" label="所属院系"></el-table-column>
-
           </el-table>
         </div>
       </el-main>
@@ -106,7 +108,7 @@ import {ElMessage,ElMessageBox} from "element-plus";
 import {Document, Folder, Search} from '@element-plus/icons-vue';
 import{ exportTableToCSV } from "../utils/exportTableToCSV.js";
 import{ searchInTable } from "../utils/searchInTable.js";
-
+import AddPeopleDialog from "./subcomponents/AddPeopleDialog.vue"
 
 //tab显示，学生-1，老师-2，默认为老师
 const activeTab = ref('2');
@@ -120,6 +122,13 @@ const obsmenulist = ref([]);
 const peoplelist = ref([]);
 
 const searchKeyword = ref('')
+
+// const dialogVisible = ref(false);
+const showDialog = ref(false);
+
+const ccc = ()=>{
+    showDialog.value = true;
+}
 
 const columns = ref([
   { prop: 'username', label: '用户名' },
@@ -157,7 +166,6 @@ const currentobsid = ref('');
 
 //切换老师学生tab页的方法
 const switchTab = (tab, event) => {
-  // console.log(tab.props.name);
   nextTick(() => {
   request.get('/sysmangt/personnelmangt/person?obsid='+currentobsid.value+'&catelog='+activeTab.value)
       .then(res => {
@@ -175,7 +183,7 @@ const switchTab = (tab, event) => {
   });
    });
   selectedRows.value = [];
-
+  showDialog.value=false;
 };
 
 const filteredData = ref([peoplelist.value]);
@@ -186,7 +194,6 @@ const treeNodeClick = (data, node, event) => {
   // console.log(data);
   showmenu.value = true;
   currentobsid.value=data.id;
-  // console.log("activeTab:"+activeTab.value)
   request.get('/sysmangt/personnelmangt/person?obsid='+currentobsid.value+'&catelog='+activeTab.value)
       .then(res => {
         if (res.code === 200) {
@@ -272,7 +279,7 @@ const exportData = () => {
       })
 }
 const addData = () => {
-  // 处理添加数据逻辑
+
 }
 const importData = () => {
   // 处理导入数据逻辑

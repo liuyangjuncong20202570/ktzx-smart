@@ -11,13 +11,14 @@
 			<!--生成-->
 			<el-table :data="tableData" style="height: 100%; table-layout:auto; width: 100%;" v-model="selected"
 				@select="handleSelect" @select-all="handleSelectAll"
-				:default-sort="{ prop: 'rolecode', order: 'ascending' }" stripe>
+				:default-sort="{ prop: 'rolecode', order: 'ascending' }"  stripe>
 				<el-table-column type="selection" width="55"></el-table-column>
-				<el-table-column prop="rolecode" sortable label="角色代码" width="110">
+				<el-table-column prop="rolecode"  label="角色代码" width="110">
+<!--          -->
 				</el-table-column>
 				<el-table-column prop="rolename" label="角色名称" width="150">
 					<template #default="{ row }">
-						<el-input v-if="row.editingRolename" style="width: 100%; height: 25px;" v-model="row.tempRolename"
+						<el-input v-if="row.editingRolename" :ref=setInputRef style="width: 100%; height: 25px;" v-model="row.tempRolename"
 							@blur="handleBlur(row, 'editingRolename')"></el-input>
 						<div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingRolename')">{{
 							row.rolename }}
@@ -26,7 +27,7 @@
 				</el-table-column>
 				<el-table-column prop="roletype" label="角色类型" width="150">
 					<template #default="{ row }">
-						<el-input v-if="row.editingRoletype" style="width: 100%; height: 25px;" v-model="row.roletype"
+						<el-input v-if="row.editingRoletype" :ref=setInputRef style="width: 100%; height: 25px;" v-model="row.roletype"
 							@blur="handleBlur(row, 'editingRoletype')"></el-input>
 						<div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingRoletype')">{{
 							row.roletype }}
@@ -35,7 +36,7 @@
 				</el-table-column>
 				<el-table-column prop="homepage" label="首页" width="200">
 					<template #default="{ row }">
-						<el-input v-if="row.editingHomepage" style="width: 100%; height: 25px;" v-model="row.homepage"
+						<el-input v-if="row.editingHomepage" :ref=setInputRef style="width: 100%; height: 25px;" v-model="row.homepage"
 							@blur="handleBlur(row, 'editingHomepage')"></el-input>
 						<div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingHomepage')">{{
 							row.homepage }}
@@ -44,7 +45,7 @@
 				</el-table-column>
 				<el-table-column prop="homeurl" label="首页地址" width="220">
 					<template #default="{ row }">
-						<el-input v-if="row.editingHomeUrl" style="width: 100%; height: 25px;" v-model="row.homeUrl"
+						<el-input v-if="row.editingHomeUrl" :ref=setInputRef style="width: 100%; height: 25px;" v-model="row.homeUrl"
 							@blur="handleBlur(row, 'editingHomeUrl')"></el-input>
 						<div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingHomeUrl')">{{
 							row.homeurl }}
@@ -53,7 +54,7 @@
 				</el-table-column>
 				<el-table-column prop="remark" label="备注" min-width="250">
 					<template #default="{ row }">
-						<el-input v-if="row.editingRemark" style="width: 100%; height: 25px;" v-model="row.remark"
+						<el-input v-if="row.editingRemark" :ref=setInputRef style="width: 100%; height: 25px;" v-model="row.remark"
 							@blur="handleBlur(row, 'editingRemark')"></el-input>
 						<div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingRemark')">{{
 							row.remark }}
@@ -66,7 +67,7 @@
 	</el-container>
 </template>
 <script setup>
-import { reactive, ref, computed, onMounted } from "vue";
+import {reactive, ref, computed, onMounted, nextTick,toRaw} from "vue";
 import request from "../utils/request.js";
 import { ElMessage, ElMessageBox } from 'element-plus';
 
@@ -107,16 +108,27 @@ const handleSelect = (selection) => {
 const handleSelectAll = (selection) => {
 	selected.value = selection;
 };
-/*****************/
-
+/*********处理点击获取焦点和失焦后数据保存********/
+const inputsRefs = ref({});
+//点击时会将relename的值赋值给tempRolename 用于在输入框中进行显示
 const handleClick = (row, field) => {
-	row[field] = true
-	// console.log(row);
-	if (field === 'editingRolename') row.tempRolename = row.rolename;
-};
+  row[field] = true;
+  if (field === 'editingRolename') row.tempRolename = row.rolename;
 
+  nextTick(() => {
+    const inputRef = `input-${row.id}`;
+    const inputElement = inputsRefs.value[inputRef];
+    if (inputElement) {
+      inputElement.focus();
+    }
+  });
+};
+const setInputRef = (el, row) => {
+  if (el) {
+    inputsRefs.value[`input-${row.id}`] = el;
+  }
+};
 const handleBlur = (row, field) => {
-	// console.log(row);
 	if (row.rolename !== row.tempRolename) {
 		if (field === 'editingRolename' && row.tempRolename.includes('未命名角色')) {
 			ElMessage.error('命名不可包含“未命名角色”');
@@ -125,7 +137,16 @@ const handleBlur = (row, field) => {
 	}
 	row.tempRolename = '';
 	row[field] = false;
+  console.log(toRaw (row));
 };
+
+/**************************************/
+
+
+
+/**************************************/
+
+
 
 const handleRoleDel = () => {
 	if (selected.value.length === 0) {
@@ -156,7 +177,7 @@ const handleRoleDel = () => {
 			}).catch(() => { });
 	}
 };
-
+//假的测试数据
 const tableData = ref([
 	// {
 	//   id: '1',
@@ -184,6 +205,7 @@ const tableData = ref([
 	// }
 ]);
 
+//未命名的角色数
 const nullRoleNum = ref(0);
 
 const getTableData = () => {
@@ -192,7 +214,6 @@ const getTableData = () => {
 			// 登录成功
 			if (res.code === 200) {
 				tableData.value = res.data;
-				// console.log(res.data);
 				initialize();
 			}
 		})
@@ -205,8 +226,10 @@ const getTableData = () => {
 		);
 };
 
+//初始化数据
 const initialize = () => {
 	tableData.value.forEach(item => {   // 为每一个表格数据添加是否显示输入框的判定
+    item.rolecode = Number(item.rolecode);
 		item.editingRolename = false;
 		item.editingRoletype = false;
 		item.editingHomepage = false;
