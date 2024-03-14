@@ -152,11 +152,11 @@ const handleCheckChange = (node, data, key) => {
 //更新对应的状态权限
 const updateRole=(menuname , Item)=>{
   console.log("menuname",menuname);
-  console.log("ID",typeof(Item.value.id));
-  console.log("rolecode",typeof(Item.value.rolecode));
-   console.log("Item",typeof(Item.value.status));
+  console.log("ID",Item.value.id);
+  console.log("rolecode",Item.value.rolecode);
+   console.log("Item",Item.value.status);
 
-  request.post('/sysmangt/rolepurview',Item)
+  request.post('/sysmangt/rolepurview',Item.value)
       .then(res => {
         if (res.code === 200) {
           ElMessage({
