@@ -7,14 +7,13 @@
 			<el-button type="danger" @click="handleRoleDel">删除</el-button>
 			<el-button type="success" @click="">保存</el-button>
 		</el-header>
-		<el-main style="padding: 0;">
+		<el-main style="padding: 0;overflow: auto;">
 			<!--生成-->
 			<el-table :data="tableData" style="height: 100%; table-layout:auto; width: 100%;" v-model="selected"
 				@select="handleSelect" @select-all="handleSelectAll"
 				:default-sort="{ prop: 'rolecode', order: 'ascending' }"  stripe>
 				<el-table-column type="selection" width="55"></el-table-column>
 				<el-table-column prop="rolecode"  label="角色代码" width="110">
-<!--          -->
 				</el-table-column>
 				<el-table-column prop="rolename" label="角色名称" width="150">
 					<template #default="{ row }">
