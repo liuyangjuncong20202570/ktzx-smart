@@ -24,15 +24,6 @@
 						</div>
 					</template>
 				</el-table-column>
-<!--				<el-table-column prop="roletype" label="角色类型" width="150">-->
-<!--					<template #default="{ row }">-->
-<!--						<el-input v-if="row.editingRoletype" :ref=setInputRef style="width: 100%; height: 25px;" v-model="row.roletype"-->
-<!--							@blur="handleBlur(row, 'editingRoletype')"></el-input>-->
-<!--						<div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingRoletype')">{{-->
-<!--							row.roletype }}-->
-<!--						</div>-->
-<!--					</template>-->
-<!--				</el-table-column>-->
 				<el-table-column prop="homepage" label="首页" width="200">
 					<template #default="{ row }">
 						<el-input v-if="row.editingHomepage" :ref=setInputRef style="width: 100%; height: 25px;" v-model="row.homepage"

@@ -7,7 +7,11 @@ function exportTableToCSV(tableData, columns) {
     // 遍历表格数据，转换为CSV格式
     tableData.forEach(row => {
         const values = columns.map(col => {
-            const value = row[col.prop];
+            // 检查值是否为null或undefined，是则替换为空字符串
+            let value = row[col.prop];
+            if (value === null || value === undefined) {
+                value = '';  // 将null或undefined替换为空字符串
+            }
             // 处理数据，确保CSV格式正确
             return `"${value}"`;
         });
