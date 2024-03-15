@@ -69,6 +69,7 @@
 import {reactive, ref, computed, onMounted, nextTick,toRaw} from "vue";
 import request from "../utils/request.js";
 import { ElMessage, ElMessageBox } from 'element-plus';
+import isEqual from 'lodash/isEqual.js'
 
 
 /**************获取表单数据，并预处理*******************/
@@ -173,10 +174,14 @@ const setInputRef = (el, row) => {
   }
 };
 
+let orirow = null;
+let rowdata =null;
+let hasChanged = null;
 const handleClick = (row, field) => {
-  row[field] = true;
-
+  orirow = JSON.parse(JSON.stringify(row));
+  console.log(orirow)
   nextTick(() => {
+    row[field] = true;
     setTimeout(() => {
       const inputRef = `input-${row.id}`;
       // 假设 inputsRefs.value[inputRef] 是对 el-input 组件的引用
@@ -192,45 +197,54 @@ const handleClick = (row, field) => {
     }, 0);
   });
 };
-
-
 const handleBlur = (row, field) => {
+
   nextTick(() => {
-	row[field] = false;
-  });
-  // console.log(toRaw (row));
-  const rowdata = ref(toRaw (row))
 
-  const updateItem = ref({
-    id:rowdata.value.id,
-    rolecode:rowdata.value.rolecode,
-    rolename:rowdata.value.rolename,
-    remark:rowdata.value.remark,
-    homename:rowdata.value.homename,
-    homeurl:rowdata.value.homeurl
-  })
+	  row[field] = false;
+    rowdata= JSON.parse(JSON.stringify(row));
+    console.log(rowdata)
+    console.log(orirow)
+    //isEqual(a,b) a,b是否相同
+    hasChanged = isEqual(rowdata, orirow);
 
-  console.log(updateItem.value)
-  request.post('/sysmangt/rolemangt/update',updateItem.value)
-      .then(res => {
-        // 登录成功
-        if (res.code === 200) {
-          ElMessage({
-            type: 'success',
-            message: '修改角色信息成功'
-          });
-          //这里刷新dom
-          getTableData();
-        }
-      })
-      .catch(() => {
+
+  if(hasChanged){
+    ElMessage({
+      type: 'info',
+      message: '无修改字段'
+    });
+  }else{
+    const updateItem = ref({
+      id:toRaw(row).id,
+      rolecode:toRaw(row).rolecode,
+      rolename:toRaw(row).rolename,
+      remark:toRaw(row).remark,
+      homename:toRaw(row).homename,
+      homeurl:toRaw(row).homeurl
+    })
+    request.post('/sysmangt/rolemangt/update',updateItem.value)
+        .then(res => {
+          // 登录成功
+          if (res.code === 200) {
             ElMessage({
-              type: 'error',
-              message: '修改角色信息失败'
+              type: 'success',
+              message: '修改角色信息成功'
             });
-        getTableData();
+            //这里刷新dom
+            getTableData();
           }
-      );
+        })
+        .catch(() => {
+              ElMessage({
+                type: 'error',
+                message: '修改角色信息失败'
+              });
+              getTableData();
+            }
+        )
+  }
+  });
 };
 
 /**************************************/

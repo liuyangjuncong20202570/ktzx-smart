@@ -18,7 +18,7 @@
                     </el-table-column>
                     <el-table-column prop="termname" label="学期" min-width="130">
                         <template #default="{ row }">
-                            <el-input v-if="row.editingTermName" :ref=setInputRef  style="width:100%; height: 25px;" v-model="row.tempTermName"
+                            <el-input v-if="row.editingTermName" :ref="el => setInputRef(el, row)" style="width:100%; height: 25px;" v-model="row.termname"
                                 @blur="handleBlur(row, 'editingTermName')"></el-input>
                             <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingTermName')">
                                 {{ row.termname }}
@@ -27,7 +27,7 @@
                     </el-table-column>
                     <el-table-column prop="begindate" label="起始日期" min-width="120">
                         <template #default="{ row }">
-                            <el-date-picker v-if="row.editingbegindate"  :ref=setInputRef style="width: 100%; height: 25px;" v-model="row.begindate"
+                            <el-date-picker v-if="row.editingbegindate"  :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.begindate"
                                 @blur="handleBlur(row, 'editingbegindate')" placeholder="请选择日期" value-format="YYYY-MM-DD"></el-date-picker>
                             <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingbegindate')">
                                 {{ row.begindate }}
@@ -36,7 +36,7 @@
                     </el-table-column>
                     <el-table-column prop="enddate" label="结束日期" min-width="120">
                         <template #default="{ row }">
-                            <el-date-picker v-if="row.editingEndDate" :ref=setInputRef style="width: 100%; height: 25px;" v-model="row.enddate"
+                            <el-date-picker v-if="row.editingEndDate" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.enddate"
                                 @blur="handleBlur(row, 'editingEndDate')" placeholder="请选择日期" value-format="YYYY-MM-DD"></el-date-picker>
                             <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingEndDate')">
                                 {{ row.enddate }}
@@ -45,7 +45,7 @@
                     </el-table-column>
                     <el-table-column prop="remark" label="备注" min-width="200">
                         <template #default="{ row }">
-                            <el-input v-if="row.editingRemark" :ref=setInputRef style="width: 100%; height: 25px;" v-model="row.remark"
+                            <el-input v-if="row.editingRemark" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.remark"
                                 @blur="handleBlur(row, 'editingRemark')"></el-input>
                             <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingRemark')">
                                 {{row.remark }}
@@ -66,27 +66,40 @@
 
 <script lang="ts" setup>
 import { ElMessage, ElMessageBox, rowProps } from "element-plus";
-import {nextTick, onMounted, reactive, ref} from "vue";
+import {nextTick, onMounted, reactive, ref, toRaw} from "vue";
 import request from "../utils/request";
 import{ exportTableToCSV } from "../utils/exportTableToCSV.js";
+import isEqual from "lodash/isEqual";
 
+//数据列表
 const tableData = ref([]);
+//未命名学期计数
+const nullTermNum = ref(0);
+//当前学期ID
+const currentTermID = ref('');
+//选中学期集合
+const selectedRows = ref([]);
+//选中想删除学期集合
+const deleteTermList = ref([]);
 
+/**************获取学期列表，并初始化********************/
 const getTableData = () => {
-    request.get('/sysmangt/terms').then((res) => {
+    request.get('/sysmangt/terms')
+        .then((res) => {
         if(res.code === 200){
+          console.log(111);
             tableData.value = res.data;
             initialize();
+            console.log(tableData.value)
         }
     }).catch(() => {
+      console.log(222);
         ElMessage({
             type: 'error',
             message: '获取学期失败'
         });
     });
 };
-
-const nullTermNum = ref(0);
 
 //获取学期数据后初始化
 const initialize = () => {
@@ -95,54 +108,59 @@ const initialize = () => {
         item.editingbegindate = false;
         item.editingEndDate = false;
         item.editingRemark = false;
-        item.tempTermName = '';
-        item.iscurrenttermBoolean = (item.iscurrentterm === "1");
-        if(item.termname.includes('未命名角色')){
-            if(item.termname.length > 5 && nullTermNum.value < Number(item.termname[6])){
-                nullTermNum.value = Number(item.termname[6]);
-            }
-            else if(item.termname.length === 5 && nullTermNum.value === 0) nullTermNum.value ++;
+        if(item.iscurrentterm === "1"){
+          currentTermID.value = item.id;
+          item.iscurrenttermBoolean = true;
         }
+        else{
+          item.iscurrenttermBoolean = false;
+        }
+        //差一个处理名字的逻辑
     });
-    console.log(tableData.value)
 };
 
-onMounted(() => {
-    getTableData();
-});
+/*****************************************/
 
+/******************新增学期***********************/
 const addTerm = () => {
-    // nullTermNum.value ++;
-    // tableData.value.push({
-    //     id: tableData.value.length + '',
-    //     termname: nullTermNum.value > 1 ? '未命名学期(' + nullTermNum.value + ')' : '未命名学期',
-    //     begindate: '',
-    //     enddate: '',
-    //     remark: '',
-    //     iscurrentterm: 0,
-    //     editingTermName: false,
-    //     editingbegindate: false,
-    //     editingEndDate: false,
-    //     editingRemark: false,
-    //     tempTermName: '',
-    // })
+   nullTermNum.value ++;
+  const tempTerminfo = ref({
+    termname:nullTermNum.value > 1 ? '未命名学期(' + nullTermNum.value + ')' : '未命名学期',
+    begindate:ref(`${new Date().toISOString().split('T')[0]}`),
+    enddate:"",
+    remark:"",
+  });
+
+  request.post('/sysmangt/terms/create',tempTerminfo.value)
+      .then(res => {
+        // 登录成功
+        if (res.code === 200) {
+          ElMessage({
+            type: 'success',
+            message: '新增学期成功'
+          });
+          //这里刷新dom
+          // nullRoleNum.value = 0;
+          getTableData();
+        }
+      })
+      .catch(() => {
+            ElMessage({
+              type: 'error',
+              message: '新增学期失败'
+            });
+          }
+      );
 };
+/*****************************************/
 
-const selected = ref([]);
 
-// const exportType = ref('导出全部学期')
-
-/*判定哪些行被选中*/
+/**************判定哪些行被选中***************/
 const handleSelect = (selection) => {
-    console.log(selection);
-    selected.value = selection;
+    selectedRows.value = selection;
 
 };
-/*****************/
-
-
-const selectedRows = ref([]);
-
+//选中改变时
 const handleSelectionChange = (selection) => {
   selectedRows.value = selection;
 };
@@ -155,13 +173,10 @@ const columns = ref([
   { prop: 'iscurrentterm', label: '当前学期' },
 ]);
 
-//导出数据
+/***************导出学期****************/
 const exportData = () => {
   // 获取选中的行
   const dataToExport = selectedRows.value.length > 0 ? selectedRows.value : tableData.value;
-
-  console.log(dataToExport)
-
   // 检查是否有数据可导出
   if (dataToExport.length === 0) {
     ElMessage({
@@ -188,10 +203,11 @@ const exportData = () => {
         })
       })
 }
+/*************************************/
 
-
+/***************删除学期****************/
 const deleteTerm = () => {
-    if(selected.value.length === 0){
+    if(selectedRows.value.length === 0){
         ElMessage({
             type: 'warning',
             message: '未选择学期',
@@ -199,7 +215,7 @@ const deleteTerm = () => {
         });
         return ;
     }
-    if (selected) {
+    if (selectedRows) {
         ElMessageBox.confirm(
             '选中的学期将被删除，是否确定',
             '警告',
@@ -209,36 +225,78 @@ const deleteTerm = () => {
                 type: 'warning',
             }
         ).then(() => {
-            // tableData.value = tableData.value.filter((row) => !selected.value.includes(row));
-            console.log(selected.value)
-
-
-            // console.log(tableData.value);
+          selectedRows.value.forEach(item=>{
+          deleteTermList.value.push(item.id)
+          });
+          console.log("curr"+currentTermID.value)
+          console.log("delete"+deleteTermList.value)
+          if(deleteTermList.value.includes(currentTermID.value)){
             ElMessage({
-                type: 'success',
-                message: '删除成功'
+              type: 'error',
+              message: '无法删除当前学期'
             });
-            selected.value = [];
-        }).catch(() => { });
+          }else {
+            request.post('/sysmangt/terms/delete', deleteTermList.value)
+                .then(res => {
+                  // 登录成功
+                  if (res.code === 200) {
+                    ElMessage({
+                      type: 'success',
+                      message: '删除学期成功'
+                    });
+                    //这里刷新dom
+                    getTableData();
+                  }
+                })
+                .catch(() => {
+                      ElMessage({
+                        type: 'error',
+                        message: '删除学期失败'
+                      });
+                    }
+                );
+          }
+
+          selectedRows.value = [];
+          deleteTermList.value=[];
+        })
+            .catch(() => { });
     }
+};
+/**********************************************/
+
+/*********************修改当前学期****************/
+const changeStatus = (selectedRow) => {
+  currentTermID.value = selectedRow.id;
+  console.log(currentTermID.value)
+  request.get ('/sysmangt/terms/currentterm?id='+currentTermID.value)
+      .then(res => {
+        // 登录成功
+        if (res.code === 200) {
+          ElMessage({
+            type: 'success',
+            message: '修改当前学期成功'
+          });
+          //这里刷新dom
+          // nullRoleNum.value = 0;
+          nextTick(() => {
+
+            getTableData();
+
+          })
+        }
+      })
+      .catch(() => {
+            ElMessage({
+              type: 'error',
+              message: '修改当前学期失败'
+            });
+          }
+      );
 };
 
 /*********处理点击获取焦点和失焦后数据保存********/
 const inputsRefs = ref({});
-const handleClick = (row, field) => {
-    row[field] = true
-    // console.log(row);
-    if(field === 'editingTermName') row.tempTermName = row.termname;
-
-    nextTick(() => {
-    const inputRef = `input-${row.id}`;
-    const inputElement = inputsRefs.value[inputRef];
-    if (inputElement) {
-      inputElement.focus();
-    }
-  });
-
-};
 
 const setInputRef = (el, row) => {
   if (el) {
@@ -246,36 +304,85 @@ const setInputRef = (el, row) => {
   }
 };
 
-const handleBlur = (row, field) => {
-    if(row.termname !== row.tempTermName){
-        if(field === 'editingTermName' && row.tempTermName.includes('未命名学期') && row.termname !== row.tempTermName){
-            ElMessage.error('命名不可包含“未命名学期”');
-        }
-        else if(row.tempTermName !== '' && row.termname !== row.tempTermName) row.termname = row.tempTermName;
-    }
-    row.tempTermName = '';
-    row[field] = false;
-    // console.log(tableData.value);
-};
+let orirow = null;
+let rowdata =null;
+let hasChanged = null;
+const handleClick = (row, field) => {
 
+  orirow = JSON.parse(JSON.stringify(row));
+  console.log(orirow)
+  nextTick(() => {
+    row[field] = true;
+    setTimeout(() => {
+      const inputRef = `input-${row.id}`;
+      // 假设 inputsRefs.value[inputRef] 是对 el-input 组件的引用
+      const inputComponent = inputsRefs.value[inputRef];
 
-
-const changeStatus = (selectedRow) => {
-  tableData.value.forEach(row => {
-    // 将所有行的iscurrentterm设置为0
-    row.iscurrentterm = "0";
-    row.iscurrenttermBoolean = false;
+      // 检查 inputComponent 并尝试获取其内部的 input 元素
+      if (inputComponent && inputComponent.$refs.input) {
+        const nativeInputElement = inputComponent.$refs.input;
+        nativeInputElement.focus();
+        const len = nativeInputElement.value.length;
+        nativeInputElement.setSelectionRange(len, len);
+      }
+    }, 0);
   });
-  // 将选中行的iscurrentterm设置为1
-  selectedRow.iscurrentterm = "1";
-  selectedRow.iscurrenttermBoolean = true;
+};
+const handleBlur = (row, field) => {
 
   nextTick(() => {
-    //发后端更新
-  })
+
+    row[field] = false;
+    rowdata= JSON.parse(JSON.stringify(row));
+    console.log(rowdata)
+    console.log(orirow)
+    //isEqual(a,b) a,b是否相同
+    hasChanged = isEqual(rowdata, orirow);
+
+    if(hasChanged){
+      ElMessage({
+        type: 'info',
+        message: '无修改字段'
+      });
+    }else{
+      const updateItem = ref({
+        id:toRaw(row).id,
+        termname:toRaw(row).termname,
+        begindate:toRaw(row).begindate,
+        enddate:toRaw(row).enddate,
+        remark:toRaw(row).remark
+      })
+      request.post('/sysmangt/terms',updateItem.value)
+          .then(res => {
+            // 登录成功
+            if (res.code === 200) {
+              ElMessage({
+                type: 'success',
+                message: '修改x学期信息成功'
+              });
+              //这里刷新dom
+              getTableData();
+            }
+          })
+          .catch(() => {
+                ElMessage({
+                  type: 'error',
+                  message: '修改学期信息失败'
+                });
+                getTableData();
+              }
+          )
+    }
+  });
 };
 
 
+
+
+
+onMounted(() => {
+  getTableData();
+});
 </script>
 
 <style scoped>
