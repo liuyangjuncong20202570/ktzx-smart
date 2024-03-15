@@ -81,8 +81,9 @@ const closeDialog = () => {
 
 //从后端请求菜单数据
 const getmenu = (row) => {
-  console.log(row.rolecode);
-  request.get('/sysmangt/rolepurview/menus?rolecode=' + row.rolecode)
+  // console.log(row.rolecode);
+  // console.log(row.id);
+  request.get('/sysmangt/rolepurview/menus?id=' + row.id)
       .then(res => {
         if (res.code === 200) {
           // showmenu.value = true;
@@ -141,7 +142,7 @@ const handleCheckChange = (node, data, key) => {
   // console.log(menuname);
   const updateItem = ref({
     "id":String(data.id),
-    "rolecode":String(roledata.value.rolecode),
+    "roleid":String(roledata.value.id),
     "status":String(data.status),
   })
 //调取更新接口
