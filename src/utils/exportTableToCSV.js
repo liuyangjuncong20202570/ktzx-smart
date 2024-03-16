@@ -23,7 +23,7 @@ function exportTableToCSV(tableData, columns) {
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'table-data.csv';  // 文件名
+    link.download = 'table_data.csv';  // 文件名
     link.click();
 }
 

@@ -107,7 +107,6 @@ const initialize = () => {
     item.editingHomeName = false;
     item.editingHomeUrl = false;
     item.editingRemark = false;
-    // item.tempRolename = '';
     if (item.rolename.includes('未命名角色')) {
       if (item.rolename.length > 5 && nullRoleNum.value < Number(item.rolename[6])) {
         nullRoleNum.value = Number(item.rolename[6]);

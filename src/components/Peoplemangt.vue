@@ -248,8 +248,6 @@ const handleSelectionChange = (selection) => {
 const exportData = () => {
   // 获取选中的行
    const dataToExport = selectedRows.value.length > 0 ? selectedRows.value : peoplelist.value;
-  // exportTableToCSV(dataToExport, columns.value);
-
   // 检查是否有数据可导出
   if (dataToExport.length === 0) {
     ElMessage({

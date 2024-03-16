@@ -36,7 +36,7 @@
                     </el-table-column>
                     <el-table-column prop="enddate" label="结束日期" min-width="120">
                         <template #default="{ row }">
-                            <el-date-picker v-if="row.editingEndDate" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.enddate"
+                            <el-date-picker v-if="row.editingEndDate" :ref="el=>setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.enddate"
                                 @blur="handleBlur(row, 'editingEndDate')" placeholder="请选择日期" value-format="YYYY-MM-DD"></el-date-picker>
                             <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingEndDate')">
                                 {{ row.enddate }}
@@ -317,13 +317,16 @@ const handleClick = (row, field) => {
       const inputRef = `input-${row.id}`;
       // 假设 inputsRefs.value[inputRef] 是对 el-input 组件的引用
       const inputComponent = inputsRefs.value[inputRef];
-
+      const datePickerComponent = inputsRefs.value[inputRef];
       // 检查 inputComponent 并尝试获取其内部的 input 元素
       if (inputComponent && inputComponent.$refs.input) {
         const nativeInputElement = inputComponent.$refs.input;
         nativeInputElement.focus();
         const len = nativeInputElement.value.length;
         nativeInputElement.setSelectionRange(len, len);
+      }
+      if (datePickerComponent) {
+        datePickerComponent.focus(); // 尝试让 date-picker 聚焦，这可能会使其弹出日期选择面板
       }
     }, 0);
   });
