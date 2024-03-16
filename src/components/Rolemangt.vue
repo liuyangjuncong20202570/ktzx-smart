@@ -1,120 +1,158 @@
 <template>
-  <el-container style="height: 92vh;">
-    <!--两个按钮，靠最左-->
-    <el-header
-      style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
-      <el-button type="primary" style="margin-left: 0.8vw;margin-right: 0.8vw;" @click="handleRoleAdd">添加</el-button>
+	<el-container style="height: 92vh;">
+		<!--两个按钮，靠最左-->
+		<el-header
+			style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
+			<el-button type="primary" style="margin-left: 0.8vw;" @click="handleRoleAdd">新增角色</el-button>
+			<el-button type="danger" @click="handleRoleDel">删除</el-button>
+			<el-button type="success" @click="">保存</el-button>
+		</el-header>
+		<el-main style="padding: 0;overflow: auto;">
+			<!--生成-->
+			<el-table :data="tableData" style="height: 100%; table-layout:auto; width: 100%;" v-model="selected"
+				@select="handleSelect" @select-all="handleSelectAll"
+				:default-sort="{ prop: 'rolecode', order: 'ascending' }"  stripe>
+				<el-table-column type="selection" width="55"></el-table-column>
+        
+				<el-table-column prop="rolecode"  label="角色代码" width="110">
+          <template #default="{ row }">
+            <el-input v-if="row.editingRolecode" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.rolecode"
+                      @blur="handleBlur(row, 'editingRolecode')"></el-input>
+            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingRolecode')">{{
+                row.rolecode }}
+            </div>
+          </template>
 
-      <el-dialog :modelValue="dialogVisible" :show-close="false" :close-on-click-modal="false" title="新增角色">
-        <!-- 弹窗内容 -->
-        <el-form ref="form" :model="Addform" :rules="Addrules" label-width="80px">
-          <el-form-item label="角色名称" prop="name">
-            <el-input v-model="Addform.name" placeholder="请输入角色名称"></el-input>
-          </el-form-item>
-          <el-form-item label="角色类型" prop="type">
-            <el-input v-model="Addform.type" placeholder="请输入角色类型"></el-input>
-          </el-form-item>
-          <el-form-item label="首页名称" prop="homepagename">
-            <el-input v-model="Addform.homepagename" placeholder="请输入首页名称"></el-input>
-          </el-form-item>
-          <el-form-item label="首页地址" prop="homepageurl">
-            <el-input v-model="Addform.homepageurl" placeholder="请输入首页地址"></el-input>
-          </el-form-item>
-          <!-- 添加更多表单项 -->
-          <el-form-item label="角色描述" prop="description">
-            <el-input v-model="Addform.description" type="textarea" placeholder="请输入角色描述"></el-input>
-          </el-form-item>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="confirmAdd">确 定</el-button>
-        </span>
-      </el-dialog>
-      <el-button type="danger" @click="handleRoleDel">删除</el-button>
-      <el-button type="success" @click="">保存</el-button>
-    </el-header>
-    <el-main style="padding: 0;">
-      <!--生成-->
-      <el-table :data="tableData" style="table-layout:auto; width: 100%;" v-model="selected"
-        @select="handleSelect" @select-all="handleSelectAll" stripe>
-        <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="rolecode" label="角色代码" width="100">
-        </el-table-column>
-        <el-table-column prop="rolename" label="角色名称" width="220">
-          <template #default="{ row }">
-            <el-input v-if="row.editingRolename" style="width: 190px; height: 25px;" v-model="row.rolename" @blur="handleBlur(row, 'editingRolename')"></el-input>
-            <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingRolename')">{{ row.rolename }}</div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="roletype" label="角色类型" width="220">
-          <template #default="{ row }">
-            <el-input v-if="row.editingRoletype" style="width: 190px; height: 25px;" v-model="row.roletype" @blur="handleBlur(row, 'editingRoletype')"></el-input>
-            <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingRoletype')">{{ row.roletype }}</div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="homepage" label="首页" width="220">
-          <template #default="{ row }">
-            <el-input v-if="row.editingHomepage" style="width: 190px; height: 25px;" v-model="row.homepage" @blur="handleBlur(row, 'editingHomepage')"></el-input>
-            <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingHomepage')">{{ row.homepage }}</div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="homeurl" label="首页地址" width="220">
-          <template #default="{ row }">
-            <el-input v-if="row.editingHomeUrl" style="width: 190px; height: 25px;" v-model="row.homeUrl" @blur="handleBlur(row, 'editingHomeUrl')"></el-input>
-            <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingHomeUrl')">{{ row.homeurl }}</div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="remark" label="角色描述">
-          <template #default="{ row }">
-            <el-input v-if="row.editingRemark" style="height: 25px;" v-model="row.roleDescri" @blur="handleBlur(row, 'editingRemark')"></el-input>
-            <div v-else style="width: 200px; height: 25px;" @click="handleClick(row, 'editingRemark')">{{ row.remark }}</div>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-main>
+				</el-table-column>
+				<el-table-column prop="rolename" label="角色名称" min-width="150">
+					<template #default="{ row }">
+						<el-input v-if="row.editingRolename" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.rolename"
+							@blur="handleBlur(row, 'editingRolename')"></el-input>
+						<div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingRolename')">{{
+							row.rolename }}
+						</div>
+					</template>
+				</el-table-column>
+				<el-table-column prop="homename" label="首页" min-width="150">
+					<template #default="{ row }">
+						<el-input v-if="row.editingHomeName" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.homename"
+							@blur="handleBlur(row, 'editingHomeName')"></el-input>
+						<div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingHomeName')">{{
+							row.homename }}
+						</div>
+					</template>
+				</el-table-column>
+				<el-table-column prop="homeurl" label="首页地址" min-width="220">
+					<template #default="{ row }">
+						<el-input v-if="row.editingHomeUrl" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.homeurl"
+							@blur="handleBlur(row, 'editingHomeUrl')"></el-input>
+						<div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingHomeUrl')">{{
+							row.homeurl }}
+						</div>
+					</template>
+				</el-table-column>
+				<el-table-column prop="remark" label="备注" min-width="200">
+					<template #default="{ row }">
+						<el-input v-if="row.editingRemark" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.remark"
+							@blur="handleBlur(row, 'editingRemark')"></el-input>
+						<div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingRemark')">{{
+							row.remark }}
+						</div>
+					</template>
+				</el-table-column>
+			</el-table>
+		</el-main>
 
-  </el-container>
+	</el-container>
 </template>
 <script setup>
-import { reactive, ref } from "vue";
-import { Edit, Right } from '@element-plus/icons-vue'
+import {reactive, ref, computed, onMounted, nextTick,toRaw} from "vue";
 import request from "../utils/request.js";
-import router from "../router/index.js";
 import { ElMessage, ElMessageBox } from 'element-plus';
+import isEqual from 'lodash/isEqual.js'
 
-const dialogVisible = ref(false);
-const Addform = ref({
-  name: '',
-  type: '',
-  homepagename: '',
-  homepageurl: '',
-});
-// 添加角色
-const handleRoleAdd = () => {
-  // console.log(dialogVisible.value)
-  // dialogVisible.value = true; // 使用 .value 来设置 dialogVisible
-  // console.log(dialogVisible.value)
-  tableData.value.push({
-    rolecode: tableData.value.length + 1 + '',
-    rolename: '',
-    roletype: '',
-    homepage: '',
-    homeurl: '',
-    remark: '',
-    editingRolename: false,
-    editingRoletype: false,
-    editingHomepage: false,
-    editingHomeUrl: false,
-    editingRemark: false,
+
+/**************获取表单数据，并预处理*******************/
+
+const tableData = ref([]);
+
+//未命名的角色数
+const nullRoleNum = ref(0);
+
+const getTableData = () => {
+  request.get('/sysmangt/rolemangt')
+      .then(res => {
+        // 登录成功
+        if (res.code === 200) {
+          tableData.value = res.data;
+          initialize();
+        }
+      })
+      .catch(() => {
+            ElMessage({
+              type: 'error',
+              message: '获取角色列表失败'
+            });
+          }
+      );
+};
+
+//初始化数据
+const initialize = () => {
+  tableData.value.forEach(item => {   // 为每一个表格数据添加是否显示输入框的判定
+    item.rolecode = Number(item.rolecode);
+    item.editingRolecode = false;
+    item.editingRolename = false;
+    item.editingRoletype = false;
+    item.editingHomeName = false;
+    item.editingHomeUrl = false;
+    item.editingRemark = false;
+    if (item.rolename.includes('未命名角色')) {
+      if (item.rolename.length > 5 && nullRoleNum.value < Number(item.rolename[6])) {
+        nullRoleNum.value = Number(item.rolename[6]);
+      }
+      else if (item.rolename.length === 5 && nullRoleNum.value === 0) nullRoleNum.value++;
+    }
   });
 };
-// 确定新增角色
-const confirmAdd = () => {
-  // 处理添加逻辑
-  dialogVisible.value = false; // 使用 .value 来设置 dialogVisible
-  console.log(Addform.value); // 使用 .value 来访问 Addform
+
+/*******************************************************/
+
+/*********************添加角色***************************/
+const handleRoleAdd = () => {
+  nullRoleNum.value++;
+  const tempRoleinfo = ref({
+    rolecode:"99",
+    rolename:nullRoleNum.value > 1 ? '未命名角色(' + nullRoleNum.value + ')' : '未命名角色',
+    remark:"",
+    homename:"",
+    homeurl:""
+  });
+  console.log(tempRoleinfo.value);
+  //
+  request.post('/sysmangt/rolemangt',tempRoleinfo.value)
+      .then(res => {
+        // 登录成功
+        if (res.code === 200) {
+          ElMessage({
+            type: 'success',
+            message: '新增角色成功'
+          });
+          //这里刷新dom
+          // nullRoleNum.value = 0;
+          getTableData();
+        }
+      })
+      .catch(() => {
+            ElMessage({
+              type: 'error',
+              message: '新增角色失败'
+            });
+          }
+      );
 };
 
+/******************选中逻辑处理***************/
 const selected = ref([]);
 
 /*判定哪些行被选中*/
@@ -125,121 +163,160 @@ const handleSelect = (selection) => {
 const handleSelectAll = (selection) => {
   selected.value = selection;
 };
-/*****************/
 
-const handleClick = (row, field) => {
-  row[field] = true
-  console.log(row);
-};
+/*********处理点击获取焦点和失焦后数据保存********/
+const inputsRefs = ref({});
 
-const handleBlur = (row, field) => {
-  row[field] = false;
-  console.log(row);
-};
-
-const handleRoleDel = () => {
-  if(selected){
-    ElMessageBox.confirm(
-      '选中的角色将被删除，是否确定',
-      '警告',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }
-    )
-      .then(() => {
-        tableData.value = tableData.value.filter((row) => !selected.value.includes(row));
-        ElMessage({
-          type: 'success',
-          message: '删除成功'
-        })
-      }).catch(() => {});
+const setInputRef = (el, row) => {
+  if (el) {
+    inputsRefs.value[`input-${row.id}`] = el;
   }
 };
 
-// const Addrules = reactive({
-//   name: [
-//     { required: true, message: '请输入角色名称', trigger: 'blur' },
-//     { min: 2, max: 30, message: '角色名称长度在 2 到 30 个字符', trigger: 'blur' }
-//   ],
-//   type: [
-//     { required: true, message: '请输入角色类型', trigger: 'blur' },
-//     // 更多验证规则
-//   ],
-//   homepagename: [
-//     { required: true, message: '请输入首页名称', trigger: 'blur' },
-//     // 更多验证规则
-//   ],
-//   homepageurl: [
-//     { required: true, message: '请输入首页地址', trigger: 'blur' },
-//     // 更多验证规则
-//   ],
-//   description: [
-//     { required: true, message: '请输入角色描述', trigger: 'blur' },
-//     // 更多验证规则
-//   ],
-//   permissions: [
-//     { type: 'array', required: true, message: '请至少选择一个权限', trigger: 'change' }
-//   ],
-//   // 更多验证规则
-// })
+let orirow = null;
+let rowdata =null;
+let hasChanged = null;
+const handleClick = (row, field) => {
+  orirow = JSON.parse(JSON.stringify(row));
+  console.log(orirow)
+  nextTick(() => {
+    row[field] = true;
+    setTimeout(() => {
+      const inputRef = `input-${row.id}`;
+      // 假设 inputsRefs.value[inputRef] 是对 el-input 组件的引用
+      const inputComponent = inputsRefs.value[inputRef];
 
-
-const tableData = ref([
-// {
-//   id: '1',
-//   rolename: '超级管理员',
-//   roletype: '系统管理员',
-//   homepage: '首页',
-//   homeUrl: '',
-//   roleDescri: ''
-// },
-// {
-//   id: '2',
-//   rolename: '管理员',
-//   roletype: '系统管理员',
-//   homepage: '首页',
-//   homeUrl: '',
-//   roleDescri: ''
-// },
-// {
-//   id: '3',
-//   rolename: '普通用户',
-//   roletype: '普通用户',
-//   homepage: '首页',
-//   homeUrl: '',
-//   roleDescri: ''
-// }
-]);
-
-tableData.value.forEach(item => {   // 为每一个表格数据添加是否显示输入框的判定
-  item.editingRolename = false;
-  item.editingRoletype = false;
-  item.editingHomepage = false;
-  item.editingHomeUrl = false;
-  item.editingRemark = false;
-});
-
-request.get('/sysmangt/rolemangt')
-  .then(res => {
-    // 登录成功
-    if (res.code === 200) {
-      tableData.value = res.data;
-      console.log(res.data);
-    }
-  }).catch(error => {
-    // 获取失败
-    ElMessage({
-      type: 'error',
-      message: '获取角色失败'
-    });
+      // 检查 inputComponent 并尝试获取其内部的 input 元素
+      if (inputComponent && inputComponent.$refs.input) {
+        const nativeInputElement = inputComponent.$refs.input;
+        nativeInputElement.focus();
+        const len = nativeInputElement.value.length;
+        nativeInputElement.setSelectionRange(len, len);
+      }
+    }, 0);
   });
+};
+const handleBlur = (row, field) => {
+
+  nextTick(() => {
+
+	  row[field] = false;
+    rowdata= JSON.parse(JSON.stringify(row));
+    console.log(rowdata)
+    console.log(orirow)
+    //isEqual(a,b) a,b是否相同
+    hasChanged = isEqual(rowdata, orirow);
+
+
+  if(hasChanged){
+    ElMessage({
+      type: 'info',
+      message: '无修改字段'
+    });
+  }else{
+    const updateItem = ref({
+      id:toRaw(row).id,
+      rolecode:toRaw(row).rolecode,
+      rolename:toRaw(row).rolename,
+      remark:toRaw(row).remark,
+      homename:toRaw(row).homename,
+      homeurl:toRaw(row).homeurl
+    })
+    request.post('/sysmangt/rolemangt/update',updateItem.value)
+        .then(res => {
+          // 登录成功
+          if (res.code === 200) {
+            ElMessage({
+              type: 'success',
+              message: '修改角色信息成功'
+            });
+            //这里刷新dom
+            getTableData();
+          }
+        })
+        .catch(() => {
+              ElMessage({
+                type: 'error',
+                message: '修改角色信息失败'
+              });
+              getTableData();
+            }
+        )
+  }
+  });
+};
+
+/**************************************/
+
+
+
+/**************************************/
+
+const deleteIdList = ref([]);
+
+const handleRoleDel = () => {
+	if (selected.value.length === 0) {
+		ElMessage({
+			type: 'warning',
+			message: '未选择角色',
+			duration: 800
+		});
+		return;
+	}
+  else{
+		ElMessageBox.confirm(
+			'选中的角色将被删除，是否确定',
+			'警告',
+			{
+				confirmButtonText: '确定',
+				cancelButtonText: '取消',
+				type: 'warning',
+			}
+		)
+			.then(() => {
+        selected.value.forEach(item=>{
+          deleteIdList.value.push(item.id)
+            }
+        )
+        request.post('/sysmangt/rolemangt/delete',deleteIdList.value)
+            .then(res => {
+              // 登录成功
+              if (res.code === 200) {
+                ElMessage({
+                  type: 'success',
+                  message: '删除成功'
+                });
+                //这里刷新dom
+                getTableData();
+              }
+            })
+            .catch(() => {
+                  ElMessage({
+                    type: 'error',
+                    message: '删除角色失败'
+                  });
+                }
+            );
+				selected.value = [];
+        deleteIdList.value=[];
+			}).catch(() => { });
+	}
+};
+
+
+
+onMounted(() => {
+	getTableData();
+});
 </script>
 
 <style scoped>
-.custom-icon:hover {
-  color: rgb(0, 115, 255) !important;
-  cursor: pointer;
+/deep/.el-table .cell {
+  text-align: center;
 }
+.custom-icon:hover {
+	color: rgb(0, 115, 255) !important;
+	cursor: pointer;
+}
+
 </style>
