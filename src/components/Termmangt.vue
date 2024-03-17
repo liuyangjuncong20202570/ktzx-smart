@@ -115,7 +115,18 @@ const initialize = () => {
         else{
           item.iscurrenttermBoolean = false;
         }
-        //差一个处理名字的逻辑
+        
+        // 处理名字的逻辑
+        if (item.termname.includes('未命名学期')) {
+          if (item.termname.length > 5) {
+            let num = '';
+            for(let i = 6; item.termname[i] !== ')'; i++){
+              num += item.termname[i];
+            }
+            if(nullTermNum.value < Number(num)) nullTermNum.value = Number(num);
+          }
+          else if (item.termname.length === 5 && nullTermNum.value === 0) nullTermNum.value++;
+        }
     });
 };
 

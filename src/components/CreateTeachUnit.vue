@@ -108,12 +108,18 @@ const initialize = (nodes) => {
     node.popVisible = false;
     node.inputVisible = false;
     node.tempData = '';
-    if(node.obsname.includes('未命名节点')){
-      if(node.obsname.length > 5 && nullNodeNum.value < Number(node.obsname[6])){
-        nullNodeNum.value = Number(node.obsname[6]);
+    
+    if (node.obsname.includes('未命名节点')) {
+      if (node.obsname.length > 5) {
+        let num = '';
+        for(let i = 6; node.obsname[i] !== ')'; i++){
+          num += node.obsname[i];
+        }
+        if(nullNodeNum.value < Number(num)) nullNodeNum.value = Number(num);
       }
-      else if(node.obsname.length === 5 && nullNodeNum.value === 0) nullNodeNum.value ++;
+      else if (node.obsname.length === 5 && nullNodeNum.value === 0) nullNodeNum.value++;
     }
+
     if (node.children && node.children.length > 0) {
       initialize(node.children); // 递归子节点
     }

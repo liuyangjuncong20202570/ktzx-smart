@@ -56,6 +56,26 @@ const routes = [
                 name: 'CourseManagement',
                 component: () => import('../components/Coursemangt.vue')
             },
+            {
+                path: 'coursemanagerhome',
+                name: 'CourseManagerHomePage',
+                component: () => import('../components/CourseManagerHomePage.vue')
+            },
+            {
+                path: 'evasys/courseinfo/formative/keyword',
+                name: 'Keyword',
+                component: () => import('../components/Keyword.vue')
+            },
+            {
+                path: 'evasys/courseinfo/formative/ability',
+                name: 'Ability',
+                component: () => import('../components/Ability.vue')
+            },
+            {
+                path: 'evasys/courseinfo/formative/teachingobjectives',
+                name: 'TeachingObjectives',
+                component: () => import('../components/TeachingObjectives.vue')
+            },
         ]
     },
 ];
