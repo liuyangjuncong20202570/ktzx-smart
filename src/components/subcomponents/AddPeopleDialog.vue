@@ -1,36 +1,38 @@
 <template>
   <div style="padding:0;margin:0;">
-    <el-dialog style="width:65vw;min-height:45vh" v-model="dialogVisible" @close="closeDialog">
-      <el-container>
+    <el-dialog
+        :destroy-on-close="true" :show-close="false" :close-on-click-modal="false"
+        style="width:40vw;" v-model="dialogVisible" @close="closeDialog">
+      <el-container style="margin-left:0">
         <!-- 对话框头部区域 -->
         <el-header style="height: auto; padding: 2px 0px; width:100%; display: flex; align-items: center;">
 
         </el-header>
-        <el-main>
+        <el-main style="padding-left:0">
           <el-form ref="formRef" :model="newform"  :rules="rules" label-width="100px">
-            <el-form-item label="用户名">
-              <el-input v-model="newform.username" :rules="rules.username"></el-input>
+            <el-form-item label="用户名" prop="username">
+              <el-input v-model="newform.username"></el-input>
             </el-form-item>
-            <el-form-item label="登录名">
-              <el-input v-model="newform.loginname" :rules="rules.loginname"></el-input>
+            <el-form-item label="登录名" prop="loginname">
+              <el-input v-model="newform.loginname" ></el-input>
             </el-form-item>
-            <el-form-item label="密码">
-              <el-input v-model="newform.pwd" show-password :rules="rules.pwd"></el-input>
+            <el-form-item label="密码" prop="pwd">
+              <el-input type="password" v-model="newform.pwd" show-password></el-input>
             </el-form-item>
-            <el-form-item :label="newform.category === '1' ? '学号' : '工号'">
-              <el-input v-model="newform.personnelno" :rules="rules.personnelno"></el-input>
+            <el-form-item :label="newform.catelog === '1' ? '学号' : '工号'" prop="personnelno">
+              <el-input v-model="newform.personnelno"></el-input>
             </el-form-item>
-            <el-form-item label="手机号">
-              <el-input v-model="newform.phone" :rules="rules.phone"></el-input>
+            <el-form-item label="手机号" prop="phone">
+              <el-input v-model="newform.phone"></el-input>
             </el-form-item>
-            <el-form-item label="人员类别">
-              <el-radio-group v-model="newform.category" :rules="rules.category">
+            <el-form-item label="人员类别" prop="catelog">
+              <el-radio-group v-model="newform.catelog">
                 <el-radio label="1">学生</el-radio>
                 <el-radio label="2">老师</el-radio>
               </el-radio-group>
             </el-form-item>
 
-            <el-form-item label="状态">
+            <el-form-item label="状态" >
               <el-switch v-model="newform.status" :active-value="'1'" :inactive-value="'0'"></el-switch>
               <span style="margin-left: 10px; color: blue;">{{ newform.status === '1' ? '正常' : '停用' }}</span>
             </el-form-item>
@@ -51,8 +53,8 @@
               <el-input type="textarea" v-model="newform.remark"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="info" style="min-width:150px" @click="closeDialog">取消</el-button>
-              <el-button type="success" style="min-width:150px" @click="Addpeople(formRef)">新增</el-button>
+              <el-button type="info" large style="width: 40%" @click="closeDialog">取消</el-button>
+              <el-button type="success"  large style="width: 40%"  @click="submitForm">新增</el-button>
             </el-form-item>
           </el-form>
         </el-main>
@@ -66,6 +68,7 @@ import {ref, reactive, defineExpose, watch, nextTick, onMounted, getCurrentInsta
 import request from "../../utils/request.js";
 import {ElMessage} from "element-plus";
 import {Document, Folder} from "@element-plus/icons-vue";
+import Peoplemangt from "../Peoplemangt.vue"
 
 //显示弹窗组件
 const dialogVisible = ref(false);
@@ -76,7 +79,7 @@ const newform = reactive({
   pwd: '123456',
   personnelno: '',
   phone: '',
-  category: '', // default value
+  catelog: '', // default value
   status: '1', // default to '有效'
   obsid: '',
   obsname:'',
@@ -92,7 +95,7 @@ const rules = reactive({
     { required: true, message: '请输入手机号', trigger: 'blur' },
     { pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }
   ],
-  category: [{ required: true, message: '请选择人员类别', trigger: 'change' }],
+  catelog: [{ required: true, message: '请选择人员类别', trigger: 'change' }],
   obsid: [{ required: true, message: '请选择机构', trigger: 'change' }]
 });
 
@@ -115,57 +118,49 @@ function init(form,oriobsmenulist) {
   console.log(newform)
 }
 
+const emit = defineEmits(['formSubmitted']);
 
 
 //将init函数暴露给父组件
 defineExpose({ init });
 
-const Addpeople = () => {
+const submitForm = () => {
+  formRef.value.validate((valid) => {
+    if (valid) {
+      const { obsid, ...dataToSend } = newform;
+      console.log(dataToSend);
+      // 表单验证通过，处理表单提交逻辑
+      request.post('/sysmangt/personnelmangt/create', dataToSend)
+          .then(res => {
+            if (res.code === 200) {
+              ElMessage({
+                type: 'success',
+                message: '新增角色成功'
+              });
+              emit('formSubmitted');
+              closeDialog();
 
+            }
+          }).catch(error => {
+        ElMessage({
+          type: 'error',
+          message: '新增角色失败'
+        });
+      });
+    } else {
+      // 表单验证未通过
+      ElMessage({
+        type: 'error',
+        message: '请输入正确的信息'
+      });
+    }
+  });
 };
-
-
 
 
 //关闭对话框方法
 const closeDialog = () => {
   dialogVisible.value = false;
-};
-
-//从后端请求菜单数据
-const getmenu = (row) => {
-  // console.log(row.rolecode);
-  // console.log(row.id);
-  request.get('/sysmangt/rolepurview/menus?id=' + row.id)
-      .then(res => {
-        if (res.code === 200) {
-          // showmenu.value = true;
-          rolepurviewData.value = res.data;
-          // 初始化 checkedEdit 和 checkedView
-          initializeCheckStatus(rolepurviewData.value);
-          // console.log(res.data);
-          console.log(rolepurviewData.value);
-        }
-      }).catch(error => {
-    ElMessage({
-      type: 'error',
-      message: '获取角色对应菜单列表失败'
-    });
-  });
-};
-
-//初始化两个状态选择框
-const initializeCheckStatus = (nodes) => {
-  nodes.forEach(node => {
-    // 根据 status 字段设置 checkedEdit 和 checkedView
-    node.checkedEdit = node.status === '1';
-    node.checkedView = node.status === '1' || node.status === '2';
-
-    // 如果有子节点，递归初始化
-    if (node.children && node.children.length > 0) {
-      initializeCheckStatus(node.children);
-    }
-  });
 };
 
 

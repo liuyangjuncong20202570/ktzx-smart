@@ -11,6 +11,6 @@ import {clickOutside} from './directives/clickOutside.js'
 const pinia = createPinia();
 createApp(App).use(router).use(pinia).use(ElementPlus)
     .directive('blur-on-click', blurOnClick)
-    // .directive('click-outside',clickOutside)
+    .directive('click-outside',clickOutside)
     .mount('#app')
 

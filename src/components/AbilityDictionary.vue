@@ -21,15 +21,17 @@
             </div>
 
             <div class="tree-container" style="height: calc(100% - 25px); overflow:auto;">
-                <el-tree :data="treeData" draggable
-                         :props="defaultProps"
-                         node-key="id"
-                         :expand-on-click-node="true"
-                         ref="nodeExpand"
-                         :default-expand-all="expandAll"
-                         @node-drag-start="handleDragStart"
-                         @node-drag-end="handleDragEnd"
-                         @node-contextmenu="clickNode"
+                <el-tree 
+                        :data="treeData"
+                        draggable
+                        node-key=""
+                        :props="defaultProps"
+                        :expand-on-click-node="true"
+                        ref="nodeExpand"
+                        :default-expand-all="expandAll"
+                        @node-drag-start=""
+                        @node-drag-end=""
+                        @node-contextmenu=""
                          >
                     <template #default="{ node }">
                         <div style="display: flex; justify-content: space-between; flex: auto; text-align: left;">
@@ -337,6 +339,18 @@ const treeData = ref([
         ]
     }
 ])
+
+const nodeExpand = ref(null);
+
+const expandAll = ref(false);
+
+//展开所有或收起所有
+const changeTreeExpand = () => {
+    expandAll.value = !expandAll.value;
+    for (let i = 0; i < nodeExpand.value.store._getAllNodes().length; i++) {
+        nodeExpand.value.store._getAllNodes()[i].expanded = expandAll.value;
+    }
+}
 
 </script>
 

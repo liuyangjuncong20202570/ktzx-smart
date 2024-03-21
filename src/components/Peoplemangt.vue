@@ -69,12 +69,11 @@
           </div>
         </div>
 
-        <AddPeopleDialog  v-show="dialogVisible"  ref="DialogShow" />
-
+        <AddPeopleDialog  v-show="dialogVisible"  ref="DialogShow" @formSubmitted="getPeopleList" />
 
         <!--老师tab-->
         <div v-if="activeTab === '2'" style="" >
-          <el-table :data="filteredData" style="width: 100%" @selection-change="handleSelectionChange">
+          <el-table :data="pagedData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="index" label=""></el-table-column>
             <el-table-column type="selection" label=""></el-table-column>
             <el-table-column prop="username" label="用户名"></el-table-column>
@@ -84,11 +83,10 @@
             <el-table-column prop="status"  label="状态" :formatter="formatColumn" ></el-table-column>
             <el-table-column prop="obsname" label="所属院系"></el-table-column>
           </el-table>
-
         </div>
         <!--学生tab-->
         <div v-if="activeTab === '1'">
-          <el-table :data="filteredData" style="width: 100%" @selection-change="handleSelectionChange">
+          <el-table :data="pagedData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="index" label=""></el-table-column>
             <el-table-column type="selection" label=""></el-table-column>
             <el-table-column prop="username" label="用户名"></el-table-column>
@@ -99,12 +97,27 @@
             <el-table-column prop="obsname" label="所属院系"></el-table-column>
           </el-table>
         </div>
+        <el-footer style="display: flex; justify-content: center;">
+          <el-pagination
+              style="margin-top:20px;text-align: center;"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="currentPage"
+              :page-sizes="[10, 20, 30, 40]"
+              :page-size="pageSize"
+              :hide-on-single-page="true"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="total">
+          </el-pagination>
+        </el-footer>
       </el-main>
+
     </el-container>
+
   </el-container>
 </template>
 <script setup>
-import {reactive, ref, nextTick, onMounted, toRaw} from "vue";
+import {reactive, ref, nextTick, onMounted, toRaw,computed} from "vue";
 import request from "../utils/request.js";
 import {ElMessage,ElMessageBox} from "element-plus";
 import {Document, Folder, Search} from '@element-plus/icons-vue';
@@ -126,8 +139,6 @@ const peoplelist = ref([]);
 
 const searchKeyword = ref('')
 
-// const dialogVisible = ref(false);
-const showDialog = ref(false);
 
 //设置默认的aside宽度
 const asideWidth = ref(300);
@@ -215,26 +226,15 @@ const removeFirstLayer = node => {
 const currentobsid = ref('');
 const currentobsname = ref('');
 
+
 //切换老师学生tab页的方法
 const switchTab = (tab, event) => {
   nextTick(() => {
-  request.get('/sysmangt/personnelmangt/person?obsid='+currentobsid.value+'&catelog='+activeTab.value)
-      .then(res => {
-        if (res.code === 200) {
-          showmenu.value = true;
-          peoplelist.value=res.data;
-          searchKeyword.value=null;
-          filteredData.value = peoplelist.value
-        }
-      }).catch(error => {
-    ElMessage({
-      type: 'error',
-      message: '获取师生列表失败'
-    });
+    currentPage.value = 1;
+    // 获取数据列表
+    getPeopleList();
   });
-   });
   selectedRows.value = [];
-  showDialog.value=false;
 };
 
 const filteredData = ref([peoplelist.value]);
@@ -246,11 +246,21 @@ const treeNodeClick = (data, node, event) => {
   showmenu.value = true;
   currentobsid.value=data.id;
   currentobsname.value = data.obsname;
+  getPeopleList();
+};
+
+
+
+
+const getPeopleList=()=>{
   request.get('/sysmangt/personnelmangt/person?obsid='+currentobsid.value+'&catelog='+activeTab.value)
       .then(res => {
         if (res.code === 200) {
           peoplelist.value=res.data;
-          filteredData.value = peoplelist.value
+          searchKeyword.value=null;
+          filteredData.value = peoplelist.value;
+          total.value = filteredData.value.length;
+
         }
       }).catch(error => {
     ElMessage({
@@ -258,8 +268,39 @@ const treeNodeClick = (data, node, event) => {
       message: '获取师生列表失败'
     });
   });
+}
 
+const currentPage = ref(1);
+const pageSize = ref(10);
+const total = ref(0); // 总数据量，初始为0
+
+const singlepageData = ref([]);
+
+
+// 处理每页显示条目数改变
+const handleSizeChange = (newSize) => {
+  pageSize.value = newSize;
+  // 重置当前页到第一页
+  currentPage.value = 1;
 };
+
+// 处理当前页改变
+const handleCurrentChange = (newPage) => {
+  currentPage.value = newPage;
+};
+
+// 计算分页数据
+const pagedData = computed(() => {
+  return filteredData.value.slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value);
+});
+
+
+
+
+
+
+
+
 //格式化el-table中的接口返回数据
 //根据列的数值进行format操作
 const formatColumn = (row, column, cellValue, index) => {
@@ -281,24 +322,25 @@ const newform = reactive({
   pwd: '',
   personnelno: '',
   phone: '',
-  category: '',
+  catelog: '',
   status: '1',
   obsid: '',
   obsname:'',
   remark: ''
 });
 
+//新增教师
 const createPeople = () =>{
-  newform.category = activeTab.value;
+  newform.catelog = activeTab.value;
   newform.obsid = currentobsid.value;
   newform.obsname = currentobsname.value;
 
-  // console.log(newform)
-  console.log(obsmenulist.value)
   dialogVisible.value = true;  // 打开弹窗
 
   DialogShow.value.init(newform,obsmenulist);
 }
+
+
 const selectedRows = ref([]);
 
 const handleSelectionChange = (selection) => {
@@ -337,14 +379,27 @@ const exportData = () => {
         })
       })
 }
-const addData = () => {
-
-}
 const importData = () => {
   // 处理导入数据逻辑
 }
 const deleteSelected = () => {
-  // 处理删除选中记录逻辑
+  const ids = selectedRows.value.map(row => row.id);
+
+  request.post('/sysmangt/personnelmangt/delete', ids)
+      .then(res => {
+        if (res.code === 200) {
+          ElMessage({
+            type: 'success',
+            message: '删除用户成功'
+          });
+          getPeopleList();
+        }
+      }).catch(error => {
+    ElMessage({
+      type: 'error',
+      message: '删除用户失败'
+    });
+  });
 }
 const saveData = () => {
   // 处理保存数据逻辑

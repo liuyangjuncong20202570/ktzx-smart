@@ -95,7 +95,6 @@ const expandAll = ref(false);
 const expandtip = ref('');
 //展开所有或收起所有
 const changeTreeExpand = () => {
-
 	expandAll.value = !expandAll.value;
 	for (let i = 0; i < nodeExpand.value.store._getAllNodes().length; i++) {
 		nodeExpand.value.store._getAllNodes()[i].expanded = expandAll.value;
