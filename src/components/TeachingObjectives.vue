@@ -3,7 +3,7 @@
         <el-header
             style="height: auto; padding: 5px 0px; width:100%; text-align: left; background-color:#deebf7;">
             <el-button type="success" style="margin-left: 0.8vw;" @click="addKWA()">新增</el-button>
-            <el-button type="danger" @click="">删除</el-button>
+            <el-button type="danger" @click="deleteKWA">删除</el-button>
             <el-button type="primary">保存</el-button>
             <el-button type="warning">导出Excel</el-button>
             <el-input v-model="tableSearchData" style="margin-left: 0.8vw; width: 250px" placeholder="查找KWA">
@@ -12,7 +12,7 @@
         </el-header>
         <el-main style="padding: 0;">
             <el-table :data="filterTableData" style="height: 100%; width: 100%;" v-model="tableSelected"
-                    @select="filterTableSelect" @select-all="filterTableSelectAll" stripe>
+                    @select="tableSelect" @select-all="tableSelectAll" stripe>
                 <el-table-column type="selection" width="55"></el-table-column>
                 <el-table-column prop="id" label="序码" width="100"></el-table-column>
                 <el-table-column prop="name" label="名称" width="300">
@@ -111,7 +111,7 @@
 import { computed, nextTick, onMounted, ref } from 'vue';
 import { Edit, Search } from '@element-plus/icons-vue';
 import  _  from 'lodash';
-import { ElTable } from 'element-plus';
+import { ElMessage, ElMessageBox, ElTable } from 'element-plus';
 
 const tableSearchData = ref('');    // KWA表的搜索数据
 
@@ -119,7 +119,7 @@ const keywordSearchData = ref('');  // 关键字表的搜索数据
 
 const abilitySearchData = ref('');  // 能力表的搜索数据
 
-const tableData = ref([     // KWA表数据
+const tableData: any = ref([     // KWA表数据
     {
         id: 'A1-B1',
         name: '中断系统-代码编程能力',
@@ -141,9 +141,20 @@ const tableData = ref([     // KWA表数据
         abilityname: '程序实现能力',
         datavalue: 0.00,
     },
+    {
+        id: '',
+        name: '新建KWA(100)',
+        keywordname: '',
+        abilityname: '',
+        datavalue: 0.00,
+    }
 ])
 
 const tempRowData = ref({});
+
+const nullKWANum = ref(0);
+
+const tableSelected = ref([]);
 
 const filterTableData = computed(() =>  // 实际显示的表格数据源
     tableData.value.filter((data) =>   // 过滤掉不包含搜索框中字符的数据
@@ -295,9 +306,98 @@ const initialize = () => {
         item.abilityPopVisible = false;
         item.editingDatavalue = false;
         item.datavalue = Number(item.datavalue).toFixed(2);
+        
+        if (item.name.includes('新建KWA')) {
+        if (item.name.length > 5) {
+            let num = '';
+            for(let i = 6; item.name[i] !== ')'; i++){
+                num += item.name[i];
+            }
+            if(nullKWANum.value < Number(num)) nullKWANum.value = Number(num);
+        }
+        else if (item.name.length === 5 && nullKWANum.value === 0) nullKWANum.value++;
+        }
     });
     inputRefs.value = {};
 };
+
+/*****************KWA表函数*****************/
+const handleClick = (row, field) => {
+    nextTick(() => {
+        tempRowData.value = Object.assign({}, row.row);     // 存一份修改之前的数据用作比对
+        row.row[field] = true
+        setTimeout(() => {
+            if(inputRefs.value[row.row.id] && inputRefs.value[row.row.id].$refs.input){
+                inputRefs.value[row.row.id].$refs.input.focus();
+            }
+        }, 0);
+    });
+};
+
+const handleBlur = (row, field) => {
+    row.row[field] = false;
+    if(!_.isEqual(tempRowData.value, row.row)){
+        // 当数据发生改变了再传数据给后端
+    }
+};
+
+const inputRefs = ref({});
+
+const setInputRef = (el, row) => {
+  if (el) {
+    inputRefs.value[row.row.id] = el;
+  }
+};
+
+const addKWA = () => {      // 新增KWA
+    nullKWANum.value ++;
+    tableData.value.push({
+        id: '',
+        name: nullKWANum.value > 1 ? '新建KWA(' + nullKWANum.value + ')' : '新建KWA',
+        keywordname: '',
+        abilityname: '',
+        datavalue: Number(0.00).toFixed(2),
+        keywordPopVisible: false,
+        abilityPopVisible: false,
+        editingDatavalue: false,
+    })
+};
+
+/*判定哪些行被选中*/
+const tableSelect = (selection) => {
+  tableSelected.value = selection;
+};
+
+const tableSelectAll = (selection) => {
+  tableSelected.value = selection;
+};
+
+// 删除KWA
+const deleteKWA = () => {
+    if(!tableSelected.value.length){
+        ElMessage({
+            type: 'warning',
+            message: '未选择KWA',
+            duration: 800
+        });
+        return ;
+    }
+    ElMessageBox.confirm(
+        '选中的KWA将被删除，是否确定',
+        '警告',
+        {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',        
+        }
+    ).then(() => {
+        // 删除逻辑
+    }).catch(() => {});
+};
+
+
+/*******************************************/
+
 
 /**************关键字表格的函数***************/
 const openKeywordDictionary = (row) => {
@@ -382,38 +482,6 @@ const setAbility = (row) => {   // 点击确定后将选择的能力赋值给KWA
 };
 
 /*******************************************/
-
-
-/*****************KWA表函数*****************/
-const handleClick = (row, field) => {
-    nextTick(() => {
-        tempRowData.value = Object.assign({}, row.row);     // 存一份修改之前的数据用作比对
-        row.row[field] = true
-        setTimeout(() => {
-            if(inputRefs.value[row.row.id] && inputRefs.value[row.row.id].$refs.input){
-                inputRefs.value[row.row.id].$refs.input.focus();
-            }
-        }, 0);
-    });
-};
-
-const handleBlur = (row, field) => {
-    row.row[field] = false;
-    if(!_.isEqual(tempRowData.value, row.row)){
-        // 当数据发生改变了再传数据给后端
-    }
-};
-
-const inputRefs = ref({});
-
-const setInputRef = (el, row) => {
-  if (el) {
-    inputRefs.value[row.row.id] = el;
-  }
-};
-
-/*******************************************/
-
 
 </script>
 

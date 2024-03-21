@@ -107,9 +107,14 @@ const initialize = () => {
     item.editingHomeName = false;
     item.editingHomeUrl = false;
     item.editingRemark = false;
+    
     if (item.rolename.includes('未命名角色')) {
-      if (item.rolename.length > 5 && nullRoleNum.value < Number(item.rolename[6])) {
-        nullRoleNum.value = Number(item.rolename[6]);
+      if (item.rolename.length > 5) {
+          let num = '';
+          for(let i = 6; item.rolwname[i] !== ')'; i++){
+              num += item.rolename[i];
+          }
+          if(nullRoleNum.value < Number(num)) nullRoleNum.value = Number(num);
       }
       else if (item.rolename.length === 5 && nullRoleNum.value === 0) nullRoleNum.value++;
     }
