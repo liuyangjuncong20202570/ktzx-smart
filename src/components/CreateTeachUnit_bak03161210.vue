@@ -17,8 +17,7 @@
                          :default-expand-all="expandAll"
                          @node-drag-start="handleDragStart"
                          @node-drag-end="handleDragEnd"
-                         @node-contextmenu="clickNode"
-                         show-checkbox>
+                         @node-contextmenu="clickNode">
                     <template #default="{ node }">
                         <el-popover :visible="node.data.popVisible" placement="right" >
                             <el-button style="margin-top: 6px;" type="success" @click="editNode(node.data)">编辑</el-button><br>

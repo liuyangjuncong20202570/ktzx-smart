@@ -3,7 +3,7 @@
         <el-header
             style="height: auto; padding: 5px 0px; width:100%; text-align: left; background-color:#deebf7;">
             <el-button type="success" style="margin-left: 0.8vw;" @click="addKeyword">新增</el-button>
-            <el-button type="primary" @click="openDictionary">从关键字字典选择</el-button>
+            <!-- <el-button type="primary" @click="openDictionary">从关键字字典选择</el-button> -->
             <el-button type="danger" @click="deleteKeyword">删除</el-button>
             <el-button type="primary">保存</el-button>
             <el-input v-model="tableSearchData" style="margin-left: 0.8vw; width: 250px" placeholder="查找关键字">
@@ -58,55 +58,15 @@
             </el-table>
         </el-main>
     </el-container>
-
-    <el-dialog v-model="keywordDictionaryVisible" width="1000" style="height: 450px; background-color: #eef3f6;"
-        :close-on-click-modal="false" :show-close="false" destroy-on-close align-center>
-        <template #header="{ titleId }">
-            <el-header style="height: auto; padding: 5px 0px; width:100%;" :id="titleId">
-                <div style=" display: flex; justify-content: space-between;">
-                    <div>
-                        <el-button type="success" style="margin-left: 0.8vw;" @click="">新增</el-button>
-                        <el-button type="danger" @click="">删除</el-button>
-                        <el-button type="primary">保存</el-button>
-                        <el-input v-model="dictionarySearchData" style="margin-left: 0.8vw; width: 250px" placeholder="查找关键字">
-                            <template #append><el-button :icon="Search" /></template>
-                        </el-input>
-                    </div>
-                    <el-button link type="danger" @click="closeDictionary">
-                        <el-icon size="20" class="el-icon--left"><CloseBold /></el-icon>
-                    </el-button>
-                </div>
-            </el-header>
-            <el-table :data="filterDictionaryData" height="370" @select="dictionaryTableSelect" v-model="dictionarySelected"
-                        @select-all="dictionaryTableSelectAll" stripe>
-                <el-table-column type="selection" width="55"></el-table-column>
-                <el-table-column width="55">
-                    <template v-slot="row">
-                        {{ row.$index + 1 }}
-                    </template>
-                </el-table-column>
-                <el-table-column prop="name" label="名称" width="200"></el-table-column>
-                <el-table-column prop="datavalue" label="数值" width="100">
-                    <template v-slot="row">
-                        {{ row.row.datavalue }}
-                    </template>
-                </el-table-column>
-                <el-table-column prop="importantlevelid" label="重要程度" width="150"></el-table-column>
-                <el-table-column prop="remark" label="备注"></el-table-column>
-            </el-table>
-        </template>
-    </el-dialog>
 </template>
 
 <script setup>
 import { CloseBold, Search } from '@element-plus/icons-vue';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { computed, nextTick, onMounted, ref } from 'vue';
 import _ from 'lodash';
 
 const tableSearchData = ref('');    // 主界面搜索框数据
-
-const dictionarySearchData = ref('');   // 关键字字典弹窗的搜索框数据
 
 const tableData = ref([     // 主界面表格数据
     {
@@ -176,143 +136,17 @@ const tableData = ref([     // 主界面表格数据
 
 const tempRowData = ref({});
 
-
 const importanceData = [
     {label: '低', value: 1},{label: '中', value: 2},{label: '高', value: 3},
 ];
 
 const tableSelected = ref([]);    // 记录主界面的表格选择
 
-const dictionarySelected = ref([]);     // 记录字典弹窗表格选择的数据
-
 const nullKeywordNum = ref(0);  // 未命名关键字数
 
 const filterTableData = computed(() =>  // 实际显示的表格数据源
     tableData.value.filter((data) =>   // 过滤掉不包含搜索框中字符的数据
         !tableSearchData.value || data.name.toLowerCase().includes(tableSearchData.value.toLowerCase())
-    )
-)
-
-const keywordDictionaryVisible = ref(false);    // 关键字字典弹窗是否显示
-
-const dictionaryData = ref([    //关键字字典数据
-    {
-        id: 'A1',
-        name: '中断系统',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A2',
-        name: '串口并口通讯',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A3',
-        name: '伪指令集',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A4',
-        name: '单片机IO口',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A5',
-        name: '单片机内部结构',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A6',
-        name: '单片机外设模块扩展',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A7',
-        name: '单片机外部存储结构',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A8',
-        name: '单片机外部硬件扩展',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A9',
-        name: '操作系统',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A10',
-        name: '串口并口传输',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A11',
-        name: '伪代码',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A12',
-        name: '硬件参数',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A13',
-        name: '控制芯片指令',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A14',
-        name: '单片机模块复用',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A15',
-        name: '单片机内部存储结构',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A16',
-        name: 'test',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-]);
-
-const filterDictionaryData = computed(() =>     // 实际显示的关键字字典数据源
-    dictionaryData.value.filter((data) => 
-        !dictionarySearchData.value || data.name.toLowerCase().includes(dictionarySearchData.value.toLowerCase())
     )
 )
 
@@ -412,27 +246,17 @@ const deleteKeyword = () => {
         });
         return ;
     }
-};
-
-const openDictionary = () =>{
-    keywordDictionaryVisible.value = true;
-    dictionaryData.value.forEach((item) => {
-        item.datavalue = Number(item.datavalue).toFixed(2);
-    })
-};
-
-const closeDictionary = (close) => {
-    keywordDictionaryVisible.value = false;
-    dictionarySearchData.value = '';
-};
-
-/*判断数据字典弹窗中哪些行被选中*/
-const dictionaryTableSelect = (selection) => {
-	dictionarySelected.value = selection;
-};
-
-const dictionaryTableSelectAll = (selection) => {
-	dictionarySelected.value = selection;
+    ElMessageBox.confirm(
+        '选中的关键字将被删除，是否确定',
+        '警告',
+        {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',
+        }
+    ).then(() => {
+        // 删除逻辑
+    }).catch(() => {})
 };
 /*****************************/
 </script>

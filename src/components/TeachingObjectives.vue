@@ -3,7 +3,7 @@
         <el-header
             style="height: auto; padding: 5px 0px; width:100%; text-align: left; background-color:#deebf7;">
             <el-button type="success" style="margin-left: 0.8vw;" @click="addKWA()">新增</el-button>
-            <el-button type="danger" @click="">删除</el-button>
+            <el-button type="danger" @click="deleteKWA">删除</el-button>
             <el-button type="primary">保存</el-button>
             <el-button type="warning">导出Excel</el-button>
             <el-input v-model="tableSearchData" style="margin-left: 0.8vw; width: 250px" placeholder="查找KWA">
@@ -12,7 +12,7 @@
         </el-header>
         <el-main style="padding: 0;">
             <el-table :data="filterTableData" style="height: 100%; width: 100%;" v-model="tableSelected"
-                    @select="filterTableSelect" @select-all="filterTableSelectAll" stripe>
+                    @select="tableSelect" @select-all="tableSelectAll" stripe>
                 <el-table-column type="selection" width="55"></el-table-column>
                 <el-table-column prop="id" label="序码" width="100"></el-table-column>
                 <el-table-column prop="name" label="名称" width="300">
@@ -111,7 +111,7 @@
 import { computed, nextTick, onMounted, ref } from 'vue';
 import { Edit, Search } from '@element-plus/icons-vue';
 import  _  from 'lodash';
-import { ElTable } from 'element-plus';
+import { ElMessage, ElMessageBox, ElTable } from 'element-plus';
 
 const tableSearchData = ref('');    // KWA表的搜索数据
 
@@ -153,6 +153,8 @@ const tableData: any = ref([     // KWA表数据
 const tempRowData = ref({});
 
 const nullKWANum = ref(0);
+
+const tableSelected = ref([]);
 
 const filterTableData = computed(() =>  // 实际显示的表格数据源
     tableData.value.filter((data) =>   // 过滤掉不包含搜索框中字符的数据
@@ -360,6 +362,39 @@ const addKWA = () => {      // 新增KWA
         editingDatavalue: false,
     })
 };
+
+/*判定哪些行被选中*/
+const tableSelect = (selection) => {
+  tableSelected.value = selection;
+};
+
+const tableSelectAll = (selection) => {
+  tableSelected.value = selection;
+};
+
+// 删除KWA
+const deleteKWA = () => {
+    if(!tableSelected.value.length){
+        ElMessage({
+            type: 'warning',
+            message: '未选择KWA',
+            duration: 800
+        });
+        return ;
+    }
+    ElMessageBox.confirm(
+        '选中的KWA将被删除，是否确定',
+        '警告',
+        {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',        
+        }
+    ).then(() => {
+        // 删除逻辑
+    }).catch(() => {});
+};
+
 
 /*******************************************/
 

@@ -230,12 +230,12 @@ onMounted(() => {
     sessionStorage.removeItem('users');
     sessionStorage.removeItem('isLoggedIn');
 
-    router.push({ name: 'Login' });
+    // router.push({ name: 'Login' });
     // 或
     // ElMessage.error('请重新登录');
   }
   //获取完pinia中的数据后重新重定向到父页面
-  router.push(homeurl.value);
+  // router.push(homeurl.value);
 // 0304：为生成侧面导航栏此处暂时写死：当前接口为：POST /homes/superadminhome
 // request.post(`${homeurl}`,loginInfo)
 // 0311修改为teacherhome
