@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory,onBeforeRouteLeave } from 'vue-router';
 
-const rolehome =['teacherhomne','adminhome','superadminhome','secretariatehome','academicaffairshome','majormanagerhome','coursemanagerhome'];
+const rolehome =['teacherhomne','adminhome','superadminhome','secretariatehome','academicaffairshome','coursemanagerhome'];
 //superadminhome 超级管理员首页
 //secretariatehome 教学秘书首页
 //academicaffairshome 教务处首页
@@ -75,11 +75,6 @@ const routes = [
                 path: 'evasys/courseinfo/formative/teachingobjectives',
                 name: 'TeachingObjectives',
                 component: () => import('../components/TeachingObjectives.vue')
-            },
-            {
-                path: 'evasys/abilitydictionary',
-                name: 'abilitydictionary',
-                component: () => import('../components/AbilityDictionary.vue')
             },
         ]
     },

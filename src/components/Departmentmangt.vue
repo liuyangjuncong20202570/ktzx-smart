@@ -3,21 +3,21 @@
     <!--两个按钮，靠最左-->
     <el-header
         style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
-      <el-button type="success" style="margin-left: 0.8vw;" @click="exportData">导出学院</el-button>
-      <el-button type="primary" style="margin-left: 0.8vw;" @click="handleRoleAdd">新增学院</el-button>
-      <el-button type="danger" @click="handleRoleDel">删除学院</el-button>
-<!--      <el-button type="success" @click="">保存</el-button>-->
+      <el-button type="success" style="margin-left: 0.8vw;" @click="exportData">导出部门</el-button>
+      <el-button type="primary" style="margin-left: 0.8vw;" @click="handleRoleAdd">新增部门</el-button>
+      <el-button type="danger" @click="handleRoleDel">删除部门</el-button>
+      <!--      <el-button type="success" @click="">保存</el-button>-->
     </el-header>
     <el-main style="padding: 0;overflow: auto;">
       <!--生成-->
       <el-table :data="tableData" style="height: 100%; table-layout:auto; width: 100%;"
-                 @select-all="handleSelectAll" @selection-change="handleSelectionChange"
+                @select-all="handleSelectAll" @selection-change="handleSelectionChange"
                 :default-sort="{ prop:'levelcode', order: 'ascending' }"  stripe>
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column width="55" label="序号">
           <template v-slot="row">{{ row.$index + 1 }}</template>
         </el-table-column>
-        <el-table-column prop="obsname" label="学院名称" min-width="100">
+        <el-table-column prop="obsname" label="部门名称" min-width="100">
           <template #default="{ row }">
             <el-input v-if="row.editingobsname" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.obsname"
                       @blur="handleBlur(row, 'editingobsname')"></el-input>
@@ -33,7 +33,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="" label="学院负责人">
+        <el-table-column prop="" label="部门负责人">
         </el-table-column>
         <el-table-column prop="remark" label="备注" min-width="80">
           <template #default="{ row }">
@@ -53,7 +53,16 @@ import request from "../utils/request.js";
 import { ElMessage, ElMessageBox } from 'element-plus';
 import isEqual from 'lodash/isEqual.js'
 import {exportTableToCSV} from "../utils/exportTableToCSV.js";
+import {useProfileStore} from "../stores/profileStore.js";
 
+
+//获取Stroe
+const profileStore = useProfileStore();
+const loginInfo = ref ({
+  userid: profileStore.profileid,
+  roleid: profileStore.profileroleid,
+  catelog: profileStore.profilecatelog,
+});
 
 /**************获取表单数据，并预处理*******************/
 
@@ -62,8 +71,12 @@ const tableData = ref([]);
 //未命名的角色数
 const nullRoleNum = ref(0);
 
+
 const getTableData = () => {
-  request.get('/sysmangt/collegemangt')
+
+
+
+  request.post('sysmangt/department',loginInfo.value)
       .then(res => {
         // 登录成功
         if (res.code === 200) {
@@ -74,7 +87,7 @@ const getTableData = () => {
       .catch(() => {
             ElMessage({
               type: 'error',
-              message: '获取学院列表失败'
+              message: '获取部门列表失败'
             });
           }
       );
@@ -89,14 +102,14 @@ const initialize = () => {
     // item.editingstUsersList = false;
     item.editingRemark = false;
     if (item.obsname.includes('未命名节点')) {
-        if (item.obsname.length > 5) {
-          let num = '';
-          for(let i = 6; item.obsname[i] !== ')'; i++){
-            num += item.obsname[i];
-          }
-          if(nullRoleNum.value < Number(num)) nullRoleNum.value = Number(num);
+      if (item.obsname.length > 5) {
+        let num = '';
+        for(let i = 6; item.obsname[i] !== ')'; i++){
+          num += item.obsname[i];
         }
-        else if (item.obsname.length === 5 && nullRoleNum.value === 0) nullRoleNum.value++;
+        if(nullRoleNum.value < Number(num)) nullRoleNum.value = Number(num);
+      }
+      else if (item.obsname.length === 5 && nullRoleNum.value === 0) nullRoleNum.value++;
     }
   });
 };
@@ -118,8 +131,8 @@ const handleSelectAll = (selection) => {
 };
 
 const columns = ref([
-  { prop: 'obsname', label: '学院名称' },
-  { prop: '', label: '学院负责人' },
+  { prop: 'obsname', label: '部门名称' },
+  { prop: '', label: '部门负责人' },
   { prop: 'remark', label: '备注' }
 ]);
 
@@ -162,13 +175,13 @@ const handleRoleAdd = ()=>{
     remark : ""}
   )
 
-  request.post('/sysmangt/collegemangt',newCollege.value)
+  request.post('/sysmangt/department/create',newCollege.value)
       .then(res => {
         // 登录成功
         if (res.code === 200) {
           ElMessage({
             type: 'success',
-            message: '新增学院成功'
+            message: '新增部门成功'
           });
           getTableData()
         }
@@ -176,7 +189,7 @@ const handleRoleAdd = ()=>{
       .catch(() => {
             ElMessage({
               type: 'error',
-              message: '新增学院失败'
+              message: '新增部门失败'
             });
           }
       );
@@ -237,13 +250,13 @@ const handleBlur = (row, field) => {
         obsname:toRaw(row).obsname,
         remark:toRaw(row).remark
       })
-      request.post('/sysmangt/collegemangt/update',updateItem.value)
+      request.post('/sysmangt/department/update',updateItem.value)
           .then(res => {
             // 登录成功
             if (res.code === 200) {
               ElMessage({
                 type: 'success',
-                message: '修改学院信息成功'
+                message: '修改部门信息成功'
               });
               //这里刷新dom
               getTableData();
@@ -252,7 +265,7 @@ const handleBlur = (row, field) => {
           .catch(() => {
                 ElMessage({
                   type: 'error',
-                  message: '修改学院信息失败'
+                  message: '修改部门信息失败'
                 });
                 getTableData();
               }
@@ -293,7 +306,7 @@ const handleRoleDel = () => {
                 deleteIdList.value.push(item.id)
               }
           )
-          request.post('/sysmangt/collegemangt/delete',deleteIdList.value)
+          request.post('/sysmangt/department/delete',deleteIdList.value)
               .then(res => {
                 // 登录成功
                 if (res.code === 200) {

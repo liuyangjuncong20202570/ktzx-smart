@@ -143,8 +143,7 @@ const handleRoleAdd = () => {
             type: 'success',
             message: '新增角色成功'
           });
-          //这里刷新dom
-          // nullRoleNum.value = 0;
+
           getTableData();
         }
       })

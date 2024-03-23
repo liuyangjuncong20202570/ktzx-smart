@@ -28,8 +28,7 @@
                        :check-on-click-node="false"
                        class="tree-with-header"
                        @node-click="treeNodeClick"
-                        style="margin-bottom: 0"
-              >
+                        style="margin-bottom: 0">
                 <template #default="{ node }">
             <span>
               <el-icon v-if="node.data.children" color="orange"><Folder /></el-icon>

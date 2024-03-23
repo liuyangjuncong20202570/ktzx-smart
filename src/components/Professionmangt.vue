@@ -3,38 +3,48 @@
     <!--两个按钮，靠最左-->
     <el-header
         style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
-      <el-button type="success" style="margin-left: 0.8vw;" @click="exportData">导出学院</el-button>
-      <el-button type="primary" style="margin-left: 0.8vw;" @click="handleRoleAdd">新增学院</el-button>
-      <el-button type="danger" @click="handleRoleDel">删除学院</el-button>
-<!--      <el-button type="success" @click="">保存</el-button>-->
+      <el-button type="success" style="margin-left: 0.8vw;" @click="exportData">导出专业</el-button>
+      <el-button type="primary" style="margin-left: 0.8vw;" @click="handleRoleAdd">新增专业</el-button>
+      <el-button type="danger" @click="handleRoleDel">删除专业</el-button>
+      <!--      <el-button type="success" @click="">保存</el-button>-->
     </el-header>
     <el-main style="padding: 0;overflow: auto;">
       <!--生成-->
       <el-table :data="tableData" style="height: 100%; table-layout:auto; width: 100%;"
-                 @select-all="handleSelectAll" @selection-change="handleSelectionChange"
-                :default-sort="{ prop:'levelcode', order: 'ascending' }"  stripe>
+                @select-all="handleSelectAll" @selection-change="handleSelectionChange"
+                :default-sort="{ prop:'procode', order: 'ascending' }"  stripe>
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column width="55" label="序号">
           <template v-slot="row">{{ row.$index + 1 }}</template>
         </el-table-column>
-        <el-table-column prop="obsname" label="学院名称" min-width="100">
+        <el-table-column prop="proname" label="专业名称" min-width="100">
           <template #default="{ row }">
-            <el-input v-if="row.editingobsname" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.obsname"
-                      @blur="handleBlur(row, 'editingobsname')"></el-input>
-            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingobsname')">{{row.obsname }}
+            <el-input v-if="row.editingProname" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.proname"
+                      @blur="handleBlur(row, 'editingProname')"></el-input>
+            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingProname')">{{row.proname }}
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="levelcode" label="层级码" min-width="80">
+        <el-table-column prop="procode" label="专业代码" min-width="80">
           <template #default="{ row }">
-            <el-input v-if="row.editingLevelcode" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.levelcode"
-                      @blur="handleBlur(row, 'editingLevelcode')"></el-input>
-            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingLevelcode')">{{row.levelcode }}
+            <el-input v-if="row.editingProcode" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.procode"
+                      @blur="handleBlur(row, 'editingProcode')"></el-input>
+            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingProcode')">{{row.procode }}
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="" label="学院负责人">
+        <el-table-column prop="reachpercent" label="课程目标达成阈值" min-width="80">
+          <template #default="{ row }">
+            <el-input v-if="row.editingReachpercent" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.reachpercent"
+                      @blur="handleBlur(row, 'editingReachpercent')"></el-input>
+            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingReachpercent')">{{row.procode }}
+            </div>
+          </template>
         </el-table-column>
+
+        <el-table-column prop="" label="专业负责人">
+        </el-table-column>
+
         <el-table-column prop="remark" label="备注" min-width="80">
           <template #default="{ row }">
             <el-input v-if="row.editingRemark" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.remark"
@@ -53,7 +63,16 @@ import request from "../utils/request.js";
 import { ElMessage, ElMessageBox } from 'element-plus';
 import isEqual from 'lodash/isEqual.js'
 import {exportTableToCSV} from "../utils/exportTableToCSV.js";
+import {useProfileStore} from "../stores/profileStore.js";
 
+
+//获取Stroe
+const profileStore = useProfileStore();
+const loginInfo = ref ({
+  userid: profileStore.profileid,
+  roleid: profileStore.profileroleid,
+  catelog: profileStore.profilecatelog,
+});
 
 /**************获取表单数据，并预处理*******************/
 
@@ -62,8 +81,12 @@ const tableData = ref([]);
 //未命名的角色数
 const nullRoleNum = ref(0);
 
+
 const getTableData = () => {
-  request.get('/sysmangt/collegemangt')
+
+
+
+  request.post('sysmangt/professionmangt',loginInfo.value)
       .then(res => {
         // 登录成功
         if (res.code === 200) {
@@ -74,7 +97,7 @@ const getTableData = () => {
       .catch(() => {
             ElMessage({
               type: 'error',
-              message: '获取学院列表失败'
+              message: '获取专业列表失败'
             });
           }
       );
@@ -83,20 +106,20 @@ const getTableData = () => {
 //初始化数据
 const initialize = () => {
   tableData.value.forEach(item => {   // 为每一个表格数据添加是否显示输入框的判定
-    item.editingobsname = false;
-    item.editingLevelcode = false;
-
+    item.editingProname = false;
+    item.editingProcode = false;
+    item.editingReachpercent = false;
     // item.editingstUsersList = false;
     item.editingRemark = false;
-    if (item.obsname.includes('未命名节点')) {
-        if (item.obsname.length > 5) {
-          let num = '';
-          for(let i = 6; item.obsname[i] !== ')'; i++){
-            num += item.obsname[i];
-          }
-          if(nullRoleNum.value < Number(num)) nullRoleNum.value = Number(num);
+    if (item.proname.includes('未命名节点')) {
+      if (item.proname.length > 5) {
+        let num = '';
+        for(let i = 6; item.proname[i] !== ')'; i++){
+          num += item.proname[i];
         }
-        else if (item.obsname.length === 5 && nullRoleNum.value === 0) nullRoleNum.value++;
+        if(nullRoleNum.value < Number(num)) nullRoleNum.value = Number(num);
+      }
+      else if (item.proname.length === 5 && nullRoleNum.value === 0) nullRoleNum.value++;
     }
   });
 };
@@ -118,8 +141,10 @@ const handleSelectAll = (selection) => {
 };
 
 const columns = ref([
-  { prop: 'obsname', label: '学院名称' },
-  { prop: '', label: '学院负责人' },
+  { prop: 'proname', label: '专业名称' },
+  { prop: 'procode', label: '专业代码' },
+  { prop: 'reachpercent', label: '课程目标达成阈值' },
+  { prop: '', label: '专业负责人' },
   { prop: 'remark', label: '备注' }
 ]);
 
@@ -158,17 +183,19 @@ const exportData = () => {
 const handleRoleAdd = ()=>{
   nullRoleNum.value++;
   const newCollege = ref({
-    obsname : nullRoleNum.value > 1 ? '未命名节点(' + nullRoleNum.value + ')' : '未命名节点',
+    proname : nullRoleNum.value > 1 ? '未命名节点(' + nullRoleNum.value + ')' : '未命名节点',
+    procode :"",
+    reachpercent:"",
     remark : ""}
   )
 
-  request.post('/sysmangt/collegemangt',newCollege.value)
+  request.post('/sysmangt/professionmangt/create',newCollege.value)
       .then(res => {
         // 登录成功
         if (res.code === 200) {
           ElMessage({
             type: 'success',
-            message: '新增学院成功'
+            message: '新增专业成功'
           });
           getTableData()
         }
@@ -176,7 +203,7 @@ const handleRoleAdd = ()=>{
       .catch(() => {
             ElMessage({
               type: 'error',
-              message: '新增学院失败'
+              message: '新增专业失败'
             });
           }
       );
@@ -237,13 +264,13 @@ const handleBlur = (row, field) => {
         obsname:toRaw(row).obsname,
         remark:toRaw(row).remark
       })
-      request.post('/sysmangt/collegemangt/update',updateItem.value)
+      request.post('/sysmangt/professionmangt/update',updateItem.value)
           .then(res => {
             // 登录成功
             if (res.code === 200) {
               ElMessage({
                 type: 'success',
-                message: '修改学院信息成功'
+                message: '修改专业信息成功'
               });
               //这里刷新dom
               getTableData();
@@ -252,7 +279,7 @@ const handleBlur = (row, field) => {
           .catch(() => {
                 ElMessage({
                   type: 'error',
-                  message: '修改学院信息失败'
+                  message: '修改专业信息失败'
                 });
                 getTableData();
               }
@@ -293,7 +320,7 @@ const handleRoleDel = () => {
                 deleteIdList.value.push(item.id)
               }
           )
-          request.post('/sysmangt/collegemangt/delete',deleteIdList.value)
+          request.post('/sysmangt/professionmangt/delete',deleteIdList.value)
               .then(res => {
                 // 登录成功
                 if (res.code === 200) {

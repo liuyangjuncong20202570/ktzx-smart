@@ -3,27 +3,31 @@
     <el-container class="layout-container-demo" style="height: 100%;">
       <el-header style="position: relative; text-align:right; background-color: #0064B1; font-size: 15px; height: 8%">
         <!--右侧按钮-->
-        <div style="display: flex; align-items: center; justify-content: center; height: 100%; right: 20px;">
-          <!--标题的div background-color: red;-->
-          <div class="left-div" style="float: left; margin-right: auto; display: flex;">
-            <img src="../assets/images/logo.png" style="height:5.5vh; float: left;"/>
-            <el-text style="font-size:19px; margin-left:10px; color:white">自动化专业智能教学平台</el-text>
+        <div style="height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 0">
+          <div class="left-div" style="flex-grow: 1; display: flex; align-items: center;  ">
+            <img src="../assets/images/logo.png" style="height: 5.5vh;"/>
+            <el-text style="font-size: calc(1vw + 6px); color: white; margin-left: 10px;">自动化专业智能教学平台</el-text>
           </div>
-          <!--头像-->
-          <el-dropdown>
-            <el-avatar style="margin-right:20px"
-                       src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"/>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item>查看详情</el-dropdown-item>
-            <!-- <el-dropdown-item @click="switchRole">切换角色</el-dropdown-item> -->
-                <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-          <!--人名 -->
-          <el-text class="mx-1" size="large" style="color:white">{{loginInfo.username}}</el-text>
+
+          <div style="flex-grow: 2; text-align: center;">
+            <el-text style="font-size: calc(1.5vw + 6px); color: white;">2024春季学期</el-text>
+          </div>
+
+          <div class="right-div" style="flex-grow: 1; display: flex; align-items: center; justify-content: flex-end;">
+            <el-dropdown>
+              <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"/>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item>查看详情</el-dropdown-item>
+                  <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+            <el-text style="font-size: calc(1vw + 3px); color: white; margin-left: 10px;">{{loginInfo.username}}</el-text>
+          </div>
         </div>
+
+
       </el-header>
 
       <el-container>
