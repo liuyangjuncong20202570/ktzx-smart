@@ -208,7 +208,7 @@ const excludedPids = ['0', '102'];
   };
 //路由导航
 const navigateTo = (url) => {
-  // console.log(homeurl+url)
+   // console.log(homeurl+url)
   //前面拼一个/表示绝对路径
   router.push(homeurl.value+url);
 };

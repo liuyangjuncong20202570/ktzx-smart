@@ -54,17 +54,17 @@ const routes = [
                 component: () => import('../components/Collegemangt.vue')
             },
             {
-                path: '/sysmangt/departmentmangt',
+                path: 'sysmangt/departmentmangt',
                 name: 'Departmentmangt', //部门管理
                 component: () => import('../components/Departmentmangt.vue')
             },
             {
-                path: '/sysmangt/professionmangt',
+                path: 'sysmangt/professionmangt',
                 name: 'Professionmangt', //专业管理
                 component: () => import('../components/Professionmangt.vue')
             },
             {
-                path: '/sysmangt/classmangt',
+                path: 'sysmangt/classmangt',
                 name: 'Classmangt', //专业班级管理
                 component: () => import('../components/Classmangt.vue')
             },
