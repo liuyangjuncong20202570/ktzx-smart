@@ -123,7 +123,7 @@ import {useProfileStore} from "../stores/profileStore.js";
 //获取Stroe
 const profileStore = useProfileStore();
 
-
+const defaultActive = ref('');
 const route = useRoute();
 const router = useRouter(); // 获取路由实例
 
@@ -170,7 +170,7 @@ const handleLogout = () => {
 };
 
 // 默认显示菜单
-const defaultActive = ref('');
+// const defaultActive = ref('');
 
 const menus = ref([
 ]);
@@ -215,6 +215,7 @@ const navigateTo = (url) => {
 
 //钩子函数用来刷新后重新获取数据
 onMounted(() => {
+  const defaultActive = ref('');
   const storedUserInfo = sessionStorage.getItem('users');
   if (storedUserInfo) {
     const userInfo = JSON.parse(storedUserInfo);

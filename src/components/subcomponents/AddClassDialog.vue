@@ -41,10 +41,11 @@
 
 <script setup>
 import {ref, reactive, defineExpose, watch, nextTick, onMounted, getCurrentInstance} from 'vue';
-import request from "../../utils/request.js";
+
 import {ElMessage} from "element-plus";
 import {Document, Folder} from "@element-plus/icons-vue";
 import Classmangt from "../Classmangt.vue"
+import request from "../../utils/request.js";
 
 //显示弹窗组件
 const dialogVisible = ref(false);
@@ -64,7 +65,6 @@ const rules = reactive({
 const formRef = ref(null);
 const professionList = ref([]);
 const options = ref([]);
-const request = ref('');
 //初始化，用于接受父组件传来的值，并发送请求获取菜单
 function init(oriprofessionList) {
   dialogVisible.value = true;
