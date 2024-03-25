@@ -193,7 +193,6 @@ const login = () => {
               } else {
                 //显示弹窗
                 Object.assign(data, res.data);
-                // console.log(data);
                 showRoleModal.value = true;
               }
             } else {
@@ -240,6 +239,7 @@ const confirmRole = () => {
     };
     sessionStorage.setItem('users', JSON.stringify(userInfo));
     sessionStorage.setItem('isLoggedIn', 'true');
+    console.log(selectedRole.homeurl);
     router.push(selectedRole.homeurl);
   }
   showRoleModal.value = false;

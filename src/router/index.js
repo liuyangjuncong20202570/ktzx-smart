@@ -1,9 +1,11 @@
 import {createRouter, createWebHistory,onBeforeRouteLeave } from 'vue-router';
 
-const rolehome =['teacherhomne','adminhome','superadminhome','secretariatehome','academicaffairshome','coursemanagerhome'];
+const rolehome =['teacherhomne','adminhome','superadminhome','secretariatehome','academicaffairshome','coursemanagerhome','deanhome','departmenthome'];
 //superadminhome 超级管理员首页
 //secretariatehome 教学秘书首页
 //academicaffairshome 教务处首页
+//deanhome 学院负责人首页
+//departmenthome 系主任首页
 
 const routes = [
     {
@@ -23,34 +25,50 @@ const routes = [
         children: [
             {
                 path: 'sysmangt/rolemangt',
-                name: 'Rolemangt',
+                name: 'Rolemangt', //角色管理
                 component: () => import('../components/Rolemangt.vue')
             },
             {
                 path: 'sysmangt/rolepurview',
-                name: 'Rolepurview',
+                name: 'Rolepurview', //角色授权
                 component: () => import('../components/Rolepurview.vue')
             },
             {
                 path: 'sysmangt/termmangt',
-                name: 'TermsManagement',
+                name: 'TermsManagement', //学期管理
                 component: () => import('../components/TermMangt.vue')
             },
             {
                 path: 'sysmangt/creatteachunit',
-                name: 'Unitssmangt',
+                name: 'Unitssmangt', //教学单位管理
                 component: () => import('../components/CreateTeachUnit.vue')
             },
             {
                 path: 'sysmangt/peoplemangt',
-                name: 'PeopleManagement',
+                name: 'PeopleManagement', //人员管理
                 component: () => import('../components/Peoplemangt.vue')
             },
             {
                 path: 'sysmangt/collegemangt',
-                name: 'Collegecollegemangt',
+                name: 'Collegecollegemangt', //学院管理
                 component: () => import('../components/Collegemangt.vue')
             },
+            {
+                path: '/sysmangt/departmentmangt',
+                name: 'Departmentmangt', //部门管理
+                component: () => import('../components/Departmentmangt.vue')
+            },
+            {
+                path: '/sysmangt/professionmangt',
+                name: 'Professionmangt', //专业管理
+                component: () => import('../components/Professionmangt.vue')
+            },
+            {
+                path: '/sysmangt/classmangt',
+                name: 'Classmangt', //专业班级管理
+                component: () => import('../components/Classmangt.vue')
+            },
+
             {
                 path: 'coursemangt/coursemangt',
                 name: 'CourseManagement',

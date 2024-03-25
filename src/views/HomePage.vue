@@ -185,7 +185,7 @@ const loginInfo = reactive ({
 });
 //0310将homeurl修改为响应式计算属性，这样下面的profileStore中的值变了这边也会自动变，解决拼接地址存在问题情况
 const homeurl = computed(() => profileStore.profilehomeurl);
-
+console.log(homeurl)
 // const homeurl = profileStore.profilehomeurl;
 
 const excludedPids = ['0', '102'];
@@ -239,9 +239,9 @@ onMounted(() => {
     // ElMessage.error('请重新登录');
   }
   //获取完pinia中的数据后重新重定向到父页面
-  // router.push(homeurl.value);
-// 0304：为生成侧面导航栏此处暂时写死：当前接口为：POST /homes/superadminhome
-request.post(`${homeurl}`,loginInfo)
+  router.push(homeurl.value);
+  // 0304：为生成侧面导航栏此处暂时写死：当前接口为：POST /homes/superadminhome
+// request.post(`${homeurl}`,loginInfo)
 // 0311修改为teacherhome
 //获取菜单栏的数据
   request.post(`/homes/teacherhome`,toRaw(loginInfo))
