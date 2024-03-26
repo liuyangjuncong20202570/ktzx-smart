@@ -1,11 +1,13 @@
 import {createRouter, createWebHistory,onBeforeRouteLeave } from 'vue-router';
 
-const rolehome =['teacherhomne','adminhome','superadminhome','secretariatehome','academicaffairshome','coursemanagerhome','deanhome','departmenthome'];
-//superadminhome 超级管理员首页
-//secretariatehome 教学秘书首页
-//academicaffairshome 教务处首页
-//deanhome 学院负责人首页
-//departmenthome 系主任首页
+const rolehome =['teacherhomne','adminhome','superadminhome','secretariatehome','academicaffairshome','coursemanagerhome',
+    'deanhome','departmenthome','majormanagerhome'];
+// superadminhome 超级管理员首页
+// secretariatehome 教学秘书首页
+// academicaffairshome 教务处首页
+// deanhome 学院负责人首页
+// departmenthome 系主任首页
+// majormanagerhome 专业负责人首页  
 
 const routes = [
     {
@@ -68,31 +70,40 @@ const routes = [
                 name: 'Classmangt', //专业班级管理
                 component: () => import('../components/Classmangt.vue')
             },
-
             {
-                path: 'coursemangt/coursemangt',
+                path: 'coursemangt/coursemangt',    // 课程管理
                 name: 'CourseManagement',
                 component: () => import('../components/Coursemangt.vue')
             },
             {
-                path: 'coursemanagerhome',
+                path: 'coursemangt/abilitydictionary',  // 能力字典
+                name: 'AbilityDictionary',
+                component: () => import('../components/AbilityDictionary.vue')
+            },
+            {
+                path: 'coursemanagerhomepage',  // 课程负责人首页
                 name: 'CourseManagerHomePage',
                 component: () => import('../components/CourseManagerHomePage.vue')
             },
             {
-                path: 'evasys/courseinfo/formative/keyword',
+                path: 'evasys/courseinfo/formative/keyword',    // 形成性评价模型-关键字
                 name: 'Keyword',
                 component: () => import('../components/Keyword.vue')
             },
             {
-                path: 'evasys/courseinfo/formative/ability',
+                path: 'evasys/courseinfo/formative/ability',    // 形成性评价模型-能力
                 name: 'Ability',
                 component: () => import('../components/Ability.vue')
             },
             {
-                path: 'evasys/courseinfo/formative/teachingobjectives',
+                path: 'evasys/courseinfo/formative/teachingobjectives', // 形成性评价模型-基本教学目标
                 name: 'TeachingObjectives',
                 component: () => import('../components/TeachingObjectives.vue')
+            },
+            {
+                path: 'evasys/courseinfo/formative/knowledgeunit', // 形成性评价模型-知识单元
+                name: 'KnowledgeUnit',
+                component: () => import('../components/KnowledgeUnit.vue')
             },
         ]
     },
