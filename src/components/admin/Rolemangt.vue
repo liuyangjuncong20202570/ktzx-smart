@@ -67,7 +67,7 @@
 </template>
 <script setup>
 import {reactive, ref, computed, onMounted, nextTick,toRaw} from "vue";
-import request from "../utils/request.js";
+import request from "../../utils/request.js";
 import { ElMessage, ElMessageBox } from 'element-plus';
 import isEqual from 'lodash/isEqual.js'
 
@@ -80,7 +80,7 @@ const tableData = ref([]);
 const nullRoleNum = ref(0);
 
 const getTableData = () => {
-  request.get('/sysmangt/rolemangt')
+  request.admin.get('/sysmangt/rolemangt')
       .then(res => {
         // 登录成功
         if (res.code === 200) {
@@ -282,7 +282,7 @@ const handleRoleDel = () => {
           deleteIdList.value.push(item.id)
             }
         )
-        request.post('/sysmangt/rolemangt/delete',deleteIdList.value)
+        request.admin.post('/sysmangt/rolemangt/delete',deleteIdList.value)
             .then(res => {
               // 登录成功
               if (res.code === 200) {

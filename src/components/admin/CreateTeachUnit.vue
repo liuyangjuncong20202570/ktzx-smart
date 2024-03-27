@@ -80,8 +80,8 @@ import type Node from 'element-plus/es/components/tree/src/model/node'
 import type { DragEvents } from 'element-plus/es/components/tree/src/model/useDragNode'
 import type { NodeDropType, } from 'element-plus/es/components/tree/src/tree.type'
 import { ref, reactive, onMounted, nextTick, onBeforeUnmount } from 'vue'
-import request from '../utils/request'
-import { exportTreeToCSV } from "../utils/exportTreeToCSV";
+import request from '../../utils/request'
+import { exportTreeToCSV } from "../../utils/exportTreeToCSV";
 
 //树数据
 const treeData = ref([]);
@@ -111,13 +111,13 @@ const defaultProps = {
 
 //获取初始教学单位数据
 const getTreeData = () => {
-	request.get('/sysmangt/units').then((res) => {
+	request.admin.get('/sysmangt/units').then((res) => {
 		if (res.code === 200) {
 			treeData.value = res.data;
 			nullNodeNum.value = 0;
 			initialize(treeData.value);
-			console.log("getTreeData 被触发");
-			// console.log(treeData.value)
+			// console.log("getTreeData 被触发");
+			console.log(treeData.value)
 		}
 	}).catch(() => {
 		ElMessage({
@@ -141,6 +141,7 @@ const initialize = (nodes) => {
 					num += node.obsname[i];
 				}
 				if (nullNodeNum.value < Number(num)) nullNodeNum.value = Number(num);
+				
 			}
 			else if (node.obsname.length === 5 && nullNodeNum.value === 0) nullNodeNum.value++;
 		}
@@ -159,7 +160,7 @@ const initialize = (nodes) => {
 
 /*********************删除节点****************************/
 const confirmDeleteNodes = (deletedNode) => {
-	console.log(deletedNode)
+	// console.log(deletedNode)
 	// 检查节点是否有子节点
 	if (deletedNode.children && deletedNode.children.length > 0) {
 		// 如果有子节点，显示错误提示并阻止删除
@@ -190,7 +191,8 @@ const confirmDeleteNodes = (deletedNode) => {
 const deleteNodes = (deletedNode) => {
 	const idlist = [];
 	idlist.push(deletedNode.id);
-	request.post('/sysmangt/units/delete', idlist)
+	console.log(idlist);
+	request.admin.post('/sysmangt/units/delete', idlist)
 		.then(res => {
 			if (res.code === 200) {
 				ElMessage({
@@ -267,7 +269,7 @@ const addSiblingNode = async (addedNode) => {
 			remark: ""
 		}
 	};
-	request.post('/sysmangt/units/create', newNodeData)
+	request.admin.post('/sysmangt/units/create', newNodeData)
 		.then(res => {
 			if (res.code === 200) {
 				ElMessage({
@@ -299,7 +301,7 @@ const addChildNode = (addedNode) => {
 			}
 		}
 	)
-	request.post('/sysmangt/units/create', newNodeData.value)
+	request.admin.post('/sysmangt/units/create', newNodeData.value)
 		.then(res => {
 			if (res.code === 200) {
 				ElMessage({
@@ -496,11 +498,11 @@ onMounted(() => {
 }
 
 .element {		/* 针对Firefox */
-  scrollbar-width: none;
+  /* scrollbar-width: none; */
 }
 
 .element {		/* 针对IE和Edge旧版本 */
-  -ms-overflow-style: none;
+  /* -ms-overflow-style: none; */
 }
 /*************/
 

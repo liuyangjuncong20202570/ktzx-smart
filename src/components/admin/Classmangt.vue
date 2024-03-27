@@ -50,9 +50,9 @@
 <script setup>
 import { ref, onMounted,watch  } from 'vue';
 import { ElMessage } from 'element-plus';
-import {useProfileStore} from '../stores/profileStore.js';
+import {useProfileStore} from '../../stores/profileStore.js';
 import {Close} from '@element-plus/icons-vue'
-import request from "../utils/request.js";
+import request from "../../utils/request.js";
 import AddClassDialog from "./subcomponents/AddClassDialog.vue";
 import AddPeopleDialog from "./subcomponents/AddPeopleDialog.vue";
 
@@ -74,7 +74,7 @@ const activeNames = ref([]);
 const getTableData = () => {
   // 假设 request.post 是您项目中的请求方法
   // 这里需要替换为您实际的请求逻辑
-  request.post('sysmangt/classmangt', loginInfo.value)
+  request.admin.post('sysmangt/classmangt', loginInfo.value)
       .then(res => {
         if (res.code === 200) {
           tableData.value = res.data;
@@ -203,7 +203,7 @@ const handleClassAdd = () =>{
 
 const deleteClass = () => {
   console.log(selectedClasses.value)
-  request.post('/sysmangt/classmangt/delete', selectedClasses.value)
+  request.admin.post('/sysmangt/classmangt/delete', selectedClasses.value)
       .then(res => {
         if (res.code === 200) {
           ElMessage({

@@ -161,7 +161,7 @@ const login = () => {
   proxy.$refs.ruleFormRef.validate((valid) => {
     if (valid) {
       //请求登录接口
-      request.post('/login', loginForm)
+      request.admin.post('/login', loginForm)
           .then(res => {
             // console.log(res);
             // 登录成功

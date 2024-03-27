@@ -54,8 +54,8 @@ import type Node from 'element-plus/es/components/tree/src/model/node'
 import type { DragEvents } from 'element-plus/es/components/tree/src/model/useDragNode'
 import type { NodeDropType, } from 'element-plus/es/components/tree/src/tree.type'
 import { ref, reactive, onMounted } from 'vue'
-import request from '../utils/request'
-import{ exportTreeToCSV } from "../utils/exportTreeToCSV";
+import request from '../../utils/request'
+import{ exportTreeToCSV } from "../../utils/exportTreeToCSV";
 
 //树数据
 const treeData = ref([]);
@@ -70,7 +70,7 @@ const defaultProps = {
 
 //获取初始教学单位数据
 const getTreeData = () => {
-  request.get('/sysmangt/units').then((res) => {
+  request.admin.get('/sysmangt/units').then((res) => {
     if(res.code === 200){
       treeData.value = res.data;
       nullNodeNum.value = 0;

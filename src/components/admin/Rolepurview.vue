@@ -33,7 +33,7 @@
 <script setup>
 import {nextTick, reactive, ref,toRaw} from "vue";
 import { Document, Folder ,Edit } from '@element-plus/icons-vue'
-import request from "../utils/request.js";
+import request from "../../utils/request.js";
 import { ElMessage } from "element-plus";
 import EditRoleList from "./subcomponents/EditRoleList.vue"
 
@@ -53,7 +53,7 @@ const edit=(row)=>{
 //初始化一个响应式的角色对象
 const tableData = ref([]);
 
-request.get('/sysmangt/rolepurview')
+request.admin.get('/sysmangt/rolepurview')
     .then(res => {
       // 登录成功
       if (res.code === 200) {

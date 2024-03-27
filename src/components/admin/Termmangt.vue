@@ -67,8 +67,8 @@
 <script lang="ts" setup>
 import { ElMessage, ElMessageBox, rowProps } from "element-plus";
 import {nextTick, onMounted, reactive, ref, toRaw} from "vue";
-import request from "../utils/request";
-import{ exportTableToCSV } from "../utils/exportTableToCSV.js";
+import request from "../../utils/request";
+import{ exportTableToCSV } from "../../utils/exportTableToCSV.js";
 import isEqual from "lodash/isEqual";
 
 //数据列表
@@ -84,7 +84,7 @@ const deleteTermList = ref([]);
 
 /**************获取学期列表，并初始化********************/
 const getTableData = () => {
-    request.get('/sysmangt/terms')
+    request.admin.get('/sysmangt/terms')
         .then((res) => {
         if(res.code === 200){
           console.log(111);
@@ -142,7 +142,7 @@ const addTerm = () => {
     remark:"",
   });
 
-  request.post('/sysmangt/terms/create',tempTerminfo.value)
+  request.admin.post('/sysmangt/terms/create',tempTerminfo.value)
       .then(res => {
         // 登录成功
         if (res.code === 200) {
@@ -247,7 +247,7 @@ const deleteTerm = () => {
               message: '无法删除当前学期'
             });
           }else {
-            request.post('/sysmangt/terms/delete', deleteTermList.value)
+            request.admin.post('/sysmangt/terms/delete', deleteTermList.value)
                 .then(res => {
                   // 登录成功
                   if (res.code === 200) {
@@ -280,7 +280,7 @@ const deleteTerm = () => {
 const changeStatus = (selectedRow) => {
   currentTermID.value = selectedRow.id;
   console.log(currentTermID.value)
-  request.get ('/sysmangt/terms/currentterm?id='+currentTermID.value)
+  request.admin.get ('/sysmangt/terms/currentterm?id='+currentTermID.value)
       .then(res => {
         // 登录成功
         if (res.code === 200) {
@@ -366,7 +366,7 @@ const handleBlur = (row, field) => {
         enddate:toRaw(row).enddate,
         remark:toRaw(row).remark
       })
-      request.post('/sysmangt/terms',updateItem.value)
+      request.admin.post('/sysmangt/terms',updateItem.value)
           .then(res => {
             // 登录成功
             if (res.code === 200) {

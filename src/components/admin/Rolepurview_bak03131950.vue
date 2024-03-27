@@ -55,7 +55,7 @@
 <script setup>
 import { reactive, ref } from "vue";
 import { Document, Folder } from '@element-plus/icons-vue'
-import request from "../utils/request.js";
+import request from "../../utils/request.js";
 import { ElMessage } from "element-plus";
 
 const showmenu = ref(false);

@@ -44,7 +44,7 @@
 
 <script setup>
 import { ref, reactive,defineExpose } from 'vue';
-import request from "../../utils/request.js";
+import request from "../../../utils/request.js";
 import {ElMessage} from "element-plus";
 import {Document, Folder} from "@element-plus/icons-vue";
 
@@ -83,7 +83,7 @@ const closeDialog = () => {
 const getmenu = (row) => {
   // console.log(row.rolecode);
   // console.log(row.id);
-  request.get('/sysmangt/rolepurview/menus?id=' + row.id)
+  request.admin.get('/sysmangt/rolepurview/menus?id=' + row.id)
       .then(res => {
         if (res.code === 200) {
           // showmenu.value = true;
@@ -157,7 +157,7 @@ const updateRole=(menuname , Item)=>{
   console.log("rolecode",Item.value.rolecode);
    console.log("Item",Item.value.status);
 
-  request.post('/sysmangt/rolepurview',Item.value)
+  request.admin.post('/sysmangt/rolepurview',Item.value)
       .then(res => {
         if (res.code === 200) {
           ElMessage({

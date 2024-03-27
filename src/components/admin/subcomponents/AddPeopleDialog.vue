@@ -65,7 +65,7 @@
 
 <script setup>
 import {ref, reactive, defineExpose, watch, nextTick, onMounted, getCurrentInstance} from 'vue';
-import request from "../../utils/request.js";
+import request from "../../../utils/request.js";
 import {ElMessage} from "element-plus";
 import {Document, Folder} from "@element-plus/icons-vue";
 import Peoplemangt from "../Peoplemangt.vue"
@@ -130,7 +130,7 @@ const submitForm = () => {
       const { obsid, ...dataToSend } = newform;
       console.log(dataToSend);
       // 表单验证通过，处理表单提交逻辑
-      request.post('/sysmangt/personnelmangt/create', dataToSend)
+      request.admin.post('/sysmangt/personnelmangt/create', dataToSend)
           .then(res => {
             if (res.code === 200) {
               ElMessage({

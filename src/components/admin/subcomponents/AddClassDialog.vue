@@ -45,7 +45,7 @@ import {ref, reactive, defineExpose, watch, nextTick, onMounted, getCurrentInsta
 import {ElMessage} from "element-plus";
 import {Document, Folder} from "@element-plus/icons-vue";
 import Classmangt from "../Classmangt.vue"
-import request from "../../utils/request.js";
+import request from "../../../utils/request.js";
 
 //显示弹窗组件
 const dialogVisible = ref(false);
@@ -88,7 +88,7 @@ const submitForm = () => {
     if (valid) {
       console.log(newform);
       // // 表单验证通过，处理表单提交逻辑
-      request.post('/sysmangt/classmangt/create', newform)
+      request.admin.post('/sysmangt/classmangt/create', newform)
           .then(res => {
             if (res.code === 200) {
               ElMessage({

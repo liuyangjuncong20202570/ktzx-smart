@@ -85,7 +85,7 @@
 import { Folder, Document } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
-import request from '../utils/request'
+import request from '../../utils/request'
 
 
 const defaultProps = {
@@ -365,7 +365,7 @@ const initialize = (nodes) => {
         node.editingName = false;
         node.editingDatavalue = false;
         node.editingRemark = false;
-        node.id = id.value ++;
+        // node.id = id.value ++;
         
         if(node.name.includes('未命名能力')){
             if(node.name.length > 5){
@@ -385,11 +385,12 @@ const initialize = (nodes) => {
 };
 
 const getTreeData = () => {
-    request.get('/coursemangt/abiblity').then((res) => {
+    request.evaluation.get('/coursemangt/ability').then((res) => {
         if(res.code === 200){
             treeData.value = res.data;
             nullNodeNum.value = 0;
             initialize(treeData.value);
+            // console.log(treeData.value);
         }
     }).catch((error) => {
         ElMessage({
@@ -400,8 +401,8 @@ const getTreeData = () => {
 };
 
 onMounted(() => {
-    initialize(treeData.value);
-    // getTreeData();
+    // initialize(treeData.value);
+    getTreeData();
     document.addEventListener('click', closePopNode);
 });
 /**********************************/
@@ -429,7 +430,7 @@ const clickNode = (event, node, dom) => {   // 右键节点触发
 const closePopNode = (event) => {
 	// 检查点击事件是否在弹窗内部
 	// 如果不是，则关闭弹窗
-	if (openedPopNode.value && !event.target.closest('.el-popover')) {
+	if (openedPopNode.value) {
 		openedPopNode.value.popVisible = false;
 		openedPopNode.value = {};
 	}
@@ -462,7 +463,7 @@ const addSiblingNode = (node) => {
     const newNode = {
         id: node.id,
         pid: node.pid,
-        abilbitydeep: node.abilitydeep,
+        abilitydeep: node.abilitydeep,
         type: '1',
         cmAbility: {
             name: nullNodeNum.value > 1 ? '未命名能力(' + nullNodeNum.value + ')' : '未命名能力',
@@ -470,13 +471,13 @@ const addSiblingNode = (node) => {
         }
     };
     console.log(newNode);
-    // request.post('/coursemangt/ability/create', newNode.value).then((res) => {
-    //     if(res.code === 400){
-    //         getTreeData();
-    //     }
-    // }).catch((error) => {
-    //     ElMessage.error('获取能力数据失败');
-    // })
+    request.evaluation.post('/coursemangt/ability/create', newNode).then((res) => {
+        if(res.code === 200){
+            getTreeData();
+        }
+    }).catch((error) => {
+        ElMessage.error('获取能力数据失败' + error);
+    })
 
     node.popVisible = false;
 };
@@ -486,7 +487,7 @@ const addChildNode = (node) => {
     const newNode = {
         id: node.id,
         pid: node.pid,
-        abilbitydeep: node.abilitydeep,
+        abilitydeep: node.abilitydeep,
         type: '0',
         cmAbility: {
             name: nullNodeNum.value > 1 ? '未命名能力(' + nullNodeNum.value + ')' : '未命名能力',
@@ -494,13 +495,13 @@ const addChildNode = (node) => {
         }
     }
     console.log(newNode);
-    // request.post('/coursemangt/ability/create', newNode.value).then((res) => {
-    //     if(res.code === 400){
-    //         getTreeData();
-    //     }
-    // }).catch((error) => {
-    //     ElMessage.error('获取能力数据失败');
-    // })
+    request.evaluation.post('/coursemangt/ability/create', newNode).then((res) => {
+        if(res.code === 200){
+            getTreeData();
+        }
+    }).catch((error) => {
+        ElMessage.error('获取能力数据失败' + error);
+    })
     
     node.popVisible = false;
 };
@@ -515,16 +516,20 @@ const confirmDeleteNodes = (node) => {
             type: 'warning',
         }
     ).then(() => {
-        let deletesNodes = findChildNodes(node.children, [node.id]);
-        // console.log(deletesNodes);
+        let deletedNodes = [];
+        if(node.children && node.children.length > 0){
+            deletedNodes = findChildNodes(node.children, [node.id]);
+        }
+        else deletedNodes.push(node.id);
+        console.log(deletedNodes);
 
-        // request.post('/coursemangt/ability/delete', deletesNodes).then((res) => {
-        //     if(res.code === 400){
-        //         getTreeData();
-        //     }
-        // }).catch((error) => {
-        //     ElMessage.error('删除失败');
-        // });
+        request.evaluation.post('/coursemangt/ability/delete', deletedNodes).then((res) => {
+            if(res.code === 200){
+                getTreeData();
+            }
+        }).catch((error) => {
+            ElMessage.error('删除失败' + error);
+        });
     }).catch(() => {});
     node.popVisible = false;
 };

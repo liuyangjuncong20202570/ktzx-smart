@@ -59,11 +59,11 @@
 </template>
 <script setup>
 import {reactive, ref, computed, onMounted, nextTick, toRaw, isRef} from "vue";
-import request from "../utils/request.js";
+import request from "../../utils/request.js";
 import { ElMessage, ElMessageBox } from 'element-plus';
 import isEqual from 'lodash/isEqual.js'
-import {exportTableToCSV} from "../utils/exportTableToCSV.js";
-import {useProfileStore} from "../stores/profileStore.js";
+import {exportTableToCSV} from "../../utils/exportTableToCSV.js";
+import {useProfileStore} from "../../stores/profileStore.js";
 
 
 //获取Stroe
@@ -83,24 +83,21 @@ const nullRoleNum = ref(0);
 
 
 const getTableData = () => {
-
-
-
-  request.post('sysmangt/professionmangt',loginInfo.value)
-      .then(res => {
-        // 登录成功
-        if (res.code === 200) {
-          tableData.value = res.data;
-          initialize();
+  request.admin.post('/sysmangt/professionmangt',loginInfo.value)
+    .then(res => {
+      // 登录成功
+      if (res.code === 200) {
+        tableData.value = res.data;
+        initialize();
+      }
+    })
+    .catch(() => {
+          ElMessage({
+            type: 'error',
+            message: '获取专业列表失败'
+          });
         }
-      })
-      .catch(() => {
-            ElMessage({
-              type: 'error',
-              message: '获取专业列表失败'
-            });
-          }
-      );
+    );
 };
 
 //初始化数据
@@ -189,7 +186,7 @@ const handleRoleAdd = ()=>{
     remark : ""}
   )
 
-  request.post('/sysmangt/professionmangt/create',newCollege.value)
+  request.admin.post('/sysmangt/professionmangt/create',newCollege.value)
       .then(res => {
         // 登录成功
         if (res.code === 200) {
@@ -264,7 +261,7 @@ const handleBlur = (row, field) => {
         obsname:toRaw(row).obsname,
         remark:toRaw(row).remark
       })
-      request.post('/sysmangt/professionmangt/update',updateItem.value)
+      request.admin.post('/sysmangt/professionmangt/update',updateItem.value)
           .then(res => {
             // 登录成功
             if (res.code === 200) {
@@ -320,7 +317,7 @@ const handleRoleDel = () => {
                 deleteIdList.value.push(item.id)
               }
           )
-          request.post('/sysmangt/professionmangt/delete',deleteIdList.value)
+          request.admin.post('/sysmangt/professionmangt/delete',deleteIdList.value)
               .then(res => {
                 // 登录成功
                 if (res.code === 200) {
