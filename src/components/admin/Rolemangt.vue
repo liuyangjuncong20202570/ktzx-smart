@@ -135,7 +135,7 @@ const handleRoleAdd = () => {
   });
   console.log(tempRoleinfo.value);
   //
-  request.post('/sysmangt/rolemangt',tempRoleinfo.value)
+  request.admin.post('/sysmangt/rolemangt', tempRoleinfo.value)
       .then(res => {
         // 登录成功
         if (res.code === 200) {
@@ -226,7 +226,7 @@ const handleBlur = (row, field) => {
       homename:toRaw(row).homename,
       homeurl:toRaw(row).homeurl
     })
-    request.post('/sysmangt/rolemangt/update',updateItem.value)
+    request.admin.post('/sysmangt/rolemangt/update', updateItem.value)
         .then(res => {
           // 登录成功
           if (res.code === 200) {

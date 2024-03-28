@@ -24,7 +24,7 @@ const routes = [
         path: '/homes/:rolehome(' + rolehome.join('|') + ')',
         // path: '/homes/:rolehome(superadminhome|otherhome)',
         name: 'Homepage',
-        component: () => import('../views/HomePage.vue'),
+        component: () => import('../views/teacherHomePage.vue'),
         children: [
             {
                 path: 'sysmangt/rolemangt',

@@ -68,11 +68,7 @@ import {useProfileStore} from "../../stores/profileStore.js";
 
 //获取Stroe
 const profileStore = useProfileStore();
-const loginInfo = ref ({
-  userid: profileStore.profileid,
-  roleid: profileStore.profileroleid,
-  catelog: profileStore.profilecatelog,
-});
+
 
 /**************获取表单数据，并预处理*******************/
 
@@ -83,11 +79,12 @@ const nullRoleNum = ref(0);
 
 
 const getTableData = () => {
-  request.admin.post('/sysmangt/professionmangt',loginInfo.value)
+  request.admin.get('/sysmangt/professionmangt')
     .then(res => {
       // 登录成功
       if (res.code === 200) {
         tableData.value = res.data;
+        console.log(res.data)
         initialize();
       }
     })
@@ -188,6 +185,7 @@ const handleRoleAdd = ()=>{
 
   request.admin.post('/sysmangt/professionmangt/create',newCollege.value)
       .then(res => {
+        console.log(newCollege.value)
         // 登录成功
         if (res.code === 200) {
           ElMessage({
@@ -198,6 +196,7 @@ const handleRoleAdd = ()=>{
         }
       })
       .catch(() => {
+        console.log(newCollege.value)
             ElMessage({
               type: 'error',
               message: '新增专业失败'

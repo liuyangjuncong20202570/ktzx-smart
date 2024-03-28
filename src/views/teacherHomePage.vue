@@ -160,7 +160,6 @@ function clearLoginInfo() {
   // 清除其他可能存储的信息
   sessionStorage.removeItem('users');
   sessionStorage.removeItem('isLoggedIn');
-
 }
 
 //登出的方法
@@ -176,18 +175,15 @@ const menus = ref([
 ]);
 
 const loginInfo = reactive ({
-  userid: profileStore.profileid,
   username:profileStore.profilename,
-  loginname: profileStore.profileloginname,
-  roleid: profileStore.profileroleid,
-  catelog: profileStore.profilecatelog,
   rolename: profileStore.profilerolename,
+  catelog: profileStore.profilecatelog,
+  currentterm: profileStore.currentterm
 });
-//0310将homeurl修改为响应式计算属性，这样下面的profileStore中的值变了这边也会自动变，解决拼接地址存在问题情况
-const homeurl = computed(() => profileStore.profilehomeurl);
-console.log(homeurl)
-// const homeurl = profileStore.profilehomeurl;
 
+//0310将homeurl修改为响应式计算属性，这样下面的profileStore中的值变了这边也会自动变，解决拼接地址存在问题情况
+
+const homeurl = computed(() => profileStore.profilehomeurl);
 const excludedPids = ['0', '102'];
 
 //过滤器
@@ -208,9 +204,10 @@ const excludedPids = ['0', '102'];
   };
 //路由导航
 const navigateTo = (url) => {
-   // console.log(homeurl+url)
   //前面拼一个/表示绝对路径
-  router.push(homeurl.value+url);
+  console.log(homeurl.value + url)
+  router.push(homeurl.value + url);
+
 };
 
 //钩子函数用来刷新后重新获取数据
@@ -220,20 +217,15 @@ onMounted(() => {
   if (storedUserInfo) {
     const userInfo = JSON.parse(storedUserInfo);
     // 更新用户信息到Pinia
-    console.log(userInfo)
-    profileStore.setProfileInfo(userInfo.userId,userInfo.userName,userInfo.loginName,userInfo.roleId, userInfo.roleName, userInfo.catelog, userInfo.homeUrl);
-    loginInfo.userid = profileStore.profileid;
+    profileStore.setProfileInfo(userInfo.username, userInfo.rolename, userInfo.catelog, userInfo.homeurl, userInfo.token, userInfo.currentterm);
     loginInfo.username = profileStore.profilename;
-    loginInfo.loginname = profileStore.profileloginname;
-    loginInfo.roleid = profileStore.profileroleid;
     loginInfo.rolename = profileStore.profilerolename;
     loginInfo.catelog = profileStore.profilecatelog;
-
-    // console.log(loginInfo.username);
   } else {
     // 如果没有存储的用户信息，可以重定向到登录页面或显示提示信息
     sessionStorage.removeItem('users');
     sessionStorage.removeItem('isLoggedIn');
+    sessionStorage.removeItem('token');
 
     router.push({ name: 'Login' });
     // 或
@@ -241,16 +233,16 @@ onMounted(() => {
   }
   //获取完pinia中的数据后重新重定向到父页面
   router.push(homeurl.value);
-  // 0304：为生成侧面导航栏此处暂时写死：当前接口为：POST /homes/superadminhome
+
 // request.admin.post(`${homeurl}`,loginInfo)
-// 0311修改为teacherhome
+  console.log(1111)
 //获取菜单栏的数据
-  request.admin.post(`/homes/teacherhome`,toRaw(loginInfo))
+  request.admin.post(`/homes/teacherhome`)
       .then(res => {
+        console.log(res)
         // 登录成功
         if (res.code === 200 && res.data.length > 0)  {
           menus.value = res.data;
-          defaultActive.value = res.data[0].url;
         }
       }).catch(error => {
     // 获取失败

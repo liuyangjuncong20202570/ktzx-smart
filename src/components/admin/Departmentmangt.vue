@@ -75,8 +75,7 @@ const nullRoleNum = ref(0);
 const getTableData = () => {
 
 
-
-  request.admin.post('sysmangt/department',loginInfo.value)
+  request.admin.get('sysmangt/department')
       .then(res => {
         // 登录成功
         if (res.code === 200) {

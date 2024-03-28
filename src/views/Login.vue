@@ -38,7 +38,7 @@
                   <el-dialog :modelValue="showRoleModal" :show-close="false" :close-on-click-modal="false"
                              title="选择角色" width="30%" style="border-radius:10px">
                     <el-radio-group v-model="selectedRoleId">
-                      <el-radio v-for="role in data.simpleRoleList" :key="role.roleid"
+                      <el-radio v-for="role in roledata.simpleRoleList" :key="role.roleid"
                                 :label="role.roleid">{{role.rolename}}
                       </el-radio>
                     </el-radio-group>
@@ -73,11 +73,12 @@
                 </el-form-item>
                 <el-form-item>
                   <el-button type="primary" style="width: 100%;" @click="login">登录</el-button>
+
                   <!-- 弹窗登录-->
                   <el-dialog :modelValue="showRoleModal" :show-close="false" :close-on-click-modal="false"
                              title="选择角色" width="30%" style="border-radius:10px">
                     <el-radio-group v-model="selectedRoleId">
-                      <el-radio v-for="role in data.simpleRoleList" :key="role.roleid"
+                      <el-radio v-for="role in roledata.simpleRoleList" :key="role.roleid"
                                 :label="role.roleid">{{role.rolename}}
                       </el-radio>
                     </el-radio-group>
@@ -115,6 +116,15 @@ const loginForm = reactive({
   loginway: "1",
 })
 
+const loginuserFrom = ref({
+  id: "",
+  roleid: "",
+  obsid: "",
+  obsdeep: "",
+  catelog: ""
+})
+
+
 //学生登录/老师登录（true为学生登录）
 const StudentOrTeacher = ref(true);
 //调用getCurrentInstance()方法来获取当前组件实例的代理对象
@@ -138,8 +148,9 @@ const handleClick = (tab, event) => {
 }
 
 
-const data = reactive({});
+const roledata = reactive({});
 
+const selectedRoleId = ref(null);
 //默认选择第一个角色序号
 // const selectedRoleId = ref(data.simpleRoleList[0].roleid);
 
@@ -167,49 +178,30 @@ const login = () => {
             // 登录成功
             if (res.code === 200) {
               //处理不同角色的跳转逻辑
-              // profileStore.setProfilename(loginForm.loginname);
               const rolesCount = res.data.rolescount;
+              loginuserFrom.value.id = res.data.userid;
+              loginuserFrom.value.catelog = res.data.catelog;
+
               if (rolesCount === 1) {
-                // 跳转至指定页面
-
-                const HomeUrl = res.data.simpleRoleList[0].homeurl;
-
-                //将登录用户基本信息存储pinia
-                profileStore.setProfileInfo(res.data.userid,res.data.username,loginForm.loginname,res.data.simpleRoleList[0].roleid,res.data.simpleRoleList[0].rolename,res.data.catelog,res.data.simpleRoleList[0].homeurl);
-
-                //将用户信息格式化然后本地存储：0310
-                const userInfo = {
-                  userId: res.data.userid,
-                  userName:res.data.username,
-                  loginName: loginForm.loginname,
-                  roleId: res.data.simpleRoleList[0].roleid,
-                  roleName: res.data.simpleRoleList[0].rolename,
-                  catelog: res.data.catelog,
-                  homeUrl: res.data.simpleRoleList[0].homeurl
-                };
-                sessionStorage.setItem('users', JSON.stringify(userInfo));
-                sessionStorage.setItem('isLoggedIn', 'true');
-                router.push(HomeUrl);
+                loginuserFrom.value.roleid = res.data.simpleRoleList[0].roleid;
+                loginuserFrom.value.obsid = res.data.simpleRoleList[0].obsid;
+                loginuserFrom.value.obsdeep = res.data.simpleRoleList[0].obsdeep;
+                userlogin()
               } else {
-                //显示弹窗
-                Object.assign(data, res.data);
+                Object.assign(roledata, res.data);
+                console.log(roledata)
+                //打开弹窗选择角色
                 showRoleModal.value = true;
               }
-            } else {
-              // 登录失败
-              ElMessage({
-                type: 'error',
-                message: res.msg
-              });
             }
-          })
-          .catch(error => {
+
+          }).catch(error => {
             // 登录失败
-            ElMessage({
-              type: 'error',
-              message: '登录失败'
-            });
-          });
+        ElMessage({
+          type: 'error',
+          message: '登录失败'
+        });
+      });
     } else {
       // 输入无效
       ElMessage({
@@ -220,33 +212,67 @@ const login = () => {
   });
 };
 
-const selectedRoleId = ref(null);
 
 //登录验证跳转
 const confirmRole = () => {
-  const selectedRole = data.simpleRoleList.find(role => role.roleid === selectedRoleId.value);
+  const selectedRole = roledata.simpleRoleList.find(role => role.roleid === selectedRoleId.value);
   if (selectedRole) {
-    profileStore.setProfileInfo(data.userid,data.username,loginForm.loginname,selectedRole.roleid,selectedRole.rolename,data.catelog,selectedRole.homeurl);
-    // 将用户信息格式化然后本地存储：0310
-    const userInfo = {
-      userId: data.userid,
-      userName: data.username,
-      loginName: loginForm.loginname,
-      roleId:  selectedRole.roleid,
-      roleName: selectedRole.rolename,
-      catelog: data.catelog,
-      homeUrl: selectedRole.homeurl
-    };
-    sessionStorage.setItem('users', JSON.stringify(userInfo));
-    sessionStorage.setItem('isLoggedIn', 'true');
-    console.log(selectedRole.homeurl);
-    router.push(selectedRole.homeurl);
+    loginuserFrom.value.roleid = selectedRole.roleid;
+    loginuserFrom.value.obsid = selectedRole.obsid;
+    loginuserFrom.value.obsdeep = selectedRole.obsdeep;
   }
+  userlogin()
   showRoleModal.value = false;
+
 };
 onMounted(() => {
   sessionStorage.removeItem('users');
 })
+
+//二次请求
+const userlogin = () => {
+  console.log("userlogin")
+  request.admin.post('/login/user', loginuserFrom.value)
+      .then(res => {
+        console.log(res)
+        if (res.code === 200) {
+          console.log("userlogin_success")
+          profileStore.setProfileInfo(
+              res.data.username
+              , res.data.rolename
+              , res.data.catelog
+              , res.data.homeurl
+              , res.data.token
+              , res.data.currentterm);
+          const userInfo = {
+            username: res.data.username,
+            rolename: res.data.rolename,
+            catelog: res.data.catelog,
+            homeurl: res.data.homeurl,
+            token: res.data.token,
+            currentterm: res.data.currentterm
+          };
+
+          sessionStorage.setItem('users', JSON.stringify(userInfo));
+          sessionStorage.setItem('isLoggedIn', 'true');
+          sessionStorage.setItem('token', res.data.token);
+          console.log(res.data.homeurl)
+          router.push(res.data.homeurl);
+        } else if (res.code === 404) {
+          router.push('/login');
+        }
+
+      })
+      .catch(error => {
+        // 登录失败
+        ElMessage({
+          type: 'error',
+          message: '登录失败'
+        });
+      })
+}
+
+
 
 
 </script>

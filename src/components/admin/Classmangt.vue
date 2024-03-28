@@ -74,9 +74,10 @@ const activeNames = ref([]);
 const getTableData = () => {
   // 假设 request.post 是您项目中的请求方法
   // 这里需要替换为您实际的请求逻辑
-  request.admin.post('sysmangt/classmangt', loginInfo.value)
+  request.admin.get('sysmangt/classmangt')
       .then(res => {
         if (res.code === 200) {
+          console.log(res.data)
           tableData.value = res.data;
           initialize()
         }
