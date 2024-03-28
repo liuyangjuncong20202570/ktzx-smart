@@ -161,7 +161,7 @@ const login = () => {
   proxy.$refs.ruleFormRef.validate((valid) => {
     if (valid) {
       //请求登录接口
-      request.post('/login', loginForm)
+      request.admin.post('/login', loginForm)
           .then(res => {
             // console.log(res);
             // 登录成功
@@ -193,7 +193,7 @@ const login = () => {
               } else {
                 //显示弹窗
                 Object.assign(data, res.data);
-                // console.log(data);
+                console.log(res.data);
                 showRoleModal.value = true;
               }
             } else {
@@ -240,6 +240,7 @@ const confirmRole = () => {
     };
     sessionStorage.setItem('users', JSON.stringify(userInfo));
     sessionStorage.setItem('isLoggedIn', 'true');
+    console.log(selectedRole.homeurl);
     router.push(selectedRole.homeurl);
   }
   showRoleModal.value = false;

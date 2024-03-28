@@ -3,27 +3,31 @@
     <el-container class="layout-container-demo" style="height: 100%;">
       <el-header style="position: relative; text-align:right; background-color: #0064B1; font-size: 15px; height: 8%">
         <!--右侧按钮-->
-        <div style="display: flex; align-items: center; justify-content: center; height: 100%; right: 20px;">
-          <!--标题的div background-color: red;-->
-          <div class="left-div" style="float: left; margin-right: auto; display: flex;">
-            <img src="../assets/images/logo.png" style="height:5.5vh; float: left;"/>
-            <el-text style="font-size:19px; margin-left:10px; color:white">自动化专业智能教学平台</el-text>
+        <div style="height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 0">
+          <div class="left-div" style="flex-grow: 1; display: flex; align-items: center;  ">
+            <img src="../assets/images/logo.png" style="height: 5.5vh;"/>
+            <el-text style="font-size: calc(1vw + 6px); color: white; margin-left: 10px;">自动化专业智能教学平台</el-text>
           </div>
-          <!--头像-->
-          <el-dropdown>
-            <el-avatar style="margin-right:20px"
-                       src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"/>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item>查看详情</el-dropdown-item>
-            <!-- <el-dropdown-item @click="switchRole">切换角色</el-dropdown-item> -->
-                <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-          <!--人名 -->
-          <el-text class="mx-1" size="large" style="color:white">{{loginInfo.username}}</el-text>
+
+          <div style="flex-grow: 2; text-align: center;">
+            <el-text style="font-size: calc(1.5vw + 6px); color: white;">2024春季学期</el-text>
+          </div>
+
+          <div class="right-div" style="flex-grow: 1; display: flex; align-items: center; justify-content: flex-end;">
+            <el-dropdown>
+              <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"/>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item>查看详情</el-dropdown-item>
+                  <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+            <el-text style="font-size: calc(1vw + 3px); color: white; margin-left: 10px;">{{loginInfo.username}}</el-text>
+          </div>
         </div>
+
+
       </el-header>
 
       <el-container>
@@ -119,7 +123,7 @@ import {useProfileStore} from "../stores/profileStore.js";
 //获取Stroe
 const profileStore = useProfileStore();
 
-
+const defaultActive = ref('');
 const route = useRoute();
 const router = useRouter(); // 获取路由实例
 
@@ -166,7 +170,7 @@ const handleLogout = () => {
 };
 
 // 默认显示菜单
-const defaultActive = ref('');
+// const defaultActive = ref('');
 
 const menus = ref([
 ]);
@@ -181,7 +185,7 @@ const loginInfo = reactive ({
 });
 //0310将homeurl修改为响应式计算属性，这样下面的profileStore中的值变了这边也会自动变，解决拼接地址存在问题情况
 const homeurl = computed(() => profileStore.profilehomeurl);
-
+// console.log(homeurl)
 // const homeurl = profileStore.profilehomeurl;
 
 const excludedPids = ['0', '102'];
@@ -204,13 +208,14 @@ const excludedPids = ['0', '102'];
   };
 //路由导航
 const navigateTo = (url) => {
-  // console.log(homeurl+url)
+   // console.log(homeurl+url)
   //前面拼一个/表示绝对路径
   router.push(homeurl.value+url);
 };
 
 //钩子函数用来刷新后重新获取数据
 onMounted(() => {
+  const defaultActive = ref('');
   const storedUserInfo = sessionStorage.getItem('users');
   if (storedUserInfo) {
     const userInfo = JSON.parse(storedUserInfo);
@@ -236,11 +241,11 @@ onMounted(() => {
   }
   //获取完pinia中的数据后重新重定向到父页面
   router.push(homeurl.value);
-// 0304：为生成侧面导航栏此处暂时写死：当前接口为：POST /homes/superadminhome
-// request.post(`${homeurl}`,loginInfo)
+  // 0304：为生成侧面导航栏此处暂时写死：当前接口为：POST /homes/superadminhome
+// request.admin.post(`${homeurl}`,loginInfo)
 // 0311修改为teacherhome
 //获取菜单栏的数据
-  request.post(`/homes/teacherhome`,toRaw(loginInfo))
+  request.admin.post(`/homes/teacherhome`,toRaw(loginInfo))
       .then(res => {
         // 登录成功
         if (res.code === 200 && res.data.length > 0)  {
