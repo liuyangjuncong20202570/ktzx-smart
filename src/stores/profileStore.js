@@ -2,32 +2,29 @@ import { defineStore } from 'pinia'
 import { ref ,computed } from 'vue'
 
 export const useProfileStore = defineStore('profile', () => {
-    const profileid = ref(null) // 用户id
+
     const profilename = ref(null) //username用户名
-    const profileloginname = ref(null) //loginname用户名
-    const profileroleid = ref(null) //角色id
     const profilerolename = ref(null) //角色名
     const profilecatelog = ref(null) //登录方式
     const profilehomeurl = ref(null) //登录主页
+    const profiletoken = ref(null) //token
+    const currentterm = ref(null) //学期
 
-
-
-
-    function setProfileInfo(userid,username,loginname,roleid,rolename,catelog,homeurl) {
-        profileid.value = userid // 正确的方式来设置 ref 的值
-        profilename.value = username
-        profileloginname.value = loginname
-        profileroleid.value = roleid
+    //存入初次登录后的信息
+    function setProfileInfo(username, rolename, catelog, homeurl, token, term) {
+        profilename.value = username;
+        profilerolename.value = rolename
         profilecatelog.value = catelog
         profilehomeurl.value = homeurl
-        profilerolename.value = rolename
+        profiletoken.value = token;
+        currentterm.value = term;
     }
 
     function initProfileStore() {
         const storedUserInfo = sessionStorage.getItem('users');
         if (storedUserInfo) {
             const userInfo = JSON.parse(storedUserInfo);
-            setProfileInfo(userInfo.userid, userInfo.username,userInfo.loginname,userInfo.roleid, userInfo.rolename, userInfo.catelog, userInfo.homeurl);
+            setProfileInfo(userInfo.username, userInfo.rolename, userInfo.catelog, userInfo.homeurl, userInfo.token, userInfo.currentterm);
         }
     }
 
@@ -36,13 +33,12 @@ export const useProfileStore = defineStore('profile', () => {
 
 
     return {
-        profileid,
         profilename,
-        profileloginname,
-        profileroleid,
         profilerolename,
         profilecatelog,
         profilehomeurl,
-        setProfileInfo
+        profiletoken,
+        currentterm,
+        setProfileInfo,
     }
 })

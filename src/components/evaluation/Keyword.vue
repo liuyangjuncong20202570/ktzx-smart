@@ -14,7 +14,7 @@
             <el-table :data="filterTableData" style="height: 100%; width: 100%;" v-model="tableSelected"
                     @select="filterTableSelect" @select-all="filterTableSelectAll" stripe>
                 <el-table-column type="selection" width="55"></el-table-column>
-                <el-table-column prop="id" label="序码" width="60"></el-table-column>
+                <el-table-column prop="" label="序码" width="60"></el-table-column>
                 <el-table-column prop="name" label="名称" width="240">
                     <template v-slot="row">
                         <el-input v-if="row.row.editingName" style="width:100%; height: 25px;" v-model="row.row.tempName"
@@ -35,13 +35,14 @@
                 </el-table-column>
                 <el-table-column prop="courseid" label="重要程度" width="150">
                     <template v-slot="row">
-                        <!-- <el-input v-if="row.row.editingImportantlevelid" style="width:100%; height: 25px;"
-                            v-model="row.row.importantlevelid" @blur="handleBlur(row, 'editingImportantlevelid')"></el-input> -->
-                        <el-select v-if="row.row.editingImportantlevelid" v-model="row.row.importantlevelid"
+                        <el-input v-if="row.row.editingImportantlevelid" style="width:100%; height: 25px;"
+                            v-model="row.row.importantlevelid" @blur="handleBlur(row, 'editingImportantlevelid')"
+                            :ref="el => setInputRef(el, row)"></el-input>
+                        <!-- <el-select v-if="row.row.editingImportantlevelid" v-model="row.row.importantlevelid"
                             clearable style="width: 100%;" @blur="handleBlur(row, 'editingImportantlevelid')" size="small">
                             <el-option v-for="item in importanceData" :key="item.label" :label="item.label" :value="item.value" />
-                        </el-select>
-                        <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingImportantlevelid')">
+                        </el-select> -->
+                        <div v-else style="width: 100%; height: 25px;" @dblclick="handleClick(row, 'editingImportantlevelid')">
                             {{ row.row.importantlevelid }}
                         </div>
                     </template>
@@ -65,74 +66,11 @@ import { CloseBold, Search } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { computed, nextTick, onMounted, ref } from 'vue';
 import _ from 'lodash';
+import request from '../../utils/request';
 
 const tableSearchData = ref('');    // 主界面搜索框数据
 
-const tableData = ref([     // 主界面表格数据
-    {
-        id: 'A1',
-        name: '中断系统',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A2',
-        name: '串口并口通讯',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A3',
-        name: '伪指令集',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A4',
-        name: '单片机IO口',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A5',
-        name: '单片机内部结构',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A6',
-        name: '单片机外设模块扩展',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A7',
-        name: '单片机外部存储结构',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: 'A8',
-        name: '单片机外部硬件扩展',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-    {
-        id: '',
-        name: '未命名关键字(1145)',
-        datavalue: 0.00,
-        importantlevelid: '',
-        remark: '',
-    },
-]);
+const tableData = ref([]);
 
 const tempRowData = ref({});
 
@@ -152,8 +90,24 @@ const filterTableData = computed(() =>  // 实际显示的表格数据源
 
 const inputRefs = ref({});
 /******************************************** */
-const initialize = () => {
-    tableData.value.forEach((item) => {
+
+const getData = () => {
+    request.evaluation.get('/evaluation/keywords').then((res) => {
+        if(res.code === 200){
+            tableData.value = res.data;
+            initialize(tableData.value);
+        }
+        else{
+            ElMessage.error(res.msg);
+        }
+    }).catch((error) => {
+        ElMessage.error('获取关键字失败' + error);
+    })
+}
+
+const initialize = (data) => {
+    nullKeywordNum.value = 0;
+    data.forEach((item) => {
         item.editingName = false;
         item.editingDatavalue = false;
         item.editingImportantlevelid = false;
@@ -175,7 +129,7 @@ const initialize = () => {
 };
 
 onMounted(() => {
-    initialize();
+    getData();
 });
 
 const handleClick = (row, field) => {
@@ -192,16 +146,35 @@ const handleClick = (row, field) => {
 };
 
 const handleBlur = (row, field) => {
-    if (row.row.name !== row.row.tempName) {
-		if (field === 'editingName' && row.row.tempName.includes('未命名关键字')) {
+    if (field === 'editingName') {
+        if(row.row.tempName === ''){    // 为空则保持不变
+            row.row[field] = false;
+            return ;
+        }
+		else if (row.row.tempName !== row.row.name && row.row.tempName.includes('未命名关键字')) {  // 不可包含的策略
 			ElMessage.error('命名不可包含“未命名关键字”');
+            row.row.tempName = '';
+            row.row[field] = false;
+            return ;
 		}
-		else if (row.row.tempName !== '') row.row.name = row.row.tempName;
+		else row.row.name = row.row.tempName;   // 命名合法则赋值
 	}
-	row.row.tempName = '';
+    row.row.tempName = '';
     row.row[field] = false;
+
     if(!_.isEqual(tempRowData.value, row.row)){
         // 当数据发生改变了再传数据给后端
+        request.evaluation.post('/evaluation/keywords', row.row).then((res) => {
+            if(res.code === 200){
+                getData();
+                ElMessage.success('修改成功');
+            }
+            else{
+                ElMessage.error(res.msg);
+            }
+        }).catch((error) => {
+            ElMessage.error('修改能力失败' + error);
+        })
     }
 };
 
@@ -213,17 +186,24 @@ const setInputRef = (el, row) => {
 
 const addKeyword = () => {
     nullKeywordNum.value ++;
-    tableData.value.push({
+    const newData = {
         id: '',
         name: nullKeywordNum.value > 1 ? '未命名关键字(' + nullKeywordNum.value + ')' : '未命名关键字',
         datavalue: Number(0).toFixed(2),
         importantlevelid: '',
         remark: '',
-        editingName: false,
-        editingDatavalue: false,
-        editingImportantlevelid: false,
-        editingRemark: false,
-        tempName: '',
+    };
+
+    request.evaluation.post('/evaluation/keywords/create', newData).then((res) => {
+        if(res.code === 200){
+            getData();
+            ElMessage.success('新增成功');
+        }
+        else{
+            ElMessage.error(res.msg);
+        }
+    }).catch((error) => {
+        ElMessage.error('新增关键字失败' + error);
     });
 };
 
@@ -256,6 +236,24 @@ const deleteKeyword = () => {
         }
     ).then(() => {
         // 删除逻辑
+        let deletedIds = [];
+        for(let item of tableSelected.value) {
+            deletedIds.push(item.id);
+        };
+        // console.log(deletedIds);
+
+        request.evaluation.post('/evaluation/keywords/delete', deletedIds).then((res) => {
+            if(res.code === 200){
+                getData();
+                ElMessage.success('删除成功');
+            }
+            else{
+                ElMessage.error(res.msg);
+            }
+        }).catch((error) => {
+            ElMessage.error('删除关键字失败' + error);
+        })
+
     }).catch(() => {})
 };
 /*****************************/

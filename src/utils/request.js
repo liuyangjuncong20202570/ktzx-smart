@@ -17,8 +17,11 @@ function createAPI(url) {   // 构建不同端口的异步请求数据
     // 比如统一加token，对请求参数统一加密
     axiosData.interceptors.request.use(config => {
         config.headers['Content-Type'] = 'application/json;charset=utf-8';
-
-        // config.headers['token'] = user.token;  // 设置请求头
+        const token = sessionStorage.getItem('token'); // 示例获取 token 的代码
+        // console.log(token)
+        if (token) {
+            config.headers['token'] = token;  // 设置请求头中的 token
+        }
         return config
     }, error => {
         return Promise.reject(error)

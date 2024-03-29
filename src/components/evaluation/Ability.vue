@@ -60,15 +60,15 @@
     </el-container>
 
     <el-dialog v-model="abilityDictionaryVisible" width="1000" style="height: 390px; background-color: #eef3f6;
-            max-width: 1000px; overflow: auto;" :close-on-click-modal="false" :show-close="false"
-            destroy-on-close align-center>
+            max-width: 1000px; overflow: auto;"
+        :close-on-click-modal="false" :show-close="false" destroy-on-close align-center>
         <template #header="{ titleId }">
             <el-header style="height: auto; padding: 5px 0px; width:100%;" :id="titleId">
                 <div style=" display: flex; justify-content: space-between;">
                     <div>
-                        <el-button type="success" @click="changeDictionarySelect">保存</el-button>
+                        <el-button type="success">保存</el-button>
                     </div>
-                    <el-button link type="danger" @click="cancelDictionary">
+                    <el-button link type="danger" @click="closeDictionary">
                         <el-icon size="20" class="el-icon--left"><CloseBold /></el-icon>
                     </el-button>
                 </div>
@@ -84,8 +84,6 @@ import { CloseBold, Search } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { computed, nextTick, onMounted, ref } from 'vue';
 import _ from 'lodash';
-
-const data = ref();
 
 const aaa = () => {
     console.log(dictionarySelected.value);
@@ -147,7 +145,7 @@ const importanceData = [
 const tableSelected = ref([]);    // 记录主界面的表格选择
 
 const dictionarySelected = ref([
-    ['1', '2', '3'],
+    ['认知类型', '记忆层次', '回忆再认能力'],
 ]);     // 记录能力字典中选择的数据
 
 const nullAbilityNum = ref(0);  // 未命名能力数
@@ -163,29 +161,29 @@ const abilityDictionaryVisible = ref(false);    // 关键字字典弹窗是否�
 const props = {
     multiple: true,
     label: 'name',
-    value: 'id'
+    value: 'name'
 }
 
 const dictionaryData = [    //能力字典数据
     {
-        id: '1',
+        id: '',
         name: '认知类型',
         remark: '',
         children: [
             {
-                id: '2',
+                id: '',
                 name: '记忆层次',
                 remark: '',
                 children: [
                     {
-                        id: '3',
+                        id: '',
                         name: '回忆再认能力',
                         datavalue: '',
                         importantlevelid: '',
                         remark: '',
                     },
                     {
-                        id: '4',
+                        id: '',
                         name: '再现复述能力',
                         datavalue: '',
                         importantlevelid: '',
@@ -194,24 +192,24 @@ const dictionaryData = [    //能力字典数据
                 ]
             },
             {
-                id: '5',
+                id: '',
                 name: '理解层次',
                 remark: '',
                 children: [
                     {
-                        id: '6',
+                        id: '',
                         name: '概念识辨能力',
                         remark: '',
                         children: [
                             {
-                                id: '7',
+                                id: '',
                                 name: '概念识别能力',
                                 datavalue: '',
                                 importantlevelid: '',
                                 remark: '',
                             },
                             {
-                                id: '8',
+                                id: '',
                                 name: '概念辨析能力',
                                 datavalue: '',
                                 importantlevelid: '',
@@ -220,19 +218,19 @@ const dictionaryData = [    //能力字典数据
                         ]
                     },
                     {
-                        id: '9',
+                        id: '',
                         name: '识图绘图能力',
                         remark: '',
                         children: [
                             { 
-                                id: '10',
+                                id: '',
                                 name: '图表解析能力',
                                 datavalue: '',
                                 importantlevelid: '',
                                 remark: '',
                             },
                             { 
-                                id: '11',
+                                id: '',
                                 name: '图表绘制能力',
                                 datavalue: '',
                                 importantlevelid: '',
@@ -241,14 +239,14 @@ const dictionaryData = [    //能力字典数据
                         ]
                     },
                     {
-                        id: '12',
+                        id: '',
                         name: '诠释理解能力',
                         datavalue: '',
                         importantlevelid: '',
                         remark: '',
                     },
                     {
-                        id: '13',
+                        id: '',
                         name: '代码解析能力',
                         datavalue: '',
                         importantlevelid: '',
@@ -257,33 +255,33 @@ const dictionaryData = [    //能力字典数据
                 ]
             },
             {
-                id: '14',
+                id: '',
                 name: '应用层次',
                 reamrk: '',
                 children: [
                     {
-                        id: '15',
+                        id: '',
                         name: '直接应用能力',
                         datavalue: '',
                         importantlevelid: '',
                         remark: '',   
                     },
                     {
-                        id: '16',
+                        id: '',
                         name: '数学计算能力',
                         datavalue: '',
                         importantlevelid: '',
                         remark: '',
                     },
                     {
-                        id: '17',
+                        id: '',
                         name: '数模转化能力',
                         datavalue: '',
                         importantlevelid: '',
                         remark: '',
                     },
                     {
-                        id: '18',
+                        id: '',
                         name: '综合运用能力',
                         datavalue: '',
                         importantlevelid: '',
@@ -292,26 +290,26 @@ const dictionaryData = [    //能力字典数据
                 ]
             },
             {
-                id: '19',
+                id: '',
                 name: '分析层次',
                 remark: '',
                 children: [
                     {
-                        id: '20',
+                        id: '',
                         name: '比较分析能力',
                         datavalue: '',
                         importantlevelid: '',
                         remark: '',
                     },
                     {
-                        id: '21',
+                        id: '',
                         name: '解构归因能力',
                         datavalue: '',
                         importantlevelid: '',
                         remark: '',
                     },
                     {
-                        id: '22',
+                        id: '',
                         name: '数学建模能力',
                         datavalue: '',
                         importantlevelid: '',
@@ -322,19 +320,19 @@ const dictionaryData = [    //能力字典数据
         ]
     },
     {
-        id: '23',
+        id: '',
         name: '技术类型',
         remark: '',
         children: [
             {
-                id: '24',
+                id: '',
                 name: '文献检索能力',
                 datavalue: '',
                 importantlevelid: '',
                 remark: '',
             },
             {
-                id: '25',
+                id: '',
                 name: '工具使用能力',
                 datavalue: '',
                 importantlevelid: '',
@@ -343,19 +341,19 @@ const dictionaryData = [    //能力字典数据
         ]
     },
     {
-        id: '26',
+        id: '',
         name: '社会类型',
         remark: '',
         children: [
             {
-                id: '27',
+                id: '',
                 name: '沟通交流能力',
                 datavalue: '',
                 importantlevelid: '',
                 remark: '',
             },
             {
-                id: '28',
+                id: '',
                 name: '团队合作能力',
                 datavalue: '',
                 importantlevelid: '',
@@ -364,19 +362,19 @@ const dictionaryData = [    //能力字典数据
         ]
     },
     {
-        id: '29',
+        id: '',
         name: '思维类型',
         remark: '',
         children: [
             {
-                id: '30',
+                id: '',
                 name: '空间思维能力',
                 datavalue: '',
                 importantlevelid: '',
                 remark: '',
             },
             {
-                id: '31',
+                id: '',
                 name: '时间思维能力',
                 datavalue: '',
                 importantlevelid: '',
@@ -387,9 +385,7 @@ const dictionaryData = [    //能力字典数据
 ];
 
 const inputRefs = ref({});
-
-
-/*********************************************/
+/******************************************** */
 const initialize = () => {
     tableData.value.forEach((item) => {
         item.editingName = false;
@@ -498,20 +494,11 @@ const deleteAbility = () => {
     }).catch(() => {});
 };
 
-
-const dictionarySelected_backup = ref([]);
 const openDictionary = () =>{
     abilityDictionaryVisible.value = true;
-    dictionarySelected_backup.value = dictionarySelected.value;
 };
 
-const cancelDictionary = (close) => {
-    abilityDictionaryVisible.value = false;
-    dictionarySelected.value = dictionarySelected_backup.value;
-    dictionarySelected_backup.value = [];
-};
-
-const changeDictionarySelect = () => {
+const closeDictionary = (close) => {
     abilityDictionaryVisible.value = false;
 };
 </script>

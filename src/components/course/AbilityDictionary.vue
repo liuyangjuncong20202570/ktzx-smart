@@ -20,7 +20,7 @@
                 </div>
             </div>
 
-            <div class="tree-container" style="height: calc(100% - 25px); overflow:auto;">
+            <div class="tree-container" style="height: calc(100% - 25px); overflow: auto;">
                 <el-tree 
                         :data="treeData" draggable node-key="id" :props="defaultProps" :expand-on-click-node="false"
                         ref="nodeExpand" :default-expand-all="expandAll" :default-expanded-keys="expandedKeys"
@@ -37,7 +37,7 @@
                                 <el-button style="margin-top: 6px; width: 100%;" type="danger" plain round
                                     @click="confirmDeleteNodes(node.data)">删除</el-button>
                                 <template #reference>
-                                    <el-input v-if="node.data.editingName" v-model="node.data.name"
+                                    <el-input v-if="node.data.editingName" v-model="node.data.tempName"
                                         @blur="blurInput(node.data, 'editingName')" placeholder="请输入节点名称" @contextmenu.stop draggable="false"
                                         style="height: 20px; width: 150px;" :ref="el => setInputRef(el, node.data)"></el-input>
                                     <div v-else style="width: auto;" @dblclick="handleClick(node.data, 'editingName')">
@@ -55,14 +55,14 @@
                                     <div style="width: 150px; text-align: center;" @dblclick="handleClick(node.data, 'editingDatavalue')">
                                         <el-input v-if="node.data.editingDatavalue" v-model="node.data.datavalue"
                                             @blur="blurInput(node.data, 'editingDatavalue')" placeholder="请输入节点名称" @contextmenu.stop draggable="false"
-                                            style="height: 20px; width: 70%;" :ref="el => setInputRef(el, node.data)"></el-input>
-                                        <span v-else>{{ node.data.datavalue }}</span>
+                                            style="height: 20px; width: 100%;" :ref="el => setInputRef(el, node.data)"></el-input>
+                                        <div v-else style="width: 100%; height: 20px;">{{ node.data.datavalue }}</div>
                                     </div>
                                     <div class="overflow-text" v-bind:title="node.data.remark" @dblclick="handleClick(node.data, 'editingRemark')">
                                         <el-input v-if="node.data.editingRemark" v-model="node.data.remark"
                                             @blur="blurInput(node.data, 'editingRemark')" placeholder="请输入节点名称" @contextmenu.stop draggable="false"
                                             style="height: 20px; width: 100%;" :ref="el => setInputRef(el, node.data)"></el-input>
-                                        <span v-else>{{ node.data.remark }}</span>
+                                        <div v-else style="width: 100%; height: 20px;">{{ node.data.remark }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -107,7 +107,7 @@ const initialize = (nodes) => {
         node.editingName = false;
         node.editingDatavalue = false;
         node.editingRemark = false;
-        // node.id = id.value ++;
+        node.tempName = '';
         
         if(node.name.includes('未命名能力')){
             if(node.name.length > 5){
@@ -220,6 +220,7 @@ onBeforeUnmount(() => {
 /************对结点的操作************/
 const handleClick = (node, field) => {
     nextTick(() => {
+        node.tempName = node.name;
         node[field] = true;
         setTimeout(() => {
             if(inputRefs.value[node.id] && inputRefs.value[node.id].$refs.input){
@@ -248,6 +249,7 @@ const addSiblingNode = (node) => {
     request.evaluation.post('/coursemangt/ability/create', newNode).then((res) => {
         if(res.code === 200){
             getTreeData();
+            ElMessage.success('新增成功');
         }
     }).catch((error) => {
         ElMessage.error('新增失败失败' + error);
@@ -271,8 +273,9 @@ const addChildNode = (node) => {
     // console.log(newNode);
     request.evaluation.post('/coursemangt/ability/create', newNode).then((res) => {
         if(res.code === 200){
-            expandedKeys.value.push(node.id); //将该节点id追加到展开的id中
+            if(!expandedKeys.value.includes(node.id)) expandedKeys.value.push(node.id); //将该节点id追加到展开的id中
             getTreeData();
+            ElMessage.success('新增成功');
         }
     }).catch((error) => {
         ElMessage.error('获取能力数据失败' + error);
@@ -304,6 +307,7 @@ const confirmDeleteNodes = (node) => {
         request.evaluation.post('/coursemangt/ability/delete', deletedNodes).then((res) => {
             if(res.code === 200){
                 getTreeData();
+                ElMessage.success('删除成功');
 
                 deletedNodes.forEach((id) => {	// 删除被删除节点的默认展开数据
                     let index = -1;
@@ -349,6 +353,15 @@ const setInputRef = (el, node) => {
 };
 
 const blurInput = (node, field) => {
+	if (node.tempName !== '' && node.tempName !== node.name) {
+		if (node.tempName.includes('未命名能力')) {
+			ElMessage.error('命名不可包含“未命名能力”');
+		}
+		else {
+			node.name = node.tempName;
+			node.tempName = '';
+		}
+	}
 	node[field] = false;
 }
 
