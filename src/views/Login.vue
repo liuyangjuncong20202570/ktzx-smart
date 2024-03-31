@@ -9,9 +9,11 @@
       <!--中间右边部分-->
       <el-main style="display: flex; align-items: center;">
         <!--白框-->
-        <div style="width:16vw; height:auto; margin: 0 auto; background-color:white; border-radius:10px; padding:20px;" @keyup.enter="login">
+        <div class="container_bai"
+             style="width:45%;min-width:14vw; height:auto; margin: 0 auto; background-color:white; border-radius:10px; padding:20px;"
+             @keyup.enter="login">
           <!--切换账号登录-->
-          <el-tabs v-model="loginForm.catelog" class="demo-tabs" @tab-click="handleClick" stretch>
+          <el-tabs v-model="loginForm.catelog" class="container_tabs" @tab-click="handleClick" stretch>
             <!--学生账号登录-->
             <el-tab-pane label="学生登录" name="1">
               <!--选择登录方式-->
@@ -295,5 +297,7 @@ const userlogin = () => {
   background-repeat: no-repeat;
   background-size: cover;
   width: 95vw;
+}
 
-}</style>
+
+</style>

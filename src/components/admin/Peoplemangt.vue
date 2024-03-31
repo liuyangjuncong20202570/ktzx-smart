@@ -53,15 +53,55 @@
         <div style="width: 99%; display: flex; justify-content: space-between; align-items: center; margin-top: 0" >
           <!-- 左侧按钮 -->
           <div>
-            <el-button v-blur-on-click style="margin-left: 0.8vw" type="primary" @click="exportData">导出</el-button>
-            <el-button v-blur-on-click type="success" @click="createPeople">新增</el-button>
+            <el-button v-blur-on-click style="margin-left: 0.8vw" type="success" @click="exportData">导出</el-button>
+            <el-button v-blur-on-click type="primary" @click="createPeople">新增</el-button>
             <el-button v-blur-on-click type="info" @click="importData">导入</el-button>
             <el-button v-blur-on-click type="danger" @click="deleteSelected">删除</el-button>
           </div>
+          <el-dialog
+              :destroy-on-close="true"
+              :show-close="false"
+              :close-on-click-modal="false"
+              style="width:20vw; padding-top: 0"
+              v-model="importdialogViaible">
+            <h2 style="margin-top: 0">导入教师/学生</h2>
+            <el-upload
+                class="upload-demo"
+                ref="uploadRef"
+                auto-upload="false"
+                show-file-list="false"
+                :before-upload="beforeUpload"
+                style="margin-bottom: 20px;"
+            >
+              <!-- 使用输入框作为上传的触发器 -->
+              <el-input
+                  slot="trigger"
+                  v-model="fileName"
+                  placeholder="未选择文件"
+                  readonly
+                  style="cursor: pointer; text-align: center;"
+              ></el-input>
+            </el-upload>
+
+            <div style="text-align: center; margin-bottom: 20px;">  <!-- 添加内联样式 -->
+              <!-- 下载链接 -->
+              <a href="/file/人员管理-导入人员模板.xlsx" download>点击下载模板文件</a>
+            </div>
+
+            <div style="text-align: right;">  <!-- 添加内联样式 -->
+              <!-- 上传按钮 -->
+              <el-button style="margin-right: 10px;" @click="closeimportdialogViable">关闭</el-button>  <!-- 添加内联样式 -->
+              <el-button type="success" @click="submitUpload">上传</el-button>
+            </div>
+
+          </el-dialog>
+
+          <!--          -->
 
           <!-- 右侧搜索框和按钮 -->
           <div>
-            <el-input v-model="searchKeyword" placeholder="请输入姓名关键字" class="input-with-select"
+            <el-input v-model.lazy="searchKeyword" @input="debouncedQuerySearch" placeholder="请输入姓名关键字"
+                      class="input-with-select"
                       style="width:200px;margin-right:0.8vw"
             ></el-input>
             <el-button type="primary" @click="querySearch">搜索</el-button>
@@ -124,6 +164,7 @@ import{ exportTableToCSV } from "../../utils/exportTableToCSV.js";
 import{ searchInTable } from "../../utils/searchInTable.js";
 import AddPeopleDialog from "./subcomponents/AddPeopleDialog.vue"
 import EditRoleList from "./subcomponents/EditRoleList.vue";
+import _ from 'lodash'
 
 //tab显示，学生-1，老师-2，默认为老师
 const activeTab = ref('2');
@@ -139,6 +180,7 @@ const peoplelist = ref([]);
 const searchKeyword = ref('')
 
 
+
 //设置默认的aside宽度
 const asideWidth = ref(300);
 
@@ -146,9 +188,11 @@ const asideWidth = ref(300);
 
 const topNodes = ref([]); // 用于存储最顶层节点的数组
 const activeNames = ref([]); // 控制哪些 el-collapse-item 是打开状态
-
+const importdialogViaible = ref(false);
 const dialogVisible = ref(false);
 const DialogShow = ref(null);
+
+
 /**************移动逻辑*******************/
 const startResize = (event) => {
   const startX = event.clientX;
@@ -189,8 +233,8 @@ const defaultProps = {
 
 const fetchData = () => {
   // 模拟异步获取数据
-  setTimeout(() => {
-    //页面进入后，获取左侧的组织机构列表
+
+  //页面进入后，获取左侧的组织机构列表
     request.admin.get('/sysmangt/personnelmangt')
         .then(res => {
           // 登录成功
@@ -207,7 +251,6 @@ const fetchData = () => {
         message: '获取组织机构列表失败'
       });
     });
-  }, 1000);
 };
 
 // 移除第一层节点的函数
@@ -378,9 +421,62 @@ const exportData = () => {
         })
       })
 }
+/*************上传******************/
 const importData = () => {
-  // 处理导入数据逻辑
+  importdialogViaible.value = true;
 }
+
+const uploadRef = ref(null);
+const fileName = ref(''); // 文件名
+const fileToUpload = ref(null); // 要上传的文件对象
+
+function handleFileChange(file) {
+  if (file) {
+    fileName.value = file.name; // 显示文件名
+    fileToUpload.value = file; // 保存文件对象
+  }
+}
+
+function beforeUpload(file) {
+  handleFileChange(file); // 在上传前处理文件变化
+  return false; // 阻止默认上传行为
+}
+
+
+function submitUpload() {
+  if (fileToUpload.value) {
+    const formData = new FormData();
+    formData.append('file', fileToUpload.value);
+    request.admin.post('/sysmangt/personnelmangt/import', formData)
+        .then(res => {
+          // 处理响应
+          if (res.code === 200) {
+            ElMessage.success('文件上传成功！');
+            importdialogViaible.value = false;
+            getPeopleList();
+
+
+          } else {
+            ElMessage.error(res.message || '上传失败！');
+          }
+        })
+        .catch(error => {
+          ElMessage.error(error.message || '上传时发生错误！');
+        });
+  } else {
+    ElMessage.warning('请先选择一个文件！');
+  }
+}
+
+const closeimportdialogViable = () => {
+  importdialogViaible.value = false
+  fileName.value = '';
+  fileToUpload.value = null;
+}
+
+/*******************************************/
+
+/*************删除选中记录******************/
 const deleteSelected = () => {
   const ids = selectedRows.value.map(row => row.id);
 
@@ -400,19 +496,24 @@ const deleteSelected = () => {
     });
   });
 }
-const saveData = () => {
-  // 处理保存数据逻辑
+/*******************************************/
+
+const handleInput = () => {
+  if (searchKeyword.value.length >= 1) {
+    querySearch();
+  }
 }
-const resetPassword = () => {
-  // 处理重置密码逻辑
-}
+
+const debouncedQuerySearch = _.debounce(() => {
+  querySearch();
+}, 500);
 const querySearch = () => {
   // 处理搜索逻辑
-  filteredData.value = searchInTable(peoplelist.value, searchKeyword.value, 'username');  // 假设我们按 'username' 列搜索
-
-  console.log('搜索内容:', searchKeyword.value)
+  if (searchKeyword.value.length >= 1 || searchKeyword.value.length === 0) {
+    filteredData.value = searchInTable(peoplelist.value, searchKeyword.value, 'username');  // 假设我们按 'username' 列搜索
+    // console.log('搜索内容:', searchKeyword.value)
+  }
 }
-
 
 onMounted(() => {
   fetchData();
@@ -434,21 +535,28 @@ onMounted(() => {
   transform: rotate(90deg);
 }
 
+::v-deep(.el-dialog__header) {
+  padding-top: 0;
+  padding-bottom: 0;
+}
 /* Vue 3 使用 ::v-deep 选择器 */
-/deep/ .el-collapse-item__arrow.is-active {
+::v-deep(.el-collapse-item__arrow.is-active) {
   transform: rotate(90deg);
 }
-/deep/ .el-collapse-item__header{
+
+::v-deep(.el-collapse-item__header) {
   background-color:whitesmoke;
 }
-/deep/ button:focus, button:focus-visible {
+
+::v-deep(button:focus, button:focus-visible) {
   outline: none; /* 使用你的颜色 */
 }
 
-/deep/ .el-collapse-item__content{
+::v-deep(.el-collapse-item__content) {
   padding-bottom: 0;
 }
-/deep/ .el-tabs__header {
+
+::v-deep(.el-tabs__header) {
   margin: 0 0 5px !important;
 }
 </style>

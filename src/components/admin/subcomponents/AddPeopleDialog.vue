@@ -135,7 +135,7 @@ const submitForm = () => {
             if (res.code === 200) {
               ElMessage({
                 type: 'success',
-                message: '新增角色成功'
+                message: '新增人员成功'
               });
               emit('formSubmitted');
               closeDialog();
@@ -144,7 +144,7 @@ const submitForm = () => {
           }).catch(error => {
         ElMessage({
           type: 'error',
-          message: '新增角色失败'
+          message: '新增人员成功'
         });
       });
     } else {
@@ -167,13 +167,13 @@ const closeDialog = () => {
 </script>
 <style scoped>
 /*覆盖el-dialog__header的样式*/
-/deep/ .el-dialog__header {
+::v-deep(.el-dialog__header) {
   padding-top: 0;
   padding-bottom: 0;
 }
 
 /*覆盖el-dialog__body 的样式*/
-/deep/.el-dialog__body{
+::v-deep(.el-dialog__body) {
   padding-top: 5px;
   padding-bottom: 5px;
 }
