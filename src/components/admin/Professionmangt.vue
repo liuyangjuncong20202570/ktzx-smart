@@ -349,7 +349,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/deep/.el-table .cell {
+::v-deep(.el-table .cell) {
   text-align: center;
 }
 .custom-icon:hover {
