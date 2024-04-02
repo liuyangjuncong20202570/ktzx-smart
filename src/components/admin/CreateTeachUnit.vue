@@ -82,6 +82,7 @@ import type { NodeDropType, } from 'element-plus/es/components/tree/src/tree.typ
 import { ref, reactive, onMounted, nextTick, onBeforeUnmount } from 'vue'
 import request from '../../utils/request'
 import { exportTreeToCSV } from "../../utils/exportTreeToCSV";
+import { expandKeys } from 'element-plus/es/components/table-v2/src/common'
 
 //树数据
 const treeData = ref([]);
@@ -96,9 +97,14 @@ const expandtip = ref('');
 //展开所有或收起所有
 const changeTreeExpand = () => {
 	expandAll.value = !expandAll.value;
-	for (let i = 0; i < nodeExpand.value.store._getAllNodes().length; i++) {
-		nodeExpand.value.store._getAllNodes()[i].expanded = expandAll.value;
+	expandedKeys.value = [];
+	let length = nodeExpand.value.store._getAllNodes().length;
+	let allNodes = nodeExpand.value.store._getAllNodes();
+	for (let i = 0; i < length; i++) {
+		allNodes[i].expanded = expandAll.value;
+		if(expandAll.value) expandedKeys.value.push(allNodes[i].key);
 	}
+	// console.log(expandedKeys.value);
 }
 
 /********初始树数据*********************/
@@ -117,7 +123,7 @@ const getTreeData = () => {
 			nullNodeNum.value = 0;
 			initialize(treeData.value);
 			// console.log("getTreeData 被触发");
-			console.log(treeData.value)
+			// console.log(treeData.value)
 		}
 	}).catch(() => {
 		ElMessage({
@@ -162,13 +168,13 @@ const initialize = (nodes) => {
 const confirmDeleteNodes = (deletedNode) => {
 	// console.log(deletedNode)
 	// 检查节点是否有子节点
-	if (deletedNode.children && deletedNode.children.length > 0) {
+	if (/* deletedNode.children && deletedNode.children.length > 0 */0) {
 		// 如果有子节点，显示错误提示并阻止删除
-		ElMessage({
-			type: 'error',
-			message: '请先删除子节点',
-		});
-		deletedNode.popVisible = false;
+		// ElMessage({
+		// 	type: 'error',
+		// 	message: '请先删除子节点',
+		// });
+		// deletedNode.popVisible = false;
 	} else {
 		// 如果没有子节点，询问用户是否真的要删除该节点
 		ElMessageBox.confirm(
@@ -189,9 +195,13 @@ const confirmDeleteNodes = (deletedNode) => {
 }
 
 const deleteNodes = (deletedNode) => {
-	const idlist = [];
-	idlist.push(deletedNode.id);
-	console.log(idlist);
+	let idlist = [];
+	if(deletedNode.children && deletedNode.children.length > 0){
+		idlist = findChildNodes(deletedNode.children, [deletedNode.id]);
+	}
+	else idlist.push(deletedNode.id);
+	// console.log(idlist);
+
 	request.admin.post('/sysmangt/units/delete', idlist)
 		.then(res => {
 			if (res.code === 200) {
@@ -200,6 +210,13 @@ const deleteNodes = (deletedNode) => {
 					message: `节点 "${deletedNode.obsname}已删除`
 				})
 				getTreeData();
+
+				idlist.forEach((id) => {	// 删除被删除节点的默认展开数据
+                    let index = -1;
+                    index = expandedKeys.value.indexOf(id);
+                    if(index > -1) expandedKeys.value.splice(index, 1);
+                })
+				console.log(expandedKeys.value);
 			}
 		}).catch(error => {
 			ElMessage({
@@ -207,6 +224,16 @@ const deleteNodes = (deletedNode) => {
 				message: '删除节点失败'
 			});
 		});
+};
+
+const findChildNodes = (nodes, array = []) => {  // 查找某一节点的所有子节点id
+    nodes.forEach((item) => {
+        array.push(item.id);
+        if(item.children && item.children.length > 0){
+            array = findChildNodes(item.children, array);
+        }
+    })
+    return array;
 };
 /********************************************************/
 /**********************导出功能****************************/
@@ -228,7 +255,7 @@ const openNode = (nodeData, node) => {
 	if (!expandedKeys.value.includes(node.key)) {
 		expandedKeys.value.push(node.key);
 	}
-	// console.log(expandedKeys.value)
+	console.log(expandedKeys.value);
 };
 
 //递归移除子节点id
