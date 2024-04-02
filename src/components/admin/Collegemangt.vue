@@ -33,8 +33,28 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="" label="学院负责人">
+
+        <el-table-column label="学院负责人" min-width="120">
+          <template #default="{ row }">
+            <div v-for="(user, index) in row.stUsersList" :key="user.id" class="user-bubbles">
+
+              <template v-if="index < 4">
+
+                <span v-for="(user, index) in row.stUsersList" v-if="index < 4" :key="user.id"
+                      class="user-bubble">
+              {{ user.username }}
+            </span>
+              </template>
+              <span v-if="row.stUsersList.length > 4"
+                    class="more-users">+{{ row.stUsersList.length - 4 }}</span>
+              <el-icon class="edit-icon" @click="showHeadofDialog(row)">
+                <edit/>
+              </el-icon>
+            </div>
+          </template>
         </el-table-column>
+
+        <!--        @click="showDialog(row)"-->
         <el-table-column prop="remark" label="备注" min-width="80">
           <template #default="{ row }">
             <el-input v-if="row.editingRemark" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.remark"
@@ -44,6 +64,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <EditHeadofCollege v-show="dialogVisible" ref="DialogShow" @formSubmitted="getTableData"/>
     </el-main>
   </el-container>
 </template>
@@ -53,6 +74,9 @@ import request from "../../utils/request.js";
 import { ElMessage, ElMessageBox } from 'element-plus';
 import isEqual from 'lodash/isEqual.js'
 import {exportTableToCSV} from "../../utils/exportTableToCSV.js";
+import {Edit} from '@element-plus/icons-vue';
+import EditHeadofCollege from "./subcomponents/EditHeadofCollege.vue";
+
 
 
 /**************获取表单数据，并预处理*******************/
@@ -68,6 +92,7 @@ const getTableData = () => {
         // 登录成功
         if (res.code === 200) {
           tableData.value = res.data;
+          console.log(tableData.value)
           initialize();
         }
       })
@@ -220,8 +245,6 @@ const handleBlur = (row, field) => {
 
     row[field] = false;
     rowdata= JSON.parse(JSON.stringify(row));
-    // console.log(rowdata)
-    // console.log(orirow)
     //isEqual(a,b) a,b是否相同
     hasChanged = isEqual(rowdata, orirow);
     // console.log(hasChanged)
@@ -262,6 +285,22 @@ const handleBlur = (row, field) => {
 };
 
 /**************************************/
+
+const dialogVisible = ref(false);
+const DialogShow = ref(null);
+const showHeadofDialog = (row) => {
+
+  dialogVisible.value = true;  // 打开弹窗
+
+  console.log(row)
+  // DialogShow.value.init(row.stUsersList);
+  console.log(row.stUsersList)
+  DialogShow.value.init(row);
+
+}
+
+
+
 
 
 
@@ -334,4 +373,38 @@ onMounted(() => {
   cursor: pointer;
 }
 
+.user-bubbles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px; /* 气泡之间的间距 */
+  justify-content: center; /* 居中对齐所有的气泡 */
+  align-items: center; /* 垂直居中（如果你的行高较高的话） */
+}
+
+.user-bubble {
+  background-color: #E6F7FF; /* 气泡的背景颜色 */
+  border-radius: 15px; /* 边框圆角，使其看起来像气泡 */
+  padding: 5px 10px; /* 内边距 */
+  font-size: 14px; /* 文本大小 */
+  cursor: pointer; /* 鼠标悬停时的手形指针 */
+  white-space: nowrap; /* 防止文本换行 */
+}
+
+.more-users {
+  background-color: #e4e6eb;
+  border-radius: 15px;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.edit-icon {
+  cursor: pointer; /* 鼠标悬停时变成手形指针 */
+  white-space: nowrap; /* 防止文本换行 */
+  margin-left: 8px; /* 与名字标签的间距 */
+}
+
+.edit-icon:hover {
+  color: #409EFF; /* 悬浮时的颜色 */
+}
 </style>
