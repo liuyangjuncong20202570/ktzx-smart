@@ -21,6 +21,11 @@ const routes = [
         component: () => import('../views/Login.vue')
     },
     {
+        path: '/demo',
+        name: '',
+        component: () => import('../components/evaluation/demo1.vue')
+    },
+    {
         path: '/homes/:rolehome(' + rolehome.join('|') + ')',
         // path: '/homes/:rolehome(superadminhome|otherhome)',
         name: 'Homepage',
@@ -105,6 +110,11 @@ const routes = [
                 path: 'evasys/courseinfo/formative/knowledgeunit', // 形成性评价模型-知识单元
                 name: 'KnowledgeUnit',
                 component: () => import('../components/evaluation/KnowledgeUnit.vue')
+            },
+            {
+                path: 'evasys/courseinfo/formative/KWAgraph', // 形成性评价模型-知识单元
+                name: 'KWAgraph',
+                component: () => import('../components/evaluation/demo1.vue')
             },
         ]
     },

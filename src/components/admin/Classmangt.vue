@@ -241,7 +241,8 @@ onMounted(() => {
 .class-tag {
   margin-left: 5px;
 }
-/deep/.el-collapse-item__content{
+
+::v-deep(.el-collapse-item__content) {
   padding-bottom :0px;
 }
 </style>
