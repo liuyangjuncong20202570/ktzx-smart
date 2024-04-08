@@ -42,7 +42,31 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="" label="专业负责人">
+        <el-table-column label="专业负责人" min-width="100">
+          <template #default="{ row }">
+            <div style="display: flex; align-items: center;">
+              <div style="flex-grow: 1; display: flex; flex-wrap: wrap;">
+                <!-- 只在这个div上使用v-for，移除内层的v-for -->
+                <div v-for="(user, index) in row.responsiblePersonList" :key="user.id" class="user-bubbles">
+                  <!-- 使用v-if来确保只显示前四个负责人 -->
+                  <template v-if="index < 4">
+            <span class="user-bubble">
+              {{ user.username }}
+            </span>
+                  </template>
+                  <!-- 当负责人数量超过4时，显示额外的数量 -->
+                  <span v-if="index === 3 && row.responsiblePersonList.length > 4" class="more-users">
+            +{{ row.responsiblePersonList.length - 4 }}
+          </span>
+                </div>
+              </div>
+              <div>
+                <el-icon class="edit-icon" @click="showHeadofDialog(row)">
+                  <edit/>
+                </el-icon>
+              </div>
+            </div>
+          </template>
         </el-table-column>
 
         <el-table-column prop="remark" label="备注" min-width="80">
@@ -54,6 +78,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <EditHeadofProfession v-show="dialogVisible" ref="DialogShow" @formSubmitted="getTableData"/>
     </el-main>
   </el-container>
 </template>
@@ -64,7 +89,8 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import isEqual from 'lodash/isEqual.js'
 import {exportTableToCSV} from "../../utils/exportTableToCSV.js";
 import {useProfileStore} from "../../stores/profileStore.js";
-
+import EditHeadofProfession from "./subcomponents/EditHeadofProfession.vue"
+import {Edit} from "@element-plus/icons-vue";
 
 //获取Stroe
 const profileStore = useProfileStore();
@@ -138,7 +164,7 @@ const columns = ref([
   { prop: 'proname', label: '专业名称' },
   { prop: 'procode', label: '专业代码' },
   { prop: 'reachpercent', label: '课程目标达成阈值' },
-  { prop: '', label: '专业负责人' },
+  {prop: 'responsiblePersonList', label: '专业负责人', isArray: true, arrayProp: 'username'},
   { prop: 'remark', label: '备注' }
 ]);
 
@@ -286,6 +312,17 @@ const handleBlur = (row, field) => {
 
 /**************************************/
 
+const dialogVisible = ref(false);
+const DialogShow = ref(null);
+const showHeadofDialog = (row) => {
+
+  dialogVisible.value = true;  // 打开弹窗
+  console.log(row)
+  // DialogShow.value.init(row.stUsersList);
+  // console.log(row.responsiblePersonList)
+  DialogShow.value.init(row);
+
+}
 
 
 /**************************************/

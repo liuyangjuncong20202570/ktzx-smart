@@ -10,7 +10,7 @@
         <el-main style="padding-left:0">
           <el-table :data="userlist" empty-text="没有负责人">
             <el-table-column type="index" label="序号" min-width="50"></el-table-column>
-            <el-table-column label="所属院系" min-width="200">{{ obsname }}</el-table-column>
+            <el-table-column label="所属部门" min-width="200">{{ obsname }}</el-table-column>
             <!-- 从这里移除id的显示 -->
             <el-table-column prop="username" label="教师用户名" min-width="100"></el-table-column>
             <el-table-column label="操作" width="120">
@@ -52,7 +52,7 @@ import {ref, reactive, defineExpose, watch, nextTick, onMounted, getCurrentInsta
 
 import {ElMessage} from "element-plus";
 import {Document, Edit, Folder} from "@element-plus/icons-vue";
-import Collegemangt from "../Collegemangt.vue"
+import Professionmangt from "../Professionmangt.vue"
 import request from "../../../utils/request.js";
 import {CloseBold} from '@element-plus/icons-vue';
 

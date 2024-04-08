@@ -34,27 +34,33 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="学院负责人" min-width="120">
+        <el-table-column label="学院负责人" min-width="100">
           <template #default="{ row }">
-            <div v-for="(user, index) in row.stUsersList" :key="user.id" class="user-bubbles">
-
-              <template v-if="index < 4">
-
-                <span v-for="(user, index) in row.stUsersList" v-if="index < 4" :key="user.id"
-                      class="user-bubble">
+            <div style="display: flex; align-items: center;">
+              <div style="flex-grow: 1; display: flex; flex-wrap: wrap;">
+                <!-- 只在这个div上使用v-for，移除内层的v-for -->
+                <div v-for="(user, index) in row.responsiblePersonList" :key="user.id" class="user-bubbles">
+                  <!-- 使用v-if来确保只显示前四个负责人 -->
+                  <template v-if="index < 4">
+            <span class="user-bubble">
               {{ user.username }}
             </span>
-              </template>
-              <span v-if="row.stUsersList.length > 4"
-                    class="more-users">+{{ row.stUsersList.length - 4 }}</span>
-              <el-icon class="edit-icon" @click="showHeadofDialog(row)">
-                <edit/>
-              </el-icon>
+                  </template>
+                  <!-- 当负责人数量超过4时，显示额外的数量 -->
+                  <span v-if="index === 3 && row.responsiblePersonList.length > 4" class="more-users">
+            +{{ row.responsiblePersonList.length - 4 }}
+          </span>
+                </div>
+              </div>
+              <div>
+                <el-icon class="edit-icon" @click="showHeadofDialog(row)">
+                  <edit/>
+                </el-icon>
+              </div>
             </div>
           </template>
         </el-table-column>
 
-        <!--        @click="showDialog(row)"-->
         <el-table-column prop="remark" label="备注" min-width="80">
           <template #default="{ row }">
             <el-input v-if="row.editingRemark" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.remark"
@@ -110,8 +116,6 @@ const initialize = () => {
   tableData.value.forEach(item => {   // 为每一个表格数据添加是否显示输入框的判定
     item.editingobsname = false;
     item.editingLevelcode = false;
-
-    // item.editingstUsersList = false;
     item.editingRemark = false;
     if (item.obsname.includes('未命名节点')) {
         if (item.obsname.length > 5) {
@@ -144,9 +148,11 @@ const handleSelectAll = (selection) => {
 
 const columns = ref([
   { prop: 'obsname', label: '学院名称' },
-  { prop: '', label: '学院负责人' },
-  { prop: 'remark', label: '备注' }
+  {prop: 'levelcode', label: '层级码'},
+  {prop: 'responsiblePersonList', label: '学院负责人', isArray: true, arrayProp: 'username'},
+  {prop: 'remark', label: '备注'},
 ]);
+
 
 const exportData = () => {
   // 获取选中的行
@@ -170,6 +176,7 @@ const exportData = () => {
       }
   )
       .then(() => {
+        console.log(dataToExport)
         exportTableToCSV(dataToExport, columns.value);
       })
       .catch(() => {
@@ -291,10 +298,9 @@ const DialogShow = ref(null);
 const showHeadofDialog = (row) => {
 
   dialogVisible.value = true;  // 打开弹窗
-
   console.log(row)
   // DialogShow.value.init(row.stUsersList);
-  console.log(row.stUsersList)
+  // console.log(row.responsiblePersonList)
   DialogShow.value.init(row);
 
 }

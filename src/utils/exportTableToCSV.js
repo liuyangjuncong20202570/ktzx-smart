@@ -1,31 +1,44 @@
 function exportTableToCSV(tableData, columns) {
-    // CSV列标题
-    const csvRows = [
-        ['"序号"'].concat(columns.map(col => `"${col.label}"`)).join(',')  // CSV头部，添加了序号列
-    ];
+    // 生成CSV列标题，序号作为第一列
+    const csvHeader = ['"序号"'].concat(columns.map(col => `"${col.label}"`)).join(',');
+    const csvRows = [csvHeader];  // CSV头部
 
-    // 遍历表格数据，转换为CSV格式，并为每行添加序号
+    // 遍历表格数据，生成CSV格式的行
     tableData.forEach((row, index) => {
-        const values = [index + 1];  // 序号列，从1开始计数
+        // 第一列为序号列，从1开始计数
+        const rowValues = [`"${index + 1}"`];
         columns.forEach(col => {
-            // 检查值是否为null或undefined，是则替换为空字符串
-            let value = row[col.prop];
-            if (value === null || value === undefined) {
-                value = '';  // 将null或undefined替换为空字符串
+            let cellValue = row[col.prop];
+
+            // 处理数组数据
+            if (col.isArray && Array.isArray(cellValue)) {
+                cellValue = cellValue.map(item => item[col.arrayProp]).join(';');
             }
-            // 将值转换为字符串并进行CSV格式化
-            values.push(`"${String(value).replace(/"/g, '""')}"`);  // 处理可能的引号，以确保CSV格式正确
+
+            // 如果值是null或undefined，替换为空字符串，处理引号以确保CSV格式正确
+            cellValue = cellValue === null || cellValue === undefined ? '' : String(cellValue).replace(/"/g, '""');
+
+            // 将处理后的值加入到rowValues中
+            rowValues.push(`"${cellValue}"`);
         });
-        csvRows.push(values.join(','));  // 将序号和其他列数据合并
+
+        // 将序号和其他列数据合并，添加到csvRows数组中
+        csvRows.push(rowValues.join(','));
     });
 
-    // 将所有CSV行合并为一个字符串，然后添加UTF-8 BOM
+    // 转换行数组为CSV字符串并添加UTF-8的BOM
     const csvString = '\uFEFF' + csvRows.join('\n');
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+
+    // 创建一个隐藏的下载链接并触发下载
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'table_data.csv';  // 文件名
+    link.download = 'exported_table_data.csv';  // 设定下载文件名
+    link.style.display = 'none';
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
 }
 
+// 导出函数以便在其他地方使用
 export { exportTableToCSV };

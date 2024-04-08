@@ -33,8 +33,33 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="" label="部门负责人">
+        <el-table-column label="部门负责人" min-width="100">
+          <template #default="{ row }">
+            <div style="display: flex; align-items: center;">
+              <div style="flex-grow: 1; display: flex; flex-wrap: wrap;">
+                <!-- 只在这个div上使用v-for，移除内层的v-for -->
+                <div v-for="(user, index) in row.responsiblePersonList" :key="user.id" class="user-bubbles">
+                  <!-- 使用v-if来确保只显示前四个负责人 -->
+                  <template v-if="index < 4">
+            <span class="user-bubble">
+              {{ user.username }}
+            </span>
+                  </template>
+                  <!-- 当负责人数量超过4时，显示额外的数量 -->
+                  <span v-if="index === 3 && row.responsiblePersonList.length > 4" class="more-users">
+            +{{ row.responsiblePersonList.length - 4 }}
+          </span>
+                </div>
+              </div>
+              <div>
+                <el-icon class="edit-icon" @click="showHeadofDialog(row)">
+                  <edit/>
+                </el-icon>
+              </div>
+            </div>
+          </template>
         </el-table-column>
+
         <el-table-column prop="remark" label="备注" min-width="80">
           <template #default="{ row }">
             <el-input v-if="row.editingRemark" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.remark"
@@ -44,6 +69,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <EditHeadofDepartment v-show="dialogVisible" ref="DialogShow" @formSubmitted="getTableData"/>
     </el-main>
   </el-container>
 </template>
@@ -54,6 +80,8 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import isEqual from 'lodash/isEqual.js'
 import {exportTableToCSV} from "../../utils/exportTableToCSV.js";
 import {useProfileStore} from "../../stores/profileStore.js";
+import {Edit} from "@element-plus/icons-vue";
+import EditHeadofDepartment from "./subcomponents/EditHeadofDepartment.vue";
 
 
 //获取Stroe
@@ -131,7 +159,7 @@ const handleSelectAll = (selection) => {
 
 const columns = ref([
   { prop: 'obsname', label: '部门名称' },
-  { prop: '', label: '部门负责人' },
+  {prop: 'responsiblePersonList', label: '部门负责人', isArray: true, arrayProp: 'username'},
   { prop: 'remark', label: '备注' }
 ]);
 
@@ -275,6 +303,17 @@ const handleBlur = (row, field) => {
 
 /**************************************/
 
+const dialogVisible = ref(false);
+const DialogShow = ref(null);
+const showHeadofDialog = (row) => {
+
+  dialogVisible.value = true;  // 打开弹窗
+  console.log(row)
+  // DialogShow.value.init(row.stUsersList);
+  // console.log(row.responsiblePersonList)
+  DialogShow.value.init(row);
+
+}
 
 
 /**************************************/
@@ -346,4 +385,38 @@ onMounted(() => {
   cursor: pointer;
 }
 
+.user-bubbles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px; /* 气泡之间的间距 */
+  justify-content: center; /* 居中对齐所有的气泡 */
+  align-items: center; /* 垂直居中（如果你的行高较高的话） */
+}
+
+.user-bubble {
+  background-color: #E6F7FF; /* 气泡的背景颜色 */
+  border-radius: 15px; /* 边框圆角，使其看起来像气泡 */
+  padding: 5px 10px; /* 内边距 */
+  font-size: 14px; /* 文本大小 */
+  cursor: pointer; /* 鼠标悬停时的手形指针 */
+  white-space: nowrap; /* 防止文本换行 */
+}
+
+.more-users {
+  background-color: #e4e6eb;
+  border-radius: 15px;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.edit-icon {
+  cursor: pointer; /* 鼠标悬停时变成手形指针 */
+  white-space: nowrap; /* 防止文本换行 */
+  margin-left: 8px; /* 与名字标签的间距 */
+}
+
+.edit-icon:hover {
+  color: #409EFF; /* 悬浮时的颜色 */
+}
 </style>
