@@ -19,7 +19,7 @@
                         <span v-if="!editRef.get(tableRowData.row.id)['editName']"
                               @dblclick="editEditRef(tableRowData.row,'editName')">{{ tableRowData.row.name }}</span>
                         <el-input ref="inputNameRef" v-else v-model="tableRowData.row.name" @blur="saveEditRef(tableRowData.row,'editName')"
-                                  @keyup.enter="saveEditRef(tableRowData.row,'editName')"></el-input>
+                                  @keyup.enter="saveEditRef(tableRowData.row,'editName')" style="width:100%; height: 25px;"></el-input>
                     </template>
                 </el-table-column>
                 <el-table-column prop="datavalue" label="数值" width="100">
@@ -27,7 +27,7 @@
                         <span v-if="!editRef.get(tableRowData.row.id)['editDataValue']"
                                   @dblclick="editEditRef(tableRowData.row,'editDataValue')">{{ tableRowData.row.datavalue }}</span>
                         <el-input ref="inputTableRowDataRef" v-else v-model="tableRowData.row.datavalue" @blur="saveEditRef(tableRowData.row,'editDataValue')"
-                                @keyup.enter="saveEditRef(tableRowData.row,'editDataValue')"></el-input>
+                                @keyup.enter="saveEditRef(tableRowData.row,'editDataValue')" style="width:100%; height: 25px;"></el-input>
                     </template>
                 </el-table-column>
                 <el-table-column prop="importantlevelid" label="重要程度" width="150">
@@ -35,7 +35,7 @@
                         <span v-if="!editRef.get(tableRowData.row.id)['editImportantlevelid']"
                                   @dblclick="editEditRef(tableRowData.row,'editImportantlevelid')">{{ tableRowData.row.importantlevelid }}</span>
                         <el-input ref="inputImportantlevelidRef" v-else v-model="tableRowData.row.importantlevelid" @blur="saveEditRef(tableRowData.row,'editImportantlevelid')"
-                                @keyup.enter="saveEditRef(tableRowData.row,'editImportantlevelid')"></el-input>
+                                @keyup.enter="saveEditRef(tableRowData.row,'editImportantlevelid')" style="width:100%; height: 25px;"></el-input>
                     </template>
                 </el-table-column>
                 <el-table-column prop="remark" label="备注">
@@ -43,7 +43,7 @@
                         <span v-if="!editRef.get(tableRowData.row.id)['editRemark']"
                                   @dblclick="editEditRef(tableRowData.row,'editRemark')">{{ tableRowData.row.remark }}</span>
                         <el-input ref="inputRemarkRef" v-else v-model="tableRowData.row.remark" @blur="saveEditRef(tableRowData.row,'editRemark')"
-                                @keyup.enter="saveEditRef(tableRowData.row,'editRemark')"></el-input>
+                                @keyup.enter="saveEditRef(tableRowData.row,'editRemark')" style="width:100%; height: 25px;"></el-input>
                     </template>
                 </el-table-column>
             </el-table>

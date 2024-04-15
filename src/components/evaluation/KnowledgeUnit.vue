@@ -8,8 +8,8 @@
             <el-button type="success" @click="">保存</el-button>
             <el-button v-if="selectedUnit" type="primary" @click="addSection">新增小节</el-button>
         </el-header>
-        <el-main style="padding: 0; overflow: auto;">
-            <el-table :data="tableData" style="height: 100%; width: 100%;" row-key="id" highlight-current-row
+        <el-main style="padding: 0; overflow: auto; background-color: white;">
+            <el-table :data="tableData" style="width: 100%;" row-key="id" highlight-current-row
                 size="large" :row-class-name="tableRowClassName" @current-change="chooseUnit" ref="highLightRow" border>
                 <el-table-column type="selection"></el-table-column>
                 <el-table-column label="名称">
