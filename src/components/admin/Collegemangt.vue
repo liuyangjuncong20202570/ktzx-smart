@@ -392,7 +392,7 @@ onMounted(() => {
   border-radius: 15px; /* 边框圆角，使其看起来像气泡 */
   padding: 5px 10px; /* 内边距 */
   font-size: 14px; /* 文本大小 */
-  cursor: pointer; /* 鼠标悬停时的手形指针 */
+  /* cursor: pointer;鼠标悬停时的手形指针 */
   white-space: nowrap; /* 防止文本换行 */
 }
 
