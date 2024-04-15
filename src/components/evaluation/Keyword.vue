@@ -11,252 +11,194 @@
             </el-input>
         </el-header>
         <el-main style="padding: 0;">
-            <el-table :data="filterTableData" style="height: 100%; width: 100%;" v-model="tableSelected"
-                    @select="filterTableSelect" @select-all="filterTableSelectAll" stripe>
+            <el-table :data="filteredTableData" stripe style="width: 100%" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55"></el-table-column>
-                <el-table-column prop="" label="序码" width="60"></el-table-column>
+                <el-table-column prop="showId" label="序号" width="60"></el-table-column>
                 <el-table-column prop="name" label="名称" width="240">
-                    <template v-slot="row">
-                        <el-input v-if="row.row.editingName" style="width:100%; height: 25px;" v-model="row.row.tempName"
-                            @blur="handleBlur(row, 'editingName')" :ref="el => setInputRef(el, row)"></el-input>
-                        <div v-else style="width: 100%; height: 25px;" @dblclick="handleClick(row, 'editingName')">
-                            {{ row.row.name }}
-                        </div>
+                    <template #default="tableRowData">
+                        <span v-if="!editRef.get(tableRowData.row.id)['editName']"
+                              @dblclick="editEditRef(tableRowData.row,'editName')">{{ tableRowData.row.name }}</span>
+                        <el-input ref="inputNameRef" v-else v-model="tableRowData.row.name" @blur="saveEditRef(tableRowData.row,'editName')"
+                                  @keyup.enter="saveEditRef(tableRowData.row,'editName')"></el-input>
                     </template>
                 </el-table-column>
                 <el-table-column prop="datavalue" label="数值" width="100">
-                    <template v-slot="row">
-                        <el-input v-if="row.row.editingDatavalue" style="width:100%; height: 25px;" v-model="row.row.datavalue"
-                            @blur="handleBlur(row, 'editingDatavalue')" :ref="el => setInputRef(el, row)"></el-input>
-                        <div v-else style="width: 100%; height: 25px;" @dblclick="handleClick(row, 'editingDatavalue')">
-                            {{ row.row.datavalue }}
-                        </div>
+                    <template #default="tableRowData">
+                        <span v-if="!editRef.get(tableRowData.row.id)['editDataValue']"
+                                  @dblclick="editEditRef(tableRowData.row,'editDataValue')">{{ tableRowData.row.datavalue }}</span>
+                        <el-input ref="inputTableRowDataRef" v-else v-model="tableRowData.row.datavalue" @blur="saveEditRef(tableRowData.row,'editDataValue')"
+                                @keyup.enter="saveEditRef(tableRowData.row,'editDataValue')"></el-input>
                     </template>
                 </el-table-column>
-                <el-table-column prop="courseid" label="重要程度" width="150">
-                    <template v-slot="row">
-                        <el-input v-if="row.row.editingImportantlevelid" style="width:100%; height: 25px;"
-                            v-model="row.row.importantlevelid" @blur="handleBlur(row, 'editingImportantlevelid')"
-                            :ref="el => setInputRef(el, row)"></el-input>
-                        <!-- <el-select v-if="row.row.editingImportantlevelid" v-model="row.row.importantlevelid"
-                            clearable style="width: 100%;" @blur="handleBlur(row, 'editingImportantlevelid')" size="small">
-                            <el-option v-for="item in importanceData" :key="item.label" :label="item.label" :value="item.value" />
-                        </el-select> -->
-                        <div v-else style="width: 100%; height: 25px;" @dblclick="handleClick(row, 'editingImportantlevelid')">
-                            {{ row.row.importantlevelid }}
-                        </div>
+                <el-table-column prop="importantlevelid" label="重要程度" width="150">
+                    <template #default="tableRowData">
+                        <span v-if="!editRef.get(tableRowData.row.id)['editImportantlevelid']"
+                                  @dblclick="editEditRef(tableRowData.row,'editImportantlevelid')">{{ tableRowData.row.importantlevelid }}</span>
+                        <el-input ref="inputImportantlevelidRef" v-else v-model="tableRowData.row.importantlevelid" @blur="saveEditRef(tableRowData.row,'editImportantlevelid')"
+                                @keyup.enter="saveEditRef(tableRowData.row,'editImportantlevelid')"></el-input>
                     </template>
                 </el-table-column>
-                <el-table-column prop="remark" label="备注" min-width="113">
-                    <template v-slot="row">
-                        <el-input v-if="row.row.editingRemark" style="width:100%; height: 25px;" v-model="row.row.remark"
-                            @blur="handleBlur(row, 'editingRemark')" :ref="el => setInputRef(el, row)"></el-input>
-                        <div v-else style="width: 100%; height: 25px;" @dblclick="handleClick(row, 'editingRemark')">
-                            {{ row.row.remark }}
-                        </div>
+                <el-table-column prop="remark" label="备注">
+                    <template #default="tableRowData">
+                        <span v-if="!editRef.get(tableRowData.row.id)['editRemark']"
+                                  @dblclick="editEditRef(tableRowData.row,'editRemark')">{{ tableRowData.row.remark }}</span>
+                        <el-input ref="inputRemarkRef" v-else v-model="tableRowData.row.remark" @blur="saveEditRef(tableRowData.row,'editRemark')"
+                                @keyup.enter="saveEditRef(tableRowData.row,'editRemark')"></el-input>
                     </template>
                 </el-table-column>
             </el-table>
+<!--          <p>{{ filteredTableData }}</p>-->
         </el-main>
     </el-container>
 </template>
 
 <script setup>
-import { CloseBold, Search } from '@element-plus/icons-vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
-import { computed, nextTick, onMounted, ref } from 'vue';
-import _ from 'lodash';
-import request from '../../utils/request';
+import { Search } from '@element-plus/icons-vue';
+import { ElMessage } from 'element-plus';
+import { computed, onMounted, ref } from 'vue';
+import request from "../../utils/request";
 
 const tableSearchData = ref('');    // 主界面搜索框数据
 
-const tableData = ref([]);
-
-const tempRowData = ref({});
-
-const importanceData = [
-    {label: '低', value: 1},{label: '中', value: 2},{label: '高', value: 3},
-];
-
-const tableSelected = ref([]);    // 记录主界面的表格选择
-
-const nullKeywordNum = ref(0);  // 未命名关键字数
-
-const filterTableData = computed(() =>  // 实际显示的表格数据源
-    tableData.value.filter((data) =>   // 过滤掉不包含搜索框中字符的数据
-        !tableSearchData.value || data.name.toLowerCase().includes(tableSearchData.value.toLowerCase())
-    )
-)
-
-const inputRefs = ref({});
-/******************************************** */
-
-const getData = () => {
-    request.evaluation.get('/evaluation/keywords').then((res) => {
-        if(res.code === 200){
-            tableData.value = res.data;
-            initialize(tableData.value);
-        }
-        else{
-            ElMessage.error(res.msg);
-        }
-    }).catch((error) => {
-        ElMessage.error('获取关键字失败' + error);
-    })
+const loadData = () => {
+  request.evaluation.get('/evaluation/keywords').then((res) => {
+    if(res.code === 200){
+      tableData.value = res.data;
+      initialize(tableData.value);
+    }
+    else{
+      ElMessage.error(res.msg);
+    }
+  }).catch((error) => {
+    ElMessage.error('获取关键字失败' + error);
+  })
 }
 
-const initialize = (data) => {
-    nullKeywordNum.value = 0;
-    data.forEach((item) => {
-        item.editingName = false;
-        item.editingDatavalue = false;
-        item.editingImportantlevelid = false;
-        item.editingRemark = false;
-        item.tempName = '';
-        item.datavalue = Number(item.datavalue).toFixed(2);
-
-        if (item.name.includes('未命名关键字')) {
-            if (item.name.length > 6) {
-                let num = '';
-                for(let i = 7; item.name[i] !== ')'; i++){
-                    num += item.name[i];
-                }
-                if(nullKeywordNum.value < Number(num)) nullKeywordNum.value = Number(num);
-            }
-            else if (item.name.length === 6 && nullKeywordNum.value === 0) nullKeywordNum.value++;
-        }
-    });
-};
+const initialize = () => {
+  var id = 1;
+  tableData.value.forEach((item) => {
+    item.showId = id++;
+    item.datavalue = Number(item.datavalue).toFixed(2);
+    editRef.value.set(item.id, { "editName": false, "editDataValue": false,"editImportantlevelid": false,"editRemark": false });
+  });
+}
 
 onMounted(() => {
-    getData();
+  loadData();
+  initialize();
 });
 
-const handleClick = (row, field) => {
-    nextTick(() => {
-        tempRowData.value = Object.assign({}, row.row);     // 存一份修改之前的数据用作比对
-        row.row[field] = true
-        if(field === 'editingName') row.row.tempName = row.row.name;
-        setTimeout(() => {
-            if(inputRefs.value[row.row.id] && inputRefs.value[row.row.id].$refs.input){
-                inputRefs.value[row.row.id].$refs.input.focus();
-            }
-        }, 0);
-    })
-};
+const tableData = ref([]);
 
-const handleBlur = (row, field) => {
-    if (field === 'editingName') {
-        if(row.row.tempName === ''){    // 为空则保持不变
-            row.row[field] = false;
-            return ;
-        }
-		else if (row.row.tempName !== row.row.name && row.row.tempName.includes('未命名关键字')) {  // 不可包含的策略
-			ElMessage.error('命名不可包含“未命名关键字”');
-            row.row.tempName = '';
-            row.row[field] = false;
-            return ;
-		}
-		else row.row.name = row.row.tempName;   // 命名合法则赋值
-	}
-    row.row.tempName = '';
-    row.row[field] = false;
-
-    if(!_.isEqual(tempRowData.value, row.row)){
-        // 当数据发生改变了再传数据给后端
-        request.evaluation.post('/evaluation/keywords', row.row).then((res) => {
-            if(res.code === 200){
-                getData();
-                ElMessage.success('修改成功');
-            }
-            else{
-                ElMessage.error(res.msg);
-            }
-        }).catch((error) => {
-            ElMessage.error('修改能力失败' + error);
-        })
-    }
-};
-
-const setInputRef = (el, row) => {
-  if (el) {
-    inputRefs.value[row.row.id] = el;
+const filteredTableData = computed(() => {
+  if (!tableSearchData.value) {
+    return tableData.value; // 如果没有搜索查询，返回原始数据
   }
-};
+  return tableData.value.filter(item => {
+    // 根据需要调整过滤逻辑，这里假设你想根据 'name' 属性进行过滤
+    return item.name.includes(tableSearchData.value);
+  });
+});
 
-const addKeyword = () => {
-    nullKeywordNum.value ++;
-    const newData = {
-        id: '',
-        name: nullKeywordNum.value > 1 ? '未命名关键字(' + nullKeywordNum.value + ')' : '未命名关键字',
-        datavalue: Number(0).toFixed(2),
-        importantlevelid: '',
-        remark: '',
-    };
+var multipleSelection = [];
 
-    request.evaluation.post('/evaluation/keywords/create', newData).then((res) => {
-        if(res.code === 200){
-            getData();
-            ElMessage.success('新增成功');
-        }
-        else{
-            ElMessage.error(res.msg);
-        }
-    }).catch((error) => {
-        ElMessage.error('新增关键字失败' + error);
-    });
-};
+const handleSelectionChange = (val) =>{
+  multipleSelection = val;
+}
 
-/*判定主页面哪些行被选中*/
-const filterTableSelect = (selection) => {
-	tableSelected.value = selection;
-};
-
-const filterTableSelectAll = (selection) => {
-	tableSelected.value = selection;
-};
-/*****************/
-
-const deleteKeyword = () => {
-    if(tableSelected.value.length === 0){
-        ElMessage({
-            type: 'warning',
-            message: '未选择关键字',
-            duration: 800
-        });
-        return ;
+const addKeyword = () =>{
+  var flag = true;
+  // tableData.value.forEach(item => {
+  //   if(item.id === '空'){
+  //     flag = false;
+  //     ElMessage({
+  //       type: 'warning',
+  //       message: '有未设置完善的关键字',
+  //       duration: 800
+  //     });
+  //   }
+  // });
+  if(flag){
+    var newData = {
+      id: '',
+      name: '未设置名称',
+      datavalue: 0.00,
+      importantlevelid: '0.0',
+      remark: '无',
     }
-    ElMessageBox.confirm(
-        '选中的关键字将被删除，是否确定',
-        '警告',
-        {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning',
-        }
-    ).then(() => {
-        // 删除逻辑
-        let deletedIds = [];
-        for(let item of tableSelected.value) {
-            deletedIds.push(item.id);
-        };
-        // console.log(deletedIds);
+    request.evaluation.post('/evaluation/keywords/create', newData).then((res) => {
+      if(res.code === 200){
+        loadData();
+        ElMessage.success('新增成功');
+      }
+      else{
+        ElMessage.error(res.msg);
+      }
+    }).catch((error) => {
+      ElMessage.error('新增关键字失败' + error);
+    });
+  }
+}
 
-        request.evaluation.post('/evaluation/keywords/delete', deletedIds).then((res) => {
-            if(res.code === 200){
-                getData();
-                ElMessage.success('删除成功');
-            }
-            else{
-                ElMessage.error(res.msg);
-            }
-        }).catch((error) => {
-            ElMessage.error('删除关键字失败' + error);
-        })
+const deleteKeyword = () =>{
+  if(multipleSelection.length === 0){
+    ElMessage({
+      type: 'warning',
+      message: '未选择关键字',
+      duration: 800
+    });
+  }
+  var ids = [];
+  for(const sel of multipleSelection){
+    ids.push(sel.id);
+  }
+  request.evaluation.post('/evaluation/keywords/delete', ids).then((res) => {
+    if(res.code === 200){
+      loadData();
+      ElMessage.success('删除成功');
+    }
+    else{
+      ElMessage.error(res.msg);
+    }
+  }).catch((error) => {
+    ElMessage.error('删除关键字失败' + error);
+  })
+}
 
-    }).catch(() => {})
+const editRef = ref(new Map());
+
+const inputNameRef = ref(null);
+const inputTableRowDataRef = ref(null);
+const inputImportantlevelidRef = ref(null);
+const inputRemarkRef = ref(null);
+
+const editEditRef = (row,field) => {
+  editRef.value.get(row.id)[field] = true;
+  setTimeout(() => {
+    if(field === 'editName'){
+      inputNameRef.value.focus();
+    }else if(field === 'editDataValue'){
+      inputTableRowDataRef.value.focus();
+    }else if(field === 'editImportantlevelid'){
+      inputImportantlevelidRef.value.focus();
+    }else if(field === 'editRemark'){
+      inputRemarkRef.value.focus();
+    }
+  }, 0);
 };
-/*****************************/
+
+const saveEditRef = (row,field) => {
+  editRef.value.get(row.id)[field] = false;
+  request.evaluation.post('/evaluation/keywords', row).then((res) => {
+    if(res.code === 200){
+      loadData();
+      ElMessage.success('修改成功');
+    }
+  }).catch((error) => {
+    ElMessage.error('修改能力失败' + error);
+  })
+};
+
 </script>
 
 <style scoped>
