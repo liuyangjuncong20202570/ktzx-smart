@@ -267,30 +267,6 @@ const setInputRef = (el, row) => {
 
 const addKWA = () => {      // 新增KWA
     nullKWANum.value++;
-    // const newKWA = ({
-    //     id: '',
-    //     name: nullKWANum.value > 1 ? '新建KWA(' + nullKWANum.value + ')' : '新建KWA',
-    //     keywordid: '',
-    //     abilityid: '',
-    //     keywordname: '',
-    //     abilityname: '',
-    //     courseid: courseid.value,
-    //     datavalue: Number(0.00).toFixed(2),
-    // })
-
-    // // console.log(newKWA);
-    // request.evaluation.post('/evaluation/kwadict/create', newKWA).then((res) => {
-    //     if (res.code === 200) {
-    //         getKWAData();
-    //         ElMessage.success('新增成功');
-    //     }
-    //     else {
-    //         ElMessage.error(res.msg);
-    //     }
-    // }).catch((error) => {
-    //     ElMessage.error('新增失败' + error);
-    //     // console.log(newKWA);
-    // })
 
     tableData.value.push({
         id: '',

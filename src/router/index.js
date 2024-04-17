@@ -37,6 +37,11 @@ const routes = [
                 component: () => import('../components/admin/Rolepurview.vue')
             },
             {
+                path: 'sysmangt/schoolmangt',
+                name: 'SchoolMangt',   // 学校配置
+                component: () => import('../components/admin/SchoolMangt.vue')
+            },
+            {
                 path: 'sysmangt/termmangt',
                 name: 'TermsManagement', //学期管理
                 component: () => import('../components/admin/TermMangt.vue')

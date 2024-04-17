@@ -3,13 +3,51 @@
         <el-header style="height: auto; padding: 5px 0px; width:100%; text-align: left; background-color:#deebf7;">
             <!-- <el-button type="success" style="margin-left: 0.8vw; cursor: not-allowed;">新增</el-button> -->
             <el-button type="primary" style="margin-left: 0.8vw;" @click="openDictionary">从能力字典选择</el-button>
-            <el-button type="danger" @click="deleteAbility">删除</el-button>
+            <el-button type="danger" @click="openDeleteDialog">删除</el-button>
             <el-button type="primary">保存</el-button>
             <el-input v-model="tableSearchData" style="margin-left: 0.8vw; width: 250px" placeholder="查找能力">
                 <template #append><el-button :icon="Search" /></template>
             </el-input>
         </el-header>
         <el-main style="padding: 0;">
+            <!----------------------------------确认删除的弹框-------------------------------------->
+            <el-dialog v-model="deleteDialogVisible" :showClose="false" width="700" :close-on-click-modal="false" destroy-on-close>
+                <template #header="{ close, titleId, titleClass }">
+                    <div class="my-header">
+                        <div :id="titleId" :class="titleClass" style="font-size: 15px;">
+                            <el-button link type="warning">
+                                <el-icon size="20" style="padding-bottom: 3px; box-sizing: border-box;">
+                                    <WarningFilled />
+                                </el-icon>
+                            </el-button>
+                            是否要删除选中的能力？
+                        </div>
+                        <el-button link @click="close" type="danger">
+                            <el-icon size="20">
+                                <CloseBold />
+                            </el-icon>
+                        </el-button>
+                    </div>
+                </template>
+                <div style="max-height: 300px; overflow: auto; text-align: left;">
+                    <div style="margin-bottom: 5px;">
+                        <el-text type="danger" style="display: flex;">
+                            <div>要删除能力与以下KWA有关，若删除则对应的KWA也会删除</div>
+                        </el-text>
+                    </div>
+                    <div></div>
+                </div>
+                <template #footer>
+                    <div class="dialog-footer">
+                        <el-button @click="deleteDialogVisible = false">取消</el-button>
+                        <el-button type="primary" @click="deleteAbility()">
+                            确认
+                        </el-button>
+                    </div>
+                </template>
+            </el-dialog>
+            <!-------------------------------------------------------------------------------------->
+
             <el-table :data="filterTableData" style="height: 100%; width: 100%;" v-model="tableSelected" size="large"
                 v-loading="tableLoading" element-loading-text="Loading..." @select="filterTableSelect"
                 @select-all="filterTableSelectAll" stripe>
@@ -67,7 +105,7 @@
 </template>
 
 <script setup>
-import { CloseBold, Search } from '@element-plus/icons-vue';
+import { CloseBold, Search, WarningFilled } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { computed, nextTick, onMounted, ref } from 'vue';
 import _ from 'lodash';
@@ -103,6 +141,8 @@ const props = {
 }
 
 const dictionaryData = ref([]);    //能力字典数据
+
+const deleteDialogVisible = ref(false);
 
 // const inputRefs = ref({});
 
@@ -177,7 +217,7 @@ const filterTableSelectAll = (selection) => {
 };
 /*********************************************/
 
-const deleteAbility = () => {
+const openDeleteDialog = () => {
     if (tableSelected.value.length === 0) {
         ElMessage({
             type: 'warning',
@@ -186,37 +226,34 @@ const deleteAbility = () => {
         });
         return;
     }
-    ElMessageBox.confirm(
-        '选择的能力将被删除，是否确定',
-        '警告',
-        {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning',
-        }
-    ).then(() => {
-        // 删除逻辑
-        // console.log(tableSelected.value);
-        let deletedIds = [];
-        tableSelected.value.forEach((item) => {
-            deletedIds.push(item.id);
-        })
 
-        request.evaluation.post(`/evaluation/getability/delete?courseid=${courseid.value}`, deletedIds).then((res) => {
-            if (res.code === 200) {
-                tableLoading.value = true;
-                getAbility();
-                ElMessage.success('删除成功');
-                // console.log(tableSelected.value);
-            }
-            else if (res.code === 404) {
-                ElMessage.error(res.msg);
-            }
-        }).catch((error) => {
-            ElMessage.error('删除失败' + error);
-        })
-        // console.log(deletedIds);
-    }).catch(() => { });
+    
+    deleteDialogVisible.value = true;
+}
+
+const deleteAbility = () => {
+    // console.log(tableSelected.value);
+    let deletedIds = [];
+    tableSelected.value.forEach((item) => {
+        deletedIds.push(item.id);
+    })
+
+    request.evaluation.post(`/evaluation/getability/delete?courseid=${courseid.value}`, deletedIds).then((res) => {
+        if (res.code === 200) {
+            tableLoading.value = true;
+            getAbility();
+            ElMessage.success('删除成功');
+            // console.log(tableSelected.value);
+        }
+        else if (res.code === 404) {
+            ElMessage.error(res.msg);
+        }
+    }).catch((error) => {
+        ElMessage.error('删除失败' + error);
+    })
+    // console.log(deletedIds);
+
+    deleteDialogVisible.value = false;
 };
 
 
@@ -239,7 +276,7 @@ const openDictionary = () => {
     abilityDictionaryVisible.value = true;
 };
 
-const closeDictionary = (close) => {
+const closeDictionary = () => {
     abilityDictionaryVisible.value = false;
     dictionarySelected.value = dictionarySelected_backup.value;     // 防止用户改变了选中的能力但是没有点保存导致数据错乱
     dictionarySelected_backup.value = [];
@@ -277,9 +314,10 @@ const changeAbilities = () => {
     tableLoading.value = true;
 
     if (deletedIds.length) {
+
         let deletePromise = request.evaluation.post(`/evaluation/getability/delete?courseid=${courseid.value}`, deletedIds).then((res) => {
             if (res.code === 200) {
-                
+
             }
             else if (res.code === 404) {
                 ElMessage.error(res.msg);
@@ -307,7 +345,7 @@ const changeAbilities = () => {
         promise.push(addPromise);
     }
 
-    Promise.all(promise).then(() =>{    // 所有请求都结束后再执行某些操作
+    Promise.all(promise).then(() => {    // 所有请求都结束后再执行某些操作
         getAbility();
         dictionarySelected_backup.value = [];
     })
@@ -316,4 +354,11 @@ const changeAbilities = () => {
 /****************************************/
 </script>
 
-<style scoped></style>
+<style scoped>
+.my-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: -15px;
+}
+</style>

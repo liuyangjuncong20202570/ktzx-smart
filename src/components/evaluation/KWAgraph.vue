@@ -5,11 +5,37 @@
 
 <script lang="ts" setup>
 import G6 from '@antv/g6';
-import { ElMessageBox, ElNotification } from 'element-plus';
+import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
 import { id } from 'element-plus/es/locales.mjs';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
+import request from '../../utils/request';
+
+const courseid = ref('');
+
+const edges = ref([]);
+
+const getLines = () => {
+	request.evaluation.get(`/evaluation/lines`).then((res) => {
+		if (res.code === 200) {
+			edges.value.push({
+				id: res.data.id,
+				source: res.data.startid,
+				target: res.data.endid,
+				reamrk: res.data.remark,
+				courseid: res.data.courseid
+			});
+		}
+		else {
+			ElMessage.error(res.msg);
+		}
+	}).catch((error) => {
+		ElMessage.error('获取边信息失败' + error);
+	})
+}
 
 onMounted(() => {
+
+	getLines();
 
 	const contextMenu = new G6.Menu({
 		getContent(evt) {
@@ -199,7 +225,7 @@ onMounted(() => {
 				source: '5',
 				target: '6',
 			},
-		],
+		]/*edges.value*/,
 		combos: [
 			{
 				id: 'combo1',
@@ -230,7 +256,7 @@ onMounted(() => {
 
 	let id = 1;
 	data.nodes.forEach((node) => {		// 根据节点status设置颜色，1为绿，0为红
-		node.id = '' + id ++;	// id必须为字符'0'到'9'的纯数字组成否则布局会变化
+		node.id = '' + id++;	// id必须为字符'0'到'9'的纯数字组成否则布局会变化
 		if (node.status) {
 			if (!node.style) node.style = {};
 			node.style.fill = 'green';
@@ -352,8 +378,6 @@ onMounted(() => {
 	});
 	graph.data(data);
 	graph.render();
-	// console.log(data.nodes)
-
 
 	/*****************节点的函数*****************/
 
@@ -388,18 +412,33 @@ onMounted(() => {
 	/*******************************************/
 
 	graph.on('aftercreateedge', (e) => {
-		console.log(e)
-		const edges = graph.save().edges;
-		G6.Util.processParallelEdges(edges);
-		graph.getEdges().forEach((edge, i) => {
-			graph.updateItem(edge, {
-				curveOffset: edges[i].curveOffset,
-				curvePosition: edges[i].curvePosition,
-			});
+		// console.log(e);
+		const zoom = graph.getZoom();
+		const newEdge = {
+			id: '',
+			startid: e.edge._cfg.source._cfg.model.id,
+			endid: e.edge._cfg.target._cfg.model.id,
+			remark: '',
+			courseid: courseid.value,
+		};
+
+		request.evaluation.post('/evaluation/lines/create', newEdge).then((res) => {
+			if (res.code === 200) {
+				const edges = graph.save().edges;
+				G6.Util.processParallelEdges(edges);
+				graph.getEdges().forEach((edge, i) => {
+					graph.updateItem(edge, {
+						curveOffset: edges[i].curveOffset,
+						curvePosition: edges[i].curvePosition,
+					});
+				});
+			}
+			else {
+				ElMessage.error(res.msg);
+			}
+		}).catch((error) => {
+			ElMessage.error('创建边失败' + error);
 		});
-		if (e.edge._cfg.source._cfg.id === 'main' || e.edge._cfg.target._cfg.id === 'main') {
-			e.edge._cfg.visible = false;
-		}
 	});
 
 	/********************边的函数****************/
@@ -426,8 +465,20 @@ onMounted(() => {
 				}
 			).then(() => {
 				const edge = evt.item;
-				graph.removeItem(edge);
-			}).catch((error) => {})
+				// console.log(edge._cfg.model.id);
+				const deletedEdgeId = edge._cfg.model.id;
+				request.evaluation.post('/evaluation/lines/delete', deletedEdgeId).then((res) => {
+					if (res.code === 200) {
+						graph.removeItem(edge);
+					}
+					else {
+						ElMessage.error(res.msg);
+					}
+				}).catch((error) => {
+					ElMessage.error('删除边失败' + error);
+				});
+
+			}).catch((error) => { })
 		}
 	});
 
