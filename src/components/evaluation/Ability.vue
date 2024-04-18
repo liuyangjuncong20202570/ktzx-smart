@@ -11,31 +11,30 @@
         </el-header>
         <el-main style="padding: 0;">
             <!----------------------------------确认删除的弹框-------------------------------------->
-            <el-dialog v-model="deleteDialogVisible" :showClose="false" width="700" :close-on-click-modal="false" destroy-on-close>
-                <template #header="{ close, titleId, titleClass }">
-                    <div class="my-header">
+            <el-dialog v-model="deleteDialogVisible" :showClose="false" width="450" :close-on-click-modal="false" destroy-on-close>
+                <template #header="{ titleId, titleClass }">
+                    <div style="text-align: left; margin-bottom: -15px;">
                         <div :id="titleId" :class="titleClass" style="font-size: 15px;">
                             <el-button link type="warning">
                                 <el-icon size="20" style="padding-bottom: 3px; box-sizing: border-box;">
                                     <WarningFilled />
                                 </el-icon>
                             </el-button>
-                            是否要删除选中的能力？
+                            是否要删除选中的能力
                         </div>
-                        <el-button link @click="close" type="danger">
-                            <el-icon size="20">
-                                <CloseBold />
-                            </el-icon>
-                        </el-button>
                     </div>
                 </template>
-                <div style="max-height: 300px; overflow: auto; text-align: left;">
+                <div v-if="relatedKWA.length > 0" style="max-height: 300px; overflow: auto; text-align: left;">
                     <div style="margin-bottom: 5px;">
                         <el-text type="danger" style="display: flex;">
-                            <div>要删除能力与以下KWA有关，若删除则对应的KWA也会删除</div>
+                            <div>将删除的能力与以下KWA有关，若删除则对应的KWA也会删除</div>
                         </el-text>
                     </div>
-                    <div></div>
+                    <el-table :data="relatedKWA" style="width: 100%; height: 200px;" stripe border>
+                        <el-table-column label="KWA名称">
+                            <template v-slot="row">{{ relatedKWA[row.$index] }}</template>
+                        </el-table-column>
+                    </el-table>
                 </div>
                 <template #footer>
                     <div class="dialog-footer">
@@ -144,6 +143,8 @@ const dictionaryData = ref([]);    //能力字典数据
 
 const deleteDialogVisible = ref(false);
 
+const relatedKWA = ref([]);
+
 // const inputRefs = ref({});
 
 /******************预处理数据******************/
@@ -227,7 +228,21 @@ const openDeleteDialog = () => {
         return;
     }
 
-    
+    let deletedIds = [];
+    tableSelected.value.forEach((item) => {
+        deletedIds.push(item.id);
+    })
+    request.evaluation.post(`/evaluation/getability/getKwaByGetability?courseid=${courseid.value}`, deletedIds).then((res) => {
+        if(res.code === 200) {
+            relatedKWA.value = res.data;
+        }
+        else if(res.code === 404) {
+            ElMessage.error(res.msg);
+        }
+    }).catch((error) => {
+        ElMessage.error('获取相关KWA失败' + error);
+    })
+
     deleteDialogVisible.value = true;
 }
 
@@ -259,6 +274,7 @@ const deleteAbility = () => {
 
 /*************能力字典弹窗相关*************/
 const openDictionary = () => {
+    relatedKWA.value = [];
     dictionarySelected_backup.value = dictionarySelected.value;
     // console.log(dictionarySelected.value);
     request.evaluation.get('/coursemangt/ability').then((res) => {
@@ -355,10 +371,4 @@ const changeAbilities = () => {
 </script>
 
 <style scoped>
-.my-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: -15px;
-}
 </style>
