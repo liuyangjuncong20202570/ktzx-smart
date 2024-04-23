@@ -48,8 +48,8 @@
             <!-------------------------------------------------------------------------------------->
 
             <el-table :data="filterTableData" style="height: 100%; width: 100%;" v-model="tableSelected" size="large"
-                v-loading="tableLoading" element-loading-text="Loading..." @select="filterTableSelect"
-                @select-all="filterTableSelectAll" stripe>
+                v-loading="tableLoading" element-loading-text="Loading..." element-loading-background="rgba(0, 0, 0, 0.7)"
+                @select="filterTableSelect" @select-all="filterTableSelectAll" stripe>
                 <el-table-column type="selection" width="55"></el-table-column>
                 <!-- <el-table-column prop="id" label="序码" width="60"></el-table-column> -->
                 <el-table-column width="50">

@@ -235,7 +235,7 @@ onMounted(() => {
   router.push(homeurl.value);
 
 // request.admin.post(`${homeurl}`,loginInfo)
-  console.log(1111)
+  // console.log(1111)
 //获取菜单栏的数据
   request.admin.post(`/homes/teacherhome`)
       .then(res => {
