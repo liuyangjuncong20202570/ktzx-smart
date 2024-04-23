@@ -394,4 +394,39 @@ onMounted(() => {
   cursor: pointer;
 }
 
+.user-bubbles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px; /* 气泡之间的间距 */
+  justify-content: center; /* 居中对齐所有的气泡 */
+  align-items: center; /* 垂直居中（如果你的行高较高的话） */
+}
+
+.user-bubble {
+  background-color: #E6F7FF; /* 气泡的背景颜色 */
+  border-radius: 15px; /* 边框圆角，使其看起来像气泡 */
+  padding: 5px 10px; /* 内边距 */
+  font-size: 14px; /* 文本大小 */
+  cursor: pointer; /* 鼠标悬停时的手形指针 */
+  white-space: nowrap; /* 防止文本换行 */
+}
+
+.more-users {
+  background-color: #e4e6eb;
+  border-radius: 15px;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.edit-icon {
+  cursor: pointer; /* 鼠标悬停时变成手形指针 */
+  white-space: nowrap; /* 防止文本换行 */
+  margin-left: 8px; /* 与名字标签的间距 */
+}
+
+.edit-icon:hover {
+  color: #409EFF; /* 悬浮时的颜色 */
+}
+
 </style>

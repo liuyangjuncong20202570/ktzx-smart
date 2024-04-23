@@ -27,9 +27,7 @@
         </el-table-column>
         <el-table-column prop="levelcode" label="层级码" min-width="80">
           <template #default="{ row }">
-            <el-input v-if="row.editingLevelcode" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.levelcode"
-                      @blur="handleBlur(row, 'editingLevelcode')"></el-input>
-            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingLevelcode')">{{row.levelcode }}
+            <div style="width: 100%; height: 25px;" @click="handleClick(row, 'editingLevelcode')">{{ row.levelcode }}
             </div>
           </template>
         </el-table-column>

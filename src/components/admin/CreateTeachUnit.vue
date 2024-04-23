@@ -16,7 +16,7 @@
 					<div style="display: flex; flex: auto; justify-content: space-between;">
 						<div style="width: 200px; border-right: 1px solid #bbbbbb; border-left: 1px solid #bbbbbb;
 							color: gray">层级码</div>
-						<div style="width: calc(59vw - 200px); color: gray;">备注</div>
+            <!--						<div style="width: calc(59vw - 200px); color: gray;">备注</div>-->
 					</div>
 				</div>
 			</div>
@@ -40,8 +40,8 @@
 									@click="confirmDeleteNodes(node.data)">删除</el-button>
 								<template #reference>
 									<!-- 这里用一个临时量来存新节点，否则直接绑定node.data.obsname输入框会出问题 -->
-									<el-input v-if="node.data.inputVisible" v-model="node.data.tempData"
-										@blur="blurInput(node.data)" placeholder="请输入节点名称" @contextmenu.stop
+                  <el-input ref="nodeInput" v-if="node.data.inputVisible" v-model="node.data.tempData"
+                            @blur="handleBlur(node.data)" placeholder="请输入节点名称" @contextmenu.stop
 										draggable="false" style="height:25px; width: 200px;"></el-input>
 									<div style="width: auto;">
 										<el-icon v-if="node.data.children" color="orange">
@@ -60,9 +60,9 @@
 									<div style="width: 200px;">
 										{{ node.data.levelcode }}
 									</div>
-									<div class="overflow-text" v-bind:title="node.data.remark">
-										{{ node.data.remark }}
-									</div>
+                  <!--									<div class="overflow-text" v-bind:title="node.data.remark">-->
+                  <!--										{{ node.data.remark }}-->
+                  <!--									</div>-->
 								</div>
 							</div>
 						</div>
@@ -79,10 +79,11 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type Node from 'element-plus/es/components/tree/src/model/node'
 import type { DragEvents } from 'element-plus/es/components/tree/src/model/useDragNode'
 import type { NodeDropType, } from 'element-plus/es/components/tree/src/tree.type'
-import { ref, reactive, onMounted, nextTick, onBeforeUnmount } from 'vue'
+import {ref, reactive, onMounted, nextTick, onBeforeUnmount, toRaw} from 'vue'
 import request from '../../utils/request'
 import { exportTreeToCSV } from "../../utils/exportTreeToCSV";
 import { expandKeys } from 'element-plus/es/components/table-v2/src/common'
+import isEqual from "lodash/isEqual";
 
 //树数据
 const treeData = ref([]);
@@ -123,7 +124,7 @@ const getTreeData = () => {
 			nullNodeNum.value = 0;
 			initialize(treeData.value);
 			// console.log("getTreeData 被触发");
-			// console.log(treeData.value)
+      console.log(treeData.value)
 		}
 	}).catch(() => {
 		ElMessage({
@@ -484,25 +485,56 @@ onBeforeUnmount(() => {
 });
 
 /***********************************************/
-
+const nodeInput = ref(null);
 const editNode = (node) => {
-	node.tempData = node.obsname;
-	node.inputVisible = true;
-	node.popVisible = false;
-}
+  node.tempData = node.obsname;
+  node.inputVisible = true;
+  node.popVisible = false;
+  nextTick(() => {
+    if (nodeInput.value && nodeInput.value.$refs.input) {
+      const inputElement = nodeInput.value.$refs.input;
+      inputElement.focus();
+      const len = inputElement.value.length;
+      inputElement.setSelectionRange(len, len);
+    }
+  });
+};
 
-const blurInput = (node) => {
-	if (node.tempData !== '' && node.tempData !== node.obsname) {
-		if (node.tempData.includes('未命名节点')) {
-			ElMessage.error('命名不可包含“未命名节点”');
-		}
-		else {
-			node.obsname = node.tempData;
-			node.tempData = '';
-		}
-	}
-	node.inputVisible = false;
-}
+const handleBlur = (node) => {
+  nextTick(() => {
+    node.popVisible = false;
+    if (node.tempData !== node.obsname) {
+      const editdata = ref({
+        id: node.id,
+        obsname: node.tempData,
+        remark: ''
+      })
+      request.admin.post('/sysmangt/units/update', editdata.value)
+          .then(res => {
+            if (res.code === 200) {
+              ElMessage({
+                type: 'success',
+                message: `修改教学单位名称成功`
+              })
+              getTreeData();
+            }
+          }).catch(error => {
+        ElMessage({
+          type: 'error',
+          message: '修改教学单位名称失败'
+        });
+      });
+    } else {
+      ElMessage({
+        type: 'info',
+        message: '无修改字段'
+      });
+    }
+    node.inputVisible = false;
+  });
+};
+
+
 
 
 onMounted(() => {

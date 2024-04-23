@@ -84,7 +84,7 @@ const deleteTermList = ref([]);
 
 /**************获取学期列表，并初始化********************/
 const getTableData = () => {
-    request.admin.get('/sysmangt/terms')
+  request.course.get('/sysmangt/terms')
         .then((res) => {
         if(res.code === 200){
           console.log(111);
@@ -142,7 +142,7 @@ const addTerm = () => {
     remark:"",
   });
 
-  request.admin.post('/sysmangt/terms/create',tempTerminfo.value)
+  request.course.post('/sysmangt/terms/create', tempTerminfo.value)
       .then(res => {
         // 登录成功
         if (res.code === 200) {
@@ -247,7 +247,7 @@ const deleteTerm = () => {
               message: '无法删除当前学期'
             });
           }else {
-            request.admin.post('/sysmangt/terms/delete', deleteTermList.value)
+            request.course.post('/sysmangt/terms/delete', deleteTermList.value)
                 .then(res => {
                   // 登录成功
                   if (res.code === 200) {
@@ -280,7 +280,7 @@ const deleteTerm = () => {
 const changeStatus = (selectedRow) => {
   currentTermID.value = selectedRow.id;
   console.log(currentTermID.value)
-  request.admin.get ('/sysmangt/terms/currentterm?id='+currentTermID.value)
+  request.course.get('/sysmangt/terms/currentterm?id=' + currentTermID.value)
       .then(res => {
         // 登录成功
         if (res.code === 200) {
@@ -366,13 +366,13 @@ const handleBlur = (row, field) => {
         enddate:toRaw(row).enddate,
         remark:toRaw(row).remark
       })
-      request.admin.post('/sysmangt/terms',updateItem.value)
+      request.course.post('/sysmangt/terms', updateItem.value)
           .then(res => {
             // 登录成功
             if (res.code === 200) {
               ElMessage({
                 type: 'success',
-                message: '修改x学期信息成功'
+                message: '修改学期信息成功'
               });
               //这里刷新dom
               getTableData();
