@@ -3,7 +3,7 @@ import axios from 'axios'
 const request = {
     admin: createAPI('http://localhost:8080/api'),
     course: createAPI('http://localhost:8082/api'),
-    evaluation: createAPI('http://localhost:8083'),
+    evaluation: createAPI('http://localhost:8083/api'),
 }
 
 function createAPI(url) {   // 构建不同端口的异步请求数据

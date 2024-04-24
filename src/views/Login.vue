@@ -27,12 +27,12 @@
 
                 <el-form-item prop="loginname">
                   <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="loginForm.loginname"
-                            v-rules="rules.loginname">
+                            :rules="rules.loginname">
                   </el-input>
                 </el-form-item>
                 <el-form-item prop="pwd">
                   <el-input :prefix-icon="Lock" placeholder="请输入密码" v-model="loginForm.pwd"
-                            v-rules="rules.pwd" show-password></el-input>
+                            :rules="rules.pwd" show-password></el-input>
                 </el-form-item>
                 <el-form-item>
                   <el-button type="primary" style="width: 100%;" @click="login">登录</el-button>

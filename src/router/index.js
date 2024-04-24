@@ -12,10 +12,6 @@ const rolehome =['teacherhomne','adminhome','superadminhome','secretariatehome',
 
 const routes = [
     {
-        path: '/:pathMatch(.*)*',
-        redirect: '/login'
-    },
-    {
         path: '/login',
         name: 'Login',
         component: () => import('../views/Login.vue')
@@ -118,6 +114,10 @@ const routes = [
             },
         ]
     },
+    {
+        path: '/:pathMatch(.*)*',
+        redirect: '/login'
+    },
 ];
 
 const router = createRouter({
@@ -125,17 +125,17 @@ const router = createRouter({
     routes,
 });
 
-onBeforeRouteLeave((to, from, next) => {
-    // 检查用户是否已经登录
-    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-
-    // 如果用户从登录页面离开，且没有登录标志，则清除sessionStorage中的用户信息
-    if (from.path === '/login' && !isLoggedIn) {
-        sessionStorage.removeItem('users');
-    }
-
-    next();
-});
+// onBeforeRouteLeave((to, from, next) => {
+//     // 检查用户是否已经登录
+//     const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+//
+//     // 如果用户从登录页面离开，且没有登录标志，则清除sessionStorage中的用户信息
+//     if (from.path === '/login' && !isLoggedIn) {
+//         sessionStorage.removeItem('users');
+//     }
+//
+//     next();
+// });
 
 router.beforeEach((to, from, next) => {
     // 尝试从 sessionStorage 中获取用户信息

@@ -37,7 +37,8 @@
           <template #default="{ row }">
             <el-input v-if="row.editingReachpercent" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.reachpercent"
                       @blur="handleBlur(row, 'editingReachpercent')"></el-input>
-            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingReachpercent')">{{row.procode }}
+            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingReachpercent')">
+              {{ row.reachpercent }}
             </div>
           </template>
         </el-table-column>
@@ -204,7 +205,7 @@ const handleRoleAdd = ()=>{
   nullRoleNum.value++;
   const newCollege = ref({
     proname : nullRoleNum.value > 1 ? '未命名节点(' + nullRoleNum.value + ')' : '未命名节点',
-    procode :"",
+    procode: "99999",
     reachpercent:"",
     remark : ""}
   )
@@ -269,12 +270,9 @@ const handleBlur = (row, field) => {
 
     row[field] = false;
     rowdata= JSON.parse(JSON.stringify(row));
-    // console.log(rowdata)
-    // console.log(orirow)
+
     //isEqual(a,b) a,b是否相同
     hasChanged = isEqual(rowdata, orirow);
-    // console.log(hasChanged)
-
     if(hasChanged){
       ElMessage({
         type: 'info',
@@ -282,8 +280,10 @@ const handleBlur = (row, field) => {
       });
     }else{
       const updateItem = ref({
-        id:toRaw(row).id,
-        obsname:toRaw(row).obsname,
+        obsid: toRaw(row).id,
+        proname: toRaw(row).proname,
+        procode: toRaw(row).procode,
+        reachpercent: toRaw(row).reachpercent,
         remark:toRaw(row).remark
       })
       request.admin.post('/sysmangt/professionmangt/update',updateItem.value)
