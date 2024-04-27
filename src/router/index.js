@@ -17,11 +17,6 @@ const routes = [
         component: () => import('../views/Login.vue')
     },
     {
-        path: '/demo',
-        name: '',
-        component: () => import('../components/evaluation/demo1.vue')
-    },
-    {
         path: '/homes/:rolehome(' + rolehome.join('|') + ')',
         // path: '/homes/:rolehome(superadminhome|otherhome)',
         name: 'Homepage',
