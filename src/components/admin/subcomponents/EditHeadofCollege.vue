@@ -10,7 +10,7 @@
         <el-main style="padding-left:0">
           <el-table :data="userlist" empty-text="没有负责人">
             <el-table-column type="index" label="序号" min-width="50"></el-table-column>
-            <el-table-column label="所属院系" min-width="200">{{ obsname }}</el-table-column>
+            <el-table-column prop="obsname" label="所属院系" min-width="200"></el-table-column>
             <!-- 从这里移除id的显示 -->
             <el-table-column prop="username" label="教师用户名" min-width="100"></el-table-column>
             <el-table-column label="操作" width="120">
@@ -39,7 +39,13 @@
               style="width: 60%;"
           >
           </el-cascader>
-          <el-button type="primary" @click="addTeacher" style="margin-left: 15px;">新增负责人</el-button>
+          <el-button
+              type="primary"
+              :disabled="!teacherid"
+              @click="addTeacher"
+              style="margin-left: 15px;">
+            {{ teacherid ? '点击新增教师' : '请选择负责人' }}
+          </el-button>
         </el-footer>
 
       </el-container>
@@ -93,7 +99,9 @@ const fetchData = () => {
         if (res.code === 200) {
           // 假设这里你需要的是过滤后的数据作为级联选择器的选项
           console.log(res.data)
-          teacherlist.value = formatDataForCascader(res.data.filter(item => item.id === collegeobsid.value), alreadyteacheridlist.value);
+          //不过滤指定学院
+          teacherlist.value = formatDataForCascader(res.data, alreadyteacheridlist.value);
+          //teacherlist.value = formatDataForCascader(res.data.filter(item => item.id === collegeobsid.value), alreadyteacheridlist.value);
           console.log(teacherlist.value)
         }
       }).catch(error => {
@@ -220,7 +228,9 @@ const Deleteteacher = (row) => {
 //关闭对话框方法
 const closeDialog = () => {
   dialogVisible.value = false;
-  teacherid.value = '';
+  setTimeout(() => {
+    teacherid.value = ''; // 在对话框动画完成后清空，避免视觉问题
+  }, 300);
 };
 
 

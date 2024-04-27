@@ -27,9 +27,7 @@
         </el-table-column>
         <el-table-column prop="levelcode" label="层级码" min-width="80">
           <template #default="{ row }">
-            <el-input v-if="row.editingLevelcode" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.levelcode"
-                      @blur="handleBlur(row, 'editingLevelcode')"></el-input>
-            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingLevelcode')">{{row.levelcode }}
+            <div style="width: 100%; height: 25px;" @click="handleClick(row, 'editingLevelcode')">{{ row.levelcode }}
             </div>
           </template>
         </el-table-column>
@@ -392,7 +390,7 @@ onMounted(() => {
   border-radius: 15px; /* 边框圆角，使其看起来像气泡 */
   padding: 5px 10px; /* 内边距 */
   font-size: 14px; /* 文本大小 */
-  cursor: pointer; /* 鼠标悬停时的手形指针 */
+  /* cursor: pointer;鼠标悬停时的手形指针 */
   white-space: nowrap; /* 防止文本换行 */
 }
 

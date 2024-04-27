@@ -14,4 +14,7 @@ export default defineConfig({
     port:8081
   },
   base: './',
+  build: {
+    sourcemap: true  // 开启生产环境的 source maps
+  }
 })

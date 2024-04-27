@@ -37,7 +37,8 @@
           <template #default="{ row }">
             <el-input v-if="row.editingReachpercent" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px;" v-model="row.reachpercent"
                       @blur="handleBlur(row, 'editingReachpercent')"></el-input>
-            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingReachpercent')">{{row.procode }}
+            <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingReachpercent')">
+              {{ row.reachpercent }}
             </div>
           </template>
         </el-table-column>
@@ -204,7 +205,7 @@ const handleRoleAdd = ()=>{
   nullRoleNum.value++;
   const newCollege = ref({
     proname : nullRoleNum.value > 1 ? '未命名节点(' + nullRoleNum.value + ')' : '未命名节点',
-    procode :"",
+    procode: "99999",
     reachpercent:"",
     remark : ""}
   )
@@ -269,12 +270,9 @@ const handleBlur = (row, field) => {
 
     row[field] = false;
     rowdata= JSON.parse(JSON.stringify(row));
-    // console.log(rowdata)
-    // console.log(orirow)
+
     //isEqual(a,b) a,b是否相同
     hasChanged = isEqual(rowdata, orirow);
-    // console.log(hasChanged)
-
     if(hasChanged){
       ElMessage({
         type: 'info',
@@ -282,8 +280,10 @@ const handleBlur = (row, field) => {
       });
     }else{
       const updateItem = ref({
-        id:toRaw(row).id,
-        obsname:toRaw(row).obsname,
+        obsid: toRaw(row).id,
+        proname: toRaw(row).proname,
+        procode: toRaw(row).procode,
+        reachpercent: toRaw(row).reachpercent,
         remark:toRaw(row).remark
       })
       request.admin.post('/sysmangt/professionmangt/update',updateItem.value)
@@ -392,6 +392,41 @@ onMounted(() => {
 .custom-icon:hover {
   color: rgb(0, 115, 255) !important;
   cursor: pointer;
+}
+
+.user-bubbles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px; /* 气泡之间的间距 */
+  justify-content: center; /* 居中对齐所有的气泡 */
+  align-items: center; /* 垂直居中（如果你的行高较高的话） */
+}
+
+.user-bubble {
+  background-color: #E6F7FF; /* 气泡的背景颜色 */
+  border-radius: 15px; /* 边框圆角，使其看起来像气泡 */
+  padding: 5px 10px; /* 内边距 */
+  font-size: 14px; /* 文本大小 */
+  cursor: pointer; /* 鼠标悬停时的手形指针 */
+  white-space: nowrap; /* 防止文本换行 */
+}
+
+.more-users {
+  background-color: #e4e6eb;
+  border-radius: 15px;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.edit-icon {
+  cursor: pointer; /* 鼠标悬停时变成手形指针 */
+  white-space: nowrap; /* 防止文本换行 */
+  margin-left: 8px; /* 与名字标签的间距 */
+}
+
+.edit-icon:hover {
+  color: #409EFF; /* 悬浮时的颜色 */
 }
 
 </style>

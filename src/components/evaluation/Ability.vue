@@ -1,20 +1,63 @@
 <template>
     <el-container style="height: 92vh;">
         <el-header style="height: auto; padding: 5px 0px; width:100%; text-align: left; background-color:#deebf7;">
-            <el-button type="info" style="margin-left: 0.8vw; cursor: not-allowed;">新增</el-button>
-            <el-button type="primary" @click="openDictionary">从能力字典选择</el-button>
-            <el-button type="danger" @click="deleteAbility">删除</el-button>
+            <!-- <el-button type="success" style="margin-left: 0.8vw; cursor: not-allowed;">新增</el-button> -->
+            <el-button type="primary" style="margin-left: 0.8vw;" @click="openDictionary">从能力字典选择</el-button>
+            <el-button type="danger" @click="openDeleteDialog">删除</el-button>
             <el-button type="primary">保存</el-button>
             <el-input v-model="tableSearchData" style="margin-left: 0.8vw; width: 250px" placeholder="查找能力">
                 <template #append><el-button :icon="Search" /></template>
             </el-input>
         </el-header>
         <el-main style="padding: 0;">
-            <el-table :data="filterTableData" style="height: 100%; width: 100%;" v-model="tableSelected"
+            <!----------------------------------确认删除的弹框-------------------------------------->
+            <el-dialog v-model="deleteDialogVisible" :showClose="false" width="450" :close-on-click-modal="false" destroy-on-close>
+                <template #header="{ titleId, titleClass }">
+                    <div style="text-align: left; margin-bottom: -15px;">
+                        <div :id="titleId" :class="titleClass" style="font-size: 15px;">
+                            <el-button link type="warning">
+                                <el-icon size="20" style="padding-bottom: 3px; box-sizing: border-box;">
+                                    <WarningFilled />
+                                </el-icon>
+                            </el-button>
+                            是否要删除选中的能力
+                        </div>
+                    </div>
+                </template>
+                <div v-if="relatedKWA.length > 0" style="max-height: 300px; overflow: auto; text-align: left;">
+                    <div style="margin-bottom: 5px;">
+                        <el-text type="danger" style="display: flex;">
+                            <div>将删除的能力与以下KWA有关，若删除则对应的KWA也会删除</div>
+                        </el-text>
+                    </div>
+                    <el-table :data="relatedKWA" style="width: 100%; height: 200px;" stripe border>
+                        <el-table-column label="KWA名称">
+                            <template v-slot="row">{{ relatedKWA[row.$index] }}</template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+                <template #footer>
+                    <div class="dialog-footer">
+                        <el-button @click="deleteDialogVisible = false">取消</el-button>
+                        <el-button type="primary" @click="deleteAbility()">
+                            确认
+                        </el-button>
+                    </div>
+                </template>
+            </el-dialog>
+            <!-------------------------------------------------------------------------------------->
+
+            <el-table :data="filterTableData" style="height: 100%; width: 100%;" v-model="tableSelected" size="large"
+                v-loading="tableLoading" element-loading-text="Loading..." element-loading-background="rgba(0, 0, 0, 0.7)"
                 @select="filterTableSelect" @select-all="filterTableSelectAll" stripe>
                 <el-table-column type="selection" width="55"></el-table-column>
-                <el-table-column prop="id" label="序码" width="60"></el-table-column>
-                <el-table-column prop="name" label="名称" width="300">
+                <!-- <el-table-column prop="id" label="序码" width="60"></el-table-column> -->
+                <el-table-column width="50">
+                    <template v-slot="row">
+                        {{ row.$index + 1 }}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="名称" width="350">
                     <template v-slot="row">
                         {{ row.row.name }}
                     </template>
@@ -24,11 +67,11 @@
                         {{ Number(row.row.datavalue).toFixed(2) }}
                     </template>
                 </el-table-column>
-                <el-table-column prop="courseid" label="重要程度" width="150">
+                <!-- <el-table-column prop="courseid" label="重要程度" width="150">
                     <template v-slot="row">
                         {{ row.row.importantlevelid }}
                     </template>
-                </el-table-column>
+                </el-table-column> -->
                 <el-table-column prop="remark" label="备注" min-width="113">
                     <template v-slot="row">
                         {{ row.row.remark }}
@@ -55,102 +98,29 @@
                 </div>
             </el-header>
             <el-cascader-panel style="width: fit-content; margin-top: 30px;" :options="dictionaryData" :props="props"
-                v-model="dictionarySelected_backup" />
+                v-model="dictionarySelected" />
         </template>
     </el-dialog>
 </template>
 
 <script setup>
-import { CloseBold, Search } from '@element-plus/icons-vue';
+import { CloseBold, Search, WarningFilled } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { computed, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 import _ from 'lodash';
+import request from '../../utils/request';
+
+const courseid = ref('2c918af681fa6ea7018209a505c30672');
 
 const tableSearchData = ref('');    // 主界面搜索框数据
 
-const data = ref([  //模拟后端返回的数据
-    {
-        id: '1',
-        name: '认知类型',
-        remark: '',
-        children: [
-            {
-                id: '2',
-                name: '记忆层次',
-                remark: '',
-                children: [
-                    {
-                        id: '3',
-                        name: '回忆再认能力',
-                        datavalue: '',
-                        importantlevelid: '',
-                        remark: '',
-                    },
-                    {
-                        id: '4',
-                        name: '再现复述能力',
-                        datavalue: '',
-                        importantlevelid: '',
-                        remark: '',
-                    }
-                ]
-            },
-            {
-                id: '5',
-                name: '理解层次',
-                remark: '',
-                children: [
-                    {
-                        id: '6',
-                        name: '概念识辨能力',
-                        remark: '',
-                        children: [
-                            {
-                                id: '7',
-                                name: '概念识别能力',
-                                datavalue: '',
-                                importantlevelid: '',
-                                remark: '',
-                            },
-                            {
-                                id: '8',
-                                name: '概念辨析能力',
-                                datavalue: '',
-                                importantlevelid: '',
-                                remark: '',
-                            }
-                        ]
-                    },
-                ]
-            },
-        ]
-    },
-    {
-        id: '26',
-        name: '社会类型',
-        remark: '',
-        children: [
-            {
-                id: '27',
-                name: '沟通交流能力',
-                datavalue: '',
-                importantlevelid: '',
-                remark: '',
-            },
-            {
-                id: '28',
-                name: '团队合作能力',
-                datavalue: '',
-                importantlevelid: '',
-                remark: '',
-            }
-        ]
-    },
-]);
+const data = ref([]);  //模拟后端返回的数据
 
 const tableData = ref([]);      // 主界面表格数据
 
 const tableSelected = ref([]);    // 记录主界面的表格选择
+
+const tableLoading = ref(true);
 
 const dictionarySelected = ref([]);     // 记录能力字典中选择的数据
 const dictionarySelected_backup = ref([]);  // 记录能力字典中选择的数据备份用于不保存情况下关闭弹窗后数据恢复
@@ -169,235 +139,39 @@ const props = {
     value: 'id'
 }
 
-const dictionaryData = [    //能力字典数据
-    {
-        id: '1',
-        name: '认知类型',
-        remark: '',
-        children: [
-            {
-                id: '2',
-                name: '记忆层次',
-                remark: '',
-                children: [
-                    {
-                        id: '3',
-                        name: '回忆再认能力',
-                        datavalue: '',
-                        importantlevelid: '',
-                        remark: '',
-                    },
-                    {
-                        id: '4',
-                        name: '再现复述能力',
-                        datavalue: '',
-                        importantlevelid: '',
-                        remark: '',
-                    }
-                ]
-            },
-            {
-                id: '5',
-                name: '理解层次',
-                remark: '',
-                children: [
-                    {
-                        id: '6',
-                        name: '概念识辨能力',
-                        remark: '',
-                        children: [
-                            {
-                                id: '7',
-                                name: '概念识别能力',
-                                datavalue: '',
-                                importantlevelid: '',
-                                remark: '',
-                            },
-                            {
-                                id: '8',
-                                name: '概念辨析能力',
-                                datavalue: '',
-                                importantlevelid: '',
-                                remark: '',
-                            }
-                        ]
-                    },
-                    {
-                        id: '9',
-                        name: '识图绘图能力',
-                        remark: '',
-                        children: [
-                            {
-                                id: '10',
-                                name: '图表解析能力',
-                                datavalue: '',
-                                importantlevelid: '',
-                                remark: '',
-                            },
-                            {
-                                id: '11',
-                                name: '图表绘制能力',
-                                datavalue: '',
-                                importantlevelid: '',
-                                remark: '',
-                            }
-                        ]
-                    },
-                    {
-                        id: '12',
-                        name: '诠释理解能力',
-                        datavalue: '',
-                        importantlevelid: '',
-                        remark: '',
-                    },
-                    {
-                        id: '13',
-                        name: '代码解析能力',
-                        datavalue: '',
-                        importantlevelid: '',
-                        remark: '',
-                    }
-                ]
-            },
-            {
-                id: '14',
-                name: '应用层次',
-                reamrk: '',
-                children: [
-                    {
-                        id: '15',
-                        name: '直接应用能力',
-                        datavalue: '',
-                        importantlevelid: '',
-                        remark: '',
-                    },
-                    {
-                        id: '16',
-                        name: '数学计算能力',
-                        datavalue: '',
-                        importantlevelid: '',
-                        remark: '',
-                    },
-                    {
-                        id: '17',
-                        name: '数模转化能力',
-                        datavalue: '',
-                        importantlevelid: '',
-                        remark: '',
-                    },
-                    {
-                        id: '18',
-                        name: '综合运用能力',
-                        datavalue: '',
-                        importantlevelid: '',
-                        remark: '',
-                    },
-                ]
-            },
-            {
-                id: '19',
-                name: '分析层次',
-                remark: '',
-                children: [
-                    {
-                        id: '20',
-                        name: '比较分析能力',
-                        datavalue: '',
-                        importantlevelid: '',
-                        remark: '',
-                    },
-                    {
-                        id: '21',
-                        name: '解构归因能力',
-                        datavalue: '',
-                        importantlevelid: '',
-                        remark: '',
-                    },
-                    {
-                        id: '22',
-                        name: '数学建模能力',
-                        datavalue: '',
-                        importantlevelid: '',
-                        remark: '',
-                    }
-                ]
-            },
-        ]
-    },
-    {
-        id: '23',
-        name: '技术类型',
-        remark: '',
-        children: [
-            {
-                id: '24',
-                name: '文献检索能力',
-                datavalue: '',
-                importantlevelid: '',
-                remark: '',
-            },
-            {
-                id: '25',
-                name: '工具使用能力',
-                datavalue: '',
-                importantlevelid: '',
-                remark: '',
-            }
-        ]
-    },
-    {
-        id: '26',
-        name: '社会类型',
-        remark: '',
-        children: [
-            {
-                id: '27',
-                name: '沟通交流能力',
-                datavalue: '',
-                importantlevelid: '',
-                remark: '',
-            },
-            {
-                id: '28',
-                name: '团队合作能力',
-                datavalue: '',
-                importantlevelid: '',
-                remark: '',
-            }
-        ]
-    },
-    {
-        id: '29',
-        name: '思维类型',
-        remark: '',
-        children: [
-            {
-                id: '30',
-                name: '空间思维能力',
-                datavalue: '',
-                importantlevelid: '',
-                remark: '',
-            },
-            {
-                id: '31',
-                name: '时间思维能力',
-                datavalue: '',
-                importantlevelid: '',
-                remark: '',
-            }
-        ]
-    }
-];
+const dictionaryData = ref([]);    //能力字典数据
+
+const deleteDialogVisible = ref(false);
+
+const relatedKWA = ref([]);
 
 // const inputRefs = ref({});
 
 /******************预处理数据******************/
+
+const getAbility = () => {
+    request.evaluation.get(`/evaluation/getability?courseid=${courseid.value}`).then((res) => {
+        if (res.code === 200) {
+            data.value = res.data;
+            tableData.value = [];
+            initialize();
+            tableLoading.value = false;
+        }
+        else if (res.code === 404) {
+            ElMessage.error(res.msg);
+        }
+    }).catch((error) => {
+        ElMessage.error('获取能力失败' + error);
+        tableLoading.value = false;
+    })
+};
+
 const splicedId = (node, namePath = [], idPath = []) => {     // 将树形结构数据的id拼接起来,DFS
     let result = [];
     const currentNamePath = [...namePath, node.name];   // 存储叶子节点全路径的name，用于在el-table中展示数据
     const currentIdPath = [...idPath, node.id];     // 存储叶子节点全路径的id，用于能力字典弹窗中记录哪些是存在于该课程的能力表中的
 
-    if (!node.children || node.children === 0) {
+    if (!node.children || node.children.length === 0) {
         tableData.value.push({      // 在这里初始化每个表格行的数据，将叶子节点全路径的name用'/'拼接起来作为每行的能力名称
             id: node.id,
             name: currentNamePath.join('/'),
@@ -416,10 +190,12 @@ const splicedId = (node, namePath = [], idPath = []) => {     // 将树形结构
 }
 
 const initialize = () => {
+    dictionarySelected.value = dictionarySelected_backup.value = [];
+    tableSelected.value = [];
+
     data.value.forEach((item) => {
         dictionarySelected.value = dictionarySelected.value.concat(splicedId(item))   // 初始化能力字典弹框中哪些能力被勾选了
     });
-    // console.log(dictionarySelected.value);
 
     tableData.value.forEach((item) => {
         item.datavalue = Number(item.datavalue).toFixed(2);
@@ -429,7 +205,7 @@ const initialize = () => {
 
 
 onMounted(() => {
-    initialize();
+    getAbility();
 });
 
 /*************判定主页面哪些行被选中************/
@@ -442,7 +218,7 @@ const filterTableSelectAll = (selection) => {
 };
 /*********************************************/
 
-const deleteAbility = () => {
+const openDeleteDialog = () => {
     if (tableSelected.value.length === 0) {
         ElMessage({
             type: 'warning',
@@ -451,37 +227,148 @@ const deleteAbility = () => {
         });
         return;
     }
-    ElMessageBox.confirm(
-        '选择的能力将被删除，是否确定',
-        '警告',
-        {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning',
+
+    let deletedIds = [];
+    tableSelected.value.forEach((item) => {
+        deletedIds.push(item.id);
+    })
+    request.evaluation.post(`/evaluation/getability/getKwaByGetability?courseid=${courseid.value}`, deletedIds).then((res) => {
+        if(res.code === 200) {
+            relatedKWA.value = res.data;
         }
-    ).then(() => {
-        // 删除逻辑
-    }).catch(() => {});
+        else if(res.code === 404) {
+            ElMessage.error(res.msg);
+        }
+    }).catch((error) => {
+        ElMessage.error('获取相关KWA失败' + error);
+    })
+
+    deleteDialogVisible.value = true;
+}
+
+const deleteAbility = () => {
+    // console.log(tableSelected.value);
+    let deletedIds = [];
+    tableSelected.value.forEach((item) => {
+        deletedIds.push(item.id);
+    })
+
+    request.evaluation.post(`/evaluation/getability/delete?courseid=${courseid.value}`, deletedIds).then((res) => {
+        if (res.code === 200) {
+            tableLoading.value = true;
+            getAbility();
+            ElMessage.success('删除成功');
+            // console.log(tableSelected.value);
+        }
+        else if (res.code === 404) {
+            ElMessage.error(res.msg);
+        }
+    }).catch((error) => {
+        ElMessage.error('删除失败' + error);
+    })
+    // console.log(deletedIds);
+
+    deleteDialogVisible.value = false;
 };
 
 
 /*************能力字典弹窗相关*************/
 const openDictionary = () => {
+    relatedKWA.value = [];
     dictionarySelected_backup.value = dictionarySelected.value;
     // console.log(dictionarySelected.value);
+    request.evaluation.get('/coursemangt/ability').then((res) => {
+        if (res.code === 200) {
+            dictionaryData.value = res.data;
+            // console.log(dictionaryData.value);
+        }
+        else {
+            ElMessage.error(res.msg);
+        }
+    }).catch((error) => {
+        ElMessage.error('获取能力字典数据失败' + error);
+    })
+
     abilityDictionaryVisible.value = true;
 };
 
-const closeDictionary = (close) => {
+const closeDictionary = () => {
     abilityDictionaryVisible.value = false;
+    dictionarySelected.value = dictionarySelected_backup.value;     // 防止用户改变了选中的能力但是没有点保存导致数据错乱
+    dictionarySelected_backup.value = [];
+    // console.log(dictionarySelected.value);
 };
 
 const changeAbilities = () => {
     // console.log(dictionarySelected.value);
-    dictionarySelected.value = dictionarySelected_backup.value;
+
+    if (_.isEqual(dictionarySelected.value, dictionarySelected_backup.value)) {
+        abilityDictionaryVisible.value = false;
+        return;
+    }
+
+    let oldIds = [];    // 存储未改变弹窗选择前的数据
+    dictionarySelected_backup.value.forEach((item) => {
+        oldIds.push(item[item.length - 1]);
+    })
+    // console.log(oldIds);
+
+    let newIds = [];    // 存储改变弹窗选择后的数据
+    dictionarySelected.value.forEach((item) => {
+        newIds.push(item[item.length - 1]);
+    })
+    // console.log(newIds);
+
+    let oldSet = new Set(oldIds);   // 将两个数组转换为set容器，使得可以在O(1)的时间内查找相应元素
+    let newSet = new Set(newIds);
+
+    let addedIds = [...newSet].filter((item) => !oldSet.has(item));
+    let deletedIds = [...oldSet].filter((item) => !newSet.has(item));
+
+    let promise = [];   // Promise.all()接受一个promise对象的数组作为参数，用作所有请求都结束后再执行某些操作
+
+    tableLoading.value = true;
+
+    if (deletedIds.length) {
+
+        let deletePromise = request.evaluation.post(`/evaluation/getability/delete?courseid=${courseid.value}`, deletedIds).then((res) => {
+            if (res.code === 200) {
+
+            }
+            else if (res.code === 404) {
+                ElMessage.error(res.msg);
+            }
+        }).catch((error) => {
+            ElMessage.error('删除失败' + error);
+            tableLoading.value = false;
+        })
+
+        promise.push(deletePromise);
+    }
+    if (addedIds.length) {
+        let addPromise = request.evaluation.post(`/evaluation/getability/insert?courseid=${courseid.value}`, addedIds).then((res) => {
+            if (res.code === 200) {
+
+            }
+            else if (res.code === 404) {
+                ElMessage.error(res.msg);
+            }
+        }).catch((error) => {
+            ElMessage.error('新增失败' + error);
+            tableLoading.value = false;
+        })
+
+        promise.push(addPromise);
+    }
+
+    Promise.all(promise).then(() => {    // 所有请求都结束后再执行某些操作
+        getAbility();
+        dictionarySelected_backup.value = [];
+    })
     abilityDictionaryVisible.value = false;
 }
 /****************************************/
 </script>
 
-<style scoped></style>
+<style scoped>
+</style>

@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const request = {
     admin: createAPI('http://localhost:8080/api'),
-    course: createAPI('http://localhost:8082'),
+    course: createAPI('http://localhost:8082/api'),
     evaluation: createAPI('http://localhost:8083'),
 }
 

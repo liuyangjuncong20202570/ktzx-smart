@@ -12,10 +12,6 @@ const rolehome =['teacherhomne','adminhome','superadminhome','secretariatehome',
 
 const routes = [
     {
-        path: '/:pathMatch(.*)*',
-        redirect: '/login'
-    },
-    {
         path: '/login',
         name: 'Login',
         component: () => import('../views/Login.vue')
@@ -40,6 +36,11 @@ const routes = [
                 path: 'sysmangt/rolepurview',
                 name: 'Rolepurview', //角色授权
                 component: () => import('../components/admin/Rolepurview.vue')
+            },
+            {
+                path: 'sysmangt/schoolmangt',
+                name: 'SchoolMangt',   // 学校配置
+                component: () => import('../components/admin/SchoolMangt.vue')
             },
             {
                 path: 'sysmangt/termmangt',
@@ -112,11 +113,20 @@ const routes = [
                 component: () => import('../components/evaluation/KnowledgeUnit.vue')
             },
             {
-                path: 'evasys/courseinfo/formative/KWAgraph', // 形成性评价模型-知识单元
+                path: 'evasys/courseinfo/formative/KWAgraph', // 形成性评价模型-知识能力图谱
                 name: 'KWAgraph',
-                component: () => import('../components/evaluation/demo1.vue')
+                component: () => import('../components/evaluation/KWAgraph.vue')
+            },
+            {
+                path: 'evasys/courseinfo/formative/3Dgraph', // 形成性评价模型-3D图谱
+                name: '3Dgraph',
+                component: () => import('../components/evaluation/3Dgraph.vue')
             },
         ]
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        redirect: '/login'
     },
 ];
 
@@ -125,17 +135,17 @@ const router = createRouter({
     routes,
 });
 
-onBeforeRouteLeave((to, from, next) => {
-    // 检查用户是否已经登录
-    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-
-    // 如果用户从登录页面离开，且没有登录标志，则清除sessionStorage中的用户信息
-    if (from.path === '/login' && !isLoggedIn) {
-        sessionStorage.removeItem('users');
-    }
-
-    next();
-});
+// onBeforeRouteLeave((to, from, next) => {
+//     // 检查用户是否已经登录
+//     const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+//
+//     // 如果用户从登录页面离开，且没有登录标志，则清除sessionStorage中的用户信息
+//     if (from.path === '/login' && !isLoggedIn) {
+//         sessionStorage.removeItem('users');
+//     }
+//
+//     next();
+// });
 
 router.beforeEach((to, from, next) => {
     // 尝试从 sessionStorage 中获取用户信息

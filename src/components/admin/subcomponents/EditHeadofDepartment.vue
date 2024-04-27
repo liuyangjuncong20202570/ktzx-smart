@@ -10,7 +10,7 @@
         <el-main style="padding-left:0">
           <el-table :data="userlist" empty-text="没有负责人">
             <el-table-column type="index" label="序号" min-width="50"></el-table-column>
-            <el-table-column label="所属部门" min-width="200">{{ obsname }}</el-table-column>
+            <el-table-column prop="obsname" label="所属部门" min-width="200"></el-table-column>
             <!-- 从这里移除id的显示 -->
             <el-table-column prop="username" label="教师用户名" min-width="100"></el-table-column>
             <el-table-column label="操作" width="120">
@@ -39,7 +39,13 @@
               style="width: 60%;"
           >
           </el-cascader>
-          <el-button type="primary" @click="addTeacher" style="margin-left: 15px;">新增负责人</el-button>
+          <el-button
+              type="primary"
+              :disabled="!teacherid"
+              @click="addTeacher"
+              style="margin-left: 15px;">
+            {{ teacherid ? '点击新增教师' : '请选择负责人' }}
+          </el-button>
         </el-footer>
 
       </el-container>
@@ -88,12 +94,12 @@ const emit = defineEmits(['formSubmitted']);
 defineExpose({init});
 
 const fetchData = () => {
-  request.admin.get('/sysmangt/collegemangt/collageRP')
+  request.admin.get('/sysmangt/department/departmentRP')
       .then(res => {
         if (res.code === 200) {
           // 假设这里你需要的是过滤后的数据作为级联选择器的选项
           console.log(res.data)
-          teacherlist.value = formatDataForCascader(res.data.filter(item => item.id === collegeobsid.value), alreadyteacheridlist.value);
+          teacherlist.value = formatDataForCascader(res.data, alreadyteacheridlist.value);
           console.log(teacherlist.value)
         }
       }).catch(error => {
@@ -164,11 +170,11 @@ const addTeacher = () => {
     ElMessage.error('教师ID未选择，请选择一个教师。');
     return; // 终止函数执行
   } else {
-    const teacherform = ref({
+    const teacherform = {
       userid: teacherid.value,
       obsid: collegeobsid.value,
-    })
-    request.admin.post('/sysmangt/collegemangt/collageRP/create', teacherform.value)
+    }
+    request.admin.post('/sysmangt/department/departmentRP/create', teacherform)
         .then(res => {
           if (res.code === 200) {
             // 假设这里你需要的是过滤后的数据作为级联选择器的选项
@@ -176,26 +182,26 @@ const addTeacher = () => {
               type: 'success',
               message: '新增负责人成功'
             });
+            emit('formSubmitted');
           }
         }).catch(error => {
       ElMessage({
         type: 'error',
         message: '新增负责人失败，请重新尝试'
       });
+      teacherid.value = '';
     });
-    teacherid.value = '';
-    emit('formSubmitted');
     closeDialog();
   }
+
 };
 
 const Deleteteacher = (row) => {
-  console.log(row.id)
   const teacherform = ref({
     userid: row.id,
     obsid: collegeobsid.value,
   })
-  request.admin.post('/sysmangt/collegemangt/collageRP/delete', teacherform.value)
+  request.admin.post('/sysmangt/department/departmentRP/delete', teacherform.value)
       .then(res => {
         if (res.code === 200) {
           // 假设这里你需要的是过滤后的数据作为级联选择器的选项
@@ -203,6 +209,8 @@ const Deleteteacher = (row) => {
             type: 'success',
             message: '删除负责人成功'
           });
+          emit('formSubmitted');
+          closeDialog();
         }
       }).catch(error => {
     ElMessage({
@@ -210,17 +218,15 @@ const Deleteteacher = (row) => {
       message: '删除负责人失败，请重新尝试'
     });
   });
-  teacherid.value = '';
-  emit('formSubmitted');
-  closeDialog();
-
 }
 
 
 //关闭对话框方法
 const closeDialog = () => {
   dialogVisible.value = false;
-  teacherid.value = '';
+  setTimeout(() => {
+    teacherid.value = ''; // 在对话框动画完成后清空，避免视觉问题
+  }, 300);
 };
 
 

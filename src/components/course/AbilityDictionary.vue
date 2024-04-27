@@ -4,10 +4,10 @@
             style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
             <el-button type="primary" style="margin-left: 0.8vw;" @click="exportData">导出到Excel</el-button>
             <el-button type="danger" @click="changeTreeExpand" style="margin-left: 0.8vw;">全部展开/关闭</el-button>
-            <el-button type="success" style="margin-left: 0.8vw;" >保存</el-button>
+            <el-button type="success" style="margin-left: 0.8vw;">保存</el-button>
         </el-header>
 
-        <el-main style="padding: 0;">  
+        <el-main style="padding: 0;">
             <div style="height: 25px; display: flex; justify-content: space-between; flex: auto; text-align: center;
                 background-color: whitesmoke;">
                 <div style="width: 390px; color: gray">名称</div>
@@ -21,18 +21,10 @@
             </div>
 
             <div class="tree-container" style="height: calc(100% - 25px); overflow:auto;">
-                <el-tree 
-                        :data="treeData"
-                        draggable
-                        node-key=""
-                        :props="defaultProps"
-                        :expand-on-click-node="false"
-                        ref="nodeExpand"
-                        :default-expand-all="expandAll"
-                        @node-drag-start=""
-                        @node-drag-end=""
-                        @node-contextmenu="clickNode"
-                         >
+                <el-tree :data="treeData" draggable node-key="id" :props="defaultProps" :expand-on-click-node="false"
+                    ref="nodeExpand" :default-expand-all="expandAll" :default-expanded-keys="expandedKeys"
+                    @node-drag-start="" @node-drag-end="" @node-contextmenu="clickNode" @node-expand="openNode"
+                    @node-collapse="closeNode">
                     <template #default="{ node }">
                         <div style="display: flex; justify-content: space-between; flex: auto; text-align: left;">
                             <el-popover :visible="node.data.popVisible" placement="right"
@@ -44,32 +36,41 @@
                                 <el-button style="margin-top: 6px; width: 100%;" type="danger" plain round
                                     @click="confirmDeleteNodes(node.data)">删除</el-button>
                                 <template #reference>
-                                    <el-input v-if="node.data.editingName" v-model="node.data.name"
-                                        @blur="blurInput(node.data, 'editingName')" placeholder="请输入节点名称" @contextmenu.stop draggable="false"
-                                        style="height: 20px; width: 150px;" :ref="el => setInputRef(el, node.data)"></el-input>
-                                    <div v-else style="width: auto;" @dblclick="handleClick(node.data, 'editingName')">
-                                        <span>
-                                            <el-icon v-if="node.data.children" color="orange"><Folder /></el-icon>
-                                            <el-icon v-else color="dodgerblue"><Document /></el-icon>
+                                    <div style="width: 100%; height: 20px;" @dblclick="handleClick(node.data, 'editingName')">
+                                        <el-input v-if="node.data.editingName" v-model="node.data.name"
+                                            @blur="blurInput(node.data, 'editingName')" placeholder="请输入节点名称"
+                                            @contextmenu.stop draggable="false" style="height: 20px; width: 150px;"
+                                            :ref="el => setInputRef(el, node.data)"></el-input>
+                                        <div v-else style="width: 100%; height: 20px;">
+                                            <el-icon v-if="node.data.children" color="orange">
+                                                <Folder />
+                                            </el-icon>
+                                            <el-icon v-else color="dodgerblue">
+                                                <Document />
+                                            </el-icon>
                                             {{ node.data.name }}
-                                        </span>
+                                        </div>
                                     </div>
                                 </template>
                             </el-popover>
 
                             <div style="width: 59vw;">
                                 <div style="display: flex; flex: auto; justify-content: space-between;">
-                                    <div style="width: 150px; text-align: center;" @dblclick="handleClick(node.data, 'editingDatavalue')">
+                                    <div style="width: 150px; text-align: center; height: 100%; overflow: hidden;"
+                                        @dblclick="handleClick(node.data, 'editingDatavalue')">
                                         <el-input v-if="node.data.editingDatavalue" v-model="node.data.datavalue"
-                                            @blur="blurInput(node.data, 'editingDatavalue')" placeholder="请输入节点名称" @contextmenu.stop draggable="false"
-                                            style="height: 20px; width: 70%;" :ref="el => setInputRef(el, node.data)"></el-input>
-                                        <span v-else>{{ node.data.datavalue }}</span>
+                                            @blur="blurInput(node.data, 'editingDatavalue')" placeholder="请输入数值"
+                                            @contextmenu.stop draggable="false" style="height: 20px; width: 100%;"
+                                            :ref="el => setInputRef(el, node.data)"></el-input>
+                                        <div style="width: 100%; height: 20px;" v-else>{{ node.data.datavalue }}</div>
                                     </div>
-                                    <div class="overflow-text" v-bind:title="node.data.remark" @dblclick="handleClick(node.data, 'editingRemark')">
+                                    <div class="overflow-text" v-bind:title="node.data.remark"
+                                        @dblclick="handleClick(node.data, 'editingRemark')">
                                         <el-input v-if="node.data.editingRemark" v-model="node.data.remark"
-                                            @blur="blurInput(node.data, 'editingRemark')" placeholder="请输入节点名称" @contextmenu.stop draggable="false"
-                                            style="height: 20px; width: 100%;" :ref="el => setInputRef(el, node.data)"></el-input>
-                                        <span v-else>{{ node.data.remark }}</span>
+                                            @blur="blurInput(node.data, 'editingRemark')" placeholder="请输入备注"
+                                            @contextmenu.stop draggable="false" style="height: 20px; width: 100%;"
+                                            :ref="el => setInputRef(el, node.data)"></el-input>
+                                        <div style="width: 100%; height: 20px;" v-else>{{ node.data.remark }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -89,268 +90,17 @@ import request from '../../utils/request'
 
 
 const defaultProps = {
-  children: 'children',
-  label: 'name',
+    children: 'children',
+    label: 'name',
 }
 
-const treeData = ref([
-    {
-        id: '1',
-        name: '认知类型',
-        datavalue: '0.00',
-        remark: '基于布鲁姆教育目标分类学的六个层次划分，对每个层次进行了一定程度的细化11111111111111111',
-        children: [
-            {
-                id: '',
-                name: '记忆层次',
-                datavalue: '0.00',
-                remark: '111',
-                children: [
-                    {
-                        id: '',
-                        name: '识记再现能力',
-                        datavalue: '1.22',
-                        remark: '09樱花怒放',
-                        children: [
-                            {
-                                id: '',
-                                name: '回忆再认能力',
-                                datavalue: '5.55',
-                                remark: '1234',
-                            },
-                            {
-                                id: '',
-                                name: '再现复述能力',
-                                datavalue: '0.00',
-                                remark: '',
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                id: '',
-                name: '理解层次',
-                datavalue: '0.00',
-                remark: '2222',
-                children: [
-                    {
-                        id: '',
-                        name: '概念识辨能力',
-                        datavalue: '0.00',
-                        remark: '6666',
-                    },
-                    {
-                        id: '',
-                        name: '识图绘图能力',
-                        datavalue: '0.00',
-                        remark: 'dwvcwed',
-                    },
-                    {
-                        id: '',
-                        name: '诠释理解能力',
-                        datavalue: '0.00',
-                        remark: 'aevgrefbara'
-                    }
-                ]
-            },
-            {
-                id: '',
-                name: '应用层次',
-                datavalue: '0.00',
-                remark: '豆腐刺尾u城内外才弄完纽黑文你好',
-                children: [
-                    {
-                        id: '',
-                        name: '直接应用能力',
-                        datavalue: '0.88',
-                        remark: 'dwwqfewfewf',
-                    },
-                    {
-                        id: '',
-                        name: '数学计算能力',
-                        datavalue: '0.88',
-                        remark: 'dwwqfewfewf',
-                    },
-                    {
-                        id: '',
-                        name: '数模转化能力',
-                        datavalue: '0.88',
-                        remark: 'dwwqfewfewf',
-                    },
-                    {
-                        id: '',
-                        name: '综合运用能力',
-                        datavalue: '0.88',
-                        remark: 'dwwqfewfewf',
-                    },
-                ]
-            }
-        ]
-    },
-    {
-        id: '',
-        name: '技术类型',
-        datavalue: '0.99',
-        remark: '1我的绯闻iojsdjwdcwqqwsd',
-        children: [
-            {
-                id: '',
-                name: '文献检索能力',
-                datavalue: '0.88',
-                remark: 'dwwqfewfewf',
-            },
-            {
-                id: '',
-                name: '工具使用能力',
-                datavalue: '0.88',
-                remark: 'dwwqfewfewf',
-            },
-            {
-                id: '',
-                name: '设备操作能力',
-                datavalue: '0.88',
-                remark: 'dwwqfewfewf',
-            },
-            {
-                id: '',
-                name: '程序实现能力',
-                datavalue: '0.88',
-                remark: 'dwwqfewfewf',
-            },
-        ]
-    },
-    {
-        id: '',
-        name: '认知类型',
-        datavalue: '0.00',
-        remark: '基于布鲁姆教育目标分类学的六个层次划分，对每个层次进行了一定程度的细化11111111111111111',
-        children: [
-            {
-                id: '',
-                name: '记忆层次',
-                datavalue: '0.00',
-                remark: '111',
-                children: [
-                    {
-                        id: '',
-                        name: '识记再现能力',
-                        datavalue: '1.22',
-                        remark: '09樱花怒放',
-                        children: [
-                            {
-                                id: '',
-                                name: '回忆再认能力',
-                                datavalue: '5.55',
-                                remark: '1234',
-                            },
-                            {
-                                id: '',
-                                name: '再现复述能力',
-                                datavalue: '0.00',
-                                remark: '',
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                id: '',
-                name: '理解层次',
-                datavalue: '0.00',
-                remark: '2222',
-                children: [
-                    {
-                        id: '',
-                        name: '概念识辨能力',
-                        datavalue: '0.00',
-                        remark: '6666',
-                    },
-                    {
-                        id: '',
-                        name: '识图绘图能力',
-                        datavalue: '0.00',
-                        remark: 'dwvcwed',
-                    },
-                    {
-                        id: '',
-                        name: '诠释理解能力',
-                        datavalue: '0.00',
-                        remark: 'aevgrefbara'
-                    }
-                ]
-            },
-            {
-                id: '',
-                name: '应用层次',
-                datavalue: '0.00',
-                remark: '豆腐刺尾u城内外才弄完纽黑文你好',
-                children: [
-                    {
-                        id: '',
-                        name: '直接应用能力',
-                        datavalue: '0.88',
-                        remark: 'dwwqfewfewf',
-                    },
-                    {
-                        id: '',
-                        name: '数学计算能力',
-                        datavalue: '0.88',
-                        remark: 'dwwqfewfewf',
-                    },
-                    {
-                        id: '',
-                        name: '数模转化能力',
-                        datavalue: '0.88',
-                        remark: 'dwwqfewfewf',
-                    },
-                    {
-                        id: '',
-                        name: '综合运用能力',
-                        datavalue: '0.88',
-                        remark: 'dwwqfewfewf',
-                    },
-                ]
-            }
-        ]
-    },
-    {
-        id: '',
-        name: '技术类型',
-        datavalue: '0.99',
-        remark: '1我的绯闻iojsdjwdcwqqwsd',
-        children: [
-            {
-                id: '',
-                name: '文献检索能力',
-                datavalue: '0.88',
-                remark: 'dwwqfewfewf',
-            },
-            {
-                id: '',
-                name: '工具使用能力',
-                datavalue: '0.88',
-                remark: 'dwwqfewfewf',
-            },
-            {
-                id: '',
-                name: '设备操作能力',
-                datavalue: '0.88',
-                remark: 'dwwqfewfewf',
-            },
-            {
-                id: '',
-                name: '程序实现能力',
-                datavalue: '0.88',
-                remark: 'dwwqfewfewf',
-            },
-        ]
-    }
-])
+const treeData = ref([]);
 
 const nodeExpand = ref(null);
 
 const expandAll = ref(false);
+
+const expandedKeys = ref([]);   // 默认展开的节点的key的数组
 
 const openedPopNode = ref({});    // 记录哪个节点的弹出框被打开了
 
@@ -366,27 +116,27 @@ const initialize = (nodes) => {
         node.editingDatavalue = false;
         node.editingRemark = false;
         // node.id = id.value ++;
-        
-        if(node.name.includes('未命名能力')){
-            if(node.name.length > 5){
+
+        if (node.name.includes('未命名能力')) {
+            if (node.name.length > 5) {
                 let num = '';
-                for(let i = 6; node.name[i] !== ')'; i ++){
+                for (let i = 6; node.name[i] !== ')'; i++) {
                     num += node.name[i];
                 }
-                if(nullNodeNum.value < Number(num)) nullNodeNum.value = Number(num);
+                if (nullNodeNum.value < Number(num)) nullNodeNum.value = Number(num);
             }
-            else if(node.name.length === 5 && nullNodeNum.value === 0) nullNodeNum.value ++;
+            else if (node.name.length === 5 && nullNodeNum.value === 0) nullNodeNum.value++;
         }
 
         if (node.children && node.children.length > 0) {
-			initialize(node.children); // 递归子节点
-		}
+            initialize(node.children); // 递归子节点
+        }
     })
 };
 
 const getTreeData = () => {
     request.evaluation.get('/coursemangt/ability').then((res) => {
-        if(res.code === 200){
+        if (res.code === 200) {
             treeData.value = res.data;
             nullNodeNum.value = 0;
             initialize(treeData.value);
@@ -395,7 +145,7 @@ const getTreeData = () => {
     }).catch((error) => {
         ElMessage({
             type: 'error',
-            message: '获取能力数据失败'
+            message: '获取能力数据失败' + error
         });
     })
 };
@@ -407,33 +157,66 @@ onMounted(() => {
 });
 /**********************************/
 
-//展开所有或收起所有
+/*****************控制树节点展开****************/
 const changeTreeExpand = () => {
     expandAll.value = !expandAll.value;
-    for (let i = 0; i < nodeExpand.value.store._getAllNodes().length; i++) {
-        nodeExpand.value.store._getAllNodes()[i].expanded = expandAll.value;
+    expandedKeys.value = [];
+    let length = nodeExpand.value.store._getAllNodes().length;
+    let allNodes = nodeExpand.value.store._getAllNodes();
+    for (let i = 0; i < length; i++) {
+        allNodes[i].expanded = expandAll.value;
+        if (expandAll.value) expandedKeys.value.push(allNodes[i].key);
+    }
+    // console.log(expandedKeys.value)
+}
+
+const openNode = (nodeData, node) => {
+    // console.log(node);
+    if (!expandedKeys.value.includes(node.key)) {
+        expandedKeys.value.push(node.key);
+    }
+    // console.log(expandedKeys.value)
+};
+
+const closeNode = (nodeData, node) => {
+    removeExpandedKeys(node);
+}
+
+const removeExpandedKeys = (node) => {
+    // 首先递归地移除所有子节点的ID
+    if (node.childNodes && node.childNodes.length > 0) {
+        node.childNodes.forEach(childNode => {
+            removeExpandedKeys(childNode);
+        });
+    }
+
+    // 然后移除当前节点的ID
+    const index = expandedKeys.value.indexOf(node.key);
+    if (index > -1) {
+        expandedKeys.value.splice(index, 1);
     }
 }
+/********************************************/
 
 /************ 与弹出框显示有关 **********/
 
 const clickNode = (event, node, dom) => {   // 右键节点触发
-	//event为必须参数鼠标点击对象，node为节点的数据是可选参数，dom是当前节点的DOM元素也是可选参数
-	if (openedPopNode.value) {
-		openedPopNode.value.popVisible = false; // 防止多个弹出框一块显示，不好看
-		openedPopNode.value = {};
-	}
-	node.popVisible = true;
-	openedPopNode.value = node;
+    //event为必须参数鼠标点击对象，node为节点的数据是可选参数，dom是当前节点的DOM元素也是可选参数
+    if (openedPopNode.value) {
+        openedPopNode.value.popVisible = false; // 防止多个弹出框一块显示，不好看
+        openedPopNode.value = {};
+    }
+    node.popVisible = true;
+    openedPopNode.value = node;
 }
 
 const closePopNode = (event) => {
-	// 检查点击事件是否在弹窗内部
-	// 如果不是，则关闭弹窗
-	if (openedPopNode.value) {
-		openedPopNode.value.popVisible = false;
-		openedPopNode.value = {};
-	}
+    // 检查点击事件是否在弹窗内部
+    // 如果不是，则关闭弹窗
+    if (openedPopNode.value) {
+        openedPopNode.value.popVisible = false;
+        openedPopNode.value = {};
+    }
 };
 
 onBeforeUnmount(() => {
@@ -447,19 +230,18 @@ const handleClick = (node, field) => {
     nextTick(() => {
         node[field] = true;
         setTimeout(() => {
-            if(inputRefs.value[node.id] && inputRefs.value[node.id].$refs.input){
+            if (inputRefs.value[node.id] && inputRefs.value[node.id].$refs.input) {
                 inputRefs.value[node.id].$refs.input.focus();
             }
         }, 0);
     })
 };
 
-const blurInput = (node, field) => {
-	node[field] = false;
-}
+/***********************************/
 
+/**************新增节点*************/
 const addSiblingNode = (node) => {
-    nullNodeNum.value ++;
+    nullNodeNum.value++;
     const newNode = {
         id: node.id,
         pid: node.pid,
@@ -470,20 +252,20 @@ const addSiblingNode = (node) => {
             remark: ''
         }
     };
-    console.log(newNode);
+    // console.log(newNode);
     request.evaluation.post('/coursemangt/ability/create', newNode).then((res) => {
-        if(res.code === 200){
+        if (res.code === 200) {
             getTreeData();
         }
     }).catch((error) => {
-        ElMessage.error('获取能力数据失败' + error);
+        ElMessage.error('新增失败失败' + error);
     })
 
     node.popVisible = false;
 };
 
 const addChildNode = (node) => {
-    nullNodeNum.value ++;
+    nullNodeNum.value++;
     const newNode = {
         id: node.id,
         pid: node.pid,
@@ -494,18 +276,22 @@ const addChildNode = (node) => {
             remark: ''
         }
     }
-    console.log(newNode);
+    // console.log(newNode);
     request.evaluation.post('/coursemangt/ability/create', newNode).then((res) => {
-        if(res.code === 200){
+        if (res.code === 200) {
+            expandedKeys.value.push(node.id); //将该节点id追加到展开的id中
             getTreeData();
         }
     }).catch((error) => {
         ElMessage.error('获取能力数据失败' + error);
     })
-    
+
     node.popVisible = false;
 };
+/***********************************/
 
+
+/*****************删除节点***************/
 const confirmDeleteNodes = (node) => {
     ElMessageBox.confirm(
         `是否删除"${node.name}"能力及其下属所有能力?`,
@@ -517,68 +303,90 @@ const confirmDeleteNodes = (node) => {
         }
     ).then(() => {
         let deletedNodes = [];
-        if(node.children && node.children.length > 0){
+        if (node.children && node.children.length > 0) {
             deletedNodes = findChildNodes(node.children, [node.id]);
         }
         else deletedNodes.push(node.id);
-        console.log(deletedNodes);
+        // console.log(deletedNodes);
 
         request.evaluation.post('/coursemangt/ability/delete', deletedNodes).then((res) => {
-            if(res.code === 200){
+            if (res.code === 200) {
                 getTreeData();
+
+                deletedNodes.forEach((id) => {	// 删除被删除节点的默认展开数据
+                    let index = -1;
+                    index = expandedKeys.value.indexOf(id);
+                    if (index > -1) expandedKeys.value.splice(index, 1);
+                })
+                // console.log(expandedKeys.value);
+            }
+            else {
+                ElMessage({
+                    type: 'error',
+                    message: res.msg
+                })
             }
         }).catch((error) => {
             ElMessage.error('删除失败' + error);
         });
-    }).catch(() => {});
+    }).catch(() => { });
     node.popVisible = false;
 };
 
 const findChildNodes = (nodes, array = []) => {  // 查找某一节点的所有子节点id
     nodes.forEach((item) => {
         array.push(item.id);
-        if(item.children && item.children.length > 0){
+        if (item.children && item.children.length > 0) {
             array = findChildNodes(item.children, array);
         }
     })
     return array;
 };
-/***********************************/
+/****************************************/
+
+
 
 /***************与输入框显示有关***************/
 
 const inputRefs = ref({});
 
 const setInputRef = (el, node) => {
-  if (el) {
-    inputRefs.value[`${node.id}`] = el;
-  }
+    if (el) {
+        inputRefs.value[`${node.id}`] = el;
+    }
 };
+
+const blurInput = (node, field) => {
+    node[field] = false;
+}
 
 /********************************************/
 </script>
 
 <style scoped>
-
 .overflow-text {
     width: calc(59vw - 150px);
+    height: 100%;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
 /* 去掉滚动条 */
-.tree-container::-webkit-scrollbar {	/* 针对Chrome, Safari, Edge, 和 Opera */
-	display: none;
+.tree-container::-webkit-scrollbar {
+    /* 针对Chrome, Safari, Edge, 和 Opera */
+    display: none;
 }
 
-.element {		/* 针对Firefox */
-  scrollbar-width: none;
+.element {
+    /* 针对Firefox */
+    scrollbar-width: none;
 }
 
-.element {		/* 针对IE和Edge旧版本 */
-  -ms-overflow-style: none;
+.element {
+    /* 针对IE和Edge旧版本 */
+    -ms-overflow-style: none;
 }
+
 /*************/
-
 </style>
