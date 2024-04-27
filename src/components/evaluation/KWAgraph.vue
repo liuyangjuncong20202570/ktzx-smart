@@ -8,7 +8,6 @@
 </template>
 
 <script lang="ts" setup>
-import G6 from '@antv/g6';
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
 import { onMounted, ref } from 'vue';
 import request from '../../utils/request';
