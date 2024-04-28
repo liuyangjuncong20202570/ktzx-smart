@@ -8,21 +8,10 @@
         <el-header style="height: auto; padding: 2px 0px; width:100%; display: flex; align-items: center;">
         </el-header>
         <el-main>
-          <el-form ref="formRef" :model="newform"  :rules="rules" label-width="100px">
-            <el-form-item label="选择专业" prop="id">
-<!--              <el-input v-model=""></el-input>-->
-              <el-select-v2
-                  v-model="newform.id"
-                  :options="options"
-                  placeholder="选择专业"
-              />
-            </el-form-item>
+          <el-form ref="formRef" :model="newform" :rules="rules" label-width="100px">
             <el-form-item label="班级名称" prop="classname">
               <el-input v-model="newform.classname" placeholder="请输入班级名"></el-input>
             </el-form-item>
-            <!--            <el-form-item label="年级" prop="grade">-->
-            <!--              <el-input  v-model="newform.grade"></el-input>-->
-            <!--            </el-form-item>-->
             <el-form-item label="年级" prop="grade">
               <el-select v-model="newform.grade" placeholder="请选择年级">
                 <el-option
@@ -38,7 +27,7 @@
             </el-form-item>
             <el-form-item>
               <el-button type="info" large style="width: 40%" @click="closeDialog">取消</el-button>
-              <el-button type="success"  large style="width: 40%"  @click="submitForm">新增</el-button>
+              <el-button type="success" large style="width: 40%" @click="submitForm">更新</el-button>
             </el-form-item>
           </el-form>
         </el-main>
@@ -54,70 +43,81 @@ import {ElMessage} from "element-plus";
 import {Document, Folder} from "@element-plus/icons-vue";
 import Classmangt from "../Classmangt.vue"
 import request from "../../../utils/request.js";
+import {deepEqual} from "../../../utils/deepEqual.js";
 
 //显示弹窗组件
 const dialogVisible = ref(false);
-const newform = reactive({
-  id: '',
-  classname: '',
-  grade: '',
-  remark: ''
-});
-
+const oldform = ref({})
+const newform = ref({})
 const recentYears = computed(() => {
   const currentYear = new Date().getFullYear();
   return [currentYear - 2, currentYear - 1, currentYear, currentYear + 1, currentYear + 2];
 });
 
 const rules = reactive({
-  id: [{ required: true, message: '请选择专业', trigger: 'blur' }],
-  classname: [{ required: true, message: '请输入班级名', trigger: 'blur' }],
-  grade: [{ required: true, message: '请输入年级', trigger: 'blur' }],
+  classname: [{required: true, message: '请输入班级名', trigger: 'blur'}],
+  grade: [{required: true, message: '请输入年级', trigger: 'blur'}],
 });
 
 const formRef = ref(null);
 const professionList = ref([]);
 const options = ref([]);
+
 //初始化，用于接受父组件传来的值，并发送请求获取菜单
-function init(oriprofessionList) {
+function init(selectClassInfo) {
   dialogVisible.value = true;
-  professionList.value = oriprofessionList.value;
-  options.value = oriprofessionList.map(item => ({
-    value: item.id, // 设置value为id
-    label: item.obsname // 设置label为obsname
-  }));
+  //采用深拷贝赋值
+  oldform.value = JSON.parse(JSON.stringify(selectClassInfo));
+  newform.value = JSON.parse(JSON.stringify(selectClassInfo));
 }
 
 const emit = defineEmits(['formSubmitted']);
 
 
 //将init函数暴露给父组件
-defineExpose({ init });
+defineExpose({init});
 
 const submitForm = () => {
 
-
   formRef.value.validate((valid) => {
     if (valid) {
-      console.log(newform);
       // // 表单验证通过，处理表单提交逻辑
-      request.admin.post('/sysmangt/classmangt/create', newform)
-          .then(res => {
-            if (res.code === 200) {
-              ElMessage({
-                type: 'success',
-                message: '新增班级成功'
-              });
-              emit('formSubmitted');
-              closeDialog();
-
-            }
-          }).catch(error => {
+      if (deepEqual(newform.value, oldform.value)) {
         ElMessage({
-          type: 'error',
-          message: '新增班级失败'
+          message: '没有变更的班级信息。',
+          type: 'info',
         });
-      });
+        closeDialog();
+        // console.log('oldform.value', oldform.value);
+      } else {
+
+
+        const updataform = ref({
+          obsid: newform.value.id,
+          classname: newform.value.classname,
+          grade: newform.value.grade,
+          remark: newform.value.remark,
+        })
+        console.log('newform.value', updataform.value);
+        request.admin.post('/sysmangt/classmangt/update', updataform.value)
+            .then(res => {
+              if (res.code === 200) {
+                ElMessage({
+                  type: 'success',
+                  message: '修改班级信息成功'
+                });
+                emit('formSubmitted');
+                closeDialog();
+
+              }
+            }).catch(error => {
+          ElMessage({
+            type: 'error',
+            message: '修改班级信息失败'
+          });
+        });
+
+      }
     } else {
       // 表单验证未通过
       ElMessage({
@@ -156,11 +156,12 @@ const closeDialog = () => {
   align-items: center;
   width: 100%; /* Ensure the tree node takes full width */
 }
+
 /*修改点击框样式*/
 .checkbox-container {
   display: flex;
   gap: 8vw;
-  margin-right:5vw;
+  margin-right: 5vw;
 }
 
 /* Adjust the negative margin to align with the header */
