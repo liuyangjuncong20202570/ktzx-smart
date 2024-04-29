@@ -251,6 +251,7 @@ onMounted(() => {
               ElMessage.success('移动成功');
               loadData();
             }else{
+              loadData();
               ElMessage.error(res.msg);
             }
           }).catch((error) => {
