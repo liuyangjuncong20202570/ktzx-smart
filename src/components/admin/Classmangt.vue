@@ -190,9 +190,6 @@ const EditDialogShow = ref(null);
 
 
 const handleClassAdd = () =>{
-  console.log(professionList.value)
-  console.log(tableData.value)
-  // newform.obsname = currentobsname.value;
   ADDdialogVisible.value = true;  // 打开弹窗
   ADDDialogShow.value.init(professionList.value);
 }

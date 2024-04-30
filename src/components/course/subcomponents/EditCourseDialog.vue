@@ -8,7 +8,7 @@
         <el-header style="height: auto; padding: 2px 0px; width:100%; display: flex; align-items: center;">
         </el-header>
         <el-main>
-          <el-form ref="formRef" :model="newform" :rules="rules" label-width="120px">
+          <el-form ref="formRef" :model="newform" :rules="rules" label-width="150px">
             <el-form-item label="学期" prop="">
               <el-input disabled v-model="newform.term"></el-input>
             </el-form-item>
@@ -44,9 +44,8 @@
             </el-form-item>
             <el-form-item style="display: flex; justify-content: center; gap: 20px;">
               <el-button type="info" large style="width: 40%;" @click="closeDialog">取消</el-button>
-              <el-button type="success" large style="width: 40%;" @click="submitForm">新增</el-button>
+              <el-button type="success" large style="width: 40%;" @click="submitForm">提交修改</el-button>
             </el-form-item>
-
           </el-form>
         </el-main>
       </el-container>
@@ -59,18 +58,25 @@ import {ref, reactive, defineExpose, nextTick, onMounted, getCurrentInstance} fr
 import {ElMessage, ElMessageBox} from "element-plus";
 import request from "../../../utils/request.js";
 import Coursemangt from "../Coursemangt.vue"
+import {exportTableToCSV} from "../../../utils/exportTableToCSV.js";
 
 const AdddialogVisible = ref(false);
 
-const newform = reactive({
-  term: '',
-  courseChineseName: '',
-  courseEnglishName: '',
-  classname: '',
-  courseCode: '',
-  professionName: '',
-  professionId: ''
-});
+
+function createForm() {
+  return reactive({
+    id: '',
+    term: '',
+    courseChineseName: '',
+    courseEnglishName: '',
+    courseCode: '',
+    professionName: '',
+    professionId: '',
+    responsiblePersonList: [],
+  });
+}
+
+
 const emit = defineEmits(['formSubmitted']);
 defineExpose({init});
 const rules = reactive({
@@ -79,18 +85,31 @@ const rules = reactive({
   courseCode: [{required: true, message: '请输入课程代码', trigger: 'blur'}],
 });
 
-const teacherid = ref('');
+const teacherid = ref([]);
 const teacherlist = ref([]);
 const alreadyteacheridlist = ref([])
+// 使用函数创建两个独立的响应式对象
+const newform = createForm();
+const oldform = createForm();
 
-
-function init(profession) {
+function init(row) {
+  fetchData()
   AdddialogVisible.value = true;
   const storedUserInfo = sessionStorage.getItem('users');
   const userInfo = JSON.parse(storedUserInfo);
   newform.term = userInfo.currentterm;
-  newform.professionName = profession.value.professionName;
-  newform.professionId = profession.value.professionId;
+  oldform.term = userInfo.currentterm;
+  // newform.professionName = row.value.professionName;
+  // newform.professionId = row.value.professionId;
+
+  Object.keys(row).forEach(key => {
+    if (newform.hasOwnProperty(key) && oldform.hasOwnProperty(key)) {
+      newform[key] = row[key];  // 使用 row[key] 而不是 row.value[key]
+      oldform[key] = row[key];
+    }
+  });
+  teacherid.value = newform.responsiblePersonList.map(item => item.id);
+  console.log(teacherid.value)
 }
 
 
@@ -143,37 +162,6 @@ const formatDataForCascader = (nodes, selectedTeacherIds) => {
   return nodes.map(node => formatNode(node)).filter(node => node !== null);
 };
 
-//
-// const addTeacher = () => {
-//   if (!teacherid.value) {
-//     // 如果 teacherid 为空或未定义，则显示错误消息
-//     ElMessage.error('教师ID未选择，请选择一个教师。');
-//     return; // 终止函数执行
-//   } else {
-//     const teacherform = ref({
-//       userid: teacherid.value,
-//       obsid: collegeobsid.value,
-//     })
-//     request.admin.post('/sysmangt/collegemangt/collageRP/create', teacherform.value)
-//         .then(res => {
-//           if (res.code === 200) {
-//             // 假设这里你需要的是过滤后的数据作为级联选择器的选项
-//             ElMessage({
-//               type: 'success',
-//               message: '新增负责人成功'
-//             });
-//           }
-//         }).catch(error => {
-//       ElMessage({
-//         type: 'error',
-//         message: '新增负责人失败，请重新尝试'
-//       });
-//     });
-//     teacherid.value = '';
-//     emit('formSubmitted');
-//     closeDialog();
-//   }
-// };
 
 const handleCascaderChange = (value, selectedData) => {
   console.log("selectedData" + selectedData)
@@ -206,9 +194,8 @@ const closeDialog = () => {
 };
 
 const submitForm = () => {
-
   ElMessageBox.confirm(
-      '是否确认新增',
+      '是否确认修改',
       '提示',
       {
         confirmButtonText: '确认',
@@ -217,7 +204,7 @@ const submitForm = () => {
       }
   )
       .then(() => {
-        console.log('确认新增')
+        console.log('确认修改')
         emit('formSubmitted');
         closeDialog();
       })
@@ -227,7 +214,6 @@ const submitForm = () => {
           message: '取消',
         })
       })
-
 }
 
 
