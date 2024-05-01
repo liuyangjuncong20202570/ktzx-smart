@@ -9,18 +9,18 @@
 
         <el-main style="padding: 0;">
             <div style="height: 25px; display: flex; justify-content: space-between; flex: auto; text-align: center;
-                background-color: whitesmoke;">
-                <div style="width: 390px; color: gray">名称</div>
-                <div style="width: 59vw;">
+                background-color: whitesmoke; min-width: 1290px; color: gray">
+                <div style="min-width: 390px;">名称</div>
+                <div style="min-width: 900px; width: 59vw;">
                     <div style="display: flex; flex: auto; justify-content: space-between;">
                         <div style="width: 150px; border-right: 1px solid #bbbbbb; border-left: 1px solid #bbbbbb;
                             color: gray">系数</div>
-                        <div style="width: calc(59vw - 150px); color: gray;">备注</div>
+                        <div style="min-width: 750px; width: 100%;">备注</div>
                     </div>
                 </div>
             </div>
 
-            <div class="tree-container" style="height: calc(100% - 25px); overflow:auto;">
+            <div class="tree-container" style="height: calc(100% - 25px); overflow: auto; min-width: 1290px;">
                 <el-tree :data="treeData" draggable node-key="id" :props="defaultProps" :expand-on-click-node="false"
                     ref="nodeExpand" :default-expand-all="expandAll" :default-expanded-keys="expandedKeys"
                     @node-drag-start="" @node-drag-end="" @node-contextmenu="clickNode" @node-expand="openNode"
@@ -36,25 +36,24 @@
                                 <el-button style="margin-top: 6px; width: 100%;" type="danger" plain round
                                     @click="confirmDeleteNodes(node.data)">删除</el-button>
                                 <template #reference>
-                                    <div style="width: 100%; height: 20px;" @dblclick="handleClick(node.data, 'editingName')">
-                                        <el-input v-if="node.data.editingName" v-model="node.data.name"
-                                            @blur="blurInput(node.data, 'editingName')" placeholder="请输入节点名称"
-                                            @contextmenu.stop draggable="false" style="height: 20px; width: 150px;"
-                                            :ref="el => setInputRef(el, node.data)"></el-input>
-                                        <div v-else style="width: 100%; height: 20px;">
-                                            <el-icon v-if="node.data.children" color="orange">
-                                                <Folder />
-                                            </el-icon>
-                                            <el-icon v-else color="dodgerblue">
-                                                <Document />
-                                            </el-icon>
-                                            {{ node.data.name }}
-                                        </div>
+                                    <el-input v-if="node.data.editingName" v-model="node.data.name"
+                                        @blur="blurInput(node.data, 'editingName')" placeholder="请输入节点名称"
+                                        @contextmenu.stop draggable="false" style="height: 20px; width: 150px;"
+                                        :ref="el => setInputRef(el, node.data)"></el-input>
+                                    <div v-else style="width: auto; height: 20px;"
+                                        @dblclick="handleClick(node.data, 'editingName')">
+                                        <el-icon v-if="node.data.children" color="orange">
+                                            <Folder />
+                                        </el-icon>
+                                        <el-icon v-else color="dodgerblue">
+                                            <Document />
+                                        </el-icon>
+                                        {{ node.data.name }}
                                     </div>
                                 </template>
                             </el-popover>
 
-                            <div style="width: 59vw;">
+                            <div style="min-width: 900px; width: 59vw;">
                                 <div style="display: flex; flex: auto; justify-content: space-between;">
                                     <div style="width: 150px; text-align: center; height: 100%; overflow: hidden;"
                                         @dblclick="handleClick(node.data, 'editingDatavalue')">
@@ -64,13 +63,17 @@
                                             :ref="el => setInputRef(el, node.data)"></el-input>
                                         <div style="width: 100%; height: 20px;" v-else>{{ node.data.datavalue }}</div>
                                     </div>
-                                    <div class="overflow-text" v-bind:title="node.data.remark"
+                                    <div style="min-width: 750px; width: 100%; height: 100%; overflow: hidden; white-space: nowrap;
+                                        text-overflow: ellipsis;" v-bind:title="node.data.remark"
                                         @dblclick="handleClick(node.data, 'editingRemark')">
                                         <el-input v-if="node.data.editingRemark" v-model="node.data.remark"
                                             @blur="blurInput(node.data, 'editingRemark')" placeholder="请输入备注"
                                             @contextmenu.stop draggable="false" style="height: 20px; width: 100%;"
                                             :ref="el => setInputRef(el, node.data)"></el-input>
-                                        <div style="width: 100%; height: 20px;" v-else>{{ node.data.remark }}</div>
+                                        <div v-else style="width: 100%; height: 20px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+										    v-bind:title="node.data.remark">
+                                            {{ node.data.remark }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -364,14 +367,6 @@ const blurInput = (node, field) => {
 </script>
 
 <style scoped>
-.overflow-text {
-    width: calc(59vw - 150px);
-    height: 100%;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
 /* 去掉滚动条 */
 .tree-container::-webkit-scrollbar {
     /* 针对Chrome, Safari, Edge, 和 Opera */

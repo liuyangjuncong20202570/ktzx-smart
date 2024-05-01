@@ -112,6 +112,11 @@ const routes = [
                 name: 'KWAgraph',
                 component: () => import('../components/evaluation/KWAgraph.vue')
             },
+            {
+                path: 'evasys/courseinfo/formative/3Dgraph', // 形成性评价模型-知识能力图谱
+                name: '3Dgraph',
+                component: () => import('../components/evaluation/3Dgraph.vue')
+            },
         ]
     },
     {

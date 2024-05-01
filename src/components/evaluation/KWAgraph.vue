@@ -8,7 +8,6 @@
 </template>
 
 <script lang="ts" setup>
-import G6 from '@antv/g6';
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
 import { onMounted, ref } from 'vue';
 import request from '../../utils/request';
@@ -125,7 +124,7 @@ const getNodesCombosProp = (data, parent = null) => {
 			item.kwas.forEach((node) => {
 				// console.log(node)
 				nodes.value.push({
-					id: 'n' + String(nodesId++),	// id前面拼不同的字符会导致布局改变，我也不知道为什么，拼个1还算能看的
+					id: 'n' + String(nodesId++),	// id前面拼不同的字符会导致布局改变，我也不知道为什么
 					unitid: node.unitid,
 					kwaid: node.kwaid,
 					label: fittingString(node.name, 80, 12),
@@ -199,9 +198,9 @@ onMounted(() => {
 				})
 			},
 			// 需要加上父级容器的 padding-left 16 与自身偏移量 10
-			offsetX: -285,
+			offsetX: -290,
 			// 需要加上父级容器的 padding-top 24 、画布兄弟元素高度、与自身偏移量 10
-			offsetY: -60,
+			offsetY: -50,
 			// 在哪些类型的元素上响应
 			itemTypes: ['node'],
 		});
@@ -240,7 +239,7 @@ onMounted(() => {
 			height,
 			animate: true,
 			minZoom: 0.2,
-			maxZoom: 1.3,
+			// maxZoom: 1.3,
 			fitView: true,	// 自适应画布
 			fitViewPadding: 60,		// 自适应画布后内四周的内边距
 			linkCenter: true,	// 让箭头居中
@@ -260,7 +259,7 @@ onMounted(() => {
 				labelCfg: {
 					style: {
 						fill: '#000000',
-						fontSize: 8
+						fontSize: 12
 					},
 					position: 'bottom',
 				},
@@ -296,8 +295,8 @@ onMounted(() => {
 			},
 			defaultCombo: {
 				type: "rect",
-				padding: 30,
-				size: [90, 90],
+				padding: 40,
+				size: [60, 60],
 				labelCfg: {
 					style: {
 						fontSize: 20,
