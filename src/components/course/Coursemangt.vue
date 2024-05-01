@@ -5,91 +5,121 @@
           <el-button type="primary" style="margin-left: 0.8vw;" @click="exportCourseList">导出课程列表</el-button>
             <el-button type="primary" style="margin-left: 0.8vw;" @click="addTerm">新增课程</el-button>
             <el-button type="danger" style="margin-left: 0.8vw;" @click="deleteTerm">删除课程</el-button>
-            <el-button type="primary" style="margin-left: 0.8vw;" @click="addTerm">复制历史课程</el-button>
+          <el-button type="primary" style="margin-left: 0.8vw;" @click="CopyTerm">复制历史课程</el-button>
         </el-header>
         <div style="max-height: 100%; height: 100%; overflow:auto;">
+          <AddCourseDialog v-show="AdddialogVisible" ref="AddDialogShow" @formSubmitted="getcourseList"/>
+          <EditCourseDialog v-show="EditdialogVisible" ref="EditDialogShow" @formSubmitted="getcourseList"/>
+          <CopyCourseDialog v-show="CopydialogVisible" ref="CopyDialogShow" @formSubmitted="getcourseList"/>
+
           <el-table :data="courseList" style="table-layout:auto; width: 100%; height: 100%;"
                     @selection-change="handleSelectionChange" stripe>
                 <el-table-column type="selection" width="30"></el-table-column>
                 <el-table-column width="49">
                     <template v-slot="row">{{ row.$index + 1 }}</template>
                 </el-table-column>
-                <el-table-column prop="termname" label="学期" min-width="130">
-                    <!-- <template #default="{ row }">
-                        <el-input v-if="row.editingTermName" style="width:100%; height: 25px;" v-model="row.termname"
-                            @blur="handleBlur(row, 'editingTermName')"></el-input>
-                        <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingTermName')">
-                            {{row.termname }}
-                        </div>
-                    </template> -->
-                </el-table-column>
-            <el-table-column prop="courseChineseName" label="课程名称(中文)" min-width="180">
+            <!--            <el-table-column label="学期" min-width="130">-->
+            <!--              {{ currentterm }}-->
+            <!--            </el-table-column>-->
+            <el-table-column prop="courseChineseName" label="课程名称(中文)" min-width="120">
+              <template #default="{ row }">
+                <div class="dynamic-font-size" style="width: 100%; height: 25px;">
+                  {{ row.courseChineseName }}
+                </div>
+              </template>
+            </el-table-column>
+
+            <el-table-column prop="courseEnglishName" label="课程名称(英文)" min-width="120">
                     <template #default="{ row }">
-                      <el-input v-if="row.editingcourseChineseName" style="width:100%; height: 25px;"
-                                v-model="row.courseChineseName"
-                                @blur="handleBlur(row, 'editingcourseChineseName')"></el-input>
-                      <div v-else style="width: 100%; height: 25px;"
-                           @click="handleClick(row, 'editingcourseChineseName')">
-                        {{ row.courseChineseName }}
-                        </div>
-                    </template>
-                </el-table-column>
-            <el-table-column prop="courseEnglishName" label="课程名称(英文)" min-width="260">
-                    <template #default="{ row }">
-                      <el-input v-if="row.editingcourseEnglishName" style="width: 100%; height: 25px;"
-                                v-model="row.courseEnglishName"
-                                @blur="handleBlur(row, 'editingcourseEnglishName')"></el-input>
-                      <div v-else style="width: 100%; height: 25px;"
-                           @click="handleClick(row, 'editingcourseEnglishName')">
+                      <div style="width: 100%; height: 25px;" class="dynamic-font-size">
                         {{ row.courseEnglishName }}
                         </div>
                     </template>
                 </el-table-column>
-            <el-table-column prop="courseCode" label="课程代码" min-width="90">
+            <el-table-column prop="courseCode" label="课程代码" min-width="70">
                     <template #default="{ row }">
-                      <el-input v-if="row.editingcourseCode" style="width: 100%; height: 25px;" v-model="row.courseCode"
-                                @blur="handleBlur(row, 'editingcourseCode')"></el-input>
-                      <div v-else style="width: 100%; height: 25px;" @click="handleClick(row, 'editingcourseCode')">
+                      <div style="width: 100%; height: 25px;" class="dynamic-font-size">
                         {{ row.courseCode }}
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="major" label="所属专业" min-width="113">
-                    <template #default="{ row }">
-                        <div style="width: 100%; height: 25px;" @click="handleClick(row, 'editingMajor')">
-                            {{row.major }}
-                          <el-icon color="dodgerblue" @click="">
-                            <Edit/>
-                          </el-icon>
-                        </div>
+            <el-table-column prop="professionName" label="所属专业" min-width="90">
+              <template #default="{ row }">
+                <div style="width: 100%; height: 25px;" class="dynamic-font-size">
+                  {{ row.professionName }}
+
+                </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="courseManager" label="课程负责人" min-width="150">
-                  <el-icon color="dodgerblue" @click="">
-                    <Edit/>
-                  </el-icon>
-                </el-table-column>
-            </el-table>
+            <el-table-column label="专业负责人" min-width="100">
+              <template #default="{ row }">
+                <div style="display: flex; align-items: center;">
+                  <div style="flex-grow: 1; display: flex; flex-wrap: wrap;">
+                    <!-- 只在这个div上使用v-for，移除内层的v-for -->
+                    <div v-for="(user, index) in row.responsiblePersonList" :key="user.id" class="user-bubbles">
+                      <!-- 使用v-if来确保只显示前四个负责人 -->
+                      <template v-if="index < 4">
+            <span class="user-bubble">
+              {{ user.username }}
+            </span>
+                      </template>
+                      <!-- 当负责人数量超过4时，显示额外的数量 -->
+                      <span v-if="index === 3 && row.responsiblePersonList.length > 4" class="more-users">
+            +{{ row.responsiblePersonList.length - 4 }}
+          </span>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="" label="编辑" min-width="50">
+              <template #default="{ row }">
+                <el-icon class="edit-icon" @click="editTerm(row)">
+                  <Edit/>
+                </el-icon>
+              </template>
+            </el-table-column>
+
+
+          </el-table>
         </div>
     </div>
 </template>
 
 <script setup>
 import { Edit } from '@element-plus/icons-vue';
-import { onMounted, ref } from 'vue';
+import {ref, onMounted, onUnmounted, nextTick, watch} from 'vue';
 import request from "../../utils/request.js";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {exportTableToCSV} from "../../utils/exportTableToCSV.js";
+import AddCourseDialog from "../course/subcomponents/AddCourseDialog.vue"
+import EditCourseDialog from "../course/subcomponents/EditCourseDialog.vue"
+import CopyCourseDialog from "../course/subcomponents/CopyCourseDialog.vue"
 
-const courseList = ref([])
+const courseList = ref([]);
+const selectedCourseId = ref([]);
 const selectedRows = ref([]);
+const currentterm = ref('');
+
+const AdddialogVisible = ref(false)
+const AddDialogShow = ref(null)
+const EditdialogVisible = ref(false)
+const EditDialogShow = ref(null)
+
+const CopydialogVisible = ref(false)
+const CopyDialogShow = ref(null)
+
+const professioninfo = ref({
+  professionName: null,
+  professionId: null,
+})
 
 const columns = ref([
   {prop: '', label: '学期'},
   {prop: 'courseChineseName', label: '课程名称(中文)'},
   {prop: 'courseEnglishName', label: '课程名称(英文)'},
   {prop: 'courseCode', label: '课程代码'},
-  {prop: '', label: '所属专业'},
+  {prop: 'professionName', label: '所属专业'},
   {prop: '', label: '课程负责人'}
 ]);
 
@@ -99,8 +129,11 @@ const handleSelectionChange = (selection) => {
 };
 
 
-const getcourseList = () => {
-  request.course.get('/coursemangt/course')
+const contentRef = ref(null);
+
+
+const getcourseList = async () => {
+  await request.course.get('/coursemangt/course')
       .then(res => {
         // 登录成功
         if (res.code === 200) {
@@ -115,13 +148,16 @@ const getcourseList = () => {
             });
           }
       );
+
+  const storedUserInfo = sessionStorage.getItem('users');
+  const userInfo = JSON.parse(storedUserInfo);
+  currentterm.value = userInfo.currentterm;
+  console.log(currentterm.value)
 };
 const initialize = () => {
-  courseList.value.forEach((item) => {
-    item.editingcourseChineseName = false;
-    item.editingcourseEnglishName = false;
-    item.editingcourseCode = false;
-  });
+  professioninfo.value.professionId = courseList.value[0].professionId
+  professioninfo.value.professionName = courseList.value[0].professionName
+  console.log(professioninfo.value)
 }
 
 
@@ -163,11 +199,59 @@ onMounted(() => {
 
 
 const addTerm = () => {
-  const storedUserInfo = sessionStorage.getItem('users');
-  const userInfo = JSON.parse(storedUserInfo);
-  console.log(userInfo.currentterm)
+  AdddialogVisible.value = true;  // 打开弹窗
+  AddDialogShow.value.init(professioninfo);
+  console.log(123)
 }
 
+const editTerm = (row) => {
+
+  EditdialogVisible.value = true;  // 打开弹窗
+  EditDialogShow.value.init(row);
+  // console.log(row)
+}
+
+const CopyTerm = () => {
+  CopydialogVisible.value = true;  // 打开弹窗
+  CopyDialogShow.value.init('x');
+}
+
+const deleteTerm = () => {
+  if (selectedRows.value.length === 0) {
+    ElMessage({
+      type: 'info',
+      message: '未选中班级，无法删除',
+    })
+  } else {
+    selectedCourseId.value = selectedRows.value.map(row => row.id)
+
+    ElMessageBox.confirm(
+        `是否要删除勾选的 ${selectedRows.value.length} 条记录？`,
+        '提示',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'info',
+        }
+    )
+        .then(() => {
+          console.log(selectedRows.value)
+
+          //加入删除的逻辑
+
+        })
+        .catch(() => {
+          ElMessage({
+            type: 'info',
+            message: '取消删除',
+          })
+        })
+
+
+    console.log(selectedCourseId.value)
+  }
+
+}
 const handleClick = (row, field) => {
     row[field] = true
 };
@@ -221,5 +305,13 @@ const handleBlur = (row, field) => {
 .edit-icon:hover {
   color: #409EFF; /* 悬浮时的颜色 */
 }
+
+.dynamic-font-size {
+  font-size: calc(3px + 0.8vw); /* 根据视口宽度动态计算字体大小 */
+  overflow: hidden; /* 隐藏溢出的文本 */
+  text-overflow: ellipsis; /* 用省略号表示被裁剪的文本 */
+  white-space: nowrap; /* 不允许文本换行 */
+}
+
 
 </style>

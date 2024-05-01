@@ -318,8 +318,6 @@ const showHeadofDialog = (row) => {
 
   dialogVisible.value = true;  // 打开弹窗
   console.log(row)
-  // DialogShow.value.init(row.stUsersList);
-  // console.log(row.responsiblePersonList)
   DialogShow.value.init(row);
 
 }
