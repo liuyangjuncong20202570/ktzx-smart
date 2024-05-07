@@ -15,6 +15,7 @@
     "element-plus": "^2.5.1",
     "lodash": "^4.17.21",
     "pinia": "^2.1.7",
+    "sortablejs": "^1.15.2",
     "vue": "^3.3.11",
     "vue-resize-text": "^0.1.1",
     "vue-router": "^4.2.5",
