@@ -9,9 +9,9 @@
 
         <el-main style="padding: 0;">
             <div style="height: 25px; display: flex; justify-content: space-between; flex: auto; text-align: center;
-                background-color: whitesmoke; min-width: 1290px; color: gray">
-                <div style="min-width: 390px;">名称</div>
-                <div style="min-width: 900px; width: 59vw;">
+                background-color: whitesmoke; min-width: 1190px; color: gray">
+                <div style="min-width: 340px;">名称</div>
+                <div style="min-width: 850px; width: 59vw;">
                     <div style="display: flex; flex: auto; justify-content: space-between;">
                         <div style="width: 150px; border-right: 1px solid #bbbbbb; border-left: 1px solid #bbbbbb;
                             color: gray">系数</div>
@@ -20,7 +20,7 @@
                 </div>
             </div>
 
-            <div class="tree-container" style="height: calc(100% - 25px); overflow: auto; min-width: 1290px;">
+            <div class="tree-container" style="height: calc(100% - 25px); overflow: auto; min-width: 1190px;">
                 <el-tree :data="treeData" draggable node-key="id" :props="defaultProps" :expand-on-click-node="false"
                     ref="nodeExpand" :default-expand-all="expandAll" :default-expanded-keys="expandedKeys"
                     @node-drag-start="" @node-drag-end="" @node-contextmenu="clickNode" @node-expand="openNode"
@@ -53,7 +53,7 @@
                                 </template>
                             </el-popover>
 
-                            <div style="min-width: 900px; width: 59vw;">
+                            <div style="min-width: 850px; width: 59vw;">
                                 <div style="display: flex; flex: auto; justify-content: space-between;">
                                     <div style="width: 150px; text-align: center; height: 100%; overflow: hidden;"
                                         @dblclick="handleClick(node.data, 'editingDatavalue')">

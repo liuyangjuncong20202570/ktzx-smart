@@ -88,32 +88,32 @@ const routes = [
                 component: () => import('../components/course/CourseManagerHomePage.vue')
             },
             {
-                path: 'evasys/courseinfo/formative/keyword',    // 形成性评价模型-关键字
+                path: 'evasys/formative/keyword',    // 形成性评价模型-关键字
                 name: 'Keyword',
                 component: () => import('../components/evaluation/Keyword.vue')
             },
             {
-                path: 'evasys/courseinfo/formative/ability',    // 形成性评价模型-能力
+                path: 'evasys/formative/ability',    // 形成性评价模型-能力
                 name: 'Ability',
                 component: () => import('../components/evaluation/Ability.vue')
             },
             {
-                path: 'evasys/courseinfo/formative/teachingobjectives', // 形成性评价模型-基本教学目标
+                path: 'evasys/formative/teachingobjectives', // 形成性评价模型-基本教学目标
                 name: 'TeachingObjectives',
                 component: () => import('../components/evaluation/TeachingObjectives.vue')
             },
             {
-                path: 'evasys/courseinfo/formative/knowledgeunit', // 形成性评价模型-知识单元
+                path: 'evasys/formative/knowledgeunit', // 形成性评价模型-知识单元
                 name: 'KnowledgeUnit',
                 component: () => import('../components/evaluation/KnowledgeUnit.vue')
             },
             {
-                path: 'evasys/courseinfo/formative/KWAgraph', // 形成性评价模型-知识能力图谱
+                path: 'evasys/formative/KWAgraph', // 形成性评价模型-知识能力图谱
                 name: 'KWAgraph',
                 component: () => import('../components/evaluation/KWAgraph.vue')
             },
             {
-                path: 'evasys/courseinfo/formative/3Dgraph', // 形成性评价模型-知识能力图谱
+                path: 'evasys/formative/3Dgraph', // 形成性评价模型-知识能力图谱
                 name: '3Dgraph',
                 component: () => import('../components/evaluation/3Dgraph.vue')
             },

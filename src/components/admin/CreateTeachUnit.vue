@@ -10,9 +10,9 @@
 
 		<el-main style="padding: 0;">
 			<div style="height: 25px; display: flex; justify-content: space-between; flex: auto; color: gray;
-				background-color: whitesmoke; min-width: 1336px;">
-				<div style="min-width: 435px;">名称</div>
-				<div style="min-width: 900px; width: 58vw;">
+				background-color: whitesmoke; min-width: 1236px;">
+				<div style="min-width: 385px;">名称</div>
+				<div style="min-width: 850px; width: 58vw;">
 					<div style="display: flex; flex: auto; justify-content: space-between;">
 						<div style="width: 200px; border-right: 1px solid #bbbbbb; border-left: 1px solid #bbbbbb;">层级码</div>
 						<div style="min-width: 700px; width: 100%;">备注</div>
@@ -20,7 +20,7 @@
 				</div>
 			</div>
 
-			<div class="tree-container" style="height: calc(100% - 25px); overflow: auto; min-width: 1336px;">
+			<div class="tree-container" style="height: calc(100% - 25px); overflow: auto; min-width: 1236px;">
 				<el-tree :data="treeData" draggable :props="defaultProps" node-key="id" :expand-on-click-node="true"
 					ref="nodeExpand" @node-click="handleNodeClick" :default-expanded-keys="expandedKeys"
 					:default-expand-all="expandAll" @node-drag-start="handleDragStart" @node-drag-end="handleDragEnd"
@@ -54,7 +54,7 @@
 								</template>
 							</el-popover>
 
-							<div style="min-width: 900px; width: 58vw;">
+							<div style="min-width: 850px; width: 58vw;">
 								<div style="display: flex; flex: auto; justify-content: space-between;">
 									<div style="width: 200px;">
 										{{ node.data.levelcode }}

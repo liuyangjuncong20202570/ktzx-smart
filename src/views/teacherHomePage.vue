@@ -1,11 +1,11 @@
 <template>
   <div style="height: 100vh;">
     <el-container class="layout-container-demo" style="height: 100%;">
-      <el-header style="position: relative; text-align:right; background-color: #0064B1; font-size: 15px; height: 8%">
+      <el-header style="position: relative; text-align:right; background-color: #0064B1; font-size: 15px; height: 8vh">
         <!--右侧按钮-->
         <div style="height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 0">
           <div class="left-div" style="flex-grow: 1; display: flex; align-items: center;  ">
-            <img src="../assets/images/logo.png" style="height: 5.5vh;"/>
+            <img src="../assets/images/logo.png" style="height: 5.5vh;" />
             <el-text style="font-size: calc(1vw + 6px); color: white; margin-left: 10px;">自动化专业智能教学平台</el-text>
           </div>
 
@@ -15,7 +15,7 @@
 
           <div class="right-div" style="flex-grow: 1; display: flex; align-items: center; justify-content: flex-end;">
             <el-dropdown>
-              <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"/>
+              <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item>查看详情</el-dropdown-item>
@@ -23,7 +23,8 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <el-text style="font-size: calc(1vw + 3px); color: white; margin-left: 10px;">{{loginInfo.username}}</el-text>
+            <el-text style="font-size: calc(1vw + 3px); color: white; margin-left: 10px;">{{ loginInfo.username
+              }}</el-text>
           </div>
         </div>
 
@@ -31,48 +32,51 @@
       </el-header>
 
       <el-container>
-        <el-aside width="200px">
-
-          <div
-              style="width: 100%; height: auto; padding: 10px 0; background-color: #c8c9cc; display: flex; align-items: center;">
+        <el-aside width="200px" style="height: 100%;">
+          <div style="width: 100%; height: 20vh; padding: 10px 0; background-color: #c8c9cc; display: flex; align-items: center;
+                    box-sizing: border-box;">
             <!--头像-->
             <div style="width: 76px; height: 105px; margin-left: 10px; overflow: hidden;object-fit: cover;">
               <el-upload style="width: 100%; height: 100%; display: flex;" class="avatar-uploader"
-                         action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" :show-file-list="false"
-                         :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+                action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" :show-file-list="false"
+                :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
                 <!-- action属性指定了文件上传的目标服务器地址 -->
                 <!-- show-file-list属性设置为false，表示不显示已选择的文件列表 -->
                 <!-- on-success属性是一个事件回调函数，当文件上传成功时，该函数将被调用 -->
                 <!-- before-upload属性是一个事件回调函数，当文件准备上传时，该函数将被调用 -->
                 <!-- 如果imageUrl有值，则显示这个图片，否则不显示 -->
-                <img v-if="imageUrl" :src="imageUrl" class="avatar" style="width: 100%; height: 120%; object-fit: cover;"/>
+                <img v-if="imageUrl" :src="imageUrl" class="avatar"
+                  style="width: 100%; height: 120%; object-fit: cover;" />
                 <!-- 如果imageUrl没有值，则显示提示文本-->
                 <el-text v-else size="small" style="width:72px; color:white">点击上传头像</el-text>
               </el-upload>
             </div>
             <div style="width: 88px; margin: 0 15px 0 15px">
               <el-row :gutter="0">
-                <p style="font-size:14px;margin-left:1px;line-height:0.3;">{{loginInfo.username}}</p>
+                <p style="font-size: 14px; line-height: 15px;">{{ loginInfo.username }}</p>
               </el-row>
               <el-row :gutter="0">
-                <p style="font-size:14px;margin-left: 2px;color:cornflowerblue;line-height:0.2;">{{loginInfo.rolename}}</p>
+                <p style="font-size: 14px; margin-left: 2px; color: cornflowerblue; line-height: 0.2;">{{
+                  loginInfo.rolename
+                  }}
+                </p>
               </el-row>
-              <el-row :gutter="0" style="height:20px;margin-top: 20px">
+              <el-row :gutter="0" style="height: 20px; margin-top: 20px">
                 <el-col :span="5">
-                  <el-icon style="float:left;margin-top:2px;margin-left:1px;color:blue">
-                    <Platform/>
+                  <el-icon style="float: left; margin-top: 2px; margin-left: 1px; color: blue">
+                    <Platform />
                   </el-icon>
                 </el-col>
                 <el-col :span="7" style="">
-                  <p style="font-size:10px;line-height:0">在线</p>
+                  <p style="font-size: 10px; line-height: 0">在线</p>
                 </el-col>
                 <el-col :span="5">
-                  <el-icon style="float:left;margin-top:2px;margin-left:3px">
-                    <Right/>
+                  <el-icon style="float: left; margin-top: 2px; margin-left: 3px">
+                    <Right />
                   </el-icon>
                 </el-col>
                 <el-col :span="7" style="">
-                  <p style="font-size:10px;line-height:0">注销</p>
+                  <p style="font-size: 10px; line-height: 0">注销</p>
                 </el-col>
               </el-row>
             </div>
@@ -80,24 +84,28 @@
           <!-- 使用 el-scrollbar 包裹 el-menu，设置高度为 70% -->
 
           <!--页面左侧导航栏-->
-          <el-scrollbar style="height: 70%">
-            <el-menu :default-active="defaultActive">
-              <template v-for="menu in filteredMenus">
-                <el-sub-menu v-if="hasChildren(menu)" :index="menu.id" :key="menu.id">
-                  <template #name>
+          <div style="height: 72vh;">
+            <el-scrollbar>
+              <el-menu :default-active="defaultActive">
+                <template v-for="menu in filteredMenus">
+                  <el-sub-menu v-if="hasChildren(menu)" :index="menu.id" :key="menu.id"
+                    style="border-top: 1px solid #efefef;">
+                    <template #title>
+                      <span>{{ menu.name }}</span>
+                    </template>
+                    <el-menu-item v-for="child in getChildrenMenus(menu)" :index="child.url" :key="child.id"
+                      style="border-top: 1px solid #efefef;" @click="navigateTo(child.url)">
+                      <span>{{ child.name }}</span>
+                    </el-menu-item>
+                  </el-sub-menu>
+                  <el-menu-item v-else :index="menu.url" :key="menu.id" @click="navigateTo(menu.url)"
+                    style="border-top: 1px solid #efefef;">
                     <span>{{ menu.name }}</span>
-                  </template>
-                  <el-menu-item v-for="child in getChildrenMenus(menu.id)" :index="child.url" :key="child.id"
-                                @click="navigateTo(child.url)">
-                    <span>{{ child.name }}</span>
                   </el-menu-item>
-                </el-sub-menu>
-                <el-menu-item v-else :index="menu.url" :key="menu.id" @click="navigateTo(menu.url)">
-                  <span>{{ menu.name }}</span>
-                </el-menu-item>
-              </template>
-            </el-menu>
-          </el-scrollbar>
+                </template>
+              </el-menu>
+            </el-scrollbar>
+          </div>
         </el-aside>
 
         <el-main>
@@ -111,13 +119,13 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, reactive,computed, onMounted,toRaw } from 'vue'
-import {useRoute, useRouter} from 'vue-router';
+import { ref, reactive, computed, onMounted, toRaw } from 'vue'
+import { useRoute, useRouter } from 'vue-router';
 import request from "../utils/request.js";
-import {ElMessage,} from 'element-plus'
-import {Menu as IconMenu, Message, Setting, Plus, Platform, Right} from '@element-plus/icons-vue'
-import type {UploadProps} from 'element-plus'
-import {useProfileStore} from "../stores/profileStore.js";
+import { ElMessage, } from 'element-plus'
+import { Menu as IconMenu, Message, Setting, Plus, Platform, Right } from '@element-plus/icons-vue'
+import type { UploadProps } from 'element-plus'
+import { useProfileStore } from "../stores/profileStore.js";
 
 
 //获取Stroe
@@ -132,8 +140,8 @@ const imageUrl = ref('https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55
 
 // 定义处理上传成功的函数
 const handleAvatarSuccess: UploadProps['onSuccess'] = (
-    response, // 上传成功后的响应数据
-    uploadFile // 上传的文件对象
+  response, // 上传成功后的响应数据
+  uploadFile // 上传的文件对象
 ) => {
   // 使用 FileReader API 创建一个临时的 URL，以便可以在网页上查看图片
   imageUrl.value = URL.createObjectURL(uploadFile.raw!)
@@ -165,7 +173,7 @@ function clearLoginInfo() {
 //登出的方法
 const handleLogout = () => {
   clearLoginInfo();
-  router.push({name: 'Login'}); // 假设您的登录路由的名字是 'Login'
+  router.push({ name: 'Login' }); // 假设您的登录路由的名字是 'Login'
 };
 
 // 默认显示菜单
@@ -174,8 +182,8 @@ const handleLogout = () => {
 const menus = ref([
 ]);
 
-const loginInfo = reactive ({
-  username:profileStore.profilename,
+const loginInfo = reactive({
+  username: profileStore.profilename,
   rolename: profileStore.profilerolename,
   catelog: profileStore.profilecatelog,
   currentterm: profileStore.currentterm
@@ -187,21 +195,24 @@ const homeurl = computed(() => profileStore.profilehomeurl);
 const excludedPids = ['0', '102'];
 
 //过滤器
-  const filteredMenus = computed(() => {
-    return menus.value
-        .filter(menu => !excludedPids.includes(menu.pid))
-        //0311加入菜单按顺序排列
-        .sort((a,b) =>a.orderno - b.orderno);
-  });
+const filteredMenus = computed(() => {
+  return menus.value
+    .filter(menu => !excludedPids.includes(menu.pid))
+    //0311加入菜单按顺序排列
+    .sort((a, b) => a.orderno - b.orderno);
+});
 
 //过滤节点是否有孩子节点
-  const hasChildren = (menu) => {
-    return menus.value.some(child => child.pid === menu.id);
-  };
+const hasChildren = (menu) => {
+  // console.log(menu);
+  if (menu.children && menu.children.length > 0) return true;
+  return false;
+  // return menus.value.some(child => child.pid === menu.id);
+};
 //获取节点的孩子节点
-  const getChildrenMenus = (parentId) => {
-    return menus.value.filter(menu => menu.pid === parentId);
-  };
+const getChildrenMenus = (menu) => {
+  return menu.children;
+};
 //路由导航
 const navigateTo = (url) => {
   //前面拼一个/表示绝对路径
@@ -234,23 +245,23 @@ onMounted(() => {
   //获取完pinia中的数据后重新重定向到父页面
   // router.push(homeurl.value);
 
-// request.admin.post(`${homeurl}`,loginInfo)
+  // request.admin.post(`${homeurl}`,loginInfo)
   // console.log(1111)
-//获取菜单栏的数据
+  //获取菜单栏的数据
   request.admin.post(`/homes/teacherhome`)
-      .then(res => {
-        console.log(res)
-        // 登录成功
-        if (res.code === 200 && res.data.length > 0)  {
-          menus.value = res.data;
-        }
-      }).catch(error => {
-    // 获取失败
-    ElMessage({
-      type: 'error',
-      message: '获取导航失败'
+    .then(res => {
+      console.log(res)
+      // 登录成功
+      if (res.code === 200 && res.data.length > 0) {
+        menus.value = res.data;
+      }
+    }).catch(error => {
+      // 获取失败
+      ElMessage({
+        type: 'error',
+        message: '获取导航失败'
+      });
     });
-  });
 });
 
 
