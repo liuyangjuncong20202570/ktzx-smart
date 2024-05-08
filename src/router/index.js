@@ -1,7 +1,7 @@
 import {createRouter, createWebHistory,onBeforeRouteLeave } from 'vue-router';
 
 const rolehome =['teacherhomne','adminhome','superadminhome','secretariatehome','academicaffairshome','deanhome',
-    'departmenthome', 'majormanagerhome', 'coursemanagerhome', 'professionhome'];
+    'departmenthome', 'majormanagerhome', 'coursemanagerhome', 'professionhome', 'assistanthome', 'courseteacherhome'];
 // superadminhome 超级管理员首页
 // secretariatehome 教学秘书首页
 // academicaffairshome 教务处首页

@@ -1,11 +1,12 @@
 import axios from 'axios'
 
 const request = {
-    admin: createAPI('http://localhost:8080/api'),
-    course: createAPI('http://localhost:8082/api'),
-    evaluation: createAPI('http://localhost:8083'),
+    admin: createAPI('http://127.0.0.1:8080/api'),
+    course: createAPI('http://127.0.0.1:8082/api'),
+    evaluation: createAPI('http://127.0.0.1:8083/api'),
 }
 
+// 60.205.178.180
 function createAPI(url) {   // 构建不同端口的异步请求数据
     const axiosData = axios.create({
         baseURL: url,

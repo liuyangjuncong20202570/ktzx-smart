@@ -66,7 +66,6 @@ const newform = reactive({
   term: '',
   courseChineseName: '',
   courseEnglishName: '',
-  classname: '',
   courseCode: '',
   professionName: '',
   professionId: ''
@@ -79,7 +78,7 @@ const rules = reactive({
   courseCode: [{required: true, message: '请输入课程代码', trigger: 'blur'}],
 });
 
-const teacherid = ref('');
+const teacherid = ref([]);
 const teacherlist = ref([]);
 const alreadyteacheridlist = ref([])
 
@@ -99,10 +98,10 @@ const fetchData = () => {
       .then(res => {
         if (res.code === 200) {
           // 假设这里你需要的是过滤后的数据作为级联选择器的选项
-          console.log(res.data)
+          // console.log(res.data)
           //不过滤指定学院
           teacherlist.value = formatDataForCascader(res.data, alreadyteacheridlist.value);
-          console.log(teacherlist.value)
+          // console.log(teacherlist.value)
         }
       }).catch(error => {
     ElMessage({
@@ -176,15 +175,15 @@ const formatDataForCascader = (nodes, selectedTeacherIds) => {
 // };
 
 const handleCascaderChange = (value, selectedData) => {
-  console.log("selectedData" + selectedData)
+  // console.log("selectedData" + selectedData)
 
   // 检查当前选中的IDs与之前的IDs进行比较
   const currentSelectedIds = value; // 当前事件的选中的IDs
   const newlySelectedIds = currentSelectedIds.filter(id => !alreadyteacheridlist.value.includes(id));
   const unselectedIds = alreadyteacheridlist.value.filter(id => !currentSelectedIds.includes(id));
 
-  console.log("Newly Selected IDs:", newlySelectedIds); // 新增的IDs
-  console.log("Unselected IDs:", unselectedIds); // 取消的IDs
+  // console.log("Newly Selected IDs:", newlySelectedIds); // 新增的IDs
+  // console.log("Unselected IDs:", unselectedIds); // 取消的IDs
 
 
   if (selectedData && selectedData.length > 0) {
@@ -206,7 +205,6 @@ const closeDialog = () => {
 };
 
 const submitForm = () => {
-
   ElMessageBox.confirm(
       '是否确认新增',
       '提示',
@@ -217,7 +215,51 @@ const submitForm = () => {
       }
   )
       .then(() => {
-        console.log('确认新增')
+        console.log(newform)
+        console.log(teacherid)
+        const newCourseform = ref({
+          schooltermId: "1653708435-00f38ff9-f009-40ea-9fc3-9e9a47f6f73c",//user里面存的学期 ,暂时写死了
+          courseChineseName: newform.courseChineseName,
+          courseEnglishName: newform.courseEnglishName,
+          courseCode: newform.courseCode,
+          professionId: newform.professionId
+        })
+
+        request.course.post('/coursemangt/course/course', newCourseform.value)
+            .then(res => {
+              if (res.code === 200) {
+                // 假设这里你需要的是过滤后的数据作为级联选择器的选项
+                ElMessage({
+                  type: 'success',
+                  message: '新增课程成功'
+                });
+              }
+            }).catch(error => {
+          ElMessage({
+            type: 'error',
+            message: '新增课程失败，请重新尝试'
+          });
+        });
+
+
+        // request.course.post('/coursemangt/course/course', newCourseform.value)
+        //     .then(res => {
+        //       if (res.code === 200) {
+        //         // 假设这里你需要的是过滤后的数据作为级联选择器的选项
+        //         ElMessage({
+        //           type: 'success',
+        //           message: '新增课程成功'
+        //         });
+        //       }
+        //     }).catch(error => {
+        //   ElMessage({
+        //     type: 'error',
+        //     message: '新增课程失败，请重新尝试'
+        //   });
+        // });
+
+
+
         emit('formSubmitted');
         closeDialog();
       })
