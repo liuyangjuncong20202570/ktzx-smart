@@ -2,7 +2,7 @@
   <div style="padding:0;margin:0;">
     <el-dialog
         :destroy-on-close="true" :show-close="false" :close-on-click-modal="false"
-        style="width:50vw;" v-model="AdddialogVisible" @close="closeDialog">
+        style="width:50vw;" v-model="EditdialogVisible" @close="closeDialog">
       <el-container style="margin-left:0">
         <!-- 对话框头部区域 -->
         <el-header style="height: auto; padding: 2px 0px; width:100%; display: flex; align-items: center;">
@@ -60,7 +60,7 @@ import request from "../../../utils/request.js";
 import Coursemangt from "../Coursemangt.vue"
 import {exportTableToCSV} from "../../../utils/exportTableToCSV.js";
 
-const AdddialogVisible = ref(false);
+const EditdialogVisible = ref(false);
 
 
 function createForm() {
@@ -94,13 +94,11 @@ const oldform = createForm();
 
 function init(row) {
   fetchData()
-  AdddialogVisible.value = true;
+  EditdialogVisible.value = true;
   const storedUserInfo = sessionStorage.getItem('users');
   const userInfo = JSON.parse(storedUserInfo);
   newform.term = userInfo.currentterm;
   oldform.term = userInfo.currentterm;
-  // newform.professionName = row.value.professionName;
-  // newform.professionId = row.value.professionId;
 
   Object.keys(row).forEach(key => {
     if (newform.hasOwnProperty(key) && oldform.hasOwnProperty(key)) {
@@ -164,16 +162,6 @@ const formatDataForCascader = (nodes, selectedTeacherIds) => {
 
 
 const handleCascaderChange = (value, selectedData) => {
-  console.log("selectedData" + selectedData)
-
-  // 检查当前选中的IDs与之前的IDs进行比较
-  const currentSelectedIds = value; // 当前事件的选中的IDs
-  const newlySelectedIds = currentSelectedIds.filter(id => !alreadyteacheridlist.value.includes(id));
-  const unselectedIds = alreadyteacheridlist.value.filter(id => !currentSelectedIds.includes(id));
-
-  console.log("Newly Selected IDs:", newlySelectedIds); // 新增的IDs
-  console.log("Unselected IDs:", unselectedIds); // 取消的IDs
-
 
   if (selectedData && selectedData.length > 0) {
     const lastSelectedNode = selectedData[selectedData.length - 1];
@@ -188,9 +176,8 @@ const handleCascaderChange = (value, selectedData) => {
   }
 };
 
-
 const closeDialog = () => {
-  AdddialogVisible.value = false;
+  EditdialogVisible.value = false;
 };
 
 const submitForm = () => {
@@ -205,6 +192,8 @@ const submitForm = () => {
   )
       .then(() => {
         console.log('确认修改')
+
+
         emit('formSubmitted');
         closeDialog();
       })

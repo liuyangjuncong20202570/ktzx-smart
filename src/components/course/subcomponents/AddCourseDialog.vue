@@ -54,7 +54,7 @@
   </div>
 </template>
 <script setup>
-import {ref, reactive, defineExpose, nextTick, onMounted, getCurrentInstance} from 'vue';
+import {ref, reactive, defineExpose, nextTick, onMounted, getCurrentInstance, computed} from 'vue';
 
 import {ElMessage, ElMessageBox} from "element-plus";
 import request from "../../../utils/request.js";
@@ -142,49 +142,9 @@ const formatDataForCascader = (nodes, selectedTeacherIds) => {
   return nodes.map(node => formatNode(node)).filter(node => node !== null);
 };
 
-//
-// const addTeacher = () => {
-//   if (!teacherid.value) {
-//     // 如果 teacherid 为空或未定义，则显示错误消息
-//     ElMessage.error('教师ID未选择，请选择一个教师。');
-//     return; // 终止函数执行
-//   } else {
-//     const teacherform = ref({
-//       userid: teacherid.value,
-//       obsid: collegeobsid.value,
-//     })
-//     request.admin.post('/sysmangt/collegemangt/collageRP/create', teacherform.value)
-//         .then(res => {
-//           if (res.code === 200) {
-//             // 假设这里你需要的是过滤后的数据作为级联选择器的选项
-//             ElMessage({
-//               type: 'success',
-//               message: '新增负责人成功'
-//             });
-//           }
-//         }).catch(error => {
-//       ElMessage({
-//         type: 'error',
-//         message: '新增负责人失败，请重新尝试'
-//       });
-//     });
-//     teacherid.value = '';
-//     emit('formSubmitted');
-//     closeDialog();
-//   }
-// };
+
 
 const handleCascaderChange = (value, selectedData) => {
-  // console.log("selectedData" + selectedData)
-
-  // 检查当前选中的IDs与之前的IDs进行比较
-  const currentSelectedIds = value; // 当前事件的选中的IDs
-  const newlySelectedIds = currentSelectedIds.filter(id => !alreadyteacheridlist.value.includes(id));
-  const unselectedIds = alreadyteacheridlist.value.filter(id => !currentSelectedIds.includes(id));
-
-  // console.log("Newly Selected IDs:", newlySelectedIds); // 新增的IDs
-  // console.log("Unselected IDs:", unselectedIds); // 取消的IDs
-
 
   if (selectedData && selectedData.length > 0) {
     const lastSelectedNode = selectedData[selectedData.length - 1];
@@ -199,77 +159,84 @@ const handleCascaderChange = (value, selectedData) => {
   }
 };
 
-
 const closeDialog = () => {
   AdddialogVisible.value = false;
 };
 
-const submitForm = () => {
-  ElMessageBox.confirm(
-      '是否确认新增',
-      '提示',
-      {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消',
-        type: 'info',
-      }
-  )
-      .then(() => {
-        console.log(newform)
-        console.log(teacherid)
-        const newCourseform = ref({
-          schooltermId: "1653708435-00f38ff9-f009-40ea-9fc3-9e9a47f6f73c",//user里面存的学期 ,暂时写死了
-          courseChineseName: newform.courseChineseName,
-          courseEnglishName: newform.courseEnglishName,
-          courseCode: newform.courseCode,
-          professionId: newform.professionId
-        })
+const courseID = ref('');
 
-        request.course.post('/coursemangt/course/course', newCourseform.value)
-            .then(res => {
-              if (res.code === 200) {
-                // 假设这里你需要的是过滤后的数据作为级联选择器的选项
-                ElMessage({
-                  type: 'success',
-                  message: '新增课程成功'
-                });
-              }
-            }).catch(error => {
-          ElMessage({
-            type: 'error',
-            message: '新增课程失败，请重新尝试'
-          });
+const formattedData = computed(() => {
+  const result = []
+  Object.values(teacherid.value).forEach((id, index) => {
+    result.push({
+      userid: id, // 使用最后一个值作为userid
+      obsid: courseID.value
+      // obsid: courseID.value
+    })
+
+  })
+  return result
+})
+
+
+async function submitForm() {
+  try {
+    // 显示确认对话框
+    await ElMessageBox.confirm(
+        '是否确认新增',
+        '提示',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'info',
+        }
+    );
+
+    // 用户确认后执行以下代码
+    const newCourseform = ref({
+      schooltermId: "1653708435-00f38ff9-f009-40ea-9fc3-9e9a47f6f73c", //user里面存的学期 ,暂时写死了
+      courseChineseName: newform.courseChineseName,
+      courseEnglishName: newform.courseEnglishName,
+      courseCode: newform.courseCode,
+      professionId: newform.professionId
+    });
+    const courseRPlist = ref([])
+    // 接下来可以加入发送请求的代码
+    const courseResponse = await request.course.post('/coursemangt/course/create', newCourseform.value);
+    if (courseResponse.code === 200) {
+      // 处理响应
+      ElMessage({
+        type: 'success',
+        message: '新增课程成功'
+      });
+      courseID.value = courseResponse.data;
+      courseRPlist.value = formattedData.value;
+      const CourseRPResponse = await request.course.post('/coursemangt/course/courseRP/create', courseRPlist.value);
+
+      if (CourseRPResponse.code === 200) {
+        ElMessage({
+          type: 'success',
+          message: '新增负责人成功'
         });
-
-
-        // request.course.post('/coursemangt/course/course', newCourseform.value)
-        //     .then(res => {
-        //       if (res.code === 200) {
-        //         // 假设这里你需要的是过滤后的数据作为级联选择器的选项
-        //         ElMessage({
-        //           type: 'success',
-        //           message: '新增课程成功'
-        //         });
-        //       }
-        //     }).catch(error => {
-        //   ElMessage({
-        //     type: 'error',
-        //     message: '新增课程失败，请重新尝试'
-        //   });
-        // });
-
-
-
         emit('formSubmitted');
         closeDialog();
-      })
-      .catch(() => {
-        ElMessage({
-          type: 'info',
-          message: '取消',
-        })
-      })
+      } else {
+        throw new Error('新增负责人失败')
+        //此处应该把已经新增的课程删除？
+      }
 
+    } else {
+      throw new Error('新增课程失败');
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      // 如果用户取消，则不显示错误消息
+      ElMessage({
+        type: 'error',
+        message: error.message || '操作取消'
+      });
+    }
+  }
 }
 
 

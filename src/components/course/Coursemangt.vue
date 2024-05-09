@@ -3,9 +3,9 @@
         <el-header
             style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex;">
           <el-button type="primary" style="margin-left: 0.8vw;" @click="exportCourseList">导出课程列表</el-button>
-            <el-button type="primary" style="margin-left: 0.8vw;" @click="addTerm">新增课程</el-button>
-            <el-button type="danger" style="margin-left: 0.8vw;" @click="deleteTerm">删除课程</el-button>
-          <el-button type="primary" style="margin-left: 0.8vw;" @click="CopyTerm">复制历史课程</el-button>
+          <el-button type="primary" style="margin-left: 0.8vw;" @click="addCourse">新增课程</el-button>
+          <el-button type="danger" style="margin-left: 0.8vw;" @click="deleteCourse">删除课程</el-button>
+          <el-button type="primary" style="margin-left: 0.8vw;" @click="CopyCourse">复制历史课程</el-button>
         </el-header>
         <div style="max-height: 100%; height: 100%; overflow:auto;">
           <AddCourseDialog v-show="AdddialogVisible" ref="AddDialogShow" @formSubmitted="getcourseList"/>
@@ -139,13 +139,14 @@ const getcourseList = async () => {
         if (res.code === 200) {
           courseList.value = res.data;
           initialize();
+        } else {
+          ElMessage({
+            type: 'error',
+            message: '获取课程列表失败'
+          });
         }
       })
       .catch(() => {
-            ElMessage({
-              type: 'error',
-              message: '获取课程列表失败'
-            });
           }
       );
 
@@ -198,7 +199,7 @@ onMounted(() => {
 })
 
 
-const addTerm = () => {
+const addCourse = () => {
   AdddialogVisible.value = true;  // 打开弹窗
   AddDialogShow.value.init(professioninfo);
   console.log(123)
@@ -211,16 +212,16 @@ const editTerm = (row) => {
   // console.log(row)
 }
 
-const CopyTerm = () => {
+const CopyCourse = () => {
   CopydialogVisible.value = true;  // 打开弹窗
   CopyDialogShow.value.init('x');
 }
 
-const deleteTerm = () => {
+const deleteCourse = () => {
   if (selectedRows.value.length === 0) {
     ElMessage({
       type: 'info',
-      message: '未选中班级，无法删除',
+      message: '未选中课程，无法删除',
     })
   } else {
     selectedCourseId.value = selectedRows.value.map(row => row.id)
@@ -235,9 +236,28 @@ const deleteTerm = () => {
         }
     )
         .then(() => {
-          console.log(selectedRows.value)
 
-          //加入删除的逻辑
+          const deleteCourseList = ref([])
+          deleteCourseList.value = Object.values(selectedCourseId.value);
+          console.log("删除课程列表")
+          console.log(deleteCourseList.value)
+          request.course.get('/coursemangt/course/delete', deleteCourseList.value)
+              .then(res => {
+                if (res.code === 200) {
+                  // 假设这里你需要的是过滤后的数据作为级联选择器的选项
+                  ElMessage({
+                    type: 'success',
+                    message: '删除课程成功'
+                  });
+                  getcourseList();
+                }
+              }).catch(error => {
+            ElMessage({
+              type: 'error',
+              message: '删除课程失败，请稍后尝试'
+            });
+          });
+
 
         })
         .catch(() => {
@@ -247,8 +267,6 @@ const deleteTerm = () => {
           })
         })
 
-
-    console.log(selectedCourseId.value)
   }
 
 }

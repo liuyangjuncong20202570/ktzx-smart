@@ -110,8 +110,8 @@
             </el-table>
           </el-main>
           <el-footer style="text-align: center;">
-            <el-button type="success" @click="submitForm">确定选项</el-button>
             <el-button type="primary" @click="closeDialog">取消</el-button>
+            <el-button type="success" @click="submitForm">复制所选课程</el-button>
           </el-footer>
         </el-container>
       </template>
@@ -193,27 +193,69 @@ const closeDialog = () => {
 };
 
 const submitForm = () => {
-  console.log(selectedRows.value)
-  const courseNames = selectedRows.value.map(row => row.courseChineseName).join('、');
-  ElMessageBox.confirm(
-      `是否要将所选 ${courseNames} 复制到当前学期？`,
-      '提示',
-      {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消',
-        type: 'info',
-      }
-  )
-      .then(() => {
-        console.log("确认复制");
-        closeDialog();
-      })
-      .catch(() => {
-        ElMessage({
+  const selectedCount = selectedRows.value.length;
+
+  if (selectedCount > 1) {
+    // 如果选中多于一项
+    ElMessage({
+      type: 'error',
+      message: '只能一次新增一门课程'
+    });
+  } else if (selectedCount === 0) {
+    // 如果一项也没选中
+    ElMessage({
+      type: 'error',
+      message: '请选择需要复制的历史课程'
+    });
+  } else {
+    const courseNames = selectedRows.value.map(row => row.courseChineseName).join('、');
+    const courseId = selectedRows.value.map(row => row.id)
+    ElMessageBox.confirm(
+        `是否要将所选 ${courseNames} 复制到当前学期？`,
+        '提示',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
           type: 'info',
-          message: '取消复制',
+        }
+    )
+        .then(() => {
+          console.log(courseId)
+          request.course.get('/coursemangt/course/copy?id=' + courseId)
+              .then(res => {
+                // 登录成功
+                if (res.code === 200) {
+                  ElMessage({
+                    type: 'success',
+                    message: '复制历史课程成功'
+                  });
+                  emit('formSubmitted');
+                  closeDialog();
+                }
+              })
+              .catch(() => {
+                    ElMessage({
+                      type: 'error',
+                      message: '复制历史学期失败'
+                    });
+                  }
+              );
+
+
+          closeDialog();
         })
-      })
+        .catch(() => {
+              ElMessage({
+                type: 'error',
+                message: '复制课程失败'
+              });
+              closeDialog(); // 根据需要决定是否在错误后关闭对话框
+            }
+        )
+  }
+
+
+
 }
 
 </script>
