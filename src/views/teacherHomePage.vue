@@ -33,7 +33,7 @@
 
       <el-container>
         <el-aside width="200px" style="height: 100%;">
-          <div style="width: 100%; height: 20vh; padding: 10px 0; background-color: #c8c9cc; display: flex; align-items: center;
+          <div style="width: 100%; height: 150px; padding: 10px 0; background-color: #c8c9cc; display: flex; align-items: center;
                     box-sizing: border-box;">
             <!--头像-->
             <div style="width: 76px; height: 105px; margin-left: 10px; overflow: hidden;object-fit: cover;">
@@ -84,7 +84,7 @@
           <!-- 使用 el-scrollbar 包裹 el-menu，设置高度为 70% -->
 
           <!--页面左侧导航栏-->
-          <div style="height: 72vh;">
+          <div style="height: calc(92vh - 150px);">
             <el-scrollbar>
               <el-menu :default-active="defaultActive">
                 <template v-for="menu in filteredMenus">
