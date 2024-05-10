@@ -237,11 +237,10 @@ const deleteCourse = () => {
     )
         .then(() => {
 
-          const deleteCourseList = ref([])
+          const deleteCourseList = ref([]);
           deleteCourseList.value = Object.values(selectedCourseId.value);
-          console.log("删除课程列表")
           console.log(deleteCourseList.value)
-          request.course.get('/coursemangt/course/delete', deleteCourseList.value)
+          request.course.post('/coursemangt/course/delete', deleteCourseList.value)
               .then(res => {
                 if (res.code === 200) {
                   // 假设这里你需要的是过滤后的数据作为级联选择器的选项
