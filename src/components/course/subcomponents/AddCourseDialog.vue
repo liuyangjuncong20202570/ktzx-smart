@@ -54,7 +54,7 @@
   </div>
 </template>
 <script setup>
-import {ref, reactive, defineExpose, nextTick, onMounted, getCurrentInstance, computed} from 'vue';
+import {ref, reactive, defineExpose, nextTick, onMounted, getCurrentInstance, computed, onBeforeUnmount} from 'vue';
 
 import {ElMessage, ElMessageBox} from "element-plus";
 import request from "../../../utils/request.js";
@@ -70,6 +70,15 @@ const newform = reactive({
   professionName: '',
   professionId: ''
 });
+const resetForm = () => {
+  newform.term = '';
+  newform.courseChineseName = '';
+  newform.courseEnglishName = '';
+  newform.courseCode = '';
+  newform.professionName = '';
+  newform.professionId = '';
+  teacherid.value = [];
+};
 const emit = defineEmits(['formSubmitted']);
 defineExpose({init});
 const rules = reactive({
@@ -84,6 +93,7 @@ const alreadyteacheridlist = ref([])
 
 
 function init(profession) {
+  resetForm();
   AdddialogVisible.value = true;
   const storedUserInfo = sessionStorage.getItem('users');
   const userInfo = JSON.parse(storedUserInfo);
@@ -161,6 +171,7 @@ const handleCascaderChange = (value, selectedData) => {
 
 const closeDialog = () => {
   AdddialogVisible.value = false;
+
 };
 
 const courseID = ref('');
@@ -239,6 +250,10 @@ async function submitForm() {
   }
 }
 
+
+onMounted(() => {
+
+})
 
 </script>
 <style scoped>

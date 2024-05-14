@@ -2,10 +2,13 @@
     <div style="height: 92vh; display: flex; flex-direction: column;">
         <el-header
             style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex;">
-          <el-button type="primary" style="margin-left: 0.8vw;" @click="exportCourseList">导出课程列表</el-button>
-          <el-button type="primary" style="margin-left: 0.8vw;" @click="addCourse">新增课程</el-button>
-          <el-button type="danger" style="margin-left: 0.8vw;" @click="deleteCourse">删除课程</el-button>
-          <el-button type="primary" style="margin-left: 0.8vw;" @click="CopyCourse">复制历史课程</el-button>
+          <el-button type="success" v-blur-on-click style="margin-left: 0.8vw;" @click="exportCourseList">导出课程列表
+          </el-button>
+          <el-button type="primary" v-blur-on-click style="margin-left: 0.8vw;" @click="addCourse">新增课程</el-button>
+          <el-button type="danger" v-blur-on-click style="margin-left: 0.8vw;" @click="deleteCourse">删除课程
+          </el-button>
+          <el-button type="primary" v-blur-on-click style="margin-left: 0.8vw;" @click="CopyCourse">复制历史课程
+          </el-button>
         </el-header>
         <div style="max-height: 100%; height: 100%; overflow:auto;">
           <AddCourseDialog v-show="AdddialogVisible" ref="AddDialogShow" @formSubmitted="getcourseList"/>
@@ -95,6 +98,8 @@ import {exportTableToCSV} from "../../utils/exportTableToCSV.js";
 import AddCourseDialog from "../course/subcomponents/AddCourseDialog.vue"
 import EditCourseDialog from "../course/subcomponents/EditCourseDialog.vue"
 import CopyCourseDialog from "../course/subcomponents/CopyCourseDialog.vue"
+import blurOnClick from '../../directives/blur-on-click.js';
+
 
 const courseList = ref([]);
 const selectedCourseId = ref([]);
@@ -120,9 +125,8 @@ const columns = ref([
   {prop: 'courseEnglishName', label: '课程名称(英文)'},
   {prop: 'courseCode', label: '课程代码'},
   {prop: 'professionName', label: '所属专业'},
-  {prop: '', label: '课程负责人'}
+  {prop: 'responsiblePersonList', label: '课程负责人', isArray: true, arrayProp: 'username'}
 ]);
-
 
 const handleSelectionChange = (selection) => {
   selectedRows.value = selection;

@@ -118,7 +118,7 @@ const oldform = createForm();
 
 
 function init(row) {
-  console.log("数据", row)
+  alreadyteacheridlist.value = []
   courseID.value = row.id;
   userlist.value = row.responsiblePersonList;
   row.responsiblePersonList.forEach(item => {
@@ -147,8 +147,9 @@ const fetchData = () => {
           // 假设这里你需要的是过滤后的数据作为级联选择器的选项
           //不过滤指定学院
           obslist.value = formatDataForCascader(res.data, alreadyteacheridlist.value);
+          console.log("alreadyteacheridlist.value", alreadyteacheridlist.value)
           extractTeachers(res.data)
-          console.log(obslist.value)
+
         }
       }).catch(error => {
     ElMessage({
@@ -157,6 +158,7 @@ const fetchData = () => {
     });
   });
 };
+
 
 function extractTeachers(nodes) {
   nodes.forEach(node => {
@@ -238,6 +240,9 @@ const Deleteteacher = (row) => {
             message: '删除负责人成功'
           });
           userlist.value = userlist.value.filter(user => !filteredTeachers.some(teacher => teacher.id === user.id));
+          console.log("alreadyteacheridlist.value", alreadyteacheridlist.value)
+          alreadyteacheridlist.value = alreadyteacheridlist.value.filter(id => id !== row.id);
+          obslist.value = formatDataForCascader(obslist.value, alreadyteacheridlist.value);
         }
       }).catch(error => {
     ElMessage({
@@ -265,6 +270,12 @@ const addTeacher = () => {
             type: 'success',
             message: '新增负责人成功'
           });
+
+          teacherform.forEach(teacher => {
+            alreadyteacheridlist.value.push(teacher.userid);
+          });
+
+          obslist.value = formatDataForCascader(obslist.value, alreadyteacheridlist.value);
           filteredTeachers.forEach(teacher => {
             if (!userlist.value.find(t => t.id === teacher.id)) {
               userlist.value.push(teacher);

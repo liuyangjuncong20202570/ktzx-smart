@@ -3,7 +3,7 @@ import axios from 'axios'
 const request = {
     admin: createAPI('http://127.0.0.1:8080/api'),
     course: createAPI('http://127.0.0.1:8082/api'),
-    evaluation: createAPI('http://localhost:8083'),
+    evaluation: createAPI('http://127.0.0.1:8083/api'),
 }
 
 // 60.205.178.180
