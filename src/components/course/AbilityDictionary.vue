@@ -121,7 +121,7 @@ const initialize = (nodes) => {
         // node.id = id.value ++;
 
         if (node.name.includes('未命名能力')) {
-            if (node.name.length > 5) {
+            if (node.name.length > 5 && node.name[5] === '(') {
                 let num = '';
                 for (let i = 6; node.name[i] !== ')'; i++) {
                     num += node.name[i];

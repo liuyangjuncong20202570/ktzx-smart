@@ -77,24 +77,1620 @@ let data = {
             id: '13',
             name: 'node13',
             level: 3,
-        }
+        },
+        {
+            id: '14',
+            name: 'node14',
+            level: 2,
+        },
+        {
+            id: '15',
+            name: 'node15',
+            level: 2,
+        },
+        {
+            id: '16',
+            name: 'node16',
+            level: 2,
+        },
+        {
+            id: '17',
+            name: 'node17',
+            level: 2,
+        },
+        {
+            id: '18',
+            name: 'node18',
+            level: 2,
+        },
+        {
+            id: '19',
+            name: 'node19',
+            level: 2,
+        },
+        {
+            id: '20',
+            name: 'node20',
+            level: 2,
+        },
+        {
+            id: '21',
+            name: 'node21',
+            level: 2,
+        },
+        {
+            id: '22',
+            name: 'node22',
+            level: 2,
+        },
+        {
+            id: '23',
+            name: 'node23',
+            level: 2,
+        }, ,
+        {
+            id: '24',
+            name: 'node24',
+            level: 2,
+        },
+        {
+            id: '25',
+            name: 'node25',
+            level: 2,
+        },
+        {
+            id: '26',
+            name: 'node26',
+            level: 2,
+        },
+        {
+            id: '27',
+            name: 'node27',
+            level: 2,
+        },
+        {
+            id: '28',
+            name: 'node28',
+            level: 2,
+        },
+        {
+            id: '29',
+            name: 'node29',
+            level: 2,
+        },
+        {
+            id: '30',
+            name: 'node30',
+            level: 2,
+        },
+        {
+            id: '31',
+            name: 'node31',
+            level: 2,
+        },
+        {
+            id: '32',
+            name: 'node32',
+            level: 2,
+        }, ,
+        {
+            id: '33',
+            name: 'node33',
+            level: 2,
+        },
+        {
+            id: '34',
+            name: 'node34',
+            level: 2,
+        },
+        {
+            id: '35',
+            name: 'node35',
+            level: 2,
+        },
+        {
+            id: '36',
+            name: 'node36',
+            level: 2,
+        },
+        {
+            id: '37',
+            name: 'node37',
+            level: 2,
+        },
+        // {
+        //     id: '21',
+        //     name: 'node21',
+        //     level: 2,
+        // },
+        // {
+        //     id: '22',
+        //     name: 'node22',
+        //     level: 2,
+        // },
+        // {
+        //     id: '23',
+        //     name: 'node23',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '24',
+        //     name: 'node24',
+        //     level: 2,
+        // },
+        // {
+        //     id: '25',
+        //     name: 'node25',
+        //     level: 2,
+        // },
+        // {
+        //     id: '26',
+        //     name: 'node26',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '21',
+        //     name: 'node21',
+        //     level: 2,
+        // },
+        // {
+        //     id: '22',
+        //     name: 'node22',
+        //     level: 2,
+        // },
+        // {
+        //     id: '23',
+        //     name: 'node23',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '24',
+        //     name: 'node24',
+        //     level: 2,
+        // },
+        // {
+        //     id: '25',
+        //     name: 'node25',
+        //     level: 2,
+        // },
+        // {
+        //     id: '26',
+        //     name: 'node26',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '21',
+        //     name: 'node21',
+        //     level: 2,
+        // },
+        // {
+        //     id: '22',
+        //     name: 'node22',
+        //     level: 2,
+        // },
+        // {
+        //     id: '23',
+        //     name: 'node23',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '24',
+        //     name: 'node24',
+        //     level: 2,
+        // },
+        // {
+        //     id: '25',
+        //     name: 'node25',
+        //     level: 2,
+        // },
+        // {
+        //     id: '26',
+        //     name: 'node26',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '21',
+        //     name: 'node21',
+        //     level: 2,
+        // },
+        // {
+        //     id: '22',
+        //     name: 'node22',
+        //     level: 2,
+        // },
+        // {
+        //     id: '23',
+        //     name: 'node23',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '24',
+        //     name: 'node24',
+        //     level: 2,
+        // },
+        // {
+        //     id: '25',
+        //     name: 'node25',
+        //     level: 2,
+        // },
+        // {
+        //     id: '26',
+        //     name: 'node26',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '21',
+        //     name: 'node21',
+        //     level: 2,
+        // },
+        // {
+        //     id: '22',
+        //     name: 'node22',
+        //     level: 2,
+        // },
+        // {
+        //     id: '23',
+        //     name: 'node23',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '24',
+        //     name: 'node24',
+        //     level: 2,
+        // },
+        // {
+        //     id: '25',
+        //     name: 'node25',
+        //     level: 2,
+        // },
+        // {
+        //     id: '26',
+        //     name: 'node26',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '21',
+        //     name: 'node21',
+        //     level: 2,
+        // },
+        // {
+        //     id: '22',
+        //     name: 'node22',
+        //     level: 2,
+        // },
+        // {
+        //     id: '23',
+        //     name: 'node23',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '24',
+        //     name: 'node24',
+        //     level: 2,
+        // },
+        // {
+        //     id: '25',
+        //     name: 'node25',
+        //     level: 2,
+        // },
+        // {
+        //     id: '26',
+        //     name: 'node26',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '21',
+        //     name: 'node21',
+        //     level: 2,
+        // },
+        // {
+        //     id: '22',
+        //     name: 'node22',
+        //     level: 2,
+        // },
+        // {
+        //     id: '23',
+        //     name: 'node23',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '24',
+        //     name: 'node24',
+        //     level: 2,
+        // },
+        // {
+        //     id: '25',
+        //     name: 'node25',
+        //     level: 2,
+        // },
+        // {
+        //     id: '26',
+        //     name: 'node26',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '21',
+        //     name: 'node21',
+        //     level: 2,
+        // },
+        // {
+        //     id: '22',
+        //     name: 'node22',
+        //     level: 2,
+        // },
+        // {
+        //     id: '23',
+        //     name: 'node23',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '24',
+        //     name: 'node24',
+        //     level: 2,
+        // },
+        // {
+        //     id: '25',
+        //     name: 'node25',
+        //     level: 2,
+        // },
+        // {
+        //     id: '26',
+        //     name: 'node26',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '21',
+        //     name: 'node21',
+        //     level: 2,
+        // },
+        // {
+        //     id: '22',
+        //     name: 'node22',
+        //     level: 2,
+        // },
+        // {
+        //     id: '23',
+        //     name: 'node23',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '24',
+        //     name: 'node24',
+        //     level: 2,
+        // },
+        // {
+        //     id: '25',
+        //     name: 'node25',
+        //     level: 2,
+        // },
+        // {
+        //     id: '26',
+        //     name: 'node26',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '21',
+        //     name: 'node21',
+        //     level: 2,
+        // },
+        // {
+        //     id: '22',
+        //     name: 'node22',
+        //     level: 2,
+        // },
+        // {
+        //     id: '23',
+        //     name: 'node23',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '24',
+        //     name: 'node24',
+        //     level: 2,
+        // },
+        // {
+        //     id: '25',
+        //     name: 'node25',
+        //     level: 2,
+        // },
+        // {
+        //     id: '26',
+        //     name: 'node26',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
+        // {
+        //     id: '21',
+        //     name: 'node21',
+        //     level: 2,
+        // },
+        // {
+        //     id: '22',
+        //     name: 'node22',
+        //     level: 2,
+        // },
+        // {
+        //     id: '23',
+        //     name: 'node23',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '24',
+        //     name: 'node24',
+        //     level: 2,
+        // },
+        // {
+        //     id: '25',
+        //     name: 'node25',
+        //     level: 2,
+        // },
+        // {
+        //     id: '26',
+        //     name: 'node26',
+        //     level: 2,
+        // },
+        // {
+        //     id: '27',
+        //     name: 'node27',
+        //     level: 2,
+        // },
+        // {
+        //     id: '28',
+        //     name: 'node28',
+        //     level: 2,
+        // },
+        // {
+        //     id: '29',
+        //     name: 'node29',
+        //     level: 2,
+        // },
+        // {
+        //     id: '30',
+        //     name: 'node30',
+        //     level: 2,
+        // },
+        // {
+        //     id: '31',
+        //     name: 'node31',
+        //     level: 2,
+        // },
+        // {
+        //     id: '32',
+        //     name: 'node32',
+        //     level: 2,
+        // }, ,
+        // {
+        //     id: '33',
+        //     name: 'node33',
+        //     level: 2,
+        // },
+        // {
+        //     id: '34',
+        //     name: 'node34',
+        //     level: 2,
+        // },
+        // {
+        //     id: '35',
+        //     name: 'node35',
+        //     level: 2,
+        // },
+        // {
+        //     id: '36',
+        //     name: 'node36',
+        //     level: 2,
+        // },
+        // {
+        //     id: '37',
+        //     name: 'node37',
+        //     level: 2,
+        // },
     ],
 }
-
 onMounted(() => {
     // 获取页面中ID为'container'的DOM元素
     const container = document.getElementById('container');
 
     // 创建一个新的Three.js场景
     const scene = new THREE.Scene();
-
-    // 创建一个透视摄像机
-    const camera = new THREE.PerspectiveCamera(
-        75, // 视野角度
-        container.scrollWidth / container.scrollHeight, // 宽高比
-        0.1, // 近裁剪面
-        1000 // 远裁剪面
-    );
 
     // 创建WebGL渲染器
     const renderer = new THREE.WebGLRenderer({
@@ -107,23 +1703,41 @@ onMounted(() => {
     // 将渲染器的DOM元素附加到container中
     container.appendChild(renderer.domElement);
 
-    // 监听窗口的resize事件
-    window.addEventListener('resize', function () {
-        // 调整渲染器的大小
-        renderer.setSize(container.offsetWidth, container.offsetHeight - 0.5);
+    // 创建一个透视摄像机
+    const camera = new THREE.PerspectiveCamera(
+        75, // 视野角度
+        container.scrollWidth / container.scrollHeight, // 宽高比
+        0.1, // 近裁剪面
+        1000 // 远裁剪面
+    );
 
-        // 调整摄像机的宽高比
-        camera.aspect = container.offsetWidth / container.offsetHeight;
+    // 设置摄像机的位置
+    camera.position.x = 0;
+    camera.position.y = 1.5;
+    camera.position.z = 4.5;
+    camera.lookAt(0, 0, 0);
 
-        // 更新摄像机的投影矩阵
-        camera.updateProjectionMatrix();
-        // console.log('resize')
-    });
-
-
-    const planeSize = 5;
-    const gridCount = 4;    // 创建的网格的大小gridCount * gridCount
+    let planeSize = 4;
+    let gridCount = 4;    // 平面中一行或一列上可以有多少个节点，用于创建网格的大小gridCount * gridCount
     const edgeWidth = 0.5;  // 节点距离方形区域边缘的距离
+    let planeDist = 1.2   // 平面之间的距离
+
+    // 计算每个平面上的节点数量，以其中的最大值确定平面的大小
+    let levelNodeAmount = [0, 0, 0];
+    data.nodes.forEach((node) => {
+        levelNodeAmount[node.level - 1] ++;
+    })
+    // console.log(levelNodeAmount);
+
+    let maxNodeAmount = Math.max(...levelNodeAmount);
+    while(planeSize * planeSize <= maxNodeAmount) {
+        // 设置俯视的最高视角，显示更美观
+        if(camera.position.y > 0.6) camera.position.y += 0.4;
+        camera.position.z += 1.2;
+        planeSize = gridCount += 1;
+        planeDist += 0.3;
+    }
+    // console.log(maxNodeAmount, camera.position.y);
 
     // 创建三个平面的几何体
     const planeGeometry = new THREE.PlaneGeometry(planeSize, planeSize);
@@ -150,6 +1764,7 @@ onMounted(() => {
         opacity
     });
 
+    // 存储平面对象
     let planes = [];
 
     // 创建平面并添加到场景
@@ -168,14 +1783,11 @@ onMounted(() => {
         }
         const plane = new THREE.Mesh(planeGeometry, material);
         plane.rotation.x = Math.PI / 2;
-        plane.position.y = i * 1.5; // 设置每个平面沿Z轴的距离
+        plane.position.y = i * planeDist; // 设置每个平面沿Z轴的距离
         scene.add(plane);
         planes.push(plane);
     }
 
-    // const light = new THREE.DirectionalLight(0xffffff, 5);
-    // light.position.set(-10, 10, 10);    // 设置光源位置
-    // light.castshadow = true;    // 允许光源投射阴影
     // scene.add(light);
     const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x000520, 4);
     hemisphereLight.castShadow = true;
@@ -184,7 +1796,7 @@ onMounted(() => {
     // 创建字体加载器
     const fontLoader = new FontLoader();
 
-    // 在每个平面上添加节点和连线
+    // 每个平面上的节点颜色
     const nodeColors = ['rgb(236, 237, 231)', 'rgb(0, 255, 0)', 'rgb(246, 228, 0)'];
 
     // 加载字体
@@ -205,7 +1817,8 @@ onMounted(() => {
             const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
             sphere.position.set(gridPoints[eachLevelNodesCount[node.level - 1]].x,
                                 gridPoints[eachLevelNodesCount[node.level - 1]].y,
-                                gridPoints[eachLevelNodesCount[node.level - 1] ++].z);
+                                gridPoints[eachLevelNodesCount[node.level - 1]++].z);
+
             // 设置接收阴影
             sphere.receiveShadow = true;
             planes[node.level - 1].add(sphere);
@@ -244,13 +1857,6 @@ onMounted(() => {
         // plane.add(line); // 将连线添加为平面的子对象
     });
 
-
-    // 设置摄像机的位置
-    camera.position.x = 0;
-    camera.position.y = 1.8;
-    camera.position.z = 6;
-    camera.lookAt(0, 0, 0);
-
     // 添加世界坐标辅助器
     const axesHelper = new THREE.AxesHelper(5);
     scene.add(axesHelper);
@@ -271,6 +1877,18 @@ onMounted(() => {
     // 调用动画函数
     animate();
 
+    // 监听窗口的resize事件
+    window.addEventListener('resize', function () {
+        // 调整渲染器的大小
+        renderer.setSize(container.offsetWidth, container.offsetHeight - 0.5);
+
+        // 调整摄像机的宽高比
+        camera.aspect = container.offsetWidth / container.offsetHeight;
+
+        // 更新摄像机的投影矩阵
+        camera.updateProjectionMatrix();
+        // console.log('resize')
+    });
 })
 
 // 生成一个gridCount * gridCount的网格，存储每个网格节点
@@ -294,6 +1912,7 @@ function createGridPoints(size, gridCount, edgeWidth) {
         for (let j = 0; j < gridCount; j++) {
             // -size / 2 + edgeWidth 是左边界，i * spacing 是当前节点x轴上的距离
             const x = -size / 2 + edgeWidth + i * spacing;
+            
             // -size / 2 + edgeWidth 是下边界，j * spacing 是当前节点y轴上的距离
             const y = -size / 2 + edgeWidth + j * spacing;
 
