@@ -184,6 +184,14 @@ const login = () => {
               loginuserFrom.value.id = res.data.userid;
               loginuserFrom.value.catelog = res.data.catelog;
 
+              const logincatelog = res.data.catelog;
+              console.log("logincatelog", logincatelog)
+              if (logincatelog === '1') {
+                console.log(res.data)
+                setprofile(res.data);
+                router.push(res.data.homeurl);
+
+              } else {
               if (rolesCount === 1) {
                 loginuserFrom.value.roleid = res.data.simpleRoleList[0].roleid;
                 loginuserFrom.value.obsid = res.data.simpleRoleList[0].obsid;
@@ -191,9 +199,9 @@ const login = () => {
                 userlogin()
               } else {
                 Object.assign(roledata, res.data);
-                console.log(roledata)
                 //打开弹窗选择角色
                 showRoleModal.value = true;
+              }
               }
             }
 
@@ -215,7 +223,7 @@ const login = () => {
 };
 
 
-//登录验证跳转
+//弹窗选择角色信息
 const confirmRole = () => {
   const selectedRole = roledata.simpleRoleList.find(role => role.roleid === selectedRoleId.value);
   if (selectedRole) {
@@ -227,9 +235,7 @@ const confirmRole = () => {
   showRoleModal.value = false;
 
 };
-onMounted(() => {
-  sessionStorage.removeItem('users');
-})
+
 
 //二次请求
 const userlogin = () => {
@@ -239,26 +245,8 @@ const userlogin = () => {
         console.log(res)
         if (res.code === 200) {
           console.log("userlogin_success")
-          profileStore.setProfileInfo(
-              res.data.username
-              , res.data.rolename
-              , res.data.catelog
-              , res.data.homeurl
-              , res.data.token
-              , res.data.currentterm);
-          const userInfo = {
-            username: res.data.username,
-            rolename: res.data.rolename,
-            catelog: res.data.catelog,
-            homeurl: res.data.homeurl,
-            token: res.data.token,
-            currentterm: res.data.currentterm
-          };
+          setprofile(res.data)
 
-          sessionStorage.setItem('users', JSON.stringify(userInfo));
-          sessionStorage.setItem('isLoggedIn', 'true');
-          sessionStorage.setItem('token', res.data.token);
-          console.log(res.data.homeurl)
           router.push(res.data.homeurl);
         } else if (res.code === 404) {
           router.push('/login');
@@ -274,8 +262,32 @@ const userlogin = () => {
       })
 }
 
+//存入本地 sessionStorage
+const setprofile = (data) => {
+  profileStore.setProfileInfo(
+      data.username
+      , data.rolename
+      , data.catelog
+      , data.homeurl
+      , data.token
+      , data.currentterm);
+  const userInfo = {
+    username: data.username,
+    rolename: data.rolename,
+    catelog: data.catelog,
+    homeurl: data.homeurl,
+    token: data.token,
+    currentterm: data.currentterm
+  };
 
+  sessionStorage.setItem('users', JSON.stringify(userInfo));
+  sessionStorage.setItem('isLoggedIn', 'true');
+  sessionStorage.setItem('token', data.token);
+}
 
+onMounted(() => {
+  sessionStorage.removeItem('users');
+})
 
 </script>
 
