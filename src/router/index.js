@@ -129,7 +129,7 @@ const routes = [
                 component: () => import('../components/evaluation/KWAgraph.vue')
             },
             {
-                path: 'evasys/formative/3Dgraph', // 形成性评价模型-3D图谱
+                path: 'evasys/3Dgraph', // 形成性评价模型-3D图谱
                 name: '3Dgraph',
                 component: () => import('../components/evaluation/3Dgraph.vue')
             },

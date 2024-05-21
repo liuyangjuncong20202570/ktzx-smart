@@ -100,6 +100,7 @@ import { Search, WarningFilled } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { computed, onMounted, ref } from 'vue';
 import request from "../../utils/request";
+import _ from 'lodash';
 
 const tableSearchData = ref('');    // 主界面搜索框数据
 
@@ -197,7 +198,7 @@ const openDeleteDialog = () => {
       message: '未选择关键字',
       duration: 800
     });
-    return ;
+    return;
   }
   var ids = [];
   for (const sel of multipleSelection) {
@@ -244,7 +245,10 @@ const inputTableRowDataRef = ref(null);
 const inputImportantlevelidRef = ref(null);
 const inputRemarkRef = ref(null);
 
+const tempRowData = ref({});
+
 const editEditRef = (row, field) => {
+  tempRowData.value = _.cloneDeep(row);
   editRef.value.get(row.id)[field] = true;
   setTimeout(() => {
     if (field === 'editName') {
@@ -260,6 +264,10 @@ const editEditRef = (row, field) => {
 };
 
 const saveEditRef = (row, field) => {
+  if (_.isEqual(row, tempRowData.value)) {
+    editRef.value.get(row.id)[field] = false;
+    return ;
+  }
   editRef.value.get(row.id)[field] = false;
   request.evaluation.post('/evaluation/keywords', row).then((res) => {
     if (res.code === 200) {
@@ -273,4 +281,5 @@ const saveEditRef = (row, field) => {
 
 </script>
 
-<style scoped></style>
+<style scoped>
+</style>
