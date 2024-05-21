@@ -10,11 +10,22 @@ const rolehome =['teacherhomne','adminhome','superadminhome','secretariatehome',
 // majormanagerhome 专业负责人首页 
 // coursemanagerhome 课程负责人首页
 
+
 const routes = [
     {
         path: '/login',
         name: 'Login',
         component: () => import('../views/Login.vue')
+    },
+    {
+        path: '/homes/studenthome',
+        name: 'StudentHomePage',
+        component: () => import('../views/studentHomePage.vue')
+    },
+    {
+        path: '/homes/studentcourses',
+        name: 'StudentCoursePage',
+        component: () => import('../views/StudentCoursePage.vue')
     },
     {
         path: '/homes/:rolehome(' + rolehome.join('|') + ')',
@@ -78,15 +89,20 @@ const routes = [
                 component: () => import('../components/course/Coursemangt.vue')
             },
             {
+                path: 'coursemangt/classroom',    // 课程管理
+                name: 'ClassRoomManagement',
+                component: () => import('../components/course/Classroommangt.vue')
+            },
+            {
                 path: 'coursemangt/abilitydictionary',  // 能力字典
                 name: 'AbilityDictionary',
                 component: () => import('../components/course/AbilityDictionary.vue')
             },
-            {
-                path: 'coursemanagerhomepage',  // 课程负责人首页
-                name: 'CourseManagerHomePage',
-                component: () => import('../components/course/CourseManagerHomePage.vue')
-            },
+            // {
+            //     path: 'coursemanagerhomepage',  // 课程负责人首页
+            //     name: 'CourseManagerHomePage',
+            //     component: () => import('../components/course/CourseManagerHomePage.vue')
+            // },
             {
                 path: 'evasys/formative/keyword',    // 形成性评价模型-关键字
                 name: 'Keyword',
