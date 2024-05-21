@@ -78,7 +78,7 @@
             </el-form-item>
             <el-form-item style="display: flex; justify-content: center; gap: 20px;">
               <el-button type="info" large style="width: 40%;" @click="closeDialog">取消</el-button>
-              <el-button type="success" large style="width: 40%;" @click="submitForm">新增</el-button>
+              <el-button type="success" large style="width: 40%;" @click="submitForm">提交</el-button>
             </el-form-item>
 
           </el-form>
@@ -95,38 +95,29 @@ import request from "../../../utils/request.js";
 import Classroommangt from "../Classroommangt.vue"
 
 const EditdialogVisible = ref(false);
-
 const mainteacherid = ref('');
 const labteacherid = ref('');
 const practiceteacherid = ref('');
 const mainteachername = ref('');
 const labteachername = ref('');
 const practiceteachername = ref('');
-
-
+const ktid = ref('')
 const teacherlist = ref([]);
 const alreadyteacheridlist = ref([])
-
+const courseId = ref('');
 const resetform = () => {
   mainteacherid.value = '';
   labteacherid.value = '';
   practiceteacherid.value = '';
-  mainteachername.value = null;
-  labteachername.value = null;
-  practiceteachername.value = null;
 }
 
 function createForm() {
   return reactive({
-    courseid: '',
     courseChineseName: '',
     classroomName: '',
     teachTime: '',
     labTime: '',
     practiceTime: '',
-    // teacherId: '',
-    // labTeacherId: '',
-    // practiceTeacherId: '',
   });
 }
 
@@ -153,12 +144,19 @@ function init(row) {
         oldform[key] = row[key];
       }
     });
-    console.log(" row.teacherId", row.teacherId)
+
     // 确保在数据加载后再设置绑定值
     nextTick(() => {
+
       mainteacherid.value = row.teacherId;
       labteacherid.value = row.labTeacherId;
       practiceteacherid.value = row.practiceTeacherId;
+      mainteachername.value = row.teacherName;
+      labteachername.value = row.labTeacher;
+      practiceteachername.value = row.practiceTeacher;
+      courseId.value = row.courseId;
+      ktid.value = row.id
+
     });
   });
 }
@@ -222,6 +220,7 @@ const findNodeById = (nodes, id) => {
   return null;
 };
 
+
 const handleCascaderChange = (data, value) => {
   if (value && value.length > 0) {
     const lastSelectedNode = findNodeById(teacherlist.value, value);
@@ -257,11 +256,20 @@ const closeDialog = () => {
 };
 
 async function submitForm() {
-
+  // try {
+  //   // 显示确认对话框
+  //   await ElMessageBox.confirm(
+  //       '是否确认修改',
+  //       '提示',
+  //       {
+  //         confirmButtonText: '确认',
+  //         cancelButtonText: '取消',
+  //         type: 'info',
+  //       }
+  //   );
 
   const newClassroomform = ref({
-    courseId: newform.courseid,
-    courseChineseName: newform.courseChineseName,
+    id: ktid.value,
     classroomName: newform.classroomName,
     teacherId: mainteacherid.value,
     teacherName: mainteachername.value,
@@ -273,8 +281,31 @@ async function submitForm() {
     labTime: newform.labTime,
     practiceTime: newform.practiceTime,
   });
-  console.log(newClassroomform.value)
-  console.log(teacherlist.value)
+  console.log(newClassroomform.value.id)
+  // 接下来可以加入发送请求的代码
+  //   const courseResponse = await request.course.post('/coursemangt/classroom/update', newClassroomform.value);
+  //   if (courseResponse.code === 200) {
+  //     // 处理响应
+  //     ElMessage({
+  //       type: 'success',
+  //       message: '编辑课堂成功'
+  //     });
+  //
+  //     emit('formSubmitted');
+  //     closeDialog();
+  //
+  //   } else {
+  //     throw new Error('编辑课程失败');
+  //   }
+  // } catch (error) {
+  //   if (error !== 'cancel') {
+  //     // 如果用户取消，则不显示错误消息
+  //     ElMessage({
+  //       type: 'error',
+  //       message: error.message || '操作取消'
+  //     });
+  //   }
+  // }
 }
 
 
