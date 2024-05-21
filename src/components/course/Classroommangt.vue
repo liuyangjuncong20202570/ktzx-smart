@@ -54,6 +54,14 @@
             </div>
           </template>
         </el-table-column>
+        <!--这个字段不展示v-if="false"-->
+        <el-table-column v-if="false" prop="teacherId" label="主讲教师ID" min-width="120">
+          <template #default="{ row }">
+            <div style="width: 100%; height: 25px;">
+              {{ row.teacherId }}
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column prop="labTeacher" label="实验教师" min-width="70">
           <template #default="{ row }">
             <div style="width: 100%; height: 25px;">
@@ -61,10 +69,26 @@
             </div>
           </template>
         </el-table-column>
+        <!--这个字段不展示-->
+        <el-table-column v-if="false" prop="labTeacherId" label="实验教师ID">
+          <template #default="{ row }">
+            <div style="width: 100%; height: 25px;">
+              {{ row.labTeacherId }}
+            </div>
+          </template>
+        </el-table-column>
+
         <el-table-column prop="practiceTeacher" label="实践教师" min-width="90">
           <template #default="{ row }">
             <div style="width: 100%; height: 25px;">
               {{ row.practiceTeacher }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column v-if="false" prop="practiceTeacherId" label="实践教师ID" min-width="90">
+          <template #default="{ row }">
+            <div style="width: 100%; height: 25px;">
+              {{ row.practiceTeacherId }}
             </div>
           </template>
         </el-table-column>
@@ -96,8 +120,6 @@
             </el-icon>
           </template>
         </el-table-column>
-
-
       </el-table>
     </div>
   </div>
@@ -224,7 +246,7 @@ const handleSelectionChange = (selection) => {
 
 
 const editClassroom = (row) => {
-  console.log(row)
+  console.log("beforerow", row)
   EditdialogVisible.value = true;  // 打开弹窗
   EditDialogShow.value.init(row);
 }

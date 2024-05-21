@@ -136,6 +136,18 @@ const rules = reactive({
 
 
 function init(row) {
+  console.log("afterrow", row)
+  mainteachername.value = row.teacherName;
+  labteachername.value = row.labTeacher;
+  practiceteachername.value = row.practiceTeacher;
+
+  mainteacherid.value = row.teacherId;
+  labteacherid.value = row.labTeacherId;
+  practiceteacherid.value = row.practiceTeacherId;
+  console.log("mainteacherid.value", mainteacherid.value)
+  console.log("labteacherid.value", labteacherid.value)
+  console.log("practiceteacherid.value", practiceteacherid.value)
+
   fetchData().then(() => {
     EditdialogVisible.value = true;
     Object.keys(row).forEach(key => {
@@ -147,13 +159,10 @@ function init(row) {
 
     // 确保在数据加载后再设置绑定值
     nextTick(() => {
-
       mainteacherid.value = row.teacherId;
       labteacherid.value = row.labTeacherId;
       practiceteacherid.value = row.practiceTeacherId;
-      mainteachername.value = row.teacherName;
-      labteachername.value = row.labTeacher;
-      practiceteachername.value = row.practiceTeacher;
+
       courseId.value = row.courseId;
       ktid.value = row.id
 
@@ -166,10 +175,9 @@ const fetchData = () => {
   return request.course.post('/coursemangt/course/courseRP')
       .then(res => {
         if (res.code === 200) {
-          console.log('Fetched data:', res.data); // Log fetched data
           //不过滤指定学院
-          teacherlist.value = formatDataForCascader(res.data, alreadyteacheridlist.value);
-          console.log('Formatted teacher list:', teacherlist.value); // Log formatted teacher list
+          teacherlist.value = formatDataForCascader(res.data, alreadyteacheridlist.value)
+
         }
       }).catch(error => {
         ElMessage({
@@ -177,6 +185,8 @@ const fetchData = () => {
           message: '获取列表失败'
         });
       });
+
+
 };
 
 const formatDataForCascader = (nodes, selectedTeacherIds) => {
@@ -256,26 +266,26 @@ const closeDialog = () => {
 };
 
 async function submitForm() {
-  // try {
-  //   // 显示确认对话框
-  //   await ElMessageBox.confirm(
-  //       '是否确认修改',
-  //       '提示',
-  //       {
-  //         confirmButtonText: '确认',
-  //         cancelButtonText: '取消',
-  //         type: 'info',
-  //       }
-  //   );
+  try {
+    // 显示确认对话框
+    await ElMessageBox.confirm(
+        '是否确认修改',
+        '提示',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'info',
+        }
+    );
 
   const newClassroomform = ref({
     id: ktid.value,
     classroomName: newform.classroomName,
     teacherId: mainteacherid.value,
     teacherName: mainteachername.value,
-    labteacherId: labteacherid.value,
+    labTeacherId: labteacherid.value,
     labTeacher: labteachername.value,
-    practiceteacherId: practiceteacherid.value,
+    practiceTeacherId: practiceteacherid.value,
     practiceTeacher: practiceteachername.value,
     teachTime: newform.teachTime,
     labTime: newform.labTime,
@@ -283,34 +293,34 @@ async function submitForm() {
   });
   console.log(newClassroomform.value.id)
   // 接下来可以加入发送请求的代码
-  //   const courseResponse = await request.course.post('/coursemangt/classroom/update', newClassroomform.value);
-  //   if (courseResponse.code === 200) {
-  //     // 处理响应
-  //     ElMessage({
-  //       type: 'success',
-  //       message: '编辑课堂成功'
-  //     });
-  //
-  //     emit('formSubmitted');
-  //     closeDialog();
-  //
-  //   } else {
-  //     throw new Error('编辑课程失败');
-  //   }
-  // } catch (error) {
-  //   if (error !== 'cancel') {
-  //     // 如果用户取消，则不显示错误消息
-  //     ElMessage({
-  //       type: 'error',
-  //       message: error.message || '操作取消'
-  //     });
-  //   }
-  // }
+    const courseResponse = await request.course.post('/coursemangt/classroom/update', newClassroomform.value);
+    if (courseResponse.code === 200) {
+      // 处理响应
+      ElMessage({
+        type: 'success',
+        message: '编辑课堂成功'
+      });
+
+      emit('formSubmitted');
+      closeDialog();
+
+    } else {
+      throw new Error('编辑课程失败');
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      // 如果用户取消，则不显示错误消息
+      ElMessage({
+        type: 'error',
+        message: error.message || '操作取消'
+      });
+    }
+  }
 }
 
 
 onMounted(() => {
-  resetform();
+
 })
 
 </script>

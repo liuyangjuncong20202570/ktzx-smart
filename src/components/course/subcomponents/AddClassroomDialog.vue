@@ -265,15 +265,16 @@ async function submitForm() {
       creatorName: username.value,
       teacherId: mainteacherid.value,
       teacherName: mainteachername.value,
-      labteacherId: labteacherid.value,
+      labTeacherId: labteacherid.value,
       labTeacher: labteachername.value,
-      practiceteacherId: practiceteacherid.value,
+      practiceTeacherId: practiceteacherid.value,
       practiceTeacher: practiceteachername.value,
       teachTime: newform.teachTime,
       labTime: newform.labTime,
       practiceTime: newform.practiceTime,
     });
 
+    console.log(newClassroomform.value)
     // 接下来可以加入发送请求的代码
     const courseResponse = await request.course.post('/coursemangt/classroom/create', newClassroomform.value);
     if (courseResponse.code === 200) {
