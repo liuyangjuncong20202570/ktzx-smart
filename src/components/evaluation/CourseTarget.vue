@@ -6,6 +6,7 @@
             <el-button type="danger" @click="deleteTarget">删除</el-button>
             <el-button type="success" @click="">保存</el-button>
             <el-button type="warning" @click="">导出到Excel</el-button>
+            <el-button type="success" link >单片机</el-button>
         </el-header>
         <el-main style="padding: 0;">
             <el-table :data="courseTargetData" style="width: 100%; height: 100%;" v-model="tableSelected"
@@ -86,7 +87,7 @@ const initialize = (data) => {
 };
 
 const getData = () => {
-    request.evaluation.get('/evaluation/coursetarget').then((res) => {
+    request.evaluation.get(`/evaluation/coursetarget?courseid=${courseid.value}`).then((res) => {
         if (res.code === 200) {
             courseTargetData.value = res.data;
             initialize(courseTargetData.value);

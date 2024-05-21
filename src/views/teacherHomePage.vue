@@ -85,7 +85,7 @@
 
           <!--页面左侧导航栏-->
           <div style="height: calc(92vh - 150px);">
-            <el-scrollbar>
+            <el-scrollbar style="border-right: 1px solid #dedede;">
               <el-menu :default-active="defaultActive">
                 <template v-for="menu in filteredMenus">
                   <el-sub-menu v-if="hasChildren(menu)" :index="menu.id" :key="menu.id"

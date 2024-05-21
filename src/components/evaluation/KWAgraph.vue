@@ -246,7 +246,7 @@ onMounted(() => {
 			plugins: [contextMenu],
 			layout: {
 				type: 'comboCombined',
-				spacing: 60,
+				spacing: 100,
 			},
 			defaultNode: {
 				size: 17,
@@ -303,13 +303,14 @@ onMounted(() => {
 					}
 				},
 				style: {
-					fill: '#fffff2'
+					fill: 'lightcyan'
+					// fill: 'lightskyblue'
 				}
 			},
 			comboStateStyles: {
 				active: {
 					stroke: 'dodgerblue',
-					fill: '#fdfdfd',
+					fill: 'aliceblue',
 					lineWidth: 2,
 				},
 				dragenter: {
