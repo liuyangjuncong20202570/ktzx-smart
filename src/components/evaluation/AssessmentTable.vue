@@ -71,7 +71,7 @@
                 </template>
               </el-table-column>
             </el-table>
-            <el-table :data="tableAppendDataSecond" style="width: 100%;" :cell-style="{'background-color': '#eaeaea',color: '#000000','border-color': '#cecece'}" :show-header="false" border>
+            <el-table :data="tableAppendDataSecond" style="width: 100%;" :cell-style="{color: '#000000','border-color': '#cecece'}" :show-header="false" border>
               <el-table-column align="center" width="300" prop="name"></el-table-column>
               <el-table-column align="center" width="720" prop="num1">
                 <template #default="tableRowData">
@@ -173,7 +173,7 @@ const initialize = () => {
   }
 }
 
-//双击修改章节、名称
+//双击修改
 const editEditRef = (row,field) => {
   if(field === 'editNp' || field === 'editEp'){
     if(field === 'editNp'){
@@ -205,7 +205,7 @@ const editEditRef = (row,field) => {
   }
 };
 
-//保存章节、名称修改
+//保存
 const saveEditRef = (row,field) => {
   if (field === 'editNp' || field === 'editEp') {
     if(field === 'editNp'){
@@ -223,7 +223,6 @@ const saveEditRef = (row,field) => {
     request.evaluation.post('/evaluation/assessmentPlan/updateAssessmentPlanProportion', newData1).then((res) => {
       if(res.code === 200){
         loadData();
-        ElMessage.success('修改成功');
       }else{
         ElMessage.error(res.msg);
       }
@@ -243,7 +242,6 @@ const saveEditRef = (row,field) => {
     request.evaluation.post('/evaluation/assessmentPlan/updateAssessmentPlanItem', newData2).then((res) => {
       if(res.code === 200){
         loadData();
-        ElMessage.success('修改成功');
       }else{
         ElMessage.error(res.msg);
       }
