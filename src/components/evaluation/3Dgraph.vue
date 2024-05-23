@@ -70,12 +70,12 @@ const getData = async () => {
     } catch (error) {
         ElMessage.error('获取课程目标失败' + error);
     }
-
+    // 获取知识单元kwa间的连线
     try {
         const lineRes = await request.evaluation.get(`/evaluation/lines`);
         if (lineRes.code === 200) {
             data.kwaLines = _.cloneDeep(lineRes.data);
-            console.log(data.kwaLines);
+            // console.log(data.kwaLines);
         }
         else ElMessage.error(lineRes.msg);
     }
@@ -110,19 +110,19 @@ onMounted(async () => {
         let uniqueChildKwas = [];
         sectionChapterMap.set(unit.id, unit.id);
         unit.children.forEach((child) => {
+            sectionChapterMap.set(child.id, unit.id);
             child.kwas.forEach((kwa) => {
-                if(kwaidStatusMap.get(kwa.kwaid) === undefined) {
+                if (!kwaidStatusMap.has(kwa.kwaid)) {
                     kwa.pid = kwa.unitid;
                     kwa.unitid = unit.id;
                     uniqueChildKwas.push(kwa);
-                    sectionChapterMap.set(child.id, unit.id);
                     kwaidStatusMap.set(kwa.kwaid, kwa.status);
                 }
                 // 如果重复的kwa中存在status为0的，则显示的章中的kwa的status为0，重复的kwa的status字段是与的关系
-                else if(kwa.status === 0 && kwaidStatusMap.get(kwa.kwaid) === 1) {
+                else if (kwa.status === 0 && kwaidStatusMap.get(kwa.kwaid) === 1) {
                     kwaidStatusMap.set(kwa.id, kwa.status);
                     uniqueChildKwas.forEach((item) => {
-                        if(item.kwaid === kwa.kwaid) {
+                        if (item.kwaid === kwa.kwaid) {
                             item.status = kwa.status;
                         }
                     })
@@ -578,7 +578,8 @@ onMounted(async () => {
             sphere.add(textMesh);
         })
 
-        data.kwaLines.forEach((line, index) => {
+        // 创建知识单元间kwa的连线
+        data.kwaLines.forEach((line) => {
             // console.log(kwasPositionMap.has(JSON.stringify([line.startkwaid, sectionChapterMap.get(line.startunitid)])));
             // console.log(kwasPositionMap);
             // 创建连线
@@ -586,7 +587,9 @@ onMounted(async () => {
             const lineGeometry = new THREE.BufferGeometry();
             // 获取球形节点的位置并创建连线的顶点
             const startVertex = kwasPositionMap.get(JSON.stringify([line.startkwaid, sectionChapterMap.get(line.startunitid)]));
+            console.log(JSON.stringify([line.startkwaid, sectionChapterMap.get(line.startunitid)]));
             const endVertex = kwasPositionMap.get(JSON.stringify([line.endkwaid, sectionChapterMap.get(line.endunitid)]));
+            console.log(JSON.stringify([line.endkwaid, sectionChapterMap.get(line.endunitid)]))
             // console.log(startVertex, endVertex);
 
             // 将局部坐标转换为全局坐标，因为每章里的点的位置是相对于章平面而不是全局的
