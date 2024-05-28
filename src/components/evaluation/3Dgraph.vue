@@ -26,6 +26,10 @@ const sectionChapterMap = new Map();   // 创建知识单元中各个小节和�
 
 const kwasPositionMap = new Map();      // 以kwaid和其所在的章的id为主键创建kwa与其位置的映射
 
+const keywordPositionMap = new Map();   // 以keyword的id为键创建其位置的映射
+
+const abilityPositionMap = new Map();   // ability的id为键创建其位置的映射
+
 const getData = async () => {
     // 获取能力数据据
     try {
@@ -316,10 +320,25 @@ onMounted(async () => {
     // 存储第三层的网格节点位置
     const targetPlaneGridPoints = createGridPointsByNodeAmount(thirdPlaneSize, targetPlaneGridCount, targetPlanePadding)
 
+    let kwadict;    // 存储kwa字典的信息，用于获取每个kwa的keywordid和abilityid
+
+    try {
+        const kwadictRes = await request.evaluation.get(`/evaluation/kwadict`);
+        if (kwadictRes.code === 200) {
+            kwadict = _.cloneDeep(kwadictRes.data);
+        }
+        else {
+            ElMessage.error(kwadictRes.msg);
+        }
+    } catch (error) {
+        ElMessage.error('获取kwa字典信息失败' + error);
+    }
+
     // 创建字体加载器
     const fontLoader = new FontLoader();
+
     // 加载字体，速度比较慢
-    fontLoader.load('/src/utils/DengXian_Light_Regular.json', function (font) {
+    fontLoader.load('/FangSong_GB2312_Regular.json', function (font) {
         // 创建关键字平面
         const keywordGeometry = new THREE.CircleGeometry(Math.sqrt((keywordPlaneSize * keywordPlaneSize) / 2), 100);
         const keywordPlaneMaterial = new THREE.MeshBasicMaterial({
@@ -346,6 +365,7 @@ onMounted(async () => {
 
         // 创建关键字节点
         data.keywords.forEach((keyword, index) => {
+            // console.log(keyword);
             // 创建球形节点的材质
             const sphereMaterial = new THREE.MeshStandardMaterial({ color: '#00ff00' });
             // 创建球形节点的几何体
@@ -364,6 +384,7 @@ onMounted(async () => {
             // 将节点的位置信息存储在节点内
             keyword.position = sphere.position;
             // console.log(keyword);
+            keywordPositionMap.set(keyword.id, keyword.position);
 
             // 创建文本几何体
             const textGeometry = new TextGeometry(fittingString(keyword.name, 80, 12), {
@@ -409,6 +430,8 @@ onMounted(async () => {
 
             // 将节点的位置信息存储在节点内
             ability.position = sphere.position;
+
+            abilityPositionMap.set(ability.id, ability.position);
 
             // 创建文本几何体
             const textGeometry = new TextGeometry(fittingString(ability.name, 80, 12), {
@@ -531,6 +554,33 @@ onMounted(async () => {
                 textMesh.rotation.x = Math.PI * 1.5;
 
                 sphere.add(textMesh);
+
+                const kwainfo = kwadict.find(item => item.id === kwa.kwaid);
+                const startVertex = kwa.position;
+                const lineMaterial = new THREE.LineBasicMaterial({ color: 0xf6e432 });
+
+                const abilityVertex = abilityPositionMap.get(kwainfo.abilityid);
+                // 将局部坐标转换为全局坐标
+                const globalStartVertex = unitPlanes[kwa.unitid].localToWorld(startVertex.clone());
+                const globalAbilityVertex = abilityPlane.localToWorld(abilityVertex.clone());
+                const abilityVertices = [globalStartVertex, globalAbilityVertex];
+                const abilityLineGeometry = new THREE.BufferGeometry();
+                abilityLineGeometry.setFromPoints(abilityVertices);
+                // 创建连线
+                const abilityLine = new THREE.Line(abilityLineGeometry, lineMaterial);
+                // 将连线添加为平面的子对象
+                scene.add(abilityLine);
+                
+                const keywordVertex = keywordPositionMap.get(kwainfo.keywordid);
+                // 将局部坐标转换为全局坐标
+                const globalKeywordVertex = keywordPlane.localToWorld(keywordVertex.clone());
+                const keywordVertices = [globalStartVertex, globalKeywordVertex];
+                const keywordLineGeometry = new THREE.BufferGeometry();
+                keywordLineGeometry.setFromPoints(keywordVertices);
+                // 创建连线
+                const keywordLine = new THREE.Line(keywordLineGeometry, lineMaterial);
+                // 将连线添加为平面的子对象
+                scene.add(keywordLine);
             })
         });
 
@@ -587,9 +637,9 @@ onMounted(async () => {
             const lineGeometry = new THREE.BufferGeometry();
             // 获取球形节点的位置并创建连线的顶点
             const startVertex = kwasPositionMap.get(JSON.stringify([line.startkwaid, sectionChapterMap.get(line.startunitid)]));
-            console.log(JSON.stringify([line.startkwaid, sectionChapterMap.get(line.startunitid)]));
+            // console.log(JSON.stringify([line.startkwaid, sectionChapterMap.get(line.startunitid)]));
             const endVertex = kwasPositionMap.get(JSON.stringify([line.endkwaid, sectionChapterMap.get(line.endunitid)]));
-            console.log(JSON.stringify([line.endkwaid, sectionChapterMap.get(line.endunitid)]))
+            // console.log(JSON.stringify([line.endkwaid, sectionChapterMap.get(line.endunitid)]))
             // console.log(startVertex, endVertex);
 
             // 将局部坐标转换为全局坐标，因为每章里的点的位置是相对于章平面而不是全局的

@@ -138,7 +138,7 @@ const initialize = (nodes) => {
 };
 
 const getTreeData = () => {
-    request.evaluation.get('/coursemangt/ability').then((res) => {
+    request.evaluation.get('/evaluation/ability').then((res) => {
         if (res.code === 200) {
             treeData.value = res.data;
             nullNodeNum.value = 0;
@@ -256,7 +256,7 @@ const addSiblingNode = (node) => {
         }
     };
     // console.log(newNode);
-    request.evaluation.post('/coursemangt/ability/create', newNode).then((res) => {
+    request.evaluation.post('/evaluation/ability/create', newNode).then((res) => {
         if (res.code === 200) {
             getTreeData();
         }
@@ -280,7 +280,7 @@ const addChildNode = (node) => {
         }
     }
     // console.log(newNode);
-    request.evaluation.post('/coursemangt/ability/create', newNode).then((res) => {
+    request.evaluation.post('/evaluation/ability/create', newNode).then((res) => {
         if (res.code === 200) {
             expandedKeys.value.push(node.id); //将该节点id追加到展开的id中
             getTreeData();
@@ -312,7 +312,7 @@ const confirmDeleteNodes = (node) => {
         else deletedNodes.push(node.id);
         // console.log(deletedNodes);
 
-        request.evaluation.post('/coursemangt/ability/delete', deletedNodes).then((res) => {
+        request.evaluation.post('/evaluation/ability/delete', deletedNodes).then((res) => {
             if (res.code === 200) {
                 getTreeData();
 

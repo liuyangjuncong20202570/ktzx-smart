@@ -141,18 +141,6 @@ const initialize = (nodes) => {
 		node.inputVisible = false;
 		node.tempData = '';
 
-		if (node.obsname.includes('未命名节点')) {
-			if (node.obsname.length > 5) {
-				let num = '';
-				for (let i = 6; node.obsname[i] !== ')'; i++) {
-					num += node.obsname[i];
-				}
-				if (nullNodeNum.value < Number(num)) nullNodeNum.value = Number(num);
-
-			}
-			else if (node.obsname.length === 5 && nullNodeNum.value === 0) nullNodeNum.value++;
-		}
-
 		if (node.children && node.children.length > 0) {
 			initialize(node.children); // 递归子节点
 		}
@@ -293,7 +281,7 @@ const addSiblingNode = async (addedNode) => {
 		obsdeep: addedNode.obsdeep.toString(), //点击的obs的obsdeep
 		type: "1", // type为1为同级新增，type为0为下级新增
 		smObs: { // 新增的数据
-			obsname: nullNodeNum.value > 1 ? '未命名节点(' + nullNodeNum.value + ')' : '未命名节点',
+			obsname: '未命名节点',
 			remark: ""
 		}
 	};
@@ -324,7 +312,7 @@ const addChildNode = (addedNode) => {
 			obsdeep: addedNode.obsdeep.toString(),//点击的obs的obsdeep
 			type: "2",//type为1为同级新增，type为0为下级新增
 			smObs: {//新增的数据
-				obsname: nullNodeNum.value > 1 ? '未命名节点(' + nullNodeNum.value + ')' : '未命名节点',
+				obsname: '未命名节点',
 				remark: ""
 			}
 		}
