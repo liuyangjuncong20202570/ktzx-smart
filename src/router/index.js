@@ -98,6 +98,21 @@ const routes = [
                 name: 'AbilityDictionary',
                 component: () => import('../components/course/AbilityDictionary.vue')
             },
+            {
+                path: 'coursemangt/instructionalprogram',  // 教学大纲
+                name: 'InstructionalProgrammangt',
+                component: () => import('../components/course/InstructionalProgrammangt.vue')
+            },
+            {
+                path: '/coursemangt/classroommangt/academiccalendar',  // 教学日历
+                name: 'AcademicCalendar',
+                component: () => import('../components/course/Classroommangt/Academiccalendar.vue')
+            },
+            {
+                path: '/coursemangt/classroommangt/lessonplan',  // 课程教案
+                name: 'LessonPlan',
+                component: () => import('../components/course/Classroommangt/LessonPlan.vue')
+            },
             // {
             //     path: 'coursemanagerhomepage',  // 课程负责人首页
             //     name: 'CourseManagerHomePage',
