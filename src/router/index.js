@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory,onBeforeRouteLeave } from 'vue-router';
 
-const rolehome = ['teacherhomne', 'adminhome', 'superadminhome', 'secretariatehome'];
+const rolehome = ['teacherhomne', 'adminhome', 'superadminhome', 'secretariatehome','coursemanagerhome'];
 
 const routes = [
     {
