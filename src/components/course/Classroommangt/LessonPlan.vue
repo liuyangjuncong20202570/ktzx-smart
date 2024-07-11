@@ -10,75 +10,115 @@
       </el-upload>
     </el-header>
     <div style="max-height: 100%; height: 100%; overflow:auto;">
-      <el-table :data="filelist" style="width: 100%">
+      <el-table :data="formattedFilelist" style="width: 100%">
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="name" label="名称"></el-table-column>
-        <el-table-column prop="size" label="大小"></el-table-column>
-        <el-table-column prop="uploadTime" label="上传时间"></el-table-column>
+        <el-table-column prop="filename" label="名称"></el-table-column>
+        <el-table-column label="大小">
+          <template #default="scope">
+            <div>
+              {{ scope.row.formattedSize }}
+              <span v-if="scope.row.size < 1024 * 1024"></span>
+              <span v-else-if="scope.row.size < 1024 * 1024 * 10"></span>
+              <span v-else>(Large File)</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createtime" label="上传时间"></el-table-column>
         <el-table-column label="操作">
           <template #default="scope">
-            <el-button size="mini" @click="previewFile(scope.row)">预览</el-button>
-            <el-button size="mini" @click="downloadFile(scope.row)">下载</el-button>
-            <el-button size="mini" @click="editFile(scope.row)">编辑</el-button>
-            <el-button size="mini" @click="deleteFile(scope.row)">删除</el-button>
+            <el-button size="small" @click="previewFile(scope.row)">预览</el-button>
+            <el-button size="small" @click="downloadFile(scope.row)">下载</el-button>
+            <el-button size="small" @click="deleteFile(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
+
+    <!-- 预览模态框 -->
+    <el-dialog v-model="previewVisible" custom-class="preview-dialog" @close="handleClosePreview" :width="dialogWidth"
+               :height="dialogWidth">
+      <template #title>
+        <span>预览文件</span>
+      </template>
+      <div v-if="previewFileType === 'pdf'" class="preview-container">
+        <PdfPreview ref="pdfPreviewRef" :fileUrl="previewFileUrl"/>
+      </div>
+      <div v-if="previewFileType === 'word'" class="preview-container">
+        <WordPreview ref="wordPreviewRef" :fileUrl="previewFileUrl"/>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="handleClosePreview">关闭</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue';
-import {ElMessage, ElMessageBox} from "element-plus";
-import request from "../../utils/request.js";
-import blurOnClick from '../../directives/blur-on-click.js';
+import {ref, onMounted, computed} from 'vue';
+import {ElMessage, ElMessageBox} from 'element-plus';
+import request from '../../../utils/request.js';
+import PdfPreview from '../Utilcomponents/PdfPreview.vue';
+import WordPreview from '../Utilcomponents/WordPreview.vue';
 
 const filelist = ref([]);
+const previewVisible = ref(false);
+const previewFileType = ref('');
+const previewFileUrl = ref('');
+const dialogWidth = ref('65%');
+
+const pdfPreviewRef = ref(null);
+const wordPreviewRef = ref(null);
 
 const fetchCourseList = async () => {
-  console.log("Fetching course list...");
-  await request.course.get('/coursemangt/instructionalprogram')
+  await request.course.get('/coursemangt/classroommangt/lessonplan')
       .then(res => {
-        console.log("Response received from fetchCourseList:", res);
         if (res.code === 200) {
-          // 确保将返回的数据映射到正确的格式
-          filelist.value = res.data.split(',').map(filename => ({
-            name: filename,
-            size: '未知',
-            uploadTime: '未知'
-          }));
-          console.log("File list updated:", filelist.value); // 打印filelist
+          filelist.value = res.data;
         } else {
-          ElMessage({
-            type: 'error',
-            message: '获取教学大纲失败'
-          });
+          ElMessage.error('获取课程教案失败');
         }
       })
-      .catch(error => {
-        console.error("Error fetching course list:", error);
-        ElMessage({
-          type: 'error',
-          message: '获取教学大纲失败'
-        });
+      .catch(() => {
+        ElMessage.error('获取课程教案失败');
       });
 };
 
-const beforeUpload = (file) => {
-  console.log("Before upload:", file);
+const formatFileSize = (size) => {
+  if (size < 1024) {
+    return size + ' B';
+  } else if (size < 1024 * 1024) {
+    return (size / 1024).toFixed(2) + ' KB';
+  } else if (size < 1024 * 1024 * 1024) {
+    return (size / (1024 * 1024)).toFixed(2) + ' MB';
+  } else {
+    return (size / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+  }
+};
 
-  // 检查文件类型
-  const isWord = file.type === 'application/msword' ||
-      file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+const formattedFilelist = computed(() => {
+  return filelist.value.map(file => ({
+    ...file,
+    formattedSize: formatFileSize(file.size),
+  }));
+});
+
+const beforeUpload = (file) => {
+  const isDoc = file.type === 'application/msword'; // 检查是否为 .doc 文件
+  const isDocx = file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
   const isPDF = file.type === 'application/pdf';
 
-  if (!isWord && !isPDF) {
-    ElMessage.error('只能上传 Word 或 PDF 文件!');
+  if (isDoc) {
+    ElMessage.error('不能上传 .doc 格式的文件，请上传 .docx 或 .pdf 格式的文件!');
     return false;
   }
 
-  // 检查文件大小
+  if (!isDocx && !isPDF) {
+    ElMessage.error('只能上传 .docx 或 .pdf 格式的文件!');
+    return false;
+  }
+
   const isLt20M = file.size / 1024 / 1024 < 20;
   if (!isLt20M) {
     ElMessage.error('上传文件大小不能超过 20MB!');
@@ -87,55 +127,79 @@ const beforeUpload = (file) => {
 
   const formData = new FormData();
   formData.append('file', file);
-  console.log("Form data prepared for upload:", formData);
 
-  request.course.post('/coursemangt/instructionalprogram/upload', formData, {
+  request.course.post('/coursemangt/classroommangt/lessonplan/upload', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
   }).then(res => {
-    console.log("Upload response:", res);
     if (res.code === 200) {
       ElMessage.success(`${file.name} 上传成功`);
       fetchCourseList();
     } else {
       ElMessage.error(`${file.name} 上传失败: ${res.msg}`);
     }
-  }).catch(error => {
-    console.error("Upload error:", error);
+  }).catch(() => {
     ElMessage.error(`${file.name} 上传失败`);
   });
 
-  return false; // 阻止默认上传行为
+  return false;
 };
 
+const previewFile = async (file) => {
+  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/classroommangt/lessonplan/download/${file.filename}`;
+  console.log('Preview file URL:', fileUrl);  // 检查 URL 是否正确
+  const isPDF = file.filename.toLowerCase().endsWith('.pdf');
+  const isWord = file.filename.toLowerCase().endsWith('.docx');
 
-const handleUploadSuccess = (response, file) => {
-  console.log("Upload success:", response, file);
-  if (response.code === 200) {
-    ElMessage.success(`${file.name} 上传成功`);
-    fetchCourseList();
+  if (isPDF) {
+    previewFileType.value = 'pdf';
+  } else if (isWord) {
+    previewFileType.value = 'word';
   } else {
-    ElMessage.error(`${file.name} 上传失败`);
+    ElMessage.error('无法预览此文件类型');
+    return;
   }
+  previewFileUrl.value = fileUrl;
+  previewVisible.value = true;
 };
 
-const handleUploadError = (error, file) => {
-  console.error("Handle upload error:", error, file);
-  ElMessage.error(`${file.name} 上传失败`);
+
+const downloadFile = (file) => {
+  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/classroommangt/lessonplan/download/${file.filename}`;
+  fetch(fileUrl)
+      .then(response => {
+        if (response.ok) {
+          return response.blob();
+        } else {
+          throw new Error('Network response was not ok');
+        }
+      })
+      .then(blob => {
+        const link = document.createElement('a');
+        const url = window.URL.createObjectURL(blob);
+        link.href = url;
+        link.download = file.filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+        ElMessage.error('文件下载失败');
+      });
 };
 
 const deleteFile = async (file) => {
-  console.log("Deleting file:", file);
   try {
-    await ElMessageBox.confirm('此操作将永久删除该课程, 是否继续?', '提示', {
+    await ElMessageBox.confirm('此操作将永久删除该课程大纲, 是否继续?', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning',
     });
-    await request.course.post('/coursemangt/instructionalprogram/delete', {filename: file.name})
+    await request.course.get(`/coursemangt/classroommangt/lessonplan/delete/${file.filename}`)
         .then(res => {
-          console.log("Delete response:", res);
           if (res.code === 200) {
             ElMessage.success('删除成功');
             fetchCourseList();
@@ -143,119 +207,46 @@ const deleteFile = async (file) => {
             ElMessage.error('删除失败');
           }
         })
-        .catch(error => {
-          console.error("Delete error:", error);
+        .catch(() => {
           ElMessage.error('删除失败');
         });
   } catch (error) {
-    console.error("Delete error in try-catch:", error);
-    ElMessage.error('删除失败');
+    ElMessage.info('删除失败');
   }
 };
 
-const previewFile = (file) => {
-  console.log("Preview file:", file);
-  // 预览课程功能
-};
+const handleClosePreview = () => {
+  previewVisible.value = false;
 
-const downloadFile = (file) => {
-  console.log("Download file:", file);
-  const link = document.createElement('a');
-  link.href = `http://127.0.0.1:8082/api/coursemangt/instructionalprogram/download/${file.name}`;
-  link.download = file.name;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
+  // 取消 PDF 预览的渲染任务
+  if (pdfPreviewRef.value) {
+    pdfPreviewRef.value.cancelCurrentTasks();
+  }
+  if (wordPreviewRef.value) {
+    wordPreviewRef.value.resetContent();
+  }
+  previewFileUrl.value = ''; // 清空预览的URL
 
-// const downloadFile = (file) => {
-//   console.log("Download file:", file);
-//
-//   const url = `/coursemangt/instructionalprogram/download/${file.name}`;
-//
-//   request.course.get(url, {responseType: 'blob'})
-//       .then(response => {
-//         if (response && response.data) {
-//           const blob = new Blob([response.data], {type: response.headers['content-type'] || 'application/octet-stream'});
-//           const link = document.createElement('a');
-//           link.href = window.URL.createObjectURL(blob);
-//           link.download = file.name;
-//           document.body.appendChild(link);
-//           link.click();
-//           document.body.removeChild(link);
-//           window.URL.revokeObjectURL(link.href);
-//           ElMessage.success(`${file.name} 下载成功`);
-//         } else {
-//           ElMessage.error(`${file.name} 下载失败: 无响应数据`);
-//         }
-//       })
-//       .catch(error => {
-//         console.error("Download error:", error);
-//         ElMessage.error(`${file.name} 下载失败`);
-//       });
-// };
-
-const editFile = (file) => {
-  console.log("Edit file:", file);
-  // 编辑课程功能
 };
 
 onMounted(() => {
-  console.log("Component mounted");
   fetchCourseList();
 });
 </script>
 
-
 <style scoped>
-::v-deep(.el-table .cell) {
-  text-align: center;
+.preview-container {
+  width: 100%;
+  height: 100%;
 }
 
-.custom-icon:hover {
-  color: rgb(0, 115, 255) !important;
-  cursor: pointer;
+.pdf-container, .word-container {
+  width: 100%;
+  height: 80vh;
 }
 
-.user-bubbles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  justify-content: center;
-  align-items: center;
-}
-
-.user-bubble {
-  background-color: #E6F7FF;
-  border-radius: 15px;
-  padding: 5px 10px;
-  font-size: 14px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.more-users {
-  background-color: #e4e6eb;
-  border-radius: 15px;
-  padding: 5px 10px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.edit-icon {
-  cursor: pointer;
-  white-space: nowrap;
-  margin-left: 8px;
-}
-
-.edit-icon:hover {
-  color: #409EFF;
-}
-
-.dynamic-font-size {
-  font-size: calc(3px + 0.8vw);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.pdf-frame, .word-frame {
+  width: 100%;
+  height: 100%;
 }
 </style>

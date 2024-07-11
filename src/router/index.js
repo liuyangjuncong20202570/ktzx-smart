@@ -104,12 +104,18 @@ const routes = [
                 component: () => import('../components/course/InstructionalProgrammangt.vue')
             },
             {
-                path: '/coursemangt/classroommangt/academiccalendar',  // 教学日历
+                path: 'coursemangt/courseresources',  // 课程资源
+                name: 'CourseResources',
+                component: () => import('../components/course/Courseresources.vue')
+            },
+
+            {
+                path: 'coursemangt/classroommangt/academiccalendar',  // 教学日历
                 name: 'AcademicCalendar',
                 component: () => import('../components/course/Classroommangt/Academiccalendar.vue')
             },
             {
-                path: '/coursemangt/classroommangt/lessonplan',  // 课程教案
+                path: 'coursemangt/classroommangt/lessonplan',  // 课程教案
                 name: 'LessonPlan',
                 component: () => import('../components/course/Classroommangt/LessonPlan.vue')
             },
@@ -152,6 +158,12 @@ const routes = [
                 path: 'evasys/accessible/coursetarget', // 达成性评价模型-课程目标
                 name: 'CourseTarget',
                 component: () => import('../components/evaluation/CourseTarget.vue')  
+            },
+
+            {
+                path: 'exam/coursequelib', // 达成性评价模型-课程目标
+                name: 'CourseTarget',
+                component: () => import('../components/evaluation/CourseTarget.vue')
             },
         ]
     },

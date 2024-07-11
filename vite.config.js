@@ -13,7 +13,7 @@ export default defineConfig({
   server: {
     port: 8081
   },
-  base: './',
+  base: '/',
   resolve: {
     alias: {
       '@': '/src'

@@ -58,9 +58,9 @@
 <script setup>
 import {ref, onMounted, computed} from 'vue';
 import {ElMessage, ElMessageBox} from 'element-plus';
-import request from '../../../utils/request.js';
-import PdfPreview from '../Utilcomponents/PdfPreview.vue';
-import WordPreview from '../Utilcomponents/WordPreview.vue';
+import request from '../../utils/request.js';
+import PdfPreview from './Utilcomponents/PdfPreview.vue';
+import WordPreview from './Utilcomponents/WordPreview.vue';
 
 const filelist = ref([]);
 const previewVisible = ref(false);
@@ -72,16 +72,16 @@ const pdfPreviewRef = ref(null);
 const wordPreviewRef = ref(null);
 
 const fetchCourseList = async () => {
-  await request.course.get('/coursemangt/classroommangt/academiccalendar')
+  await request.course.get('/coursemangt/courseresources')
       .then(res => {
         if (res.code === 200) {
           filelist.value = res.data;
         } else {
-          ElMessage.error('获取教学日历失败');
+          ElMessage.error('获取教学大纲失败');
         }
       })
       .catch(() => {
-        ElMessage.error('获取教学日历失败');
+        ElMessage.error('获取教学大纲失败');
       });
 };
 
@@ -128,7 +128,7 @@ const beforeUpload = (file) => {
   const formData = new FormData();
   formData.append('file', file);
 
-  request.course.post('/coursemangt/classroommangt/academiccalendar/upload', formData, {
+  request.course.post('/coursemangt/courseresources/upload', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
@@ -147,7 +147,7 @@ const beforeUpload = (file) => {
 };
 
 const previewFile = async (file) => {
-  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/classroommangt/academiccalendar/download/${file.filename}`;
+  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/courseresources/download/${file.filename}`;
   console.log('Preview file URL:', fileUrl);  // 检查 URL 是否正确
   const isPDF = file.filename.toLowerCase().endsWith('.pdf');
   const isWord = file.filename.toLowerCase().endsWith('.docx');
@@ -166,7 +166,7 @@ const previewFile = async (file) => {
 
 
 const downloadFile = (file) => {
-  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/classroommangt/academiccalendar/download/${file.filename}`;
+  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/courseresources/download/${file.filename}`;
   fetch(fileUrl)
       .then(response => {
         if (response.ok) {
@@ -198,7 +198,7 @@ const deleteFile = async (file) => {
       cancelButtonText: '取消',
       type: 'warning',
     });
-    await request.course.get(`/coursemangt/classroommangt/academiccalendar/delete/${file.filename}`)
+    await request.course.get(`/coursemangt/courseresources/delete/${file.filename}`)
         .then(res => {
           if (res.code === 200) {
             ElMessage.success('删除成功');

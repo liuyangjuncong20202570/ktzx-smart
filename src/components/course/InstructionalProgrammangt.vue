@@ -35,14 +35,16 @@
     </div>
 
     <!-- 预览模态框 -->
-    <el-dialog v-model="previewVisible" custom-class="preview-dialog" @close="handleClosePreview">
+    <el-dialog v-model="previewVisible" custom-class="preview-dialog" @close="handleClosePreview" :width="dialogWidth"
+               :height="dialogWidth">
       <template #title>
         <span>预览文件</span>
       </template>
-      <div v-if="previewFileType === 'pdf'" id="pdf-preview-container" class="preview-container">
-        <canvas ref="pdfCanvas"></canvas>
+      <div v-if="previewFileType === 'pdf'" class="preview-container">
+        <PdfPreview ref="pdfPreviewRef" :fileUrl="previewFileUrl"/>
       </div>
-      <div v-if="previewFileType === 'word'" id="word-preview-container" class="preview-container" v-html="wordHtml">
+      <div v-if="previewFileType === 'word'" class="preview-container">
+        <WordPreview ref="wordPreviewRef" :fileUrl="previewFileUrl"/>
       </div>
       <template #footer>
         <span class="dialog-footer">
@@ -54,19 +56,20 @@
 </template>
 
 <script setup>
-import {ref, onMounted, computed, nextTick} from 'vue';
+import {ref, onMounted, computed} from 'vue';
 import {ElMessage, ElMessageBox} from 'element-plus';
 import request from '../../utils/request.js';
-import blurOnClick from '../../directives/blur-on-click.js';
-import mammoth from 'mammoth';
-import {pdfjsLib} from '../../utils/pdfjsWorker';
+import PdfPreview from './Utilcomponents/PdfPreview.vue';
+import WordPreview from './Utilcomponents/WordPreview.vue';
 
 const filelist = ref([]);
 const previewVisible = ref(false);
 const previewFileType = ref('');
 const previewFileUrl = ref('');
-const wordHtml = ref('');
-const pdfCanvas = ref(null);
+const dialogWidth = ref('65%');
+
+const pdfPreviewRef = ref(null);
+const wordPreviewRef = ref(null);
 
 const fetchCourseList = async () => {
   await request.course.get('/coursemangt/instructionalprogram')
@@ -102,12 +105,17 @@ const formattedFilelist = computed(() => {
 });
 
 const beforeUpload = (file) => {
-  const isWord = file.type === 'application/msword' ||
-      file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+  const isDoc = file.type === 'application/msword'; // 检查是否为 .doc 文件
+  const isDocx = file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
   const isPDF = file.type === 'application/pdf';
 
-  if (!isWord && !isPDF) {
-    ElMessage.error('只能上传 Word 或 PDF 文件!');
+  if (isDoc) {
+    ElMessage.error('不能上传 .doc 格式的文件，请上传 .docx 或 .pdf 格式的文件!');
+    return false;
+  }
+
+  if (!isDocx && !isPDF) {
+    ElMessage.error('只能上传 .docx 或 .pdf 格式的文件!');
     return false;
   }
 
@@ -139,69 +147,57 @@ const beforeUpload = (file) => {
 };
 
 const previewFile = async (file) => {
-  if (file.filename.endsWith('.pdf')) {
+  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/instructionalprogram/download/${file.filename}`;
+  console.log('Preview file URL:', fileUrl);  // 检查 URL 是否正确
+  const isPDF = file.filename.toLowerCase().endsWith('.pdf');
+  const isWord = file.filename.toLowerCase().endsWith('.docx');
+
+  if (isPDF) {
     previewFileType.value = 'pdf';
-    previewVisible.value = true;
-    await nextTick();
-    previewFileUrl.value = `http://127.0.0.1:8082/api/coursemangt/instructionalprogram/download/${file.filename}`;
-    const loadingTask = pdfjsLib.getDocument(previewFileUrl.value);
-    loadingTask.promise.then(pdf => {
-      pdf.getPage(1).then(page => {
-        const viewport = page.getViewport({scale: 1.5});
-        const canvas = pdfCanvas.value;
-        const context = canvas.getContext('2d');
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-        const renderContext = {
-          canvasContext: context,
-          viewport: viewport
-        };
-        page.render(renderContext);
-      });
-    }).catch(() => {
-      ElMessage.error('PDF 加载失败');
-    });
-  } else if (file.filename.endsWith('.doc') || file.filename.endsWith('.docx')) {
+  } else if (isWord) {
     previewFileType.value = 'word';
-    const fileUrl = `http://127.0.0.1:8082/api/coursemangt/instructionalprogram/download/${file.filename}`;
-    previewFileUrl.value = fileUrl;
-    previewVisible.value = true;
-    fetch(fileUrl)
-        .then(response => response.arrayBuffer())
-        .then(data => mammoth.convertToHtml({arrayBuffer: data}))
-        .then(result => {
-          wordHtml.value = result.value;
-        })
-        .catch(() => {
-          ElMessage.error('文档转换失败');
-        });
+  } else {
+    ElMessage.error('无法预览此文件类型');
+    return;
   }
+  previewFileUrl.value = fileUrl;
+  previewVisible.value = true;
 };
+
 
 const downloadFile = (file) => {
-  const link = document.createElement('a');
-  link.href = `http://127.0.0.1:8082/api/coursemangt/instructionalprogram/download/${file.filename}`;
-  link.download = file.filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
-
-const handleClosePreview = () => {
-  previewVisible.value = false;
-  previewFileType.value = '';
-  previewFileUrl.value = '';
-  wordHtml.value = '';
+  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/instructionalprogram/download/${file.filename}`;
+  fetch(fileUrl)
+      .then(response => {
+        if (response.ok) {
+          return response.blob();
+        } else {
+          throw new Error('Network response was not ok');
+        }
+      })
+      .then(blob => {
+        const link = document.createElement('a');
+        const url = window.URL.createObjectURL(blob);
+        link.href = url;
+        link.download = file.filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+        ElMessage.error('文件下载失败');
+      });
 };
 
 const deleteFile = async (file) => {
   try {
-    await ElMessageBox.confirm('此操作将永久删除该课程, 是否继续?', '提示', {
+    await ElMessageBox.confirm('此操作将永久删除该课程大纲, 是否继续?', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning',
     });
-    console.log(file.filename);
     await request.course.get(`/coursemangt/instructionalprogram/delete/${file.filename}`)
         .then(res => {
           if (res.code === 200) {
@@ -215,8 +211,22 @@ const deleteFile = async (file) => {
           ElMessage.error('删除失败');
         });
   } catch (error) {
-    ElMessage.error('删除失败');
+    ElMessage.info('删除失败');
   }
+};
+
+const handleClosePreview = () => {
+  previewVisible.value = false;
+
+  // 取消 PDF 预览的渲染任务
+  if (pdfPreviewRef.value) {
+    pdfPreviewRef.value.cancelCurrentTasks();
+  }
+  if (wordPreviewRef.value) {
+    wordPreviewRef.value.resetContent();
+  }
+  previewFileUrl.value = ''; // 清空预览的URL
+
 };
 
 onMounted(() => {
@@ -225,59 +235,18 @@ onMounted(() => {
 </script>
 
 <style scoped>
-::v-deep(.el-table .cell) {
-  text-align: center;
-}
-
 .preview-container {
   width: 100%;
   height: 100%;
 }
 
-.custom-icon:hover {
-  color: rgb(0, 115, 255) !important;
-  cursor: pointer;
+.pdf-container, .word-container {
+  width: 100%;
+  height: 80vh;
 }
 
-.user-bubbles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  justify-content: center;
-  align-items: center;
-}
-
-.user-bubble {
-  background-color: #E6F7FF;
-  border-radius: 15px;
-  padding: 5px 10px;
-  font-size: 14px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.more-users {
-  background-color: #e4e6eb;
-  border-radius: 15px;
-  padding: 5px 10px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.edit-icon {
-  cursor: pointer;
-  white-space: nowrap;
-  margin-left: 8px;
-}
-
-.edit-icon:hover {
-  color: #409EFF;
-}
-
-.dynamic-font-size {
-  font-size: calc(3px + 0.8vw);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.pdf-frame, .word-frame {
+  width: 100%;
+  height: 100%;
 }
 </style>

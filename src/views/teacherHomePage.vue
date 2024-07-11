@@ -89,7 +89,8 @@
               <el-menu :default-active="defaultActive">
                 <template v-for="menu in filteredMenus">
                   <el-sub-menu v-if="hasChildren(menu)" :index="menu.id" :key="menu.id"
-                    style="border-top: 1px solid #efefef;">
+                               style="border-top: 1px solid #efefef;  ">
+                    <!--                    @click="navigateTo(menu.url)"-->
                     <template #title>
                       <span>{{ menu.name }}</span>
                     </template>
