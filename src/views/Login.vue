@@ -201,7 +201,8 @@ const userlogin = () => {
       .then(res => {
         if (res.code === 200) {
           setprofile(res.data)
-          router.push(res.data.homeurl);
+          // router.push(res.data.homeurl);
+          router.push('/page');
         } else if (res.code === 404) {
           router.push('/login');
         }

@@ -1,6 +1,6 @@
-import {createRouter, createWebHistory,onBeforeRouteLeave } from 'vue-router';
+import {createRouter, createWebHashHistory,onBeforeRouteLeave } from 'vue-router';
 
-const rolehome = ['teacherhomne', 'adminhome', 'superadminhome', 'secretariatehome'];
+const rolehome = ['teacherhomne', 'adminhome', 'superadminhome', 'secretariatehome','coursemanagerhome'];
 
 const routes = [
     {
@@ -13,11 +13,11 @@ const routes = [
         name: 'StudentHomePage',
         component: () => import('../views/studentHomePage.vue')
     },
-    {
-        path: '/homes/studentcourses',
-        name: 'StudentCoursePage',
-        component: () => import('../views/StudentCoursePage.vue')
-    },
+    // {
+    //     path: '/homes/studentcourses',
+    //     name: 'StudentCoursePage',
+    //     component: () => import('../views/StudentCoursePage.vue')
+    // },
     {
         path: '/homes/:rolehome(' + rolehome.join('|') + ')',
         name: 'Homepage',
@@ -31,15 +31,39 @@ const routes = [
         ]
     },
     {
+        path: '/page',
+        name: 'Page',
+        component: () => import('../views/page/index.vue'),
+        children: [
+            {
+                path: '/page/courseLib',
+                name: 'CourseLib',
+                component: () => import('../views/page/courseLib/index.vue')
+            },
+            {
+                path: '/page/type',
+                name: 'CourseLibType',
+                component: () => import('../views/page/courseLib/type/index.vue')
+            },
+            {
+                path: '/page/sync',
+                name: 'CourseLibSycn',
+                component: () => import('../views/page/courseLib/sync/index.vue')
+            },
+        ]
+    },
+    {
         path: '/:pathMatch(.*)*',
         redirect: '/login'
     },
+
 ];
 const router = createRouter({
-    history: createWebHistory('/'),
+    history: createWebHashHistory(''),
     routes,
 });
 router.beforeEach((to, from, next) => {
+    console.log('to', to)
     const storedUserInfo = sessionStorage.getItem('users');
     const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
     if (requiresAuth && !storedUserInfo) {

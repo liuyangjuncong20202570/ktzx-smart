@@ -1,10 +1,14 @@
+import { ElMessage } from 'element-plus'
 import axios from 'axios'
 //60.205.178.180
 //127.0.0.1
 const request = {
-    admin: createAPI('http://127.0.0.1:8080/api'),
-    course: createAPI('http://127.0.0.1:8082/api'),
-    evaluation: createAPI('http://127.0.0.1:8083/api'),
+    admin: createAPI('/api'),
+    course: createAPI('/api'),
+    evaluation: createAPI('/api'),
+    page: createAPI('/page'),
+    fork: createAPI('/fork'),
+    common: createAPI('common'),
 }
 
 // const request = {
@@ -44,6 +48,12 @@ function createAPI(url) {   // 构建不同端口的异步请求数据
     axiosData.interceptors.response.use(
         response => {
             let res = response.data;
+            
+            if (res.code != '200') {
+                ElMessage.error(res.message)
+            }
+
+            console.log('res----', res)
             // 如果是返回的文件
             if (response.config.responseType === 'blob') {
                 return res
