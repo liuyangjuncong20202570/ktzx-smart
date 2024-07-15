@@ -1,48 +1,81 @@
 <template>
-  <el-table ref="multipleTableRef" :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
-    <el-table-column type="selection" width="55" />
-    <!-- <el-table-column label="Date" width="120">
-      <template #default="scope">{{ scope.row.date }}</template>
-    </el-table-column> -->
-    <el-table-column property="name" label="选择" width="120" />
-    <el-table-column property="address" label="题型" show-overflow-tooltip />
-  </el-table>
-  <div style="margin-top: 20px">
-    <el-button @click="toggleSelection([tableData[1], tableData[2]])">Toggle selection status of second and third
-      rows</el-button>
-    <el-button @click="toggleSelection()">Clear selection</el-button>
+  <div class="course-type">
+    <Header title="题库管理" />
+    <el-table ref="multipleTableRef" :data="typeList" style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" />
+      <el-table-column property="name" label="题型" show-overflow-tooltip />
+      <el-table-column property="status" label="状态" show-overflow-tooltip>
+        <template #default="scope">{{ scope.row.status === 1 ? '开启' : '关闭' }}</template>
+      </el-table-column>
+    </el-table>
+    <div style="margin-top: 20px">
+      <el-button @click="toggleSelection(typeList)">Clear selection</el-button>
+      <el-button @click="save()">保存</el-button>
+    </div>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { ref } from 'vue'
-import { ElTable } from 'element-plus'
-
-interface User {
-  date: string
-  name: string
-  address: string
-}
+<script setup>
+import { ref, onMounted, nextTick } from 'vue'
+import { ElTable, ElMessage } from 'element-plus'
+import { courseLibTypeList, courseLibTypeSetStatus } from '@/api/courseLib.js'
+import Header from '../../components/header/index.vue'
+onMounted(() => {
+  getCourseLibTypeList()
+})
 
 const multipleTableRef = ref()
-const multipleSelection = ref < User[] > ([])
-const toggleSelection = (rows?: User[]) => {
+const multipleSelection = ref([])
+const typeList = ref([])
+
+const toggleSelection = (rows) => {
   if (rows) {
     rows.forEach((row) => {
-      // TODO: improvement typing when refactor table
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      multipleTableRef.value!.toggleRowSelection(row, undefined)
+      if (row.status) {
+        multipleTableRef.value?.toggleRowSelection(row, undefined)
+      }
     })
   } else {
-    multipleTableRef.value!.clearSelection()
+    multipleTableRef.value?.clearSelection()
   }
 }
-const handleSelectionChange = (val: User[]) => {
+const handleSelectionChange = (val) => {
+  console.log('val', val)
   multipleSelection.value = val
 }
 
-const tableData: User[] = [
+const getCourseLibTypeList = () => {
+  courseLibTypeList().then(res => {
+    if (res.code === '200') {
+      typeList.value = res?.data
+      console.log('multipleTableRef', multipleTableRef)
+      nextTick(() => {
+        toggleSelection(typeList.value)
+      })
+    }
+  })
+}
+
+const save = () => {
+  const selectionRows = multipleTableRef.value?.getSelectionRows()
+  const queTypeIds = selectionRows.map((item) => item.queTypeId)
+  const params = typeList.value.map((item) => {
+    const { queTypeId } = item
+    const flag = queTypeIds.indexOf(item.queTypeId) !== -1
+    return {
+      queTypeId,
+      status: flag ? 1 : 0
+    }
+  })
+  courseLibTypeSetStatus(params).then(res => {
+    if (res.code === '200') {
+      ElMessage.success('设置成功')
+      getCourseLibTypeList()
+    }
+  })
+}
+
+const tableData = [
   {
     date: '2016-05-03',
     name: 'Tom',
@@ -80,3 +113,10 @@ const tableData: User[] = [
   },
 ]
 </script>
+<style scoped>
+  .course-type {
+    background: #fff;
+    padding: 10px;
+    border-radius: 10px;
+  }
+</style>

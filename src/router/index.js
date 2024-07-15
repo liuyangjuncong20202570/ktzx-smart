@@ -41,15 +41,27 @@ const routes = [
                 component: () => import('../views/page/courseLib/index.vue')
             },
             {
-                path: '/page/type',
+                path: '/page/courseLib/type',
                 name: 'CourseLibType',
                 component: () => import('../views/page/courseLib/type/index.vue')
             },
             {
-                path: '/page/sync',
+                path: '/page/courseLib/sync',
                 name: 'CourseLibSycn',
                 component: () => import('../views/page/courseLib/sync/index.vue')
             },
+
+            
+            {
+                path: '/page/classroomLib',
+                name: 'ClassroomLib',
+                component: () => import('../views/page/classroomLib/index.vue')
+            },
+            {
+                path: '/page/classroomLib/type',
+                name: 'ClassroomLibType',
+                component: () => import('../views/page/classroomLib/type/index.vue')
+            }
         ]
     },
     {

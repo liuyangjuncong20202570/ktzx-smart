@@ -11,8 +11,8 @@
                             </template>
                             <el-menu-item-group>
                                 <el-menu-item index="/page/courseLib">课程题库管理</el-menu-item>
-                                <el-menu-item index="/page/type">题型设定</el-menu-item>
-                                <el-menu-item index="/page/sync">题库同步</el-menu-item>
+                                <el-menu-item index="/page/courseLib/type">题型设定</el-menu-item>
+                                <el-menu-item index="/page/courseLib/sync">题库同步</el-menu-item>
                             </el-menu-item-group>
                         </el-sub-menu>
 
@@ -24,8 +24,8 @@
                                 <span>课堂题库</span>
                             </template>
                             <el-menu-item-group>
-                                <el-menu-item index="2-1">课堂题库管理</el-menu-item>
-                                <el-menu-item index="2-2">题型设定</el-menu-item>
+                                <el-menu-item index="/page/classroomLib">课堂题库管理</el-menu-item>
+                                <el-menu-item index="/page/classroomLib/type">题型设定</el-menu-item>
                             </el-menu-item-group>
                         </el-sub-menu>
 

@@ -5,7 +5,7 @@
     <Kwa type="search" @kwa-event="handleKwaEvent" />
 
     <div class="cpirse-lib-btn flex-between">
-      <el-checkbox label="全选" @change="handleSelectAll" v-model="selectAll"></el-checkbox>
+      <el-checkbox label="全选" @change="handleSelectAll"></el-checkbox>
       <div>
         <el-button type="primary" @click="add">新增题目</el-button>
         <el-button type="danger" @click="batchDel">批量删除</el-button>
@@ -26,14 +26,16 @@
     />
 
     <el-collapse v-model="activeNames">
-      <el-collapse-item v-for="(course, i) in courseList" :key="course.id" :title="`${i+1}、${course.title}`" :name="course.id">
+      <el-collapse-item v-for="(course, i) in courseList" :key="course.id" :title="`${i+1}、${course.title}(${TOPICTYPE[item?.questionTypeId] ?? '预留题'})`" :name="course.id">
         <div class="topic-item">
           <div class="topic-kwa" v-if="course.answers">
             <span style="margin-right: 20px" v-for="(kwa, kwaIdx) in course.kwas" :key="kwaIdx">{{ kwa.kwaName }}</span>
           </div>
           <div>
-            <el-checkbox label="" v-model="course.isChecked"></el-checkbox>
-            <span class="topic-title">{{ course.title }}</span>
+            <span class="flex-start">
+              <el-checkbox label="" v-model="course.isChecked"></el-checkbox>
+              <span class="topic-title">{{ course.title }}</span>
+            </span>
             <div class="topic-answer-item" v-for="(answer, answerIdx) in course.answers" :key="answerIdx">
               {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}
               <span v-if="answer.isAnswer">正确答案</span>
@@ -73,9 +75,10 @@ import { Edit, DocumentCopy, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import Kwa from '@/components/kwa/index.vue'
 import Header from '../components/header/index.vue'
-import Topic from '../components/topic/index.vue'
+import Topic from './components/topic/index.vue'
 import optionTopic from './components/optionTopic/index.vue'
 import { login, courseLibList, courseLibCopy, courseLibDel } from '@/api/courseLib.js'
+import { TOPICTYPE } from '@/utils/consts'
 
 export default defineComponent({
   components: {
@@ -100,7 +103,6 @@ export default defineComponent({
     const activeNames = ref([])
     const optionTopicRef = ref(null)
     const courseList = ref(null)
-    const selectAll = ref(false)
     const total = ref(0)
     const params = ref({
       pageIndex: 1,
@@ -110,8 +112,6 @@ export default defineComponent({
       courseList.value?.forEach((course) => {
         course.isChecked = val
       })
-      selectAll.value = val
-      console.log('courseList', courseList)
     }
    
     const edit = (answer) => {
@@ -169,9 +169,11 @@ export default defineComponent({
     }
 
     const batchDel = () => {
-      if (selectAll) {
-        const ids = courseList.value.map((course) => course.id) || []
+      const ids = courseList.value.filter((course) => course.isChecked )?.map((course) => course.id)
+      if (ids && ids.length) {
         del(null, ids)
+      } else {
+        ElMessage.error('请选择要删除的题')
       }
     }
 
@@ -204,8 +206,8 @@ export default defineComponent({
     const getCourseLibList = () => {
       courseLibList(params.value).then(res => {
         if (res.code === '200') {
-          total.value = res.data.recordSize
-          courseList.value = res?.data?.data
+          total.value = res?.data?.recordSize ?? 0
+          courseList.value = res?.data?.data ?? []
           // 折叠面板默认全部展开
           activeNames.value = courseList.value.map((item) => item.id)
           console.log('res', courseList.value)
@@ -227,12 +229,12 @@ export default defineComponent({
       edit,
       copy,
       batchDel,
-      selectAll,
       handleKwaEvent,
       handleChildData,
       handleSizeChange,
       getCourseLibList ,
       handleCurrentChange,
+      TOPICTYPE,
     }
   }
 })
@@ -259,7 +261,7 @@ export default defineComponent({
   position: relative;
 
   .topic-title {
-    font-weight: bold;
+    font-size: 14px;
   }
 
   .topic-item-icon {

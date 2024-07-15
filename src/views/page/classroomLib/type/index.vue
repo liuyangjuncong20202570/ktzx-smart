@@ -1,15 +1,122 @@
 <template>
-    <div>
-      1231521
+  <div class="course-type">
+    <Header title="题库管理" />
+    <el-table ref="multipleTableRef" :data="typeList" style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" />
+      <el-table-column property="name" label="题型" show-overflow-tooltip />
+      <el-table-column property="status" label="状态" show-overflow-tooltip>
+        <template #default="scope">{{ scope.row.status === 1 ? '开启' : '关闭' }}</template>
+      </el-table-column>
+    </el-table>
+    <div style="margin-top: 20px">
+      <el-button @click="toggleSelection(typeList)">Clear selection</el-button>
+      <el-button @click="save()">保存</el-button>
     </div>
-  </template>
-  
-  <script setup>
-//   const greeting = "Hello, Vue 3!";
-  </script>
-  
-  <style scoped>
-  h2 {
-    color: blue;
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, nextTick } from 'vue'
+import { ElTable, ElMessage } from 'element-plus'
+import { classroomLibTypeList, classroomLibTypeSetStatus } from '@/api/classroomLib.js'
+import Header from '../../components/header/index.vue'
+onMounted(() => {
+  getClassroomLibTypeList()
+})
+
+const multipleTableRef = ref()
+const multipleSelection = ref([])
+const typeList = ref([])
+
+const toggleSelection = (rows) => {
+  if (rows) {
+    rows.forEach((row) => {
+      if (row.status) {
+        multipleTableRef.value?.toggleRowSelection(row, undefined)
+      }
+    })
+  } else {
+    multipleTableRef.value?.clearSelection()
   }
-  </style>
+}
+const handleSelectionChange = (val) => {
+  console.log('val', val)
+  multipleSelection.value = val
+}
+
+const getClassroomLibTypeList = () => {
+  classroomLibTypeList().then(res => {
+    if (res.code === '200') {
+      typeList.value = res?.data
+      console.log('multipleTableRef', multipleTableRef)
+      nextTick(() => {
+        toggleSelection(typeList.value)
+      })
+    }
+  })
+}
+
+const save = () => {
+  const selectionRows = multipleTableRef.value?.getSelectionRows()
+  const queTypeIds = selectionRows.map((item) => item.queTypeId)
+  const params = typeList.value.map((item) => {
+    const { queTypeId } = item
+    const flag = queTypeIds.indexOf(item.queTypeId) !== -1
+    return {
+      queTypeId,
+      status: flag ? 1 : 0
+    }
+  })
+  classroomLibTypeSetStatus(params).then(res => {
+    if (res.code === '200') {
+      ElMessage.success('设置成功')
+      getClassroomLibTypeList()
+    }
+  })
+}
+
+const tableData = [
+  {
+    date: '2016-05-03',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+  {
+    date: '2016-05-02',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+  {
+    date: '2016-05-04',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+  {
+    date: '2016-05-01',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+  {
+    date: '2016-05-08',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+  {
+    date: '2016-05-06',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+  {
+    date: '2016-05-07',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+]
+</script>
+<style scoped>
+  .course-type {
+    background: #fff;
+    padding: 10px;
+    border-radius: 10px;
+  }
+</style>

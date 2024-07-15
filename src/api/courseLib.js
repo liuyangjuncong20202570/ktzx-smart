@@ -19,10 +19,6 @@ export const courseLibType = () => {
 export const courseLibList = (data) => {
     return request.page.post('/courseLib/pager', data)
 }
-// 获得题型列表
-export const courseLibTypeList = () => {
-    return request.page.get('/courseLib/type/list')
-}
 // 复制题目
 export const courseLibCopy = (data) => {
     return request.page.get('/courseLib/copy?id=' + data)
@@ -34,6 +30,27 @@ export const courseLibDel = (data) => {
 // 编辑题目
 export const courseLibEdit = (data) => {
     return request.page.post('/courseLib/update', data)
+}
+// 获取课程题型设定
+export const courseLibTypeList = () => {
+    return request.page.get('/courseLib/type/list')
+}
+// 获取课程保存题型设定
+export const courseLibTypeSetStatus = (data) => {
+    return request.page.post('/courseLib/type/setStatus', data)
+}
+
+// 获取课程题型同步列表
+export const courseLibSyncPager = (data) => {
+    return request.page.post('/courseLib/sync/pager', data)
+}
+// 接收审批
+export const courseLibSyncAccept = (data) => {
+    return request.page.post('/courseLib/sync/accept', data)
+}
+// 获取课程保存题型设定
+export const courseLibSyncReject = (data) => {
+    return request.page.post('/courseLib/sync/reject', data)
 }
 
 export const login = () => {
