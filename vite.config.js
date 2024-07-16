@@ -33,6 +33,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\//, '')
       },
+      '/term': {
+        target: 'http://60.205.178.180:8084',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\//, '')
+      },
     }
   },
   base: './',

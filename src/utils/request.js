@@ -9,6 +9,7 @@ const request = {
     page: createAPI('/page'),
     fork: createAPI('/fork'),
     common: createAPI('common'),
+    term: createAPI('term'),
 }
 
 // const request = {

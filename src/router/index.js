@@ -50,8 +50,6 @@ const routes = [
                 name: 'CourseLibSycn',
                 component: () => import('../views/page/courseLib/sync/index.vue')
             },
-
-            
             {
                 path: '/page/classroomLib',
                 name: 'ClassroomLib',
@@ -61,6 +59,32 @@ const routes = [
                 path: '/page/classroomLib/type',
                 name: 'ClassroomLibType',
                 component: () => import('../views/page/classroomLib/type/index.vue')
+            },
+            // 作业管理
+            {
+                path: '/page/taskMgmt',
+                name: 'TaskMgmt',
+                component: () => import('../views/page/taskMgmt/index.vue')
+            },
+            {
+                path: '/page/taskMgmt/view',
+                name: 'TaskMgmtView',
+                component: () => import('../views/page/taskMgmt/view/index.vue')
+            },
+            {
+                path: '/page/taskMgmt/tpAssembly',
+                name: 'TaskMgmtTpAssembly',
+                component: () => import('../views/page/taskMgmt/tpAssembly/index.vue')
+            },
+            {
+                path: '/page/taskMgmt/taskList',
+                name: 'TaskMgmtTaskList',
+                component: () => import('../views/page/taskMgmt/taskList/index.vue')
+            },
+            {
+                path: '/page/taskMgmt/assignGrading',
+                name: 'TaskMgmtAssignGrading',
+                component: () => import('../views/page/taskMgmt/assignGrading/index.vue')
             }
         ]
     },
