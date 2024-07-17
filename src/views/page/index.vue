@@ -1,3 +1,9 @@
+<!--
+ * @Date: 2024-07-16 11:07:52
+ * @LastEditors: Ming
+ * @LastEditTime: 2024-07-16 11:33:58
+ * @FilePath: \smarttt_ktzx\src\views\page\index.vue
+-->
 <template>
     <el-container>
         <el-aside width="260px">
@@ -29,10 +35,18 @@
                             </el-menu-item-group>
                         </el-sub-menu>
 
-                        <!-- <el-menu-item index="2">
-                            <el-icon><icon-menu /></el-icon>
-                            <span>Navigator Two</span>
-                        </el-menu-item> -->
+                        <el-sub-menu index="3">
+                            <template #title>
+                                <el-icon>
+                                    <location />
+                                </el-icon>
+                                <span>实验管理</span>
+                            </template>
+                            <el-menu-item-group>
+                                <el-menu-item index="/page/practice">实验列表</el-menu-item>
+                                <el-menu-item index="/page/student">实验学生列表</el-menu-item>
+                            </el-menu-item-group>
+                        </el-sub-menu>
                     </el-menu>
         </el-aside>
         <el-main style="background: #f0f2f5">
