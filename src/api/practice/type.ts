@@ -3,6 +3,12 @@ export interface PageVO {
   pageIndex: number;
   pageSize: number;
 }
+export interface ResVO {
+  code: string;
+  data?: any;
+  message:string,
+  result:boolean
+}
 
 // 实验page参数
 export interface PracticePageVO {
@@ -46,5 +52,44 @@ export interface PracticeTemplateVO {
   stuVisible: number;
   templateCode: string;
   weight?: number;
-  kwa?:string,
+  fullName:string,
+  kwaId?:string
+  kwaName?:string
+}
+
+export interface KwaVO {
+  abilityList: Array<any>;
+  keyId: string;
+  name: string;
+}
+export interface KwaDataVO {
+  key:string;
+  ability: string;
+}
+
+export interface ParamVO {
+  beDefault?: number,
+  beValid?: number,
+  defaultPath?: "string",
+  id?: "string",
+  itemName?: "string",
+  kwas?: Array<any>,
+  practiceId?: "string",
+  stuVisible?: number,
+  weight?: number,
+}
+export interface DefaultParamVO  {
+  id?:string,
+  items:Array<ParamVO>,
+  name?:string,
+  templateCode?:string,
+  totalScore?:number
+}
+
+export interface KwaParamVO  {
+  id?:string,
+  itemId:string,
+  kwaId:string,
+  kwaName:string,
+  practiceId:string
 }

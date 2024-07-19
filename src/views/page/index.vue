@@ -1,7 +1,7 @@
 <!--
  * @Date: 2024-07-16 11:07:52
  * @LastEditors: Ming
- * @LastEditTime: 2024-07-16 11:33:58
+ * @LastEditTime: 2024-07-19 17:22:23
  * @FilePath: \smarttt_ktzx\src\views\page\index.vue
 -->
 <template>
@@ -44,7 +44,7 @@
                             </template>
                             <el-menu-item-group>
                                 <el-menu-item index="/page/practice">实验列表</el-menu-item>
-                                <el-menu-item index="/page/student">实验学生列表</el-menu-item>
+                                <!-- <el-menu-item index="/page/student">实验学生列表</el-menu-item> -->
                             </el-menu-item-group>
                         </el-sub-menu>
                     </el-menu>

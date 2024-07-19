@@ -11,6 +11,7 @@
   "dependencies": {
     "@antv/g6": "^5.0.0-beta.28",
     "@element-plus/icons-vue": "^2.3.1",
+    "@videojs-player/vue": "^1.0.0",
     "@vue-office/docx": "^1.6.2",
     "@vue-office/pdf": "^2.0.2",
     "@wangeditor/editor": "^5.1.23",
@@ -23,6 +24,7 @@
     "pinia": "^2.1.7",
     "sortablejs": "^1.15.2",
     "three": "^0.164.1",
+    "video.js": "^8.16.1",
     "vue": "^3.3.11",
     "vue-resize-text": "^0.1.1",
     "vue-router": "^4.2.5",
