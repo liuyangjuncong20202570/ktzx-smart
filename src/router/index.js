@@ -85,6 +85,23 @@ const routes = [
                 path: '/page/taskMgmt/assignGrading',
                 name: 'TaskMgmtAssignGrading',
                 component: () => import('../views/page/taskMgmt/assignGrading/index.vue')
+            },
+            // 学生端
+            {
+                path: '/page/job/list',
+                component: () => import('../views/page/job/index.vue')
+            },
+            {
+                path: '/page/job/jobAnswer',
+                component: () => import('../views/page/job/jobAnswer/index.vue')
+            },
+            {
+                path: '/page/job/jobWjList',
+                component: () => import('../views/page/job/jobWjList/index.vue')
+            },
+            {
+                path: '/page/job/jobWjDt',
+                component: () => import('../views/page/job/jobWjDt/index.vue')
             }
         ]
     },

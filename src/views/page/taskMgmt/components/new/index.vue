@@ -29,8 +29,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { ref, defineEmits } from 'vue'
+import { ElMessage } from 'element-plus'
 import { addPaper } from '@/api/taskMgmt.js'
+
+const router = useRouter()
+const emit = defineEmits(['child-event'])
 const dialogVisible = ref(false)
 const taskName = ref('')
 const init = () => {
@@ -42,6 +47,14 @@ const save = () => {
   addPaper(data).then(res => {
     if (res.code === '200') {
       handleClose()
+      ElMessage.success('添加成功')
+      router.push({
+        path: '/page/taskMgmt/tpAssembly',
+        query: {
+          id: res.data
+        }
+      });
+      emit('save')
     }
   })
 }

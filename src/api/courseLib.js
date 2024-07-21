@@ -11,6 +11,10 @@ export const courseLibKwaMap = () => {
 export const courseLibKwaTree = () => {
     return request.page.get('/courseLib/kwa/tree')
 }
+// 题型设定页-获取WR
+export const taskKwa = () => {
+    return request.page.get('/paper/edit/kwa/map')
+}
 // 课堂题型
 export const courseLibType = () => {
     return request.page.get('/courseLib/type/list')

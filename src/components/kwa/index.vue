@@ -1,6 +1,6 @@
 <template>
     <div class="bgd-kwa">
-        <el-form label-position="left" :model="form" label-width="60px"  v-if="type !== 'courseLibaAdd'">
+        <el-form label-position="left" :model="form" label-width="60px"  v-if="['search'].includes(type)">
             <el-form-item label="关键字 ">
                 <el-checkbox-group @change="handleChange" v-model="form.keyIds">
                     <el-checkbox v-for="(value, key, i) in kwaMap?.keyMap" :label="key" :key="i">{{ value }}</el-checkbox>
@@ -20,7 +20,7 @@
             </el-form-item>
         </el-form>
 
-        <el-form v-else label-position="left" :model="form" label-width="60px">
+        <el-form v-if="['courseLibaAdd'].includes(type)" label-position="left" :model="form" label-width="60px">
             <el-form-item label="关键字 ">
                 <el-checkbox-group @change="handleChange" v-model="form.treeIds">
                     <el-checkbox v-for="(item, i) in kwaTree" :key="i" :label="item.keyId">{{ item.name }}</el-checkbox>
@@ -33,12 +33,26 @@
                 </el-checkbox-group>
             </el-form-item>
         </el-form>
+
+        <el-form v-if="['taskKwa'].includes(type)" label-position="left" :model="form" label-width="60px">
+            <el-form-item label="关键字 ">
+                <el-checkbox-group @change="handleChange" v-model="form.keyIds">
+                    <el-checkbox v-for="(value, key, i) in kwaMap?.keyMap" :label="key" :key="i">{{ value }}</el-checkbox>
+                </el-checkbox-group>
+            </el-form-item>
+
+            <el-form-item label="能力">
+                <el-checkbox-group v-model="form.abilityIds" @change="handleChange">
+                    <el-checkbox v-for="(value, key, i) in kwaMap?.abilityMap" :label="key" :key="i">{{ value }}</el-checkbox >
+                </el-checkbox-group>
+            </el-form-item>
+        </el-form>
     </div>
 </template>
 
 <script setup>
 import { ref, reactive, getCurrentInstance, onMounted, defineEmits  } from 'vue'
-import { courseLibKwaMap, courseLibKwaTree, courseLibType } from '@/api/courseLib'
+import { courseLibKwaMap, courseLibKwaTree, courseLibType, taskKwa } from '@/api/courseLib'
 const emit = defineEmits(['child-event'])
 const props = defineProps({
     type: {
@@ -57,6 +71,11 @@ const kwaMap = ref(null)
 const kwaTree = ref(null)
 const courseType = ref(null)
 const abilityList = ref([])
+
+const init = () => {
+    form.value = {}
+}
+
 const getCourseLibKwa = () => {
     // 列表搜索kwa
     if (type === 'search') {
@@ -102,6 +121,14 @@ const getCourseLibKwa = () => {
             }
         })
     }
+    // 
+    if (type === 'taskKwa') {
+        taskKwa().then(res => {
+            if (res.code === '200') {
+                kwaMap.value = res.data
+            }
+        })
+    }
 }
 // 题型
 const getCourseLibType = () => {
@@ -127,7 +154,7 @@ const handleChange = () => {
         })
     }
 
-    if (type === 'search') {
+    if (['taskKwa', 'search'].includes(type)) {
         emit('kwa-event', form.value);
     }
     
@@ -149,6 +176,10 @@ const addHandleChange = (arr) => {
 onMounted(() => {
     getCourseLibKwa()
     getCourseLibType()
+})
+// 导出函数
+defineExpose({
+    init,
 })
 </script>
 

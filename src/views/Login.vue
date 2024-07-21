@@ -155,6 +155,7 @@ const login = () => {
               if (logincatelog === '1') {
                 setprofile(res.data);
                 router.push(res.data.homeurl);
+                // router.push('/page');
 
               } else {
                 if (rolesCount === 1) {

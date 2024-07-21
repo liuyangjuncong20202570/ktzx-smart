@@ -57,6 +57,39 @@
                     </el-menu-item-group>
                 </el-sub-menu>
 
+                <el-sub-menu index="4">
+                    <template #title>
+                        <el-icon>
+                            <location />
+                        </el-icon>
+                        <span>学生端</span>
+                    </template>
+
+                    <el-menu-item-group>
+                        <el-menu-item index="/page/job/list">作业列表</el-menu-item>
+                    </el-menu-item-group>
+
+                    <el-menu-item-group>
+                        <el-menu-item index="/page/job/jobAnswer">作业答题</el-menu-item>
+                    </el-menu-item-group>
+                    
+                    <el-menu-item-group>
+                        <el-menu-item index="/page/taskMgmt/tpAssembly">实验列表</el-menu-item>
+                    </el-menu-item-group>
+
+                    <el-menu-item-group>
+                        <el-menu-item index="/page/taskMgmt/taskList">提交实验</el-menu-item>
+                    </el-menu-item-group>
+
+                    <el-menu-item-group>
+                        <el-menu-item index="/page/job/jobWjList">问卷列表</el-menu-item>
+                    </el-menu-item-group>
+
+                    <el-menu-item-group>
+                        <el-menu-item index="/page/job/jobWjDt">问卷答题</el-menu-item>
+                    </el-menu-item-group>
+                </el-sub-menu>
+
                 <!-- <el-menu-item index="2">
                             <el-icon><icon-menu /></el-icon>
                             <span>Navigator Two</span>

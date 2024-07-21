@@ -24,33 +24,49 @@
       <el-table-column fixed="right" label="操作">
         <template #default="scope">
           <el-button type="text" size="small" @click="(() => {
-            router.push('/page/taskMgmt/view')
+            router.push({
+              path: '/page/taskMgmt/view',
+              query: {
+                id: scope.row.id
+              }
+            })
           })">
             预览
           </el-button>
 
-          <el-button type="text" size="small">
+          <el-button type="text" size="small" @click="copy(scope.row.id)">
             复制
           </el-button>
 
-          <el-button type="text" size="small">
+          <el-button v-if="[0, 1].includes(scope.row.status)" type="text" size="small" @click="edit(scope.row.id)">
             编辑
           </el-button>
 
-          <el-button type="text" size="small" @click="() => {
-            router.push('/page/taskMgmt/tpAssembly')
-          }">
-
+          <el-button v-if="[0].includes(scope.row.status)" @click="publish(scope.row.id)" type="text" size="small">
             发布作业
           </el-button>
 
-          <el-button type="text" size="small">
+          <el-button v-if="[1, 2].includes(scope.row.status)" @click="(() => {
+            router.push({
+              path: '/page/taskMgmt/taskList',
+              query: {
+                id: scope.row.id
+              }
+            })
+          })" type="text" size="small">
+            查看学生
+          </el-button>
+
+          <el-button v-if="[0, 1].includes(scope.row.status)" @click="lock(scope.row.id)" type="text" size="small">
             锁定
           </el-button>
 
-          <el-button type="text" size="small">
-
+          <el-button v-if="[0, 1].includes(scope.row.status)" type="text" size="small" @click="del(scope.row)">
             删除
+          </el-button>
+
+          <el-button v-if="[2].includes(scope.row.status)" @click="unlock(scope.row.id)" type="text" size="small">
+            解锁
           </el-button>
         </template>
       </el-table-column>
@@ -62,32 +78,28 @@
         @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
 
-    <div style="margin-top: 20px">
-      <el-button @click="toggleSelection([tableData[1], tableData[2]])">
-        Toggle selection status of second and third rows
-      </el-button>
-      <el-button @click="toggleSelection()">Clear selection</el-button>
-    </div>
-
-    <New ref="newRef" />
+    <New ref="newRef" @save="() => {
+      params.pageIndex = 1
+      getTaskList()
+    }" />
   </div>
 </template>
 
 <script setup>
-import router from "@/router/index.js";
 import { ref, reactive, onMounted, nextTick } from 'vue'
-import { ElTable, ElMessage } from 'element-plus'
-import { taskList, getTermAll } from '@/api/taskMgmt.js'
+import { useRouter } from 'vue-router'
+import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
+import { taskList, getTermAll, queFormDel, taskCopy, taskPublish, taskLock, taskUnlock } from '@/api/taskMgmt.js'
 import Header from '@/views/page/components/header/index.vue'
 import New from './components/new/index.vue'
 
-
+const router = useRouter()
 const newRef = ref(null)
 const multipleTableRef = ref()
-const multipleSelection = ref([])
 const termId = ref('')
 const termList = ref([])
 const tableData = ref([])
+const delIds = ref([])
 const total = ref(0)
 const params = ref({
   pageIndex: 1,
@@ -98,6 +110,52 @@ const params = ref({
 onMounted(() => {
   _getTermAll()
 })
+
+const copy = (id) => {
+  taskCopy(id).then(res => {
+    if (res.code === '200') {
+      ElMessage.success('复制成功')
+      params.pageIndex = 1
+      getTaskList()
+    }
+  })
+}
+
+const publish = (id) => {
+  taskPublish(id).then(res => {
+    if (res.code === '200') {
+      ElMessage.success('发布成功')
+      getTaskList()
+    }
+  })
+}
+
+const lock = (id) => {
+  taskLock(id).then(res => {
+    if (res.code === '200') {
+      ElMessage.success('锁定成功')
+      getTaskList()
+    }
+  })
+}
+
+const unlock = (id) => {
+  taskUnlock(id).then(res => {
+    if (res.code === '200') {
+      ElMessage.success('解锁成功')
+      getTaskList()
+    }
+  })
+}
+
+const edit = (id) => {
+  router.push({
+    path: '/page/taskMgmt/tpAssembly',
+    query: {
+      id
+    }
+  })
+}
 
 const _getTermAll = () => {
   getTermAll().then(res => {
@@ -139,8 +197,30 @@ const handleCurrentChange = (val) => {
   console.log(`current page: ${val}`)
 }
 
-const del = () => {
-
+const del = (row) => {
+  let ids = []
+  if (row.id) ids.push(row.id)
+  if (delIds.value.length) ids = delIds.value
+  if (!ids.length) return
+  ElMessageBox.confirm(
+    '确认删除此试卷吗?',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(() => {
+    queFormDel(ids).then(res => {
+      if (res.code === '200') {
+        ElMessage({
+          type: 'success',
+          message: '删除成功',
+        })
+        getTaskList()
+      }
+    })
+  })
 }
 
 const download = () => {
@@ -151,23 +231,10 @@ const addTask = () => {
   if (newRef.value) newRef.value.init()
 }
 
-const toggleSelection = (rows) => {
-  if (rows) {
-    rows.forEach((row) => {
-      if (row.status) {
-        multipleTableRef.value?.toggleRowSelection(row, undefined)
-      }
-    })
-  } else {
-    multipleTableRef.value?.clearSelection()
-  }
-}
 const handleSelectionChange = (val) => {
   console.log('val', val)
-  multipleSelection.value = val
+  delIds.value = val.map((item) => item.id)
 }
-
-
 </script>
 <style scoped>
 .test-list-wrap {
