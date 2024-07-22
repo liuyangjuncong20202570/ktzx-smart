@@ -2,7 +2,7 @@
   <el-container style="height: 92vh;">
     <!--两个按钮，靠最左-->
     <el-header
-      style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
+        style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
       <el-button type="primary" style="margin-left: 0.8vw;" @click="createParentData">新增章节</el-button>
       <el-button type="danger" @click="deleteSel">删除</el-button>
       <el-button type="success" @click="">保存</el-button>
@@ -11,8 +11,8 @@
     </el-header>
     <el-main style="padding: 0; overflow: auto; background-color: white;">
       <el-table class="uniqueTable" ref="sortableInstance" :data="tableData" style="width: 100%;margin-bottom: 20px;"
-        row-key="id" highlight-current-row size="large" :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
-        :row-class-name="tableRowClassName" @selection-change="handleSelectionChange" @current-change="changeSelRow">
+                row-key="id" highlight-current-row size="large" :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+                :row-class-name="tableRowClassName" @selection-change="handleSelectionChange" @current-change="changeSelRow">
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="type" label="类型" sortable width="180">
           <!--          <template #default="tableRowData">-->
@@ -25,34 +25,38 @@
         <el-table-column prop="name" label="名称" width="180">
           <template #default="tableRowData">
             <span v-if="!editRef.get(tableRowData.row.id)['editName']"
-              @dblclick="editEditRef(tableRowData.row, 'editName')">{{ tableRowData.row.name }}</span>
+                  @dblclick="editEditRef(tableRowData.row, 'editName')">{{ tableRowData.row.name }}</span>
             <el-input ref="inputNameRef" v-else v-model="tableRowData.row.name"
-              @blur="saveEditRef(tableRowData.row, 'editName')"
-              @keyup.enter="saveEditRef(tableRowData.row, 'editName')"></el-input>
+                      @blur="saveEditRef(tableRowData.row, 'editName')"
+                      @keyup.enter="saveEditRef(tableRowData.row, 'editName')"></el-input>
           </template>
         </el-table-column>
         <el-table-column prop="datavalue" label="数值" sortable width="100">
           <template #default="tableRowData">
             <span v-if="!editRef.get(tableRowData.row.id)['editDataValue']"
-              @dblclick="editEditRef(tableRowData.row, 'editDataValue')">{{ tableRowData.row.datavalue }}</span>
+                  @dblclick="editEditRef(tableRowData.row, 'editDataValue')">{{ tableRowData.row.datavalue }}</span>
             <el-input ref="inputDataValueRef" v-else v-model="tableRowData.row.datavalue"
-              @blur="saveEditRef(tableRowData.row, 'editDataValue')"
-              @keyup.enter="saveEditRef(tableRowData.row, 'editDataValue')"></el-input>
+                      @blur="saveEditRef(tableRowData.row, 'editDataValue')"
+                      @keyup.enter="saveEditRef(tableRowData.row, 'editDataValue')"></el-input>
           </template>
         </el-table-column>
         <el-table-column prop="kwas" label="基本教学目标">
           <template #default="tableRowData">
-            <span v-if="!tableRowData.row.isChildren">{{ tableRowData.row.tempKwas.map(item => item.name).join(", ")
-              }}</span>
-            <el-popover v-else placement="bottom" :title="`${tableRowData.row.parentType}/${tableRowData.row.type}`"
-              :width="800" trigger="click" @hide="saveEditKwa(tableRowData.row)">
-              <el-checkbox-group v-model="tableRowData.row.tempKwas">
+            <!--            <span v-if="!tableRowData.row.isChildren">{{ tableRowData.row.tempKwas.map(item => item.name).join(", ")-->
+            <!--              }}</span>-->
+            <el-popover placement="bottom" :title="`${tableRowData.row.type}`"
+                        :width="800" trigger="click" @hide="saveEditKwa(tableRowData.row)">
+              <el-checkbox-group v-if="!tableRowData.row.isChildren" v-model="tableRowData.row.tempKwas">
+                <el-checkbox v-for="item in kwaData" :label="item" size="large">{{ item.name }}</el-checkbox>
+              </el-checkbox-group>
+              <el-checkbox-group v-else v-model="tableRowData.row.tempKwas">
                 <el-checkbox v-for="item in kwaData" :label="item" size="large">{{ item.name }}</el-checkbox>
               </el-checkbox-group>
               <template #reference>
                 <!--                <el-button class="m-2">Hover to activate</el-button>-->
                 <div>
-                  <span>{{ tableRowData.row.tempKwas.map(item => item.name).join(", ") }}&nbsp;&nbsp;</span>
+                  <span v-if="!tableRowData.row.isChildren">{{ tableRowData.row.tempSumKwas.map(item => item.name).join(", ") }}&nbsp;&nbsp;</span>
+                  <span v-else>{{ tableRowData.row.tempKwas.map(item => item.name).join(", ") }}&nbsp;&nbsp;</span>
                   <el-icon color="dodgerblue">
                     <Edit />
                   </el-icon>
@@ -344,17 +348,33 @@ const initialize = () => {
         //   item.kwas=[...new Set(item.kwas.map(mapItem => JSON.stringify(mapItem)))].map(mapItem => JSON.parse(mapItem));
         //   item.kwas.sort((a, b) => a.id.localeCompare(b.id));
         // }
-        updateTempKwa(i);
+        updateChildTempKwa(i);
         // i.tempKwas.forEach(item => {
         //   ElMessage.success(item.name);
         // });
       });
     }
-    updateTempKwa(item);
+    updateParentTempKwa(item);
   });
 }
 
-const updateTempKwa = (row) => {
+const updateParentTempKwa = (row) => {
+  row.tempSumKwas = [];
+  row.children_kwas.forEach(kwa => {
+    row.tempSumKwas.push(kwaData.value.find(data => {
+      return data.id === kwa.kwaid;
+    }));
+  });
+  row.tempKwas = [];
+  row.kwas.forEach(kwa => {
+    var tmpKwa = kwaData.value.find(data => {
+      return data.id === kwa.kwaid;
+    });
+    row.tempKwas.push(tmpKwa);
+    row.tempSumKwas.push(tmpKwa);
+  });
+}
+const updateChildTempKwa = (row) => {
   row.tempKwas = [];
   row.kwas.forEach(kwa => {
     row.tempKwas.push(kwaData.value.find(data => {
@@ -476,8 +496,9 @@ const saveEditKwa = (row) => {
   // console.log(row);
   var newKwas = [];
   var deleteKwas = [];
+  var temp = row.tempKwas;
   row.kwas.forEach(item => {
-    if (row.tempKwas.find(ele => {
+    if (temp.find(ele => {
       return ele.id === item.kwaid;
     }) === undefined) {
       //删除这个kwa
@@ -485,12 +506,11 @@ const saveEditKwa = (row) => {
     } else {
       newKwas.push(item);
     }
-  })
+  });
   if (deleteKwas.length !== 0) {
-    const unitid = row.id;
     request.evaluation.post('/evaluation/knowledgeUnit/deleteKnowledgeUnitKwa?unitid=' + row.id, deleteKwas).then((res) => {
       if (res.code === 200) {
-        // ElMessage.success('删除kwa成功');
+        ElMessage.success('删除kwa成功');
       } else {
         ElMessage.error(res.msg);
       }
@@ -498,7 +518,7 @@ const saveEditKwa = (row) => {
       ElMessage.error('删除kwa失败' + error);
     });
   }
-  row.tempKwas.forEach(item => {
+  temp.forEach(item => {
     if (newKwas.find(ele => {
       return ele.kwaid === item.id;
     }) === undefined) {
@@ -508,10 +528,9 @@ const saveEditKwa = (row) => {
         kwaid: item.id,
         statue: 0,
       };
-      newKwas.push(newKwa);
       request.evaluation.post('/evaluation/knowledgeUnit/insertKnowledgeUnitKwa', newKwa).then((res) => {
         if (res.code === 200) {
-          // ElMessage.success('添加kwa成功');
+          ElMessage.success('添加kwa成功');
         } else {
           ElMessage.error(res.msg);
         }
@@ -519,8 +538,10 @@ const saveEditKwa = (row) => {
         ElMessage.error('添加kwa失败' + error);
       });
     }
-  })
-  loadData();
+  });
+  setTimeout(() => {
+    loadData();
+  }, 0);
 }
 
 //删除章
@@ -539,13 +560,13 @@ const deleteSel = () => {
     }
   }
   ElMessageBox.confirm(
-    '选中的知识单元将被删除，是否确定',
-    '警告',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning',
-    }
+      '选中的知识单元将被删除，是否确定',
+      '警告',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
   ).then(() => {
     var ids = [];
     for (const sel of multipleSelection) {

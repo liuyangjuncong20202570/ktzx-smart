@@ -5,94 +5,123 @@
       <el-button type="success" @click="">  保存</el-button>
       <el-button type="primary" style="margin-left: 0.8vw;" @click="">上传成绩</el-button>
       <el-button type="primary" style="margin-left: 0.8vw;" @click="">下载成绩</el-button>
-      <div class="flex-container"  style="width: 100%;font-weight: bold; font-size: 25px;">课程名称</div>
+      <div style="width: 100%;font-weight: bold; font-size: 25px;">课程名称</div>
     </el-header>
     <el-main style="padding: 0; overflow: auto; background-color: white;">
-      <el-table :data="tableData" style="width: 100%;margin-bottom: 20px;" size="large"
-                :cell-style="{color: '#000000','border-color': '#cecece'}"
-                :header-cell-style="{'text-align': 'center',color: '#000000','border-color': '#cecece'}">
-        <el-table-column label="课程各类考核项">
-          <el-table-column prop="name" label="课程目标" width="300"></el-table-column>
-          <el-table-column label="平时">
-            <el-table-column prop="s1" label="平时作业" width="180">
+      <el-table :data="tableData" style="width: 100%;" :cell-style="cellItemNameStyle" :header-cell-style="rowStyle">
+        <el-table-column align="center" prop="name" label="课程目标" width="300">
+        </el-table-column>
+        <el-table-column
+            v-for="(item, index) in tableColumns"
+            align="center"
+            :prop="item.id"
+            :label="item.itemName"
+            :key="index">
+
+          <template #default="tableRowData">
+            <el-table-column
+                v-if="item.childrens && item.childrens.length>0"
+                v-for="(child1, childIndex1) in item.childrens"
+                align="center"
+                :prop="child1.id"
+                :label="child1.itemName"
+                :key="childIndex1">
+
               <template #default="tableRowData">
-                <span v-if="!editRef.get(tableRowData.row.id)['editS1']"
-                      @dblclick="editEditRef(tableRowData.row,'editS1')">{{ tableRowData.row.s1 }}</span>
-                <el-input ref="inputS1" v-else v-model="tableRowData.row.s1" @blur="saveEditRef(tableRowData.row,'editS1')"
-                          @keyup.enter="saveEditRef(tableRowData.row,'editS1')"></el-input>
+                <el-table-column
+                    v-if="child1.childrens && child1.childrens.length>0"
+                    v-for="(child2, childIndex2) in child1.childrens"
+                    align="center"
+                    :prop="child2.id"
+                    :label="child2.itemName"
+                    :key="childIndex2">
+                </el-table-column>
+                <div v-else>
+                  <span v-if="editRef.get(tableRowData.row.id)[child1.id] === undefined"
+                    @dblclick="editEditRef(tableRowData.row, child1.id)">{{ tableRowData.row[child1.id] }}</span>
+                  <el-input :ref="el => inputRefs.set(child1.id, el)" v-else v-model="tableRowData.row[child1.id]"
+                            @blur="saveEditRef(tableRowData.row, child1.id)"
+                            @keyup.enter="saveEditRef(tableRowData.row, child1.id)"></el-input>
+                </div>
               </template>
+
             </el-table-column>
-            <el-table-column prop="s2" label="课堂表现" width="180">
-              <template #default="tableRowData">
-                <span v-if="!editRef.get(tableRowData.row.id)['editS2']"
-                      @dblclick="editEditRef(tableRowData.row,'editS2')">{{ tableRowData.row.s2 }}</span>
-                <el-input ref="inputS2" v-else v-model="tableRowData.row.s2" @blur="saveEditRef(tableRowData.row,'editS2')"
-                          @keyup.enter="saveEditRef(tableRowData.row,'editS2')"></el-input>
-              </template>
-            </el-table-column>
-            <el-table-column prop="s3" label="课外综合" width="180">
-              <template #default="tableRowData">
-                <span v-if="!editRef.get(tableRowData.row.id)['editS3']"
-                      @dblclick="editEditRef(tableRowData.row,'editS3')">{{ tableRowData.row.s3 }}</span>
-                <el-input ref="inputS3" v-else v-model="tableRowData.row.s3" @blur="saveEditRef(tableRowData.row,'editS3')"
-                          @keyup.enter="saveEditRef(tableRowData.row,'editS3')"></el-input>
-              </template>
-            </el-table-column>
-            <el-table-column prop="s4" label="课程实验" width="180">
-              <template #default="tableRowData">
-                <span v-if="!editRef.get(tableRowData.row.id)['editS4']"
-                      @dblclick="editEditRef(tableRowData.row,'editS4')">{{ tableRowData.row.s4 }}</span>
-                <el-input ref="inputS4" v-else v-model="tableRowData.row.s4" @blur="saveEditRef(tableRowData.row,'editS4')"
-                          @keyup.enter="saveEditRef(tableRowData.row,'editS4')"></el-input>
-              </template>
-            </el-table-column>
-          </el-table-column>
-          <el-table-column prop="s5" label="期末">
-            <template #default="tableRowData">
-                <span v-if="!editRef.get(tableRowData.row.id)['editS5']"
-                      @dblclick="editEditRef(tableRowData.row,'editS5')">{{ tableRowData.row.s5 }}</span>
-              <el-input ref="inputS5" v-else v-model="tableRowData.row.s5" @blur="saveEditRef(tableRowData.row,'editS5')"
-                        @keyup.enter="saveEditRef(tableRowData.row,'editS5')"></el-input>
-            </template>
-          </el-table-column>
+            <div v-else>
+              <span v-if="editRef.get(tableRowData.row.id)[item.id] === undefined"
+                    @dblclick="editEditRef(tableRowData.row, item.id)">{{ tableRowData.row[item.id] }}</span>
+              <el-input :ref="el => inputRefs.set(item.id, el)" v-else v-model="tableRowData.row[item.id]"
+                        @blur="saveEditRef(tableRowData.row, item.id)"
+                        @keyup.enter="saveEditRef(tableRowData.row, item.id)"></el-input>
+            </div>
+          </template>
+
         </el-table-column>
         <template #append>
           <div style="text-align: center">
-            <el-table :data="tableAppendDataFirst" style="width: 100%;" :cell-style="{'background-color': '#eaeaea',color: '#000000','border-color': '#cecece'}" :show-header="false" border>
-              <el-table-column align="center" width="300" prop="name"></el-table-column>
-              <el-table-column align="center" width="720" prop="num1">
+            <el-table :data="tableAppendDataFirst" style="width: 100%;" :cell-style="{'background-color': '#eaeaea',color: '#000000','border-color': '#bdbdbd'}"
+                      :span-method="spanMethod" :show-header="false" border>
+              <el-table-column align="center" prop="name" width="300"></el-table-column>
+              <el-table-column
+                  v-for="(item, index) in tableColumns"
+                  align="center"
+                  :prop="item.id"
+                  :label="item.itemName"
+                  :key="index">
                 <template #default="tableRowData">
-                  <div v-html="tableRowData.row.num1"></div>
-                </template>
-              </el-table-column>
-              <el-table-column align="center" prop="num2">
-                <template #default="tableRowData">
-                  <div v-html="tableRowData.row.num2"></div>
+                  <el-table-column
+                      v-if="item.childrens && item.childrens.length > 0"
+                      v-for="(child1, childIndex1) in item.childrens"
+                      align="center"
+                      :prop="child1.id"
+                      :label="child1.itemName"
+                      :key="childIndex1">
+                    <template #default="tableRowData">
+                      <div v-html="tableRowData.row[child1.id]"></div>
+                    </template>
+                  </el-table-column>
+                  <div v-else v-html="tableRowData.row[item.id]"></div>
                 </template>
               </el-table-column>
             </el-table>
-            <el-table :data="tableAppendDataSecond" style="width: 100%;" :cell-style="{color: '#000000','border-color': '#cecece'}" :show-header="false" border>
-              <el-table-column align="center" width="300" prop="name"></el-table-column>
-              <el-table-column align="center" width="720" prop="num1">
+            <el-table :data="tableAppendDataSecond" style="width: 100%;" :cell-style="cellItemNameStyle"
+                      :span-method="spanMethod" :show-header="false" border>
+              <el-table-column align="center" prop="name" width="300"></el-table-column>
+              <el-table-column
+                  v-for="(item, index) in tableColumns"
+                  align="center"
+                  :prop="item.id"
+                  :label="item.itemName"
+                  :key="index">
                 <template #default="tableRowData">
-                  <span v-if="!editNpRef"
-                      @dblclick="editEditRef(tableRowData.row,'editNp')">{{ tableRowData.row.num1 }}</span>
-                  <el-input ref="inputNp" v-else v-model="tableRowData.row.num1" @blur="saveEditRef(tableRowData.row,'editNp')"
-                            @keyup.enter="saveEditRef(tableRowData.row,'editNp')"></el-input>
-                </template>
-              </el-table-column>
-              <el-table-column align="center" prop="num2">
-                <template #default="tableRowData">
-                  <span v-if="!editEpRef"
-                      @dblclick="editEditRef(tableRowData.row,'editEp')">{{ tableRowData.row.num2 }}</span>
-                  <el-input ref="inputEp" v-else v-model="tableRowData.row.num2" @blur="saveEditRef(tableRowData.row,'editEp')"
-                            @keyup.enter="saveEditRef(tableRowData.row,'editEp')"></el-input>
+                  <el-table-column
+                      v-if="item.childrens && item.childrens.length > 0"
+                      v-for="(child1, childIndex1) in item.childrens"
+                      align="center"
+                      :prop="child1.id"
+                      :label="child1.itemName"
+                      :key="childIndex1">
+                    <template #default="tableRowData">
+                      <div>
+                        <span v-if="editRef.get('percent')[child1.id] === undefined"
+                              @dblclick="editEditRef('percent',child1.id)">{{ tableRowData.row[child1.id] }}</span>
+                        <el-input :ref="el => inputRefs.set('percent' + child1.id, el)" v-else v-model="tableRowData.row[child1.id]"
+                                  @blur="saveEditRef(tableRowData.row, child1.id,'percent')"
+                                  @keyup.enter="saveEditRef(tableRowData.row, child1.id,'percent')"></el-input>
+                      </div>
+                    </template>
+                  </el-table-column>
+                  <div v-else>
+                    <span v-if="editRef.get('percent')[item.id] === undefined"
+                              @dblclick="editEditRef('percent', item.id)">{{ tableRowData.row[item.id] }}</span>
+                    <el-input :ref="el => inputRefs.set('percent' + item.id, el)" v-else v-model="tableRowData.row[item.id]"
+                              @blur="saveEditRef(tableRowData.row, item.id,'percent')"
+                              @keyup.enter="saveEditRef(tableRowData.row, item.id,'percent')"></el-input>
+                  </div>
                 </template>
               </el-table-column>
             </el-table>
           </div>
         </template>
-
       </el-table>
     </el-main>
   </el-container>
@@ -104,8 +133,11 @@ import {ElMessage,ElMessageBox} from "element-plus";
 import request from "../../utils/request";
 
 //---------------------------------------------数据存储区
-const courseId = '2c918af681fa6ea7018209a505c30672';
-const tableData = ref(null);
+const courseId = '1';
+const tableColumns = ref([]);
+var tableColumnNumAttribute = new Map();
+var tableNodeParent = new Map();
+const tableData = ref([]);
 const tableAppendDataFirst = ref([
   {
     name: '分数合计',
@@ -121,17 +153,47 @@ const tableAppendDataSecond = ref([
   },
 ]);
 const editRef = ref(new Map());
-const editNpRef = ref(false);
-const editEpRef = ref(false);
-const inputS1 = ref();
-const inputS2 = ref();
-const inputS3 = ref();
-const inputS4 = ref();
-const inputS5 = ref();
-const inputNp = ref();
-const inputEp = ref();
+const inputRefs = ref(new Map());
 
 //---------------------------------------------处理方法区
+const cellItemNameStyle = ({ row, column, rowIndex, columnIndex }) => {
+  if(columnIndex === 0){
+    return {
+      'background-color': '#eaeaea',
+      color: '#000000',
+      'border-color': '#bdbdbd'
+    };
+  }else{
+    return {
+      'border-color': '#bdbdbd'
+    }
+  }
+}
+
+const rowStyle = ({row, column, rowIndex, columnIndex}) => {
+  return {
+    'border-color': '#bdbdbd'
+  }
+}
+
+
+const spanMethod = ({ row, column, rowIndex, columnIndex }) => {
+  if (rowIndex === 0 && columnIndex !== 0) {
+    let id = tableColumnNumAttribute.get(columnIndex);
+    if(id === tableColumnNumAttribute.get(columnIndex-1)){
+      return [0,0];
+    }
+    let columnSpan = 1;
+    for (let i = columnIndex + 1; i <= tableColumnNumAttribute.size; i++) {
+      if (tableColumnNumAttribute.get(i) === id) {
+        columnSpan++;
+      } else {
+        break;
+      }
+    }
+    return [1,columnSpan]; // 返回合并信息
+  }
+}
 
 //初始化分数合计
 onMounted(() => {
@@ -139,12 +201,11 @@ onMounted(() => {
 });
 
 const loadData = () => {
-  request.evaluation.get('/evaluation/assessmentPlan/getAssessmentPlanTable?courseid=' + courseId).then((res) => {
+  request.evaluation.get('/evaluation/assessmentPlan/getAssessmentTable?courseid=' + courseId).then((res) => {
     if(res.code === 200){
+      tableColumns.value = res.data.head;
       tableData.value = res.data.items;
-      initialize();
-      tableAppendDataSecond.value[0].num1 = res.data.proportion.nproportion;
-      tableAppendDataSecond.value[0].num2 = res.data.proportion.eproportion;
+      initialize(res.data.percent);
     }else{
       ElMessage.error(res.msg);
     }
@@ -153,75 +214,110 @@ const loadData = () => {
   })
 }
 
-const initialize = () => {
-  var sum1=Number(0);
-  var sum2=Number(0);
-  tableData.value.forEach(item => {
-    sum1 += Number(item.s1) + Number(item.s2) + Number(item.s3) + Number(item.s4);
-    sum2 += Number(item.s5);
-    editRef.value.set(item.id, { "editS1": false, "editS2": false, "editS3": false, "editS4": false, "editS5": false});
+const initialize = (percentData) => {
+  tableColumnNumAttribute = new Map();
+  var count = 1;
+  //设置列的分类
+  tableColumnNumAttribute.set(0,-1);
+  tableColumns.value.forEach(item => {
+    if(item.childrens && item.childrens.length > 0){
+      count = updateTableColumnNumAttribute(item.childrens,item.id,count);
+    }else{
+      tableColumnNumAttribute.set(count,item.id);
+      count++;
+    }
   });
-  if(sum1 === 100){
-    tableAppendDataFirst.value[0].num1 = "100";
+  //合计
+  //遍历列
+  tableColumns.value.forEach(item => {
+    var sum = 0;
+    if(item.childrens && item.childrens.length > 0){
+      let cItem = item.childrens[0];
+      while(cItem.childrens.length > 0){
+        cItem = cItem.childrens[0];
+      }
+      tableNodeParent.set(cItem.id,item.id);
+      tableAppendDataSecond.value[0][cItem.id] = percentData[item.id];
+      item.childrens.forEach(child => {
+        sum = countSum(child,sum);
+      });
+      tableAppendDataFirst.value[0][cItem.id] = sum;
+    }else{
+      sum = countSum(item,0);
+      tableAppendDataFirst.value[0][item.id] = sum;
+      tableNodeParent.set(item.id,item.id);
+      tableAppendDataSecond.value[0][item.id] = percentData[item.id];
+    }
+  });
+  Object.keys(tableAppendDataFirst.value[0]).forEach(key => {
+    if(key !== "name" && tableAppendDataFirst.value[0][key].toString() !== "100"){
+      tableAppendDataFirst.value[0][key] = "<span>" + tableAppendDataFirst.value[0][key] + "<span style='color: red;'> (分数合计需为100)</span></span>";
+    }
+  });
+  editRef.value.set('percent',{});
+  tableData.value.forEach(item => {
+    editRef.value.set(item.id,{});
+  });
+}
+const updateTableColumnNumAttribute = (array,id,count) => {
+  array.forEach(item => {
+    if(item.childrens.length > 0){
+      updateTableColumnNumAttribute(item.childrens,id,count);
+    }else{
+      tableColumnNumAttribute.set(count,id);
+      count++;
+    }
+  });
+  return count;
+}
+const countSum = (item,count) => {
+  if(item.childrens && item.childrens.length > 0){
+    item.childrens.forEach(child => {
+      count = countSum(child,count);
+    });
   }else{
-    tableAppendDataFirst.value[0].num1 = "<span>" + sum1 + "<span style='color: red;'> (分数合计需为100)</span></span>";
+    tableData.value.forEach(data => {
+      if(data[item.id]){
+        count += data[item.id];
+      }else{
+        data[item.id] = 0;
+      }
+    })
   }
-  if(sum2 === 100){
-    tableAppendDataFirst.value[0].num2 = "100";
-  }else{
-    tableAppendDataFirst.value[0].num2 = "<span>" + sum2 + "<span style='color: red;'> (分数合计需为100)</span></span>";
-  }
+  return count;
 }
 
 //双击修改
-const editEditRef = (row,field) => {
-  if(field === 'editNp' || field === 'editEp'){
-    if(field === 'editNp'){
-      editNpRef.value = true;
-      setTimeout(() => {
-        inputNp.value.focus();
-      }, 0);
-    }else{
-      editEpRef.value = true;
-      setTimeout(() => {
-        inputEp.value.focus();
-      }, 0);
-    }
-  }else{
-    editRef.value.get(row.id)[field] = true;
+const editEditRef = (row,id) => {
+  if(row === "percent"){
+    editRef.value.get("percent")[id] = true;
     setTimeout(() => {
-      if(field === 'editS1'){
-        inputS1.value.focus();
-      }else if(field === 'editS2'){
-        inputS2.value.focus();
-      }else if(field === 'editS3'){
-        inputS3.value.focus();
-      }else if(field === 'editS4'){
-        inputS4.value.focus();
-      }else if(field === 'editS5'){
-        inputS5.value.focus();
-      }
+      inputRefs.value.get('percent' + id).focus();
+    }, 0);
+  }{
+    editRef.value.get(row.id)[id] = true;
+    setTimeout(() => {
+      inputRefs.value.get(id).focus();
     }, 0);
   }
 };
 
 //保存
-const saveEditRef = (row,field) => {
-  if (field === 'editNp' || field === 'editEp') {
-    if(field === 'editNp'){
-      editNpRef.value = false;
-      tableAppendDataSecond.value[0].num2 = 100-tableAppendDataSecond.value[0].num1;
-    }else{
-      editEpRef.value = false;
-      tableAppendDataSecond.value[0].num1 = 100-tableAppendDataSecond.value[0].num2;
+const saveEditRef = (row,id,type) => {
+  if(!Number(row[id])){
+    ElMessage.error("输入了不合法的分数.");
+    loadData();
+    return;
+  }
+  if(type === "percent"){
+    editRef.value.get("percent")[id] = undefined;
+    var data = {
+      "id": tableNodeParent.get(id),
+      "percent": row[id]
     }
-    var newData1 = {
-      courseid: courseId,
-      nproportion: tableAppendDataSecond.value[0].num1,
-      eproportion: tableAppendDataSecond.value[0].num2,
-    }
-    request.evaluation.post('/evaluation/assessmentPlan/updateAssessmentPlanProportion', newData1).then((res) => {
+    request.evaluation.post('/evaluation/assessmentPlan/updatePercent', data).then((res) => {
       if(res.code === 200){
+        ElMessage.success("修改成功.");
         loadData();
       }else{
         ElMessage.error(res.msg);
@@ -229,18 +325,17 @@ const saveEditRef = (row,field) => {
     }).catch((error) => {
       ElMessage.error('修改失败' + error);
     });
-  } else {
-    editRef.value.get(row.id)[field] = false;
-    var newData2 = {
-      id: row.id,
-      s1: row.s1,
-      s2: row.s2,
-      s3: row.s3,
-      s4: row.s4,
-      s5: row.s5,
+  }else{
+    editRef.value.get(row.id)[id] = undefined;
+    data = {
+      "courseid": courseId,
+      "coursetargetId": row.id,
+      "checkitemId": id,
+      "standardScore": row[id]
     }
-    request.evaluation.post('/evaluation/assessmentPlan/updateAssessmentPlanItem', newData2).then((res) => {
+    request.evaluation.post('/evaluation/assessmentPlan/updateStandardScore', data).then((res) => {
       if(res.code === 200){
+        ElMessage.success("修改成功.");
         loadData();
       }else{
         ElMessage.error(res.msg);
@@ -249,7 +344,6 @@ const saveEditRef = (row,field) => {
       ElMessage.error('修改失败' + error);
     });
   }
-  //信息已被修改，处理
 };
 
 
