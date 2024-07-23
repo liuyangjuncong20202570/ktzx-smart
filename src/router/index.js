@@ -94,7 +94,7 @@ const routes = [
                 component: () => import('../components/course/Classroommangt.vue')
             },
             {
-                path: 'coursemangt/abilitydictionary',  // 能力字典
+                path: 'evaluation/ability',  // 能力字典
                 name: 'AbilityDictionary',
                 component: () => import('../components/course/AbilityDictionary.vue')
             },
