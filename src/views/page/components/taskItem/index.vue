@@ -16,17 +16,17 @@
         </el-radio-group>
         <!-- 填空题 -->
         <div v-if="lib.questionTypeId == '0204'">
-            
             <span v-html="lib.content"></span>
         </div>
         <!-- 简单题 -->
         <template v-if="lib.questionTypeId == '0205'">
             <span v-html="lib.content"></span>
             <el-input
+                v-model="lib.selectId"
                 :disabled="disabled"
                 maxlength="30"
                 style="width: 500px"
-                placeholder="请填写答案"
+                placeholder="请填写答案"    
                 show-word-limit
                 type="textarea"
             />

@@ -4,65 +4,122 @@
     <div class="task-view">
       <Header title="作业答题" />
       <div class="task-title flex-between">
-        <div class="flex-between task-msg">
+        <div class="flex-start task-msg">
           <span>当前作业: {{ taskDetail.name }}</span>
-          <span>所属课程: {{ taskDetail.classname }}</span>
-          <span>所属课堂: {{ taskDetail.classname }}</span>
+          <span>所属课程: {{ taskDetail.classname ?? '无' }}</span>
+          <span>所属课堂: {{ taskDetail.classroomName }}</span>
         </div>
-        <el-button @click="test">编辑</el-button>
+        <div v-if="taskDetail && taskDetail?.items?.length && !disabled">
+          <el-button @click="save">保存</el-button>
+          <el-button @click="submit">交卷</el-button>
+        </div>
       </div>
-      <div v-if="!taskDetail?.items?.length">暂无数据</div>
+      <div v-if="!taskDetail?.items?.length" class="flex-center">暂无数据</div>
       <div v-for="(item, i) in taskDetail?.items" :key="i">
-        <TaskItem :index="i+1" type="job" :disabled="false" :defaultValue="item.lib" />
+        <TaskItem :index="i+1" type="job" :disabled="disabled" :defaultValue="item.lib" />
       </div>
-     
     </div>
   </template>
   
   <script setup>
   import { onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import { ElMessage } from 'element-plus'
   import Header from '@/views/page/components/header/index.vue'
   import TaskItem from '@/views/page/components/taskItem/index.vue'
-  import { answerDetail } from '@/api/job.js'
+  import { answerDetail, answerSave, answerSubmit } from '@/api/job.js'
+  import { TOPICTYPE } from '@/utils/consts.js'
   const { currentRoute } = useRouter()
   const route = currentRoute.value
   const id = route.query?.id
+  const type = route.query?.type
+  const disabled = type === 'edit' ? false : true
   const taskDetail = ref([])
   onMounted(() => {
-    answerDetail(route.query.id).then(res => {
-      if (res.code === '200') {
+    answerDetail(id).then(res => {
+      if (res.code === '200' && res.data) {
         taskDetail.value = res.data
-        taskDetail.value?.items.forEach((item) => {
-            if (item.lib.questionTypeId === '0204') {
-                const contentItems = item.lib.content.split('__').join('').split('')
-                console.log('contentItems', contentItems)
+        const answerMap = res.data.answerMap
+        taskDetail.value?.items?.forEach((item) => {
+            const value = answerMap[item.lib.id]
+            // 填空题逻辑额外处理
+            if (TOPICTYPE[item.lib.questionTypeId] === '填空题') {
+                const contentItems = item.lib.content.split(/___/)
                 let newContent = ''
-                item.lib.inputIds = []
+                item.lib.selectId = []
+                console.log('contentItems', contentItems)
                 contentItems.forEach((content, idx) => {
-                    if (content === '_') {
-                        item.lib.inputIds.push(item.id+idx)
-                        newContent += `<input id="${item.id+idx}" />`
-                    } else {
-                        newContent+=content
-                    }
+                  newContent+=content
+                  if (idx < contentItems.length-1) {
+                    item.lib.selectId.push(item.id+idx)
+                    newContent += `<input id="${item.id+idx}" disabled="${disabled}" value="${value ? value[idx] : ''}" />`
+                  }
+                  console.log('newContent', newContent)
                 })
                 item.lib.content = newContent
                 console.log('item.lib', item.lib)
+            } else if (answerMap) {
+              if (TOPICTYPE[item.lib.questionTypeId] === '多选题') {
+                item.lib.selectId = value && value.length ? value : []
+              }else {
+                item.lib.selectId = value ? value[0] : ''
+              }
             }
         })
+        console.log('taskDetail.value', taskDetail.value)
       }
     })
   })
-  const test = () => {
-    taskDetail.value?.items.forEach((item) => {
-        if (item.lib.questionTypeId === '0204') {
-            item.lib.inputIds.forEach((input) => {
-                console.log(document.getElementById(input).value)
-            })
+
+  const itemMaps = () => {
+    // 过滤出填写的答案
+    let itemMap = {}
+    for(let i = 0; i < taskDetail.value?.items.length; i++) {
+      const item = taskDetail.value?.items[i]
+      if (!item.lib.selectId) {
+        return ElMessage.error(`请填写题${i+1}答案!`)
+      }
+      if (item.lib.questionTypeId === '0204') {
+          let value = []
+          item.lib.selectId.forEach((input) => {
+            const elValue = document.getElementById(input).value || ''
+            value.push(elValue)
+          })
+          itemMap = {
+            ...itemMap,
+            [item.lib.id]: value
+          }
+      } else {
+        itemMap = {
+          ...itemMap,
+          [item.lib.id]: Array.isArray(item.lib.selectId) ? item.lib.selectId : [item.lib.selectId]
         }
+      }
+    }
+    return itemMap
+  }
+  const save = () => {
+    const params = {
+      itemMap: itemMaps(),
+      testId: id
+    }
+    console.log(params)
+    answerSave(params).then(res => {
+      if (res.code === '200') {
+        ElMessage.success('保存成功')
+      }
     })
-        console.log('taskDetail', taskDetail.value)
+  }
+  const submit = () => {
+    const params = {
+      itemMap: itemMaps(),
+      testId: id
+    }
+    answerSubmit(params).then(res => {
+      if (res.code === '200') {
+        ElMessage.success('提交成功')
+      }
+    })
   }
   </script>
   <style scoped>
@@ -80,7 +137,7 @@
     font-size: 13px;
     margin: 10px 0;
   }
-  .task-msg {
-    min-width: 400px;
+  .task-msg span {
+    margin-right: 20px;
   }
   </style>
