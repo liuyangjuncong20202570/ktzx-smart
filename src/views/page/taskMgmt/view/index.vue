@@ -12,7 +12,7 @@
     </div>
     <div v-if="!taskDetail?.items?.length">暂无数据</div>
     <div v-for="(item, i) in taskDetail?.items" :key="i">
-      <TaskItem disabled="true" :defaultValue="item.lib" />
+      <TaskItem :index="i+1" disabled="true" :defaultValue="item.lib" />
     </div>
    
   </div>

@@ -29,32 +29,33 @@
   import TaskItem from '@/views/page/components/taskItem/index.vue'
   import { answerDetail, answerSave, answerSubmit } from '@/api/job.js'
   import { TOPICTYPE } from '@/utils/consts.js'
-  const { currentRoute } = useRouter()
+  const routes = useRouter()
+  const { currentRoute } = routes
   const route = currentRoute.value
   const id = route.query?.id
   const type = route.query?.type
-  const disabled = type === 'edit' ? false : true
+  const disabled = ref(type === 'edit' ? false : true)
   const taskDetail = ref([])
   onMounted(() => {
     answerDetail(id).then(res => {
       if (res.code === '200' && res.data) {
         taskDetail.value = res.data
         const answerMap = res.data.answerMap
+        console.log('answerMap', answerMap)
         taskDetail.value?.items?.forEach((item) => {
-            const value = answerMap[item.lib.id]
+            let value = null
+            if (answerMap) value = answerMap[item.lib.id]
             // 填空题逻辑额外处理
             if (TOPICTYPE[item.lib.questionTypeId] === '填空题') {
                 const contentItems = item.lib.content.split(/___/)
                 let newContent = ''
                 item.lib.selectId = []
-                console.log('contentItems', contentItems)
                 contentItems.forEach((content, idx) => {
                   newContent+=content
                   if (idx < contentItems.length-1) {
                     item.lib.selectId.push(item.id+idx)
-                    newContent += `<input id="${item.id+idx}" disabled="${disabled}" value="${value ? value[idx] : ''}" />`
+                    newContent += `<input id="${item.id+idx}" ${disabled.value ? 'disabled' : ''}" value="${value ? value[idx] : ''}" />`
                   }
-                  console.log('newContent', newContent)
                 })
                 item.lib.content = newContent
                 console.log('item.lib', item.lib)
@@ -107,6 +108,7 @@
     answerSave(params).then(res => {
       if (res.code === '200') {
         ElMessage.success('保存成功')
+        routes.push('/page/job/list')
       }
     })
   }

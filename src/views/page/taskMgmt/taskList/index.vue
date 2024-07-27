@@ -6,13 +6,26 @@
       <el-table-column type="index" label="序号" width="80" />
       <el-table-column property="stuNo" label="学号" />
       <el-table-column property="userName" label="姓名" />
-      <el-table-column property="status" label="状态" />
+      <el-table-column property="status" label="状态">
+        <template #default="scope">
+           <span :style="`color:${statusColors[scope.row.status]}`">{{ ['未完成', '已交卷', '已批改'][scope.row.status] }}</span>
+        </template>
+      </el-table-column>
       <el-table-column property="totalScore" label="总评成绩" />
       <el-table-column property="address" label="操作">
         <template #default="scope">
           <el-button
             type="text"
             size="small"
+            @click="(() => {
+              routes.push({
+                path: '/page/taskMgmt/assignGrading',
+                query: {
+                  testId: scope.row.testId,
+                  stuId: scope.row.stuId,
+                }
+              })
+            })"
           >
             批改
           </el-button>
@@ -28,15 +41,18 @@ import { useRouter } from 'vue-router'
 import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
 import { studentList } from '@/api/taskMgmt.js'
 import Header from '@/views/page/components/header/index.vue'
-const { currentRoute } = useRouter()
+const routes = useRouter()
+const { currentRoute } = routes
 const route = currentRoute.value
+const id = route.query.id
 const tableData = ref([])
+const statusColors = ['red', '#169bd5' ,'#169bd5']
 onMounted(() => {
   getStudentList()
 })
 
 const getStudentList = () => {
-  studentList(route.query.id).then(res => {
+  studentList(id).then(res => {
     if (res.code === '200') {
       tableData.value = res.data
     }

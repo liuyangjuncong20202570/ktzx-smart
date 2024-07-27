@@ -61,3 +61,7 @@ export const taskUnlock = (id) => {
 export const studentList = (id) => {
     return request.page.get('/paper/student/student/list?paperId=' + id)
 }
+// 批改页-学生作业详情
+export const correctDetail = ({ stuId, testId }) => {
+    return request.page.get(`/paper/correct/detail?stuId=${stuId}&testId=${testId}`)
+}
