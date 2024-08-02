@@ -9,7 +9,7 @@
       <div>
         <el-button type="primary" @click="add">新增题目</el-button>
         <el-button type="danger" @click="batchDel">批量删除</el-button>
-        <el-button type="primary">批量导入</el-button>
+        <el-button type="primary" @click="massUpload">批量上传</el-button>
       </div>
     </div>
 
@@ -26,7 +26,12 @@
     />
 
     <el-collapse v-model="activeNames">
-      <el-collapse-item v-for="(course, i) in courseList" :key="course.id" :title="`${i+1}、${course.title} (${TOPICTYPE[item?.questionTypeId] ?? '预留题'})`" :name="course.id">
+      <el-collapse-item 
+        v-for="(course, i) in courseList" 
+        :key="course.id" 
+        :title="`${i+1}、${course.title} (${TOPICTYPE[course?.questionTypeId] ?? '预留题'})`" 
+        :name="course.id"
+      >
         <div class="topic-item">
           <div class="topic-kwa" v-if="course.answers">
             <span style="margin-right: 20px" v-for="(kwa, kwaIdx) in course.kwas" :key="kwaIdx">{{ kwa.kwaName }}</span>
@@ -77,7 +82,7 @@ import Kwa from '@/components/kwa/index.vue'
 import Header from '../components/header/index.vue'
 import Topic from './components/topic/index.vue'
 import optionTopic from './components/optionTopic/index.vue'
-import { login, classroomLibList, classroomLibCopy, classroomLibDel } from '@/api/classroomLib.js'
+import { classroomLibList, classroomLibCopy, classroomLibDel, upToCourse } from '@/api/classroomLib.js'
 import { TOPICTYPE } from '@/utils/consts'
 
 export default defineComponent({
@@ -215,10 +220,25 @@ export default defineComponent({
         }
       })
     }
+
+    const massUpload = () => {
+      const ids = courseList.value.filter((course) => course.isChecked )?.map((course) => course.id)
+      if (ids && ids.length) {
+        upToCourse({ ids }).then(res => {
+          if (res.code === '200') {
+            ElMessage.success('上传成功')
+          }
+        })
+      } else {
+        ElMessage.error('请选择要上传的题')
+      }
+    }
+
     return {
       item,
       total,
       params,
+      TOPICTYPE,
       topicFlag,
       courseList,
       activeNames,
@@ -234,7 +254,7 @@ export default defineComponent({
       handleSizeChange,
       getClassroomLibList ,
       handleCurrentChange,
-      TOPICTYPE,
+      massUpload,
     }
   }
 })

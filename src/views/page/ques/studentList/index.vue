@@ -1,6 +1,6 @@
 <template>
   <div class="task-list">
-    <Header title="作业学生列表" />
+    <Header title="问卷学生列表" />
     <!-- 作业列表 -->
     <el-table ref="multipleTableRef" :data="tableData" style="width: 100%;margin-top: 10px;" @selection-change="handleSelectionChange">
       <el-table-column type="index" label="序号" width="80" />
@@ -11,24 +11,13 @@
            <span :style="`color:${statusColors[scope.row.status]}`">{{ ['未完成', '已交卷', '已批改'][scope.row.status] }}</span>
         </template>
       </el-table-column>
-      <el-table-column property="totalScore" label="总评成绩" />
       <el-table-column property="address" label="操作">
         <template #default="scope">
           <el-button
             type="text"
             size="small"
-            v-if="scope.row.status !== 2"
-            @click="(() => {
-              routes.push({
-                path: '/page/taskMgmt/assignGrading',
-                query: {
-                  testId: scope.row.testId,
-                  stuId: scope.row.stuId,
-                }
-              })
-            })"
           >
-            批改
+            查看
           </el-button>
         </template>
       </el-table-column>
@@ -40,7 +29,7 @@
 import { ref, reactive, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
-import { studentList } from '@/api/taskMgmt.js'
+import { queStudentList } from '@/api/ques.js'
 import Header from '@/views/page/components/header/index.vue'
 const routes = useRouter()
 const { currentRoute } = routes
@@ -53,7 +42,7 @@ onMounted(() => {
 })
 
 const getStudentList = () => {
-  studentList(id).then(res => {
+  queStudentList(id).then(res => {
     if (res.code === '200') {
       tableData.value = res.data
     }

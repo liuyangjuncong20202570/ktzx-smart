@@ -1,6 +1,6 @@
 <template>
   <div class="test-list-wrap">
-    <Header title="试卷列表" />
+    <Header title="往届作业" />
 
     <header class="flex-between" style="margin: 10px 0;">
       <div class="flex-start">
@@ -9,16 +9,10 @@
           <el-option @change="handleTerm" v-for="item in termList" :label="item.termname" :value="item.id"></el-option>
         </el-select>
       </div>
-
-      <div>
-        <el-button @click="del" type="danger">批量删除</el-button>
-        <!-- <el-button @click="download">下载所有成绩</el-button> -->
-        <el-button @click="addTask" type="primary">新建作业</el-button>
-      </div>
     </header>
 
-    <el-table ref="multipleTableRef" :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" />
+    <el-table ref="multipleTableRef" :data="tableData" style="width: 100%">
+      <el-table-column type="index" label="序号" width="55" />
       <el-table-column property="name" label="名称" />
       <el-table-column property="createTime" label="创建时间" />
       <el-table-column fixed="right" label="操作">
@@ -37,37 +31,6 @@
           <el-button type="text" size="small" @click="copy(scope.row.id)">
             复制
           </el-button>
-
-          <el-button v-if="[0, 1].includes(scope.row.status)" type="text" size="small" @click="edit(scope.row.id)">
-            编辑
-          </el-button>
-
-          <el-button v-if="[0].includes(scope.row.status)" @click="publish(scope.row.id)" type="text" size="small">
-            发布作业
-          </el-button>
-
-          <el-button v-if="[1, 2].includes(scope.row.status)" @click="(() => {
-            router.push({
-              path: '/page/taskMgmt/taskList',
-              query: {
-                id: scope.row.id
-              }
-            })
-          })" type="text" size="small">
-            查看学生
-          </el-button>
-
-          <el-button v-if="[0, 1].includes(scope.row.status)" @click="lock(scope.row.id)" type="text" size="small">
-            锁定
-          </el-button>
-
-          <el-button v-if="[0, 1].includes(scope.row.status)" type="text" size="small" @click="del(scope.row)">
-            删除
-          </el-button>
-
-          <el-button v-if="[2].includes(scope.row.status)" @click="unlock(scope.row.id)" type="text" size="small">
-            解锁
-          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -78,28 +41,21 @@
         @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
 
-    <New ref="newRef" @save="() => {
-      params.pageIndex = 1
-      getTaskList()
-    }" />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
-import { taskList, getTermAll, queFormDel, taskCopy, taskPublish, taskLock, taskUnlock } from '@/api/taskMgmt.js'
+import { ElTable, ElMessage } from 'element-plus'
+import { taskList, getTermAll, taskCopy, prevPager } from '@/api/taskMgmt.js'
 import Header from '@/views/page/components/header/index.vue'
-import New from './components/new/index.vue'
 
 const router = useRouter()
-const newRef = ref(null)
 const multipleTableRef = ref()
 const termId = ref('')
 const termList = ref([])
 const tableData = ref([])
-const delIds = ref([])
 const total = ref(0)
 const params = ref({
   pageIndex: 1,
@@ -121,47 +77,11 @@ const copy = (id) => {
   })
 }
 
-const publish = (id) => {
-  taskPublish(id).then(res => {
-    if (res.code === '200') {
-      ElMessage.success('发布成功')
-      getTaskList()
-    }
-  })
-}
-
-const lock = (id) => {
-  taskLock(id).then(res => {
-    if (res.code === '200') {
-      ElMessage.success('锁定成功')
-      getTaskList()
-    }
-  })
-}
-
-const unlock = (id) => {
-  taskUnlock(id).then(res => {
-    if (res.code === '200') {
-      ElMessage.success('解锁成功')
-      getTaskList()
-    }
-  })
-}
-
-const edit = (id) => {
-  router.push({
-    path: '/page/taskMgmt/tpAssembly',
-    query: {
-      id
-    }
-  })
-}
-
 const _getTermAll = () => {
   getTermAll().then(res => {
     if (res.code === '200') {
       // 
-      termList.value = res.data?.filter((item) => item.iscurrentterm === '1')
+      termList.value = res.data?.filter((item) => item.iscurrentterm === '0')
       if (termList?.value?.length) {
         // 默认展示第一个学期
         termId.value = termList.value[0].id
@@ -179,7 +99,7 @@ const handleTerm = (termId) => {
 
 const getTaskList = () => {
   params.value.termId = termId.value
-  taskList(params.value).then(res => {
+  prevPager(params.value).then(res => {
     if (res.code === '200') {
       tableData.value = res?.data?.data
       total.value = res?.data?.recordSize
@@ -189,53 +109,12 @@ const getTaskList = () => {
 
 const handleSizeChange = (val) => {
   params.value.pageSize = val
-  getTaskList()
   console.log(`${val} items per page`)
 }
 
 const handleCurrentChange = (val) => {
   params.value.pageIndex = val
-  getTaskList()
   console.log(`current page: ${val}`)
-}
-
-const del = (row) => {
-  let ids = []
-  if (row.id) ids.push(row.id)
-  if (delIds.value.length) ids = delIds.value
-  if (!ids.length) return
-  ElMessageBox.confirm(
-    '确认删除此试卷吗?',
-    '提示',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning',
-    }
-  ).then(() => {
-    queFormDel(ids).then(res => {
-      if (res.code === '200') {
-        ElMessage({
-          type: 'success',
-          message: '删除成功',
-        })
-        getTaskList()
-      }
-    })
-  })
-}
-
-const download = () => {
-
-}
-
-const addTask = () => {
-  if (newRef.value) newRef.value.init()
-}
-
-const handleSelectionChange = (val) => {
-  console.log('val', val)
-  delIds.value = val.map((item) => item.id)
 }
 </script>
 <style scoped>

@@ -48,12 +48,12 @@ export const courseLibTypeSetStatus = (data) => {
 export const courseLibSyncPager = (data) => {
     return request.page.post('/courseLib/sync/pager', data)
 }
-// 接收审批
-export const courseLibSyncAccept = (data) => {
+// 接受申请
+export const syncAccept = (data) => {
     return request.page.post('/courseLib/sync/accept', data)
 }
-// 获取课程保存题型设定
-export const courseLibSyncReject = (data) => {
+// 拒绝申请
+export const syncReject = (data) => {
     return request.page.post('/courseLib/sync/reject', data)
 }
 

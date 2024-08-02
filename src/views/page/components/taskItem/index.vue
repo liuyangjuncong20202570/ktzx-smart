@@ -6,13 +6,13 @@
         <div class="task-title">{{ index }}、{{ lib.title }}</div>
         <!-- 多选 -->
         <el-checkbox-group v-model="lib.selectId" v-if="lib.questionTypeId == '0202'" :disabled="disabled">
-            <el-checkbox v-for="item in lib.answers" :key="item.id" :label="item.id">
+            <el-checkbox v-for="item in lib.answers" :key="item.id" :label="item.itemOption">
                 {{ item.itemContent }}
             </el-checkbox>
         </el-checkbox-group>
         <!-- 单选、判断 -->
         <el-radio-group v-model="lib.selectId" v-if="['0201', '0203'].includes(lib.questionTypeId)" :disabled="disabled">
-            <el-radio v-for="item in lib.answers" :key="item.id" :label="item.id">{{ item.itemContent }}</el-radio>
+            <el-radio v-for="item in lib.answers" :key="item.id" :label="item.itemOption">{{ item.itemContent }}</el-radio>
         </el-radio-group>
         <!-- 填空题 -->
         <div v-if="lib.questionTypeId == '0204'">

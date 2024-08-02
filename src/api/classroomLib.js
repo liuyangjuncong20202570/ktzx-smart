@@ -52,6 +52,10 @@ export const classroomLibSyncAccept = (data) => {
 export const classroomLibSyncReject = (data) => {
     return request.page.post('/classroomLib/sync/reject', data)
 }
+// 从课堂题库提交到课程
+export const upToCourse = (data) => {
+    return request.page.post('/classroomLib/upToCourse', data)
+}
 
 export const login = () => {
     return request.fork.get('/login?loginName=test1&pwd=123456&catelog=2&loginway=1&roleId=516761049-234512f3-7c19-4580-abe2-ebfb1dd8db21&obsId=2c918af681fa6ea7018209a505c30672&userType=teacher')

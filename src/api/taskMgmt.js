@@ -16,7 +16,7 @@ export const getTermCurrent = () => {
 export const getTermAll = () => {
     return request.term.get('/all')
 }
-// 获取所有学期信息
+// 删除学期信息
 export const queFormDel = (data) => {
     return request.page.post('/paper/delete', data)
 }
@@ -64,4 +64,16 @@ export const studentList = (id) => {
 // 批改页-学生作业详情
 export const correctDetail = ({ stuId, testId }) => {
     return request.page.get(`/paper/correct/detail?stuId=${stuId}&testId=${testId}`)
+}
+// 批改页-自动批改
+export const correctAuto = ({ stuId, testId }) => {
+    return request.page.get(`/paper/correct/correct/auto?stuId=${stuId}&testId=${testId}`)
+}
+// 批改页-全部提交批改结果
+export const correctSubmit = (data) => {
+    return request.page.post('/paper/correct/correct/submit', data)
+}
+// 往届作业
+export const prevPager = (data) => {
+    return request.page.post('/paper/past/pager', data)
 }

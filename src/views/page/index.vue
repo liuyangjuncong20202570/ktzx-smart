@@ -55,6 +55,10 @@
                     <el-menu-item-group>
                         <el-menu-item index="/page/taskMgmt/assignGrading">作业批改</el-menu-item>
                     </el-menu-item-group>
+                    
+                    <el-menu-item-group>
+                        <el-menu-item index="/page/taskMgmt/prevTask">往届作业</el-menu-item>
+                    </el-menu-item-group>
                 </el-sub-menu>
 
                 <el-sub-menu index="4">
@@ -88,6 +92,40 @@
                     <el-menu-item-group>
                         <el-menu-item index="/page/job/jobWjDt">问卷答题</el-menu-item>
                     </el-menu-item-group>
+                </el-sub-menu>
+
+                <el-sub-menu index="5">
+                    <template #title>
+                        <el-icon>
+                            <location />
+                        </el-icon>
+                        <span>调查问卷管理</span>
+                    </template>
+
+                    <el-menu-item-group>
+                        <el-menu-item index="/page/ques/list">问卷列表</el-menu-item>
+                    </el-menu-item-group>
+
+                    <el-menu-item-group>
+                        <el-menu-item index="/page/ques/edit">问卷编辑</el-menu-item>
+                    </el-menu-item-group>
+                </el-sub-menu>
+
+                <el-sub-menu index="6">
+                    <template #title>
+                        <el-icon>
+                            <location />
+                        </el-icon>
+                        <span>学生端我的问卷</span>
+                    </template>
+
+                    <el-menu-item-group>
+                        <el-menu-item index="/page/stuQues/list">问卷列表</el-menu-item>
+                    </el-menu-item-group>
+
+                    <!-- <el-menu-item-group>
+                        <el-menu-item index="/page/ques/edit">问卷编辑</el-menu-item>
+                    </el-menu-item-group> -->
                 </el-sub-menu>
 
                 <!-- <el-menu-item index="2">

@@ -26,7 +26,12 @@
     />
 
     <el-collapse v-model="activeNames">
-      <el-collapse-item v-for="(course, i) in courseList" :key="course.id" :title="`${i+1}、${course.title}(${TOPICTYPE[item?.questionTypeId] ?? '预留题'})`" :name="course.id">
+      <el-collapse-item 
+        v-for="(course, i) in courseList" 
+        :key="course.id" 
+        :title="`${i+1}、${course.title}(${TOPICTYPE[course?.questionTypeId] ?? '预留题'})`" 
+        :name="course.id"
+      >
         <div class="topic-item">
           <div class="topic-kwa" v-if="course.answers">
             <span style="margin-right: 20px" v-for="(kwa, kwaIdx) in course.kwas" :key="kwaIdx">{{ kwa.kwaName }}</span>
@@ -36,9 +41,12 @@
               <el-checkbox label="" v-model="course.isChecked"></el-checkbox>
               <span class="topic-title">{{ course.title }}</span>
             </span>
-            <div class="topic-answer-item" v-for="(answer, answerIdx) in course.answers" :key="answerIdx">
+            <div v-if="['单选题', '多选题', '判断题'].includes(TOPICTYPE[course.questionTypeId])" class="topic-answer-item" v-for="(answer, answerIdx) in course.answers" :key="answerIdx">
               {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}
               <span v-if="answer.isAnswer">正确答案</span>
+            </div>
+            <div v-else>
+              <span v-html="course.content"></span>
             </div>
           </div>
           <div class="topic-item-icon flex-between">
@@ -208,6 +216,7 @@ export default defineComponent({
         if (res.code === '200') {
           total.value = res?.data?.recordSize ?? 0
           courseList.value = res?.data?.data ?? []
+          console.log('courseList.value', courseList.value)
           // 折叠面板默认全部展开
           activeNames.value = courseList.value.map((item) => item.id)
           console.log('res', courseList.value)

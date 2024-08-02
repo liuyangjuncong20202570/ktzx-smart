@@ -22,7 +22,7 @@
       </div>
     </div>
     <div class="flex-center" v-if="!taskList?.length">暂无数据</div>
-    <vuedraggable class="" v-model="taskList" @start="drag = true" @end="drag = false" item-key="index">
+    <vuedraggable v-model="taskList" @start="drag = true" @end="drag = false" item-key="index">
       <template #item="{ element, index }">
         <div class="topic-item">
           <div class="topic-kwa">

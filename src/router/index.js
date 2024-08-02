@@ -86,6 +86,11 @@ const routes = [
                 name: 'TaskMgmtAssignGrading',
                 component: () => import('../views/page/taskMgmt/assignGrading/index.vue')
             },
+            {
+                path: '/page/taskMgmt/prevTask',
+                name: 'TaskMgmtAssignGrading',
+                component: () => import('../views/page/taskMgmt/prevTask/index.vue')
+            },
             // 学生端
             {
                 path: '/page/job/list',
@@ -102,7 +107,41 @@ const routes = [
             {
                 path: '/page/job/jobWjDt',
                 component: () => import('../views/page/job/jobWjDt/index.vue')
-            }
+            },
+            // 调查问卷相关
+            {
+                path: '/page/ques/list',
+                component: () => import('../views/page/ques/list/index.vue')
+            },
+            {
+                path: '/page/ques/edit',
+                component: () => import('../views/page/ques/edit/index.vue')
+            },
+            {
+                path: '/page/ques/studentList',
+                component: () => import('../views/page/ques/studentList/index.vue')
+            },
+            {
+                path: '/page/ques/view',
+                component: () => import('../views/page/ques/view/index.vue')
+            },
+            // 学生端问卷
+            {
+                path: '/page/stuQues/list',
+                component: () => import('../views/page/stuQues/index.vue')
+            },
+            {
+                path: '/page/stuQues/detail',
+                component: () => import('../views/page/stuQues/detail/index.vue')
+            },
+            // {
+            //     path: '/page/job/jobWjDt',
+            //     component: () => import('../views/page/job/jobWjDt/index.vue')
+            // },
+            // {
+            //     path: '/page/job/jobWjDt',
+            //     component: () => import('../views/page/job/jobWjDt/index.vue')
+            // },
         ]
     },
     {

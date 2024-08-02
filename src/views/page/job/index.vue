@@ -2,9 +2,9 @@
     <div class="task-list">
       <Header title="我的作业" />
       <div class="flex-start task-title">
-        已布置作业：  {{ summaryMsg?.finishedTimes ?? '无' }}次
+        已布置作业：  {{ summaryMsg?.publishTimes ?? '无' }}次
 
-        已完成作业：  {{ summaryMsg?.publishTimes ?? '无' }}次
+        已完成作业：  {{ summaryMsg?.finishedTimes ?? '无' }}次
 
         完成度：  {{ convertToPercentage(summaryMsg?.finishedPercent ?? 0) }}
       </div>

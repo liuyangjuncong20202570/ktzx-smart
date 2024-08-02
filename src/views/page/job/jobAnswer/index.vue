@@ -54,7 +54,7 @@
                   newContent+=content
                   if (idx < contentItems.length-1) {
                     item.lib.selectId.push(item.id+idx)
-                    newContent += `<input id="${item.id+idx}" ${disabled.value ? 'disabled' : ''}" value="${value ? value[idx] : ''}" />`
+                    newContent += `<input id="${item.id+idx}" ${disabled.value ? 'disabled' : ''} value="${value ? value[idx] : ''}" />`
                   }
                 })
                 item.lib.content = newContent
@@ -108,7 +108,6 @@
     answerSave(params).then(res => {
       if (res.code === '200') {
         ElMessage.success('保存成功')
-        routes.push('/page/job/list')
       }
     })
   }
@@ -120,6 +119,7 @@
     answerSubmit(params).then(res => {
       if (res.code === '200') {
         ElMessage.success('提交成功')
+        routes.push('/page/job/list')
       }
     })
   }

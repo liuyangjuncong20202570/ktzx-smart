@@ -1,6 +1,9 @@
 <template>
   <div class="course-type">
     <Header title="题库管理" />
+    <div style="margin-top: 20px" class="flex-end">
+      <el-button type="primary" @click="save()">保存</el-button>
+    </div>
     <el-table ref="multipleTableRef" :data="typeList" style="width: 100%" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" />
       <el-table-column property="name" label="题型" show-overflow-tooltip />
@@ -8,10 +11,6 @@
         <template #default="scope">{{ scope.row.status === 1 ? '开启' : '关闭' }}</template>
       </el-table-column>
     </el-table>
-    <div style="margin-top: 20px">
-      <el-button @click="toggleSelection(typeList)">Clear selection</el-button>
-      <el-button @click="save()">保存</el-button>
-    </div>
   </div>
 </template>
 
