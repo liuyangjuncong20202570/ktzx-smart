@@ -71,6 +71,11 @@ const routes = [
                 name: 'PracticeInfo',
                 component: () => import('../views/page/practice/info/index.vue')
             },
+            {
+                path: '/page/correct',
+                name: 'PracticeCorrect',
+                component: () => import('../views/page/practice/correct/index.vue')
+            },
         ]
     },
     {

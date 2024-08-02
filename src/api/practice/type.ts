@@ -3,13 +3,21 @@ export interface PageVO {
   pageIndex: number;
   pageSize: number;
 }
+export interface StudentPageVO extends PageVO{
+  practiceId: string;
+}
 export interface ResVO {
   code: string;
   data?: any;
   message:string,
   result:boolean
 }
-
+export interface StudentPracticePageVO {
+  stuNo:string;
+  name:string;
+  answerPercent:number | string;
+  status:number | string;
+}
 // 实验page参数
 export interface PracticePageVO {
   beforeAttention: string;
@@ -92,4 +100,9 @@ export interface KwaParamVO  {
   kwaId:string,
   kwaName:string,
   practiceId:string
+}
+
+export interface StudentParamVO  {
+  practiceId:string,
+  stuId:string
 }

@@ -5,7 +5,7 @@
  * @FilePath: \smarttt_ktzx\src\api\practice\index.ts
  */
 import request from '../../utils/request.js'
-import {PageVO,DefaultParamVO} from './type.js'
+import {PageVO,DefaultParamVO,StudentPageVO,StudentParamVO} from './type.js'
 // 实验列表
 export const practicePage = (data:PageVO) => {
     return request.page.post('/practice/pager', data)
@@ -41,6 +41,11 @@ export const practiceDetail = (id:string) => {
 }
 
 // 学生实验
-export const studentList = (id:string) => {
-    return request.page.get(`/practice/student/list?practiceId=${id}`,)
+export const studentList = (data:StudentPageVO) => {
+    return request.page.post(`/practice/student/pager`,data)
+}
+
+// 学生实验批改
+export const studentCorrect = (params:StudentParamVO) => {
+    return request.page.get(`/practice/correct/stuDetail`,{params:params})
 }
