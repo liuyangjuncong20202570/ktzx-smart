@@ -1,3 +1,9 @@
+/*
+ * @Date: 2024-07-05 09:17:48
+ * @LastEditors: Ming
+ * @LastEditTime: 2024-07-16 15:01:20
+ * @FilePath: \smarttt_ktzx\src\router\index.js
+ */
 import {createRouter, createWebHashHistory,onBeforeRouteLeave } from 'vue-router';
 
 const rolehome = ['teacherhomne', 'adminhome', 'superadminhome', 'secretariatehome','coursemanagerhome'];
@@ -133,6 +139,27 @@ const routes = [
             {
                 path: '/page/stuQues/detail',
                 component: () => import('../views/page/stuQues/detail/index.vue')
+            },
+            // 实验
+            {
+                path: '/page/practice',
+                name: 'Practice',
+                component: () => import('../views/page/practice/index.vue')
+            },
+            {
+                path: '/page/student',
+                name: 'Student',
+                component: () => import('../views/page/practice/student/index.vue')
+            },
+            {
+                path: '/page/practiceInfo',
+                name: 'PracticeInfo',
+                component: () => import('../views/page/practice/info/index.vue')
+            },
+            {
+                path: '/page/correct',
+                name: 'PracticeCorrect',
+                component: () => import('../views/page/practice/correct/index.vue')
             },
             // {
             //     path: '/page/job/jobWjDt',

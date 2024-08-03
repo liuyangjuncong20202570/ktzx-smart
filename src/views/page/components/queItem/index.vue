@@ -33,8 +33,8 @@
 <script setup>
 import { ref, reactive, onMounted, nextTick, defineProps } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
-import { myQueFormPager } from '@/api/stuQues.js'
+// import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
+// import { myQueFormPager } from '@/api/stuQues.js'
 import { TOPICTYPE } from '@/utils/consts.js'
 const router = useRouter()
 const { currentRoute } = router
