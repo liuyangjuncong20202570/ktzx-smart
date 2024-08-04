@@ -47,13 +47,7 @@ const save = () => {
   addPaper(data).then(res => {
     if (res.code === '200') {
       handleClose()
-      ElMessage.success('添加成功')
-      router.push({
-        path: '/page/taskMgmt/tpAssembly',
-        query: {
-          id: res.data
-        }
-      });
+      ElMessage.success('添加成功') 
       emit('save')
     }
   })

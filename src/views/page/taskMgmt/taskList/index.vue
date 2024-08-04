@@ -23,7 +23,7 @@
             v-if="scope.row.status === 1"
             @click="(() => {
               routes.push({
-                path: '/page/taskMgmt/assignGrading',
+                path: '/homes/courseteacherhome/exam/test/assignGrading',
                 query: {
                   testId: scope.row.testId,
                   stuId: scope.row.stuId,
@@ -41,7 +41,7 @@
             v-if="scope.row.status === 2"
             @click="(() => {
               routes.push({
-                path: '/page/taskMgmt/assignGrading',
+                path: '/homes/courseteacherhome/exam/test/assignGrading',
                 query: {
                   testId: scope.row.testId,
                   stuId: scope.row.stuId,

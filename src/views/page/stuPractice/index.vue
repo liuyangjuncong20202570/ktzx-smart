@@ -25,7 +25,7 @@
               size="small"
               @click="(() => {
                 router.push({
-                  path: '/page/stuPractice/submitPractice',
+                  path: '/homes/studenthome/exam/submitPractice',
                   query: {
                     id: scope.row.practiceId,
                     type: 'view'
@@ -42,7 +42,7 @@
               size="small"
               @click="(() => {
                 router.push({
-                  path: '/page/stuPractice/submitPractice',
+                  path: '/homes/studenthome/exam/submitPractice',
                   query: {
                     id: scope.row.practiceId,
                     type: 'edit'

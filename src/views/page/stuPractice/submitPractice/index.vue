@@ -124,7 +124,7 @@
       if (res.code === '200') {
         ElMessage.success(name === 'save' ? '保存成功' : '提交成功')
         if (name === 'submit') {
-          routes.push('/page/stuPractice')
+          routes.push('/homes/studenthome/exam/myexperiment')
         }
       }
     })

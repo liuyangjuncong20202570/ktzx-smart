@@ -106,10 +106,6 @@ export default defineComponent({
       behavior: 'smooth'
     })
 
-    const setName = (val) => {
-      name = val
-    }
-
     const resetName = () => {
       options.value.forEach((option, i) => {
         option.name = String.fromCharCode('A'.charCodeAt() + i)
@@ -212,7 +208,6 @@ export default defineComponent({
       item,
       options,
       headline,
-      setName,
       plus,
       del,
       save,

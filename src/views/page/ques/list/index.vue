@@ -20,7 +20,7 @@
           <div class="flex-start table-btn-wrap">
             <el-button type="text" @click="(() => {
               router.push({
-                path: '/page/ques/view',
+                path: '/homes/courseteacherhome/exam/view',
                 query: {
                   id: scope.row.id,
                   privilege
@@ -32,7 +32,7 @@
 
             <el-button v-if="[1, 2].includes(scope.row.status)" type="text" @click="(() => {
               router.push({
-                path: '/page/ques/studentList',
+                path: '/homes/courseteacherhome/exam/studentList',
                 query: {
                   id: scope.row.id,
                   privilege
@@ -101,7 +101,7 @@ const getWR = () => {
 
 const edit = (id) => {
   router.push({
-    path: '/page/ques/edit',
+    path: '/homes/courseteacherhome/exam/edit',
     query: {
       id
     }
@@ -160,7 +160,7 @@ const download = () => {
 }
 
 const addTask = () => {
-  router.push('/page/ques/edit')
+  router.push('/homes/courseteacherhome/exam/edit')
 }
 
 const handleSelectionChange = (val) => {

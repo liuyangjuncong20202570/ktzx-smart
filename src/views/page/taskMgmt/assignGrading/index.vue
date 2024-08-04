@@ -16,6 +16,8 @@
         <div class="task-item" v-for="(item, i) in taskList" :key="i">
           <span class="task-kwa" v-for="kwa in item.lib.kwas" :key="item.id">({{ kwa.kwaName }})</span>
           <div class="task-title">{{i+1}}、{{ item.lib.title }}</div>
+          <div class="flex-center">本题总分：{{ item.score }}</div>
+          <div v-html="item.lib.content"></div>
           <div class="task-select flex-between" v-if="['单选题', '多选题', '判断题'].includes(TOPICTYPE[item.lib.questionTypeId])">
             <div>
               <div class="flex-start" v-for="(answer, answerIdx) in item.lib.answers" :key="answer.id">
@@ -27,7 +29,7 @@
             <div class="task-score">
               <el-button type="text" style="margin-right: 8px;">本题得分:</el-button> 
               <el-input 
-                :disabled="disabled"
+                disabled
                 @input="handleScore($event, item)" 
                 v-model.number="item.lib.value" 
                 style="width: 60px;"
@@ -35,16 +37,14 @@
             </div>
           </div>
 
-          <div class="task-select flex-between" v-if="['填空题', '简答题'].includes(TOPICTYPE[item.lib.questionTypeId])">
+          <div class="task-select flex-between" v-if="['简答题'].includes(TOPICTYPE[item.lib.questionTypeId])">
             <el-input
-              v-if="TOPICTYPE[item.lib.questionTypeId] === '简答题'"
               style="width: 400px"
               :autosize="{ minRows: 4, maxRows: 6 }"
               type="textarea"
               v-model="item.lib.answer"
               disabled
             />
-            <div v-else v-html="item.lib.content"></div>
             <div>
               <el-checkbox-group disabled="disabled" v-model="item.lib.check" :min="0" :max="1" @change="handleCheck($event, item)">
                 <el-checkbox :label="1">

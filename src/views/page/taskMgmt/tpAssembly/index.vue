@@ -173,7 +173,7 @@ const save = () => {
   taskSave(data).then(res => {
     if (res.code === '200') {
       ElMessage.success('保存成功')
-      router.push('/page/taskMgmt')
+      router.push('/homes/courseteacherhome/exam/test/testmangt')
     }
   })
   console.log('data', data)

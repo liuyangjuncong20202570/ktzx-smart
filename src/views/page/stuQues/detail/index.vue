@@ -5,7 +5,7 @@
         <div>
           当前问卷：{{ detailObj.name }}
         </div>
-        <button @click="submit" v-if="!disabled">提交</button>
+        <el-button v-if="!disabled">提交</el-button>
       </div>
       <div v-for="(item, i) in detailObj.topics" :key="i">
         <QueItem :row="item" :disabled="disabled"  />
@@ -106,7 +106,7 @@
     }).then(res => {
       if (res.code === '200') {
         ElMessage.success('提交成功')
-        router.push('/page/stuQues/list')
+        router.push('/homes/studenthome/exam/myquestionnaire')
       }
     })
   }

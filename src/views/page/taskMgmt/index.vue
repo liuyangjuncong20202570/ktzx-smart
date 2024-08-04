@@ -30,7 +30,7 @@
               type="text" 
               @click="(() => {
                 router.push({
-                  path: '/page/taskMgmt/view',
+                  path: '/homes/courseteacherhome/exam/test/taskMgmt/view',
                   query: {
                     id: scope.row.id,
                     privilege
@@ -43,7 +43,7 @@
 
             <el-button v-if="[1, 2].includes(scope.row.status)" @click="(() => {
               router.push({
-                path: '/page/taskMgmt/taskList',
+                path: '/homes/courseteacherhome/exam/test/taskList',
                 query: {
                   id: scope.row.id,
                   privilege
@@ -66,17 +66,17 @@
                 发布作业
               </el-button>
 
-              <el-button v-if="[0, 1].includes(scope.row.status)" @click="lock(scope.row.id)" type="text">
-                锁定
+              <el-button v-if="[0, 1].includes(scope.row.locked)" @click="lock(scope.row)" type="text">
+                {{ scope.row.locked ? '解锁' : '锁定' }}
               </el-button>
 
               <el-button v-if="[0, 1].includes(scope.row.status)" type="text" @click="del(scope.row)">
                 删除
               </el-button>
 
-              <el-button v-if="[2].includes(scope.row.status)" @click="unlock(scope.row.id)" type="text">
+              <!-- <el-button v-if="[2].includes(scope.row.status)" @click="unlock(scope.row.id)" type="text">
                 解锁
-              </el-button>
+              </el-button> -->
             </template>
           </div>
 
@@ -155,10 +155,11 @@ const publish = (id) => {
   })
 }
 
-const lock = (id) => {
-  taskLock(id).then(res => {
+const lock = (row) => {
+  const api = row.locked ? taskUnlock : taskLock
+  api(row.id).then(res => {
     if (res.code === '200') {
-      ElMessage.success('锁定成功')
+      ElMessage.success(row.locked ? '解锁成功' : '锁定成功')
       getTaskList()
     }
   })
@@ -175,7 +176,7 @@ const unlock = (id) => {
 
 const edit = (id) => {
   router.push({
-    path: '/page/taskMgmt/tpAssembly',
+    path: '/homes/courseteacherhome/exam/test/tpAssembly',
     query: {
       id
     }

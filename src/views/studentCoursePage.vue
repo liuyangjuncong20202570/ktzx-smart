@@ -111,6 +111,8 @@ const getChildrenMenus = (menu) => {
 };
 
 const navigateTo = (url) => {
+  if (!url) return
+  router.push(homeurl.value + url);
   console.log(homeurl.value + url)
 };
 

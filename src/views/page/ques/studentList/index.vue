@@ -19,7 +19,7 @@
             size="small"
             @click="() => {
               routes.push({
-                path: '/page/ques/view',
+                path: '/homes/courseteacherhome/exam/view',
                 query: {
                   type: 'student',
                   qfId: scope.row.qfId,

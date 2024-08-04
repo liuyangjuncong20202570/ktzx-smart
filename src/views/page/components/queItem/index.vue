@@ -6,7 +6,10 @@
     </div>
     <div class="task-select flex-between" v-if="['单选题', '判断题'].includes(TOPICTYPE[row.typeId])">
       <el-radio-group v-model="row.selectId" v-if="['0201', '0203'].includes(row.typeId)" :disabled="disabled">
-        <el-radio v-for="item in row.items" :key="item.id" :label="item.itemOption">{{ item.itemContent }}</el-radio>
+        <el-radio v-for="item in row.items" :key="item.id" :label="item.itemOption">
+          {{ item.itemContent }}
+          <img v-if="item.itemPicture" :src="item.itemPicture" />
+        </el-radio>
       </el-radio-group>
     </div>
 
@@ -14,6 +17,7 @@
       <el-checkbox-group v-model="row.selectId" v-if="row.typeId == '0202'" :disabled="disabled">
         <el-checkbox v-for="item in row.items" :key="item.id" :label="item.itemOption">
           {{ item.itemContent }}
+          <img v-if="item.itemPicture" :src="item.itemPicture" />
         </el-checkbox>
       </el-checkbox-group>
     </div>
@@ -69,7 +73,13 @@ onMounted(() => {
   }
 })
 </script>
-
+<style>
+  .stu-ques-item .el-checkbox__label {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+</style>
 <style scoped>
 .stu-ques-item {
   font-size: 13px;
@@ -77,5 +87,8 @@ onMounted(() => {
   text-align: left;
   padding-bottom: 10px;
   margin-bottom: 10px;
+  .el-checkbox {
+    height: 100%;
+  }
 }
 </style>

@@ -6,8 +6,10 @@
  */
 import {createRouter, createWebHashHistory,onBeforeRouteLeave, createWebHistory } from 'vue-router';
 
-const rolehome = ['teacherhomne', 'adminhome', 'superadminhome', 'secretariatehome','coursemanagerhome', 'courseteacherhome'];
+const rolehome = ['teacherhomne', 'adminhome', 'superadminhome', 'secretariatehome','coursemanagerhome', 'courseteacherhome', 'studenthome', 'page'];
+const pathHeader = `/homes/:rolehome(${rolehome.join('|')})`
 
+console.log('pathHeader', pathHeader)
 const routes = [
     {
         path: '/login',
@@ -22,7 +24,40 @@ const routes = [
     {
         path: '/homes/studentcourses',
         name: 'StudentCoursePage',
-        component: () => import('../views/studentCoursePage.vue')
+        component: () => import('../views/studentCoursePage.vue'),
+        children: [
+            // 学生端我的作业
+            {
+                path: pathHeader + '/exam/myhomework',
+                component: () => import('../views/page/job/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/jobAnswer',
+                component: () => import('../views/page/job/jobAnswer/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/jobWjList',
+                component: () => import('../views/page/job/jobWjList/index.vue')
+            },
+            // 学生端实验
+            {
+                path: pathHeader + '/exam/myexperiment',
+                component: () => import('../views/page/stuPractice/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/submitPractice',
+                component: () => import('../views/page/stuPractice/submitPractice/index.vue')
+            },
+            // 学生端问卷
+            {
+                path: pathHeader + '/exam/myquestionnaire',
+                component: () => import('../views/page/stuQues/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/detail',
+                component: () => import('../views/page/stuQues/detail/index.vue')
+            },
+        ]
     },
     {
         path: '/homes/:rolehome(' + rolehome.join('|') + ')',
@@ -36,22 +71,89 @@ const routes = [
             },
             // 课程页
             {
-                path: '/homes/:rolehome(' + rolehome.join('|') + ')/exam/classroomquelib',
+                path: pathHeader + '/exam/coursequelib',
                 component: () => import('../views/page/courseLib/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/coursequelib/type',
+                component: () => import('../views/page/courseLib/type/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/coursequelib/sync',
+                component: () => import('../views/page/courseLib/sync/index.vue')
             },
             // 课堂页
             {
-                path: '/homes/:rolehome(' + rolehome.join('|') + ')/exam/classroomquelib',
+                path: pathHeader + '/exam/classroomquelib',
                 component: () => import('../views/page/classroomLib/index.vue')
             },
             {
-                path: '/homes/:rolehome(' + rolehome.join('|') + ')/exam/classroomquelib/classroomQTS',
+                path: pathHeader + '/exam/classroomquelib/classroomQTS',
                 component: () => import('../views/page/classroomLib/type/index.vue')
             },
+            // 作业测试
+            {
+                path: pathHeader + '/exam/test/testmangt',
+                component: () => import('../views/page/taskMgmt/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/test/past',
+                component: () => import('../views/page/taskMgmt/prevTask/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/test/taskMgmt/view',
+                component: () => import('../views/page/taskMgmt/view/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/test/tpAssembly',
+                component: () => import('../views/page/taskMgmt/tpAssembly/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/test/taskList',
+                component: () => import('../views/page/taskMgmt/taskList/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/test/assignGrading',
+                component: () => import('../views/page/taskMgmt/assignGrading/index.vue')
+            },
+            // 实验
+            {
+                path: pathHeader + '/exam/experimental/labmangt',
+                component: () => import('../views/page/practice/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/experimental/student',
+                component: () => import('../views/page/practice/student/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/experimental/practiceInfo',
+                component: () => import('../views/page/practice/info/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/experimental/correct',
+                component: () => import('../views/page/practice/correct/index.vue')
+            },
+            // 问卷
+            {
+                path: pathHeader + '/exam/questionnaire',
+                component: () => import('../views/page/ques/list/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/edit',
+                component: () => import('../views/page/ques/edit/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/studentList',
+                component: () => import('../views/page/ques/studentList/index.vue')
+            },
+            {
+                path: pathHeader + '/exam/view',
+                component: () => import('../views/page/ques/view/index.vue')
+            }
         ]
     },
     {
-        path: '/page',
+        path: pathHeader + '/page',
         name: 'Page',
         component: () => import('../views/page/index.vue'),
         children: [

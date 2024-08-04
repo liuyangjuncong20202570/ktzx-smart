@@ -19,7 +19,7 @@
             type="text" 
             @click="(() => {
             router.push({
-              path: '/page/stuQues/detail',
+              path: '/homes/studenthome/exam/detail',
               query: {
                 id: scope.row.id,
                 type: 'edit'
@@ -30,7 +30,7 @@
           </el-button>
           <el-button v-else type="text" @click="(() => {
             router.push({
-              path: '/page/stuQues/detail',
+              path: '/homes/studenthome/exam/detail',
               query: {
                 id: scope.row.id,
                 type: 'view'

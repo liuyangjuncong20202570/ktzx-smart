@@ -67,7 +67,7 @@ const getWR = () => {
   })
 }
 const addPractice = ()=>{
-  router.push('/page/practiceInfo')
+  router.push('/homes/courseteacherhome/exam/experimental/practiceInfo')
 }
 const tableData = reactive<PracticePageVO>([])
 const handleSizeChange = ()=>{
@@ -85,7 +85,7 @@ const publishPracticeData = async (id:string) =>{
 }
 // 查看学生实验
 const lookStudent = (row:any)=>{
-  router.push({path:'/page/student',query:{ id:row.id, privilege: privilege.value }})
+  router.push({path:'/homes/courseteacherhome/exam/experimental/student',query:{ id:row.id, privilege: privilege.value }})
 }
 // 分页列表
 const getPracticePage = async () => {
@@ -98,7 +98,7 @@ const getPracticePage = async () => {
 };
 // 编辑数据
 const editPractice = (row: any)=>{
-  router.push({path:'/page/practiceInfo',query:{id:row.id}})
+  router.push({path:'/homes/courseteacherhome/exam/experimental/practiceInfo',query:{id:row.id}})
 }
 // 删除一条实验
 const delPracticeRow = async (id:string)=>{

@@ -23,7 +23,7 @@
               v-if="scope.row.status === 0"
               @click="(() => {
                 router.push({
-                  path: '/page/job/jobAnswer',
+                  path: '/homes/studenthome/exam/jobAnswer',
                   query: {
                     id: scope.row.testId,
                     type: 'edit'
@@ -38,7 +38,7 @@
               type="text"
               @click="(() => {
                 router.push({
-                  path: '/page/job/jobAnswer',
+                  path: '/homes/studenthome/exam/jobAnswer',
                   query: {
                     id: scope.row.testId,
                     type: 'view'

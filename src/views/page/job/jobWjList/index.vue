@@ -19,7 +19,7 @@
               v-if="scope.row.status === 0"
               @click="(() => {
                 router.push({
-                  path: '/page/job/jobAnswer',
+                  path: '/homes/studenthome/exam/jobAnswer',
                   query: {
                     id: scope.row.testId
                   }

@@ -10,9 +10,9 @@
       <el-checkbox label="全选" @change="handleSelectAll"></el-checkbox>
       <div>
         <el-button type="text" @click="add">新增题目</el-button>
-        <el-button type="danger" @click="batchDel">批量删除</el-button>
-        <el-button type="primary" @click="save">保存</el-button>
-        <el-button type="primary" @click="publish">发布</el-button>
+        <el-button type="danger" @click="batchDel" :disabled="!(courseList && courseList.length)">批量删除</el-button>
+        <el-button type="primary" @click="save" :disabled="!(courseList && courseList.length)">保存</el-button>
+        <el-button type="primary" @click="publish" :disabled="!(courseList && courseList.length)" v-if="status === 0">发布</el-button>
       </div>
     </div>
 
@@ -60,7 +60,7 @@
               :key="answerIdx"
             >
               {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}
-              <span v-if="answer.isAnswer">正确答案</span>
+              <img v-if="answer.itemPicture" :src="answer.itemPicture" />
             </div>
           </div>
           <div class="topic-item-icon flex-between cursor-pointer">
@@ -120,13 +120,14 @@ export default defineComponent({
     const topicFlag = ref(false)
     const optionTopicRef = ref(null)
     const courseList = ref([])
-    const name = ref('问卷1')
+    const name = ref('')
+    const status = ref(0)
     const total = ref(0)
     const topic = ref(null)
     const id = ref(route.query?.id ?? '')
 
     const handleInput = (val) => {
-      if (topic?.value) topic.value.setName(val)
+      name.value = val
     }
 
     const save = () => {
@@ -159,7 +160,7 @@ export default defineComponent({
               type: 'success',
               message: '发布成功',
             })
-            routes.push('/page/ques/list')
+            routes.push('/homes/courseteacherhome/exam/questionnaire')
           }
         })
       }).catch((err) => { console.log(err) })
@@ -221,6 +222,7 @@ export default defineComponent({
             if (a.id) delete a.id
           })
         }
+        courseList.value.unshift(_answer)
         queFormUpdate({
           id: id.value,
           topics: courseList.value,
@@ -259,13 +261,19 @@ export default defineComponent({
     }
 
     const getCourseLibList = () => {
-      if (id.value) queFormDetail(id.value).then(res => {
-        if (res.code === '200') {
-          name.value = res.data.name
-          courseList.value = res?.data?.topics ?? []
-        }
-      })
+      if (id.value) {
+        queFormDetail(id.value).then(res => {
+          if (res.code === '200') {
+            name.value = res.data?.name ? res.data.name : '问卷1'
+            status.value = res.data?.status
+            courseList.value = res?.data?.topics ?? []
+          }
+        })
+      } else {
+        name.value = '问卷1'
+      }
     }
+
     return {
       name,
       item,
@@ -286,7 +294,8 @@ export default defineComponent({
       id,
       save,
       publish,
-      handleInput
+      handleInput,
+      status
     }
   }
 })
@@ -333,6 +342,10 @@ export default defineComponent({
 
   .topic-answer-item {
     font-size: 14px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 5px;
 
     span {
       font-size: 12px;
