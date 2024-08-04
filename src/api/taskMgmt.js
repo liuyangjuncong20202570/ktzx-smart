@@ -77,3 +77,11 @@ export const correctSubmit = (data) => {
 export const prevPager = (data) => {
     return request.page.post('/paper/past/pager', data)
 }
+// 页面权限接口
+export const courseLiWR = () => {
+    return request.page.get('/paper/getWR')
+}
+// 成绩下载
+export const studentDownload = (id) => {
+    return request.page.get('/paper/student/download?testId=' + id)
+}

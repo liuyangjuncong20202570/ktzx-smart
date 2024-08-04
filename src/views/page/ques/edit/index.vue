@@ -5,17 +5,14 @@
       <div class="flex-start">
         问卷名称: <el-input style="width: 150px;margin-left: 10px;" v-model="name" @input="handleInput"></el-input>
       </div>
-      <div>
-        <!-- <el-button type="primary" @click="save">保存</el-button> -->
-        <el-button type="primary" @click="publish">保存/发布</el-button>
-      </div>
     </div>
     <div class="ques-lib-btn flex-between">
       <el-checkbox label="全选" @change="handleSelectAll"></el-checkbox>
       <div>
         <el-button type="text" @click="add">新增题目</el-button>
-        <el-button type="text">预览</el-button>
         <el-button type="danger" @click="batchDel">批量删除</el-button>
+        <el-button type="primary" @click="save">保存</el-button>
+        <el-button type="primary" @click="publish">发布</el-button>
       </div>
     </div>
 
@@ -55,6 +52,7 @@
               <el-checkbox label="" v-model="element.isChecked"></el-checkbox>
               <span class="topic-title">{{ element.title }}</span>
             </span>
+            <span v-html="element.content"></span>
             <div 
               v-if="['单选题', '多选题', '判断题'].includes(TOPICTYPE[element.typeId])" 
               class="topic-answer-item" 
@@ -64,21 +62,17 @@
               {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}
               <span v-if="answer.isAnswer">正确答案</span>
             </div>
-            <div v-else>
-              <span v-html="element.content"></span>
-            </div>
           </div>
-          <div class="topic-item-icon flex-between">
-            <el-icon @click="() => {
+          <div class="topic-item-icon flex-between cursor-pointer">
+            <el-icon title="编辑" @click="() => {
               element.topicFlag = true
-              console.log('111111111111111111', element)
             }">
               <Edit />
             </el-icon>
-            <el-icon @click="copy(element, index)">
+            <el-icon title="复制" @click="copy(element, index)">
               <DocumentCopy />
             </el-icon>
-            <el-icon @click="del(element)">
+            <el-icon title="删除" @click="del(element)">
               <Delete />
             </el-icon>
           </div>
@@ -102,7 +96,6 @@ import Header from '@/views/page/components/header/index.vue'
 import Topic from '../components/topic/index.vue'
 import optionTopic from '../components/optionTopic/index.vue'
 import { useRouter } from 'vue-router'
-// queFormDetail
 import { queFormDetail, deleteTopic, queFormUpdate, quePublish } from '@/api/ques.js'
 import { TOPICTYPE } from '@/utils/consts'
 
@@ -127,7 +120,7 @@ export default defineComponent({
     const topicFlag = ref(false)
     const optionTopicRef = ref(null)
     const courseList = ref([])
-    const name = ref('')
+    const name = ref('问卷1')
     const total = ref(0)
     const topic = ref(null)
     const id = ref(route.query?.id ?? '')
@@ -137,9 +130,17 @@ export default defineComponent({
     }
 
     const save = () => {
-      if (topic?.value) {
-        topic.value.save(name.value)
-      }
+      queFormUpdate(
+        {
+          id: id.value,
+          topics: courseList.value,
+          name: name.value
+        }
+      ).then(res => {
+        if (res.code === '200') {
+          ElMessage.success('保存成功')
+        }
+      })
     }
 
     const publish = () => {
@@ -179,7 +180,7 @@ export default defineComponent({
     }
     const del = (answer, allIds) => {
       ElMessageBox.confirm(
-        `${allIds && allIds.length ? '确定批量删除?' : '确定删除此题型?'}`,
+        `${allIds && allIds.length ? '确定批量删除?' : '确定删除此问卷?'}`,
         '提示',
         {
           confirmButtonText: '确定',
@@ -201,7 +202,7 @@ export default defineComponent({
     }
     const copy = (answer, index) => {
       ElMessageBox.confirm(
-        '确定复制此题型?',
+        '确定复制此问卷?',
         '提示',
         {
           confirmButtonText: '确定',
@@ -245,7 +246,7 @@ export default defineComponent({
       if (ids && ids.length) {
         del(null, ids)
       } else {
-        ElMessage.error('请选择要删除的题')
+        ElMessage.error('请选择要删除的问卷')
       }
     }
 
@@ -297,6 +298,7 @@ export default defineComponent({
   background: #fff;
   border-radius: 8px;
   font-size: 13px;
+  color: #000000;
 }
 
 .ques-publish {
@@ -312,7 +314,6 @@ export default defineComponent({
   margin: 10px 0;
   /* box-shadow: 0px 1px 13px #a9a9a9; */
   border-radius: 5px;
-  width: 600px;
   position: relative;
   border-bottom: 1px solid #ebeef5;
   padding-bottom: 10px;

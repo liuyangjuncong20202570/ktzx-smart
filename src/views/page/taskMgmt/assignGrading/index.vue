@@ -1,13 +1,13 @@
 <template>
   <!-- 作业批改页面 -->
     <div class="assign-wrap">
-      <Header title="作业批改" /> 
+      <Header :title="disabled ? '作业查看' : '作业批改'" /> 
       <div class="flex-between assign-title">
         <div class="flex-start">
-          <span>总分:</span>
-          <el-input v-model="total" style="width: 60px;"></el-input>
+          <span>总分：</span>
+          <el-input disabled v-model="total" style="width: 60px;"></el-input>
         </div>
-        <div>
+        <div v-if="!disabled">
           <el-button @click="auto">自动批改</el-button>
           <el-button @click="save">保存</el-button>
         </div>
@@ -27,6 +27,7 @@
             <div class="task-score">
               <el-button type="text" style="margin-right: 8px;">本题得分:</el-button> 
               <el-input 
+                :disabled="disabled"
                 @input="handleScore($event, item)" 
                 v-model.number="item.lib.value" 
                 style="width: 60px;"
@@ -45,7 +46,7 @@
             />
             <div v-else v-html="item.lib.content"></div>
             <div>
-              <el-checkbox-group v-model="item.lib.check" :min="0" :max="1" @change="handleCheck($event, item)">
+              <el-checkbox-group disabled="disabled" v-model="item.lib.check" :min="0" :max="1" @change="handleCheck($event, item)">
                 <el-checkbox :label="1">
                   A
                 </el-checkbox>
@@ -61,7 +62,7 @@
               </el-checkbox-group>
               <div class="flex-center" style="margin-bottom: 10px;">
                 <el-button type="text" style="margin-right: 8px;">本题得分:</el-button> 
-                <el-input-number @change="handleScore($event, item)" v-model="item.lib.value" :min="0" :max="item.score" />
+                <el-input-number :disabled="disabled" @change="handleScore($event, item)" v-model="item.lib.value" :min="0" :max="item.score" />
               </div>
             </div>
           </div>
@@ -82,8 +83,10 @@
   const route = currentRoute.value
   const testId = route.query.testId
   const stuId = route.query.stuId
+  const type = route.query.type
   const autoObj = ref({})
   const total = ref(0)
+  const disabled = type === 'view' ? true : false
 
   const taskList = ref([])
   onMounted(() => {
@@ -93,12 +96,13 @@
   const scoreToatl = () => {
     total.value = 0
     taskList.value.forEach((item) => {
+      // 根据返回值判断满分
       if (autoObj.value[item.lib?.id]) {
         item.lib.value  = item.score
       }
       // 自动批改错误 && 没有老师写入值
       if (autoObj.value[item.lib?.id] === false && !item.lib.value) {
-        item.lib.value  = ''
+        item.lib.value  = 0
       }
 
       if (item.lib.value) total.value += Number(item.lib.value)
@@ -117,8 +121,20 @@
   const getCorrectDetail = () => {
     correctDetail({ testId, stuId }).then(res => {
       if (res.code === '200') {
-        const answerMap = res.data.answerMap
         taskList.value = res?.data?.items || []
+        
+        const answerMap = res.data.answerMap
+        const correctMap = res.data.correctMap
+        // 回显各项分数总分
+        if (correctMap) {
+          taskList.value.forEach((item) => {
+            const score = correctMap[item.lib.id] ?? 0
+            if (score) {
+              total.value += score
+            }
+            item.lib.value  = score ? score : 0
+          })
+        }
         taskList.value.forEach((item) => {
           let value = null
           if (answerMap) value = answerMap[item.lib.id]
@@ -176,6 +192,7 @@
 
     correctSubmit({ scoreMap, testId, stuId }).then(res => {
       if (res.code === '200') {
+        ElMessage.success('保存成功')
         routes.push('/page/taskMgmt')
       }
     })
@@ -196,10 +213,16 @@
     }
 
     .task-kwa {
-      margin-right: 10px;
+      margin: 0 10px 5px 0;
+      display: inline-block;
+    }
+
+    .task-title {
+      margin-bottom: 5px;
     }
 
     .task-item {
+      padding-bottom: 10px;
       margin-bottom: 10px;
       border-bottom: 1px solid #ebeef5;
     }

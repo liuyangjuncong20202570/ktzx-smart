@@ -15,44 +15,44 @@
       <el-table-column type="selection" width="55" />
       <el-table-column property="name" label="名称" />
       <el-table-column property="createTime" label="创建时间" />
-      <el-table-column fixed="right" label="操作">
+      <el-table-column fixed="right" label="操作" width="150px">
         <template #default="scope">
-          <el-button type="text" size="small" @click="(() => {
-            router.push({
-              path: '/page/ques/view',
-              query: {
-                id: scope.row.id
-              }
-            })
-          })">
-            预览
-          </el-button>
-
-          <el-button 
-            v-if="[1, 2].includes(scope.row.status)" 
-            type="text" size="small" 
-            @click="(() => {
+          <div class="flex-start table-btn-wrap">
+            <el-button type="text" @click="(() => {
               router.push({
-                path: '/page/ques/studentList',
+                path: '/page/ques/view',
                 query: {
-                  id: scope.row.id
+                  id: scope.row.id,
+                  privilege
                 }
               })
             })">
-            查看学生
-          </el-button>
+              预览
+            </el-button>
 
-          <el-button v-if="[0].includes(scope.row.status)" type="text" size="small" @click="publish(scope.row.id)">
-            发布
-          </el-button>
+            <el-button v-if="[1, 2].includes(scope.row.status)" type="text" @click="(() => {
+              router.push({
+                path: '/page/ques/studentList',
+                query: {
+                  id: scope.row.id,
+                  privilege
+                }
+              })
+            })">
+              查看学生
+            </el-button>
 
-          <el-button type="text" size="small" @click="edit(scope.row.id)">
-            编辑
-          </el-button>
+            <template v-if="!(privilege === 'read')">
+              <el-button type="text" @click="edit(scope.row.id)">
+                编辑
+              </el-button>
 
-          <el-button type="text" size="small" @click="del(scope.row)">
-            删除
-          </el-button>
+              <el-button type="text" @click="del(scope.row)">
+                删除
+              </el-button>
+            </template>
+          </div>
+
         </template>
       </el-table-column>
     </el-table>
@@ -62,18 +62,20 @@
         :page-sizes="[10, 20, 30, 40]" layout="total, sizes, prev, pager, next, jumper" :total="total"
         @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
+    <!-- 无权限显示 -->
+    <NoAccessPermission v-if="privilege === 'none'" />
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
-import { queFormPager, queFormDel } from '@/api/ques.js'
+import { queFormPager, queFormDel, queFormWR } from '@/api/ques.js'
 import Header from '@/views/page/components/header/index.vue'
+import NoAccessPermission from '@/views/page/components/noAccessPermission/index.vue'
 
 const router = useRouter()
-const newRef = ref(null)
 const multipleTableRef = ref()
 const tableData = ref([])
 const delIds = ref([])
@@ -82,13 +84,19 @@ const params = ref({
   pageIndex: 1,
   pageSize: 20,
 })
+const privilege = ref('')
 
 onMounted(() => {
+  getWR()
   getQuesList()
 })
 
-const publish = () => {
-
+const getWR = () => {
+  queFormWR().then(res => {
+    if (res.code === '200') {
+      privilege.value = res.data
+    }
+  })
 }
 
 const edit = (id) => {
@@ -127,7 +135,7 @@ const del = (row) => {
   if (delIds.value.length) ids = delIds.value
   if (!ids.length) return
   ElMessageBox.confirm(
-    '确认删除此试卷吗?',
+    '确认删除此问卷吗?',
     '提示',
     {
       confirmButtonText: '确定',
@@ -165,6 +173,9 @@ const handleSelectionChange = (val) => {
   background: #fff;
   padding: 10px;
   border-radius: 10px;
+  position: relative;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .pagination {
@@ -223,6 +234,16 @@ const handleSelectionChange = (val) => {
 
   .task-grade {
     font-size: 12px;
+  }
+}
+
+.table-btn-wrap {
+  flex-wrap: wrap;
+
+  button {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 5px !important;
   }
 }
 </style>

@@ -181,8 +181,6 @@ export default defineComponent({
         })
       }
       
-      console.log('item.value', item.value)
-      console.log('courseList', courseList)
       const _courseList = [ ...courseList ]
       // 删除自定义标识
       if ([true, false].includes(item.value?.topicFlag)) {
@@ -190,12 +188,10 @@ export default defineComponent({
       }
       if (item.value.id) {
         const idx = _courseList.findIndex((course) => course.id === item.value.id)
-        console.log('_courseList[idx]', _courseList[idx], item.value)
         if (idx != -1) _courseList[idx] = item.value
       } else {
         _courseList.unshift(item.value)
       }
-      console.log('_courseList', _courseList)
       const api = id ? queFormUpdate : queFormEdit
       api({
         id: id ? id : undefined,

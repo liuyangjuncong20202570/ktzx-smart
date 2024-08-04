@@ -1,8 +1,12 @@
 <template>
     <div class="stu-ques-list">
       <Header title="问卷预览" />
-      <div v-if="!detailObj?.topics?.length" class="flex-center" style="margin-top: 10px;">暂无数据</div>
-      <div v-for="(item, i) in detailObj.topics" :key="i">
+      <div 
+        v-if="!detailObj?.topics?.length" 
+        class="flex-center" 
+        style="margin-top: 10px;"
+      >暂无数据</div>
+      <div class="ques-item-wrap" v-for="(item, i) in detailObj.topics" :key="i">
         <QueItem :row="item" :disabled="disabled"  />
       </div>
     </div>
@@ -11,15 +15,15 @@
   <script setup>
   import { ref, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
-  import { ElMessage } from 'element-plus'
-  import { queFormDetail } from '@/api/ques.js'
+  import { queFormDetail, queStudentDetail } from '@/api/ques.js'
   import Header from '@/views/page/components/header/index.vue'
   import QueItem from '@/views/page/components/queItem/index.vue'
   import { TOPICTYPE } from '@/utils/consts.js'
   const router = useRouter()
   const { currentRoute } = router
   const route = currentRoute.value
-  const id = route.query.id
+  const { id, qfId, stuId, type } = route.query
+  console.log('route.query', route.query)
   const disabled = true
   const detailObj = ref({})
 
@@ -28,7 +32,9 @@
   })
 
   const getMyQueFormDetail = () => {
-    queFormDetail(id).then(res => {
+    const api = type === 'student' ? queStudentDetail : queFormDetail
+    const params = type === 'student' ? { qfId, stuId } : id
+    api(params).then(res => {
       if (res.code === '200') {
         detailObj.value = res.data
         const answerMap = res.data.answerMap
@@ -45,7 +51,7 @@
                   newContent+=content
                   if (idx < contentItems.length-1) {
                     item.selectId.push(item.id+idx)
-                    newContent += `<input id="${item.id+idx}" ${disabled ? 'disabled' : ''} value="${value ? value[idx] : ''}" />`
+                    newContent += `<input id="${item.id+idx}" ${disabled ? 'disabled' : ''} value="${value ? value[idx] ?? '' : ''}" />`
                   }
                 })
                 item.content = newContent
@@ -69,5 +75,10 @@
     padding: 10px;
     border-radius: 8px;
     font-size: 13px;
+    height: 100%;
+    box-sizing: border-box;
+  }
+  .ques-item-wrap {
+    margin-top: 10px;
   }
   </style>

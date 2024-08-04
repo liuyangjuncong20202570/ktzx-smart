@@ -1,3 +1,4 @@
+
 .flex-start {
     display: flex;
     justify-content: flex-start;
@@ -24,4 +25,8 @@
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+button {
+  outline: none !important;  /* 去除聚焦时的轮廓线 */
 }

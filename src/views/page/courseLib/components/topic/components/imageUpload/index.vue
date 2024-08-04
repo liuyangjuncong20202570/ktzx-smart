@@ -2,6 +2,7 @@
   <el-upload
     style="width: 16px; height: 20px;"
     :action="action"
+    :accept="'.jpg,.png,.jpeg,.webp,.bmp,.tif,.tiff'"
     :data="data"
     :show-file-list="false"
     :on-success="handleAvatarSuccess"
@@ -12,7 +13,13 @@
       <p>图片预览</p>
       <img width="100%" :src="imageUrl" class="avatar" />
       <template #reference>
-        <el-icon><Picture /></el-icon>
+        <div class="image-wrap">
+          <el-icon><Picture /></el-icon>
+          <el-icon @click.stop="(() => {
+            item.itemPicture = ''
+            imageUrl = ''
+          })" class="image-close"><Close /></el-icon>
+        </div>
       </template>
     </el-popover>
     <el-icon v-else><Picture /></el-icon>
@@ -70,5 +77,19 @@ components: {
 <style scoped>
 .upload-wrap {
   position: relative;
+}
+.image-wrap {
+  position: relative;
+}
+.image-close {
+  font-size: 12px;
+  position: absolute;
+  top: -7px;
+  right: -9px;
+  color: red;
+  background: #fff;
+  padding: 1px;
+  border-radius: 50%;
+  box-shadow: 1px 1px 11px#c3c1c1 ;
 }
 </style>

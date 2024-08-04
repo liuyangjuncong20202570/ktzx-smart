@@ -23,28 +23,33 @@
         <template #default="scope">
           <template v-if="scope.row.beDefault==1">-</template>
           <template v-else>
-            <el-checkbox v-model="scope.row.beValid"/>
+            <el-checkbox @change="((val) => {
+              scope.row.disabled = !val
+              if (!val) {
+                scope.row.weight = 0
+              }
+            })" v-model="scope.row.beValid"/>
           </template>
         </template>
       </el-table-column>
-      <el-table-column label="名称" prop="itemName" width="120" fixed="left"></el-table-column>
+      <el-table-column label="名称" prop="itemName" width="200" fixed="left"></el-table-column>
       <el-table-column label="KWA" prop="fullName" />
       <el-table-column label="权重" prop="weight" width="240">
         <template #default="scope">
-          <template v-if="scope.row.setWeight == 1"> <el-input-number v-model="scope.row.weight" :min="0" :max="100" step-strictly />% </template>
+          <template v-if="scope.row.setWeight == 1"> <el-input-number :disabled="scope.row.disabled" v-model="scope.row.weight" :min="0" :max="100" step-strictly />% </template>
           <template v-else>-</template>
         </template>
       </el-table-column>
-      <el-table-column label="学生可见" prop="stuVisible">
+      <!-- <el-table-column label="学生可见" prop="stuVisible">
         <template #default="scope">
           <el-checkbox v-model="scope.row.stuVisible" />
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="操作" prop="address" width="280">
         <template #default="scope">
           <template  v-if="scope.row.beValid==1">
-            <el-button type="primary" :text="true" :disabled="!scope.row.defaultPath" @click="lookFile(scope.row)">预览</el-button>
-            <el-button type="primary" :text="true" @click="openUpload(scope.row)">上传</el-button>
+            <el-button v-if="scope.row.beDefault" type="primary" :text="true" :disabled="!scope.row.defaultPath" @click="lookFile(scope.row)">预览</el-button>
+            <el-button v-if="scope.row.beDefault" type="primary" :text="true" @click="openUpload(scope.row)">上传</el-button>
             <el-button type="primary" :text="true" v-if="scope.row.setKwa == 1" @click="openKwa(scope.row)">KWA关联</el-button>
           </template>
           <template v-else>-</template>
@@ -101,7 +106,7 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref, nextTick } from "vue";
-import { getTemplate,savePractice,practiceDetail,kwaTree } from "@/api/practice/index.ts";
+import { getTemplate,savePractice,practiceDetail,kwaTree, practiceUpdate } from "@/api/practice/index.ts";
 import { PracticeTemplateVO,ParamVO ,DefaultParamVO,KwaVO,KwaParamVO,ResVO } from "@/api/practice/type.ts";
 import { RuleForm } from "./type";
 import { host } from "@/api/host.js";
@@ -230,6 +235,7 @@ const beforeCloseDialog = () => {
 const sureUpload = async () => {
   await nextTick();
   const filePath = await uploadRef.value?.getFilePath();
+  console.log('uploadRowData', uploadRowData)
   if (uploadRowData) {
     let arr = JSON.parse(JSON.stringify(tableData));
     arr.forEach((item: any) => {
@@ -239,6 +245,7 @@ const sureUpload = async () => {
     });
     tableData.length = 0;
     tableData.push(...arr);
+    console.log('arr', arr)
     isOpenUploadDialog.value = false;
   }
 

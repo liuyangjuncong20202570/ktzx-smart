@@ -45,7 +45,23 @@ export const studentList = (data:StudentPageVO) => {
     return request.page.post(`/practice/student/pager`,data)
 }
 
-// 学生实验批改
+// 学生实验批改详情
 export const studentCorrect = (params:StudentParamVO) => {
     return request.page.get(`/practice/correct/stuDetail`,{params:params})
+}
+// 批改页-提交批改
+export const studentSave = (data) => {
+    return request.page.post(`/practice/correct/correct/save`,data)
+}
+// 批改页-编辑批改
+export const practiceUpdate = (data) => {
+    return request.page.post(`/practice/edit/update`,data)
+}
+// 页面权限接口
+export const studentWR = () => {
+    return request.page.get('/practice/getWR')
+}
+// 成绩下载
+export const practiceDownload = (id) => {
+    return request.page.get('/practice/student/download?practiceId=' + id)
 }

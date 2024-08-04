@@ -11,9 +11,11 @@
       </div>
 
       <div>
-        <el-button @click="del" type="danger">批量删除</el-button>
-        <!-- <el-button @click="download">下载所有成绩</el-button> -->
-        <el-button @click="addTask" type="primary">新建作业</el-button>
+        <template v-if="!(privilege === 'read')">
+          <el-button @click="del" type="danger">批量删除</el-button>
+          <!-- <el-button @click="download">下载所有成绩</el-button> -->
+          <el-button @click="addTask" type="primary">新建作业</el-button>
+        </template>
       </div>
     </header>
 
@@ -21,53 +23,63 @@
       <el-table-column type="selection" width="55" />
       <el-table-column property="name" label="名称" />
       <el-table-column property="createTime" label="创建时间" />
-      <el-table-column fixed="right" label="操作">
+      <el-table-column fixed="right" label="操作" width="200">
         <template #default="scope">
-          <el-button type="text" size="small" @click="(() => {
-            router.push({
-              path: '/page/taskMgmt/view',
-              query: {
-                id: scope.row.id
-              }
-            })
-          })">
-            预览
-          </el-button>
+          <div class="flex-start table-btn-wrap">
+            <el-button 
+              type="text" 
+              @click="(() => {
+                router.push({
+                  path: '/page/taskMgmt/view',
+                  query: {
+                    id: scope.row.id,
+                    privilege
+                  }
+                })
+              })"
+            >
+              预览
+            </el-button>
 
-          <el-button type="text" size="small" @click="copy(scope.row.id)">
-            复制
-          </el-button>
+            <el-button v-if="[1, 2].includes(scope.row.status)" @click="(() => {
+              router.push({
+                path: '/page/taskMgmt/taskList',
+                query: {
+                  id: scope.row.id,
+                  privilege
+                }
+              })
+            })" type="text">
+              查看学生
+            </el-button>
 
-          <el-button v-if="[0, 1].includes(scope.row.status)" type="text" size="small" @click="edit(scope.row.id)">
-            编辑
-          </el-button>
+            <template v-if="!(privilege === 'read')">
+              <el-button type="text" @click="copy(scope.row.id)">
+                复制
+              </el-button>
 
-          <el-button v-if="[0].includes(scope.row.status)" @click="publish(scope.row.id)" type="text" size="small">
-            发布作业
-          </el-button>
+              <el-button v-if="[0, 1].includes(scope.row.status)" type="text" @click="edit(scope.row.id)">
+                编辑
+              </el-button>
 
-          <el-button v-if="[1, 2].includes(scope.row.status)" @click="(() => {
-            router.push({
-              path: '/page/taskMgmt/taskList',
-              query: {
-                id: scope.row.id
-              }
-            })
-          })" type="text" size="small">
-            查看学生
-          </el-button>
+              <el-button v-if="[0].includes(scope.row.status)" @click="publish(scope.row.id)" type="text">
+                发布作业
+              </el-button>
 
-          <el-button v-if="[0, 1].includes(scope.row.status)" @click="lock(scope.row.id)" type="text" size="small">
-            锁定
-          </el-button>
+              <el-button v-if="[0, 1].includes(scope.row.status)" @click="lock(scope.row.id)" type="text">
+                锁定
+              </el-button>
 
-          <el-button v-if="[0, 1].includes(scope.row.status)" type="text" size="small" @click="del(scope.row)">
-            删除
-          </el-button>
+              <el-button v-if="[0, 1].includes(scope.row.status)" type="text" @click="del(scope.row)">
+                删除
+              </el-button>
 
-          <el-button v-if="[2].includes(scope.row.status)" @click="unlock(scope.row.id)" type="text" size="small">
-            解锁
-          </el-button>
+              <el-button v-if="[2].includes(scope.row.status)" @click="unlock(scope.row.id)" type="text">
+                解锁
+              </el-button>
+            </template>
+          </div>
+
         </template>
       </el-table-column>
     </el-table>
@@ -78,6 +90,9 @@
         @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
 
+    <!-- 无权限显示 -->
+    <NoAccessPermission v-if="privilege === 'none'" />
+
     <New ref="newRef" @save="() => {
       params.pageIndex = 1
       getTaskList()
@@ -86,12 +101,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
-import { taskList, getTermAll, queFormDel, taskCopy, taskPublish, taskLock, taskUnlock } from '@/api/taskMgmt.js'
+import { taskList, getTermAll, queFormDel, taskCopy, taskPublish, taskLock, taskUnlock, courseLiWR } from '@/api/taskMgmt.js'
 import Header from '@/views/page/components/header/index.vue'
 import New from './components/new/index.vue'
+import NoAccessPermission from '@/views/page/components/noAccessPermission/index.vue'
 
 const router = useRouter()
 const newRef = ref(null)
@@ -106,9 +122,18 @@ const params = ref({
   pageSize: 20,
   termId: ''
 })
+const privilege = ref('')
+const getWR = () => {
+  courseLiWR().then(res => {
+    if (res.code === '200') {
+      privilege.value = res.data
+    }
+  })
+}
 
 onMounted(() => {
   _getTermAll()
+  getWR()
 })
 
 const copy = (id) => {
@@ -243,6 +268,9 @@ const handleSelectionChange = (val) => {
   background: #fff;
   padding: 10px;
   border-radius: 10px;
+  position: relative;
+  box-sizing: border-box;
+  height: 100%;
 }
 
 .pagination {
@@ -301,6 +329,14 @@ const handleSelectionChange = (val) => {
 
   .task-grade {
     font-size: 12px;
+  }
+}
+.table-btn-wrap {
+  flex-wrap: wrap;
+  button {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 5px !important;
   }
 }
 </style>

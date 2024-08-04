@@ -5,7 +5,7 @@
         <div>
           当前问卷：{{ detailObj.name }}
         </div>
-        <button @click="submit">提交</button>
+        <button @click="submit" v-if="!disabled">提交</button>
       </div>
       <div v-for="(item, i) in detailObj.topics" :key="i">
         <QueItem :row="item" :disabled="disabled"  />
@@ -50,7 +50,7 @@
                   newContent+=content
                   if (idx < contentItems.length-1) {
                     item.selectId.push(item.id+idx)
-                    newContent += `<input id="${item.id+idx}" ${disabled ? 'disabled' : ''} value="${value ? value[idx] : ''}" />`
+                    newContent += `<input id="${item.id+idx}" ${disabled ? 'disabled' : ''} value="${value ? value[idx] ?? '' : ''}" />`
                   }
                 })
                 item.content = newContent
@@ -100,15 +100,15 @@
     console.log(itemMaps())
     const itemMap = itemMaps()
     console.log('itemMap', itemMap)
-    // myQueFormSubmit({
-    //   qfId: id,
-    //   itemMap
-    // }).then(res => {
-    //   if (res.code === '200') {
-    //     ElMessage.success('提交成功')
-    //     router.push('/page/stuQues/list')
-    //   }
-    // })
+    myQueFormSubmit({
+      qfId: id,
+      itemMap
+    }).then(res => {
+      if (res.code === '200') {
+        ElMessage.success('提交成功')
+        router.push('/page/stuQues/list')
+      }
+    })
   }
 
   </script>
@@ -119,6 +119,8 @@
     padding: 10px;
     border-radius: 8px;
     font-size: 13px;
+    height: 100%;
+    box-sizing: border-box;
   }
   .ques-title {
     margin: 10px 0;

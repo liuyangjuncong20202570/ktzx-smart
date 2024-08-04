@@ -84,20 +84,24 @@
                     </el-menu-item-group>
                     
                     <el-menu-item-group>
-                        <el-menu-item index="/page/taskMgmt/tpAssembly">实验列表</el-menu-item>
+                        <el-menu-item index="/page/stuPractice">实验列表</el-menu-item>
                     </el-menu-item-group>
 
                     <el-menu-item-group>
                         <el-menu-item index="/page/taskMgmt/taskList">提交实验</el-menu-item>
                     </el-menu-item-group>
-
+                    
                     <el-menu-item-group>
+                        <el-menu-item index="/page/stuQues/list">问卷列表</el-menu-item>
+                    </el-menu-item-group>
+
+                    <!-- <el-menu-item-group>
                         <el-menu-item index="/page/job/jobWjList">问卷列表</el-menu-item>
                     </el-menu-item-group>
 
                     <el-menu-item-group>
                         <el-menu-item index="/page/job/jobWjDt">问卷答题</el-menu-item>
-                    </el-menu-item-group>
+                    </el-menu-item-group> -->
                 </el-sub-menu>
 
                 <el-sub-menu index="5">
@@ -117,19 +121,6 @@
                     </el-menu-item-group>
                 </el-sub-menu>
 
-                <el-sub-menu index="6">
-                    <template #title>
-                        <el-icon>
-                            <location />
-                        </el-icon>
-                        <span>学生端我的问卷</span>
-                    </template>
-
-                    <el-menu-item-group>
-                        <el-menu-item index="/page/stuQues/list">问卷列表</el-menu-item>
-                    </el-menu-item-group>
-                </el-sub-menu>
-
                 <el-sub-menu index="7">
                     <template #title>
                         <el-icon>
@@ -144,7 +135,7 @@
                 </el-sub-menu>
             </el-menu>
         </el-aside>
-        <el-main style="background: #f0f2f5">
+        <el-main style="background: #f0f2f5;padding: 0;">
             <router-view />
         </el-main>
     </el-container>

@@ -43,58 +43,47 @@ const routes = [
         children: [
             {
                 path: '/page/courseLib',
-                name: 'CourseLib',
                 component: () => import('../views/page/courseLib/index.vue')
             },
             {
                 path: '/page/courseLib/type',
-                name: 'CourseLibType',
                 component: () => import('../views/page/courseLib/type/index.vue')
             },
             {
                 path: '/page/courseLib/sync',
-                name: 'CourseLibSycn',
                 component: () => import('../views/page/courseLib/sync/index.vue')
             },
             {
                 path: '/page/classroomLib',
-                name: 'ClassroomLib',
                 component: () => import('../views/page/classroomLib/index.vue')
             },
             {
                 path: '/page/classroomLib/type',
-                name: 'ClassroomLibType',
                 component: () => import('../views/page/classroomLib/type/index.vue')
             },
             // 作业管理
             {
                 path: '/page/taskMgmt',
-                name: 'TaskMgmt',
                 component: () => import('../views/page/taskMgmt/index.vue')
             },
             {
                 path: '/page/taskMgmt/view',
-                name: 'TaskMgmtView',
                 component: () => import('../views/page/taskMgmt/view/index.vue')
             },
             {
                 path: '/page/taskMgmt/tpAssembly',
-                name: 'TaskMgmtTpAssembly',
                 component: () => import('../views/page/taskMgmt/tpAssembly/index.vue')
             },
             {
                 path: '/page/taskMgmt/taskList',
-                name: 'TaskMgmtTaskList',
                 component: () => import('../views/page/taskMgmt/taskList/index.vue')
             },
             {
                 path: '/page/taskMgmt/assignGrading',
-                name: 'TaskMgmtAssignGrading',
                 component: () => import('../views/page/taskMgmt/assignGrading/index.vue')
             },
             {
                 path: '/page/taskMgmt/prevTask',
-                name: 'TaskMgmtAssignGrading',
                 component: () => import('../views/page/taskMgmt/prevTask/index.vue')
             },
             // 学生端
@@ -110,10 +99,10 @@ const routes = [
                 path: '/page/job/jobWjList',
                 component: () => import('../views/page/job/jobWjList/index.vue')
             },
-            {
-                path: '/page/job/jobWjDt',
-                component: () => import('../views/page/job/jobWjDt/index.vue')
-            },
+            // {
+            //     path: '/page/job/jobWjDt',
+            //     component: () => import('../views/page/job/jobWjDt/index.vue')
+            // },
             // 调查问卷相关
             {
                 path: '/page/ques/list',
@@ -143,32 +132,29 @@ const routes = [
             // 实验
             {
                 path: '/page/practice',
-                name: 'Practice',
                 component: () => import('../views/page/practice/index.vue')
             },
             {
                 path: '/page/student',
-                name: 'Student',
                 component: () => import('../views/page/practice/student/index.vue')
             },
             {
                 path: '/page/practiceInfo',
-                name: 'PracticeInfo',
                 component: () => import('../views/page/practice/info/index.vue')
             },
             {
                 path: '/page/correct',
-                name: 'PracticeCorrect',
                 component: () => import('../views/page/practice/correct/index.vue')
             },
-            // {
-            //     path: '/page/job/jobWjDt',
-            //     component: () => import('../views/page/job/jobWjDt/index.vue')
-            // },
-            // {
-            //     path: '/page/job/jobWjDt',
-            //     component: () => import('../views/page/job/jobWjDt/index.vue')
-            // },
+            // 学生端实验
+            {
+                path: '/page/stuPractice',
+                component: () => import('../views/page/stuPractice/index.vue')
+            },
+            {
+                path: '/page/stuPractice/submitPractice',
+                component: () => import('../views/page/stuPractice/submitPractice/index.vue')
+            }
         ]
     },
     {

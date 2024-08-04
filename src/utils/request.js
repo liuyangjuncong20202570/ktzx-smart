@@ -2,21 +2,35 @@ import { ElMessage } from 'element-plus'
 import axios from 'axios'
 //60.205.178.180
 //127.0.0.1
-const request = {
-    admin: createAPI('/api'),
-    course: createAPI('/api'),
-    evaluation: createAPI('/api'),
-    page: createAPI('/page'),
-    fork: createAPI('/fork'),
-    common: createAPI('common'),
-    term: createAPI('term'),
-}
+// const request = {
+//     admin: createAPI('/api'),
+//     course: createAPI('/api'),
+//     evaluation: createAPI('/api'),
+//     page: createAPI('/page'),
+//     fork: createAPI('/fork'),
+//     common: createAPI('common'),
+//     term: createAPI('term'),
+// }
 
 // const request = {
 //     admin: createAPI('http://60.205.178.180:8080/api'),
 //     course: createAPI('http://60.205.178.180:8082/api'),
 //     evaluation: createAPI('http://60.205.178.180:8083/api'),
+//     page: createAPI('http://60.205.178.180:8084/page'),
+//     fork: createAPI('http://60.205.178.180:8084/fork'),
+//     common: createAPI('http://60.205.178.180:8084/common'),
+//     term: createAPI('http://60.205.178.180:8084/term'),
 // }
+
+const request = {
+    admin: createAPI('http://60.205.178.180:8080/api'),
+    course: createAPI('http://60.205.178.180:8082/api'),
+    evaluation: createAPI('http://60.205.178.180:8083/api'),
+    page: createAPI('http://localhost:8084/page'),
+    fork: createAPI('http://localhost:8084/fork'),
+    common: createAPI('http://localhost:8084/common'),
+    term: createAPI('http://localhost:8084/term'),
+}
 
 
 // 60.205.178.180

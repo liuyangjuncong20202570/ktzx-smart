@@ -15,7 +15,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="creator" label="上传人" />
-      <el-table-column label="操作" width="180" filter-placement="bottom-end">
+      <el-table-column label="操作" width="180" filter-placement="bottom-end" v-if="!(privilege === 'read')">
         <template #default="scope">
           <el-button type="text" @click="reception(scope.row.id)">接收</el-button>
           <el-button type="text" @click="refuse(scope.row.id)">拒绝</el-button>
@@ -28,6 +28,8 @@
         :page-sizes="[20, 30, 40]" layout="total, sizes, prev, pager, next, jumper" :total="total"
         @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
+    <!-- 无权限显示 -->
+    <NoAccessPermission v-if="privilege === 'none'" />
   </div>
 
 </template>
@@ -35,12 +37,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'
-import { courseLibSyncPager, syncAccept, syncReject } from '@/api/courseLib.js'
+import { courseLibSyncPager, syncAccept, syncReject, courseLibWR } from '@/api/courseLib.js'
 import Header from '../../components/header/index.vue'
+import NoAccessPermission from '@/views/page/components/noAccessPermission/index.vue'
 import { TOPICTYPE } from '@/utils/consts.js'
 
 onMounted(() => {
   getCourseLibSyncPager()
+  getCourseLibWR()
 })
 
 const params = ref({
@@ -50,6 +54,15 @@ const params = ref({
 const tableRef = ref()
 const total = ref(0)
 const tableData = ref([])
+const privilege = ref('')
+
+const getCourseLibWR = () => {
+  courseLibWR().then(res => {
+    if (res.code === '200') {
+      privilege.value = res.data
+    }
+  })
+}
 
 const handleSizeChange = (val) => {
   params.value.pageSize = val
@@ -89,12 +102,15 @@ const refuse = (id) => {
 }
 </script>
 <style>
-.pagination {
-  margin-top: 10px;
-}
 .course-lib-sync {
   background: #fff;
   padding: 10px;
   border-radius: 8px;
+  position: relative;
+  box-sizing: border-box;
+  height: 100%;
+}
+.pagination {
+  margin-top: 10px;
 }
 </style>

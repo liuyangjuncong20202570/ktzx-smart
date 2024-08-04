@@ -6,8 +6,12 @@
       <div class="task-title flex-between">
         <div class="flex-start task-msg">
           <span>当前作业: {{ taskDetail.name }}</span>
-          <span>所属课程: {{ taskDetail.classname ?? '无' }}</span>
+          <!-- <span>所属课程: {{ taskDetail.classname ?? '无' }}</span> -->
           <span>所属课堂: {{ taskDetail.classroomName }}</span>
+        </div>
+        <div class="total-score">
+          <p v-if="scoreObj.total">满分：{{ scoreObj.total }}</p>
+          <p v-if="scoreObj.fullMarks">总分：{{ scoreObj.fullMarks }}</p>
         </div>
         <div v-if="taskDetail && taskDetail?.items?.length && !disabled">
           <el-button @click="save">保存</el-button>
@@ -36,13 +40,26 @@
   const type = route.query?.type
   const disabled = ref(type === 'edit' ? false : true)
   const taskDetail = ref([])
+  const scoreObj = ref({
+    total: 0,
+    fullMarks: 0,
+  })
   onMounted(() => {
     answerDetail(id).then(res => {
       if (res.code === '200' && res.data) {
         taskDetail.value = res.data
-        const answerMap = res.data.answerMap
+        const answerMap = res.data?.answerMap
+        const correctMap = res.data?.correctMap
         console.log('answerMap', answerMap)
+        scoreObj.value.total = res.data?.totalScore
         taskDetail.value?.items?.forEach((item) => {
+            // 得到总分
+            if (correctMap) {
+              if (correctMap[item.lib.id]) {
+                scoreObj.value.fullMarks+=correctMap[item.lib.id]
+                item.lib.currentScore = correctMap[item.lib.id]
+              }
+            }
             let value = null
             if (answerMap) value = answerMap[item.lib.id]
             // 填空题逻辑额外处理
@@ -77,9 +94,9 @@
     let itemMap = {}
     for(let i = 0; i < taskDetail.value?.items.length; i++) {
       const item = taskDetail.value?.items[i]
-      if (!item.lib.selectId) {
-        return ElMessage.error(`请填写题${i+1}答案!`)
-      }
+      // if (!item.lib.selectId) {
+      //   return ElMessage.error(`请填写题${i+1}答案!`)
+      // }
       if (item.lib.questionTypeId === '0204') {
           let value = []
           item.lib.selectId.forEach((input) => {
@@ -127,13 +144,15 @@
   <style scoped>
   .task-view {
     text-align: left;
-    margin: 10px 0;
     /* border-bottom: 1px solid #a9a9a9; */
     padding-bottom: 10px;
     position: relative;
     background: #fff;
     padding: 10px;
     border-radius: 8px;
+    color: #000000;
+    height: 100%;
+    box-sizing: border-box;
   }
   .task-title {
     font-size: 13px;

@@ -1,15 +1,15 @@
 <template>
   <!-- 试题组卷 -->
-  <div class="course-type">
+  <div class="tpAssembly-type">
     <Header title="试题组卷" />
     <div class="task-msg">
       <div class="flex-start task-name">
         <span>作业名称</span>
         <el-input v-model="taskName" style="width: 200px;"></el-input>
-        <el-button style="margin-left: 10px;" @click="openSearch">搜索</el-button>
+        <el-button type="primary" style="margin-left: 10px;" @click="openSearch">搜索</el-button>
       </div>
 
-      <div class="flex-start">
+      <div class="flex-start task-name">
         <span>总分</span> <el-input v-model="total" disabled style="width: 60px;"></el-input>
       </div>
     </div>
@@ -53,7 +53,8 @@
         </div>
       </template>
     </vuedraggable>
-
+    <!-- 无权限显示 -->
+    <NoAccessPermission v-if="privilege === 'none'" />
     <Search ref="searchRef" @save="(() => {
       getPreviewDetail()
     })" />
@@ -67,22 +68,31 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Edit, DocumentCopy, Delete } from '@element-plus/icons-vue'
 // import { courseLibTypeSetStatus } from '@/api/courseLib.js'
-import { previewDetail, taskSave, taskdel } from '@/api/taskMgmt.js'
+import { previewDetail, taskSave, taskdel, courseLiWR } from '@/api/taskMgmt.js'
 import Header from '@/views/page/components/header/index.vue'
 import Search from './components/search/index.vue'
-const { currentRoute } = useRouter()
-const route = currentRoute.value
+import NoAccessPermission from '@/views/page/components/noAccessPermission/index.vue'
+const router = useRouter()
+const route = router.currentRoute.value
 
 let drag = ref(false)
 const searchRef = ref(null)
 const taskList = ref([])
 const taskName = ref('')
 const total = ref(0)
+const privilege = ref('')
+const getWR = () => {
+  courseLiWR().then(res => {
+    if (res.code === '200') {
+      privilege.value = res.data
+    }
+  })
+}
 const openSearch = () => {
   if (searchRef.value) searchRef.value.init()
 }
 onMounted(() => {
-  console.log(route.query)
+  getWR()
   getPreviewDetail()
 })
 
@@ -163,6 +173,7 @@ const save = () => {
   taskSave(data).then(res => {
     if (res.code === '200') {
       ElMessage.success('保存成功')
+      router.push('/page/taskMgmt')
     }
   })
   console.log('data', data)
@@ -170,11 +181,15 @@ const save = () => {
 
 </script>
 <style scoped>
-.course-type {
+.tpAssembly-type {
   text-align: left;
   background: #fff;
   padding: 10px;
   border-radius: 10px;
+  position: relative;
+  color: #000000;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .task-msg {
@@ -184,11 +199,12 @@ const save = () => {
 
 .task-msg span {
   font-size: 14px;
-  width: 100px;
+  width: 70px;
   text-align: left;
 }
 
 .task-name {
+  color: #000000;
   margin-bottom: 10px;
 }
 

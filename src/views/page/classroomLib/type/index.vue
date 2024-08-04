@@ -2,7 +2,7 @@
   <div class="course-type">
     <Header title="题库管理" />
     <div style="margin-top: 20px" class="flex-end">
-      <el-button type="primary" @click="save()">保存</el-button>
+      <el-button type="primary" @click="save()" v-if="!(privilege === 'read')">保存</el-button>
     </div>
     <el-table ref="multipleTableRef" :data="typeList" style="width: 100%" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" />
@@ -11,21 +11,34 @@
         <template #default="scope">{{ scope.row.status === 1 ? '开启' : '关闭' }}</template>
       </el-table-column>
     </el-table>
+    <!-- 无权限显示 -->
+    <NoAccessPermission v-if="privilege === 'none'" />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'
-import { classroomLibTypeList, classroomLibTypeSetStatus } from '@/api/classroomLib.js'
+import { classroomLibTypeList, classroomLibTypeSetStatus, classroomLibWR } from '@/api/classroomLib.js'
 import Header from '../../components/header/index.vue'
+import NoAccessPermission from '@/views/page/components/noAccessPermission/index.vue'
 onMounted(() => {
   getClassroomLibTypeList()
+  getWR()
 })
 
 const multipleTableRef = ref()
 const multipleSelection = ref([])
 const typeList = ref([])
+const privilege = ref('')
+
+const getWR = () => {
+  classroomLibWR().then(res => {
+    if (res.code === '200') {
+      privilege.value = res.data
+    }
+  })
+}
 
 const toggleSelection = (rows) => {
   if (rows) {
@@ -73,49 +86,14 @@ const save = () => {
     }
   })
 }
-
-const tableData = [
-  {
-    date: '2016-05-03',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-02',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-04',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-01',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-08',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-06',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-07',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-]
 </script>
 <style scoped>
-  .course-type {
-    background: #fff;
-    padding: 10px;
-    border-radius: 10px;
-  }
+.course-type {
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  position: relative;
+  box-sizing: border-box;
+  height: 100%;
+}
 </style>

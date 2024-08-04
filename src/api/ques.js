@@ -36,6 +36,10 @@ export const queStudentList = (id) => {
     return request.page.get('/queForm/student/list?qfId='+id)
 }
 // 问卷预览
-export const queStudentDetail = (id) => {
-    return request.page.get('/queForm/student/detail?qfId='+id)
+export const queStudentDetail = ({ qfId, stuId }) => {
+    return request.page.get('/queForm/student/detail/detail?qfId=' + qfId + '&stuId=' + stuId)
+}
+// 页面权限接口
+export const queFormWR = () => {
+    return request.page.get('/queForm/getWR')
 }

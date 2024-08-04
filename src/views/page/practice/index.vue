@@ -1,6 +1,6 @@
 <template>
-  <el-card>
-    <div class="practice-tool">
+  <el-card class="practice-wrap">
+    <div class="practice-tool" v-if="!(privilege === 'read')">
       <el-button type="danger" :icon="Delete" @click="delPracticeData">批量删除</el-button>
       <el-button type="primary" :icon="Plus" @click="addPractice">新建实验</el-button>
     </div>
@@ -16,14 +16,14 @@
       <el-table-column label="操作" prop="operate">
         <template #default="scope">
           <!-- status -->
-          <template v-if="scope.row.status==0">
+          <template v-if="scope.row.status==0 && !(privilege === 'read')">
             <el-button type="primary" :text="true" @click="publishPracticeData(scope.row.id)">发布</el-button>
           </template>
           <template v-else>
             <el-button type="primary" :text="true" @click="lookStudent(scope.row)">查看学生</el-button>
           </template>
-          <el-button type="primary" :text="true" @click="editPractice(scope.row)">编辑</el-button>
-          <el-button type="danger" :text="true" @click="delPracticeRow(scope.row.id)">删除</el-button>
+          <el-button v-if="!(privilege === 'read')" type="primary" :text="true" @click="editPractice(scope.row)">编辑</el-button>
+          <el-button v-if="!(privilege === 'read')" type="danger" :text="true" @click="delPracticeRow(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -38,6 +38,8 @@
         @current-change="handleCurrentChange"
       />
     </div>
+    <!-- 无权限显示 -->
+    <NoAccessPermission v-if="privilege === 'none'" />
   </el-card>
 </template>
 
@@ -45,15 +47,25 @@
 import { onMounted,reactive ,ref} from "vue";
 import {Plus,Delete} from '@element-plus/icons-vue'
 import router from "@/router/index.js";
-import { practicePage,delPractice,publishPractice } from "@/api/practice/index.ts";
+import { practicePage,delPractice,publishPractice, studentWR } from "@/api/practice/index.ts";
 import { PracticePageVO } from "@/api/practice/type.ts";
 import { ElMessage } from "element-plus";
+import NoAccessPermission from '@/views/page/components/noAccessPermission/index.vue'
+
 const pagination = reactive({
   pageIndex:1,
   pageSize:10,
   total:0
 })
 const multipleTableRef = ref(null)
+const privilege = ref('')
+const getWR = () => {
+  studentWR().then(res => {
+    if (res.code === '200') {
+      privilege.value = res.data
+    }
+  })
+}
 const addPractice = ()=>{
   router.push('/page/practiceInfo')
 }
@@ -73,7 +85,7 @@ const publishPracticeData = async (id:string) =>{
 }
 // 查看学生实验
 const lookStudent = (row:any)=>{
-  router.push({path:'/page/student',query:{id:row.id}})
+  router.push({path:'/page/student',query:{ id:row.id, privilege: privilege.value }})
 }
 // 分页列表
 const getPracticePage = async () => {
@@ -115,9 +127,13 @@ const delPracticeData = async ()=>{
 }
 onMounted(() => {
   getPracticePage();
+  getWR()
 });
 </script>
 <style scoped>
+  .practice-wrap {
+    position: relative;
+  }
   .practice-tool {
     padding-bottom: 10px;
     display: flex;

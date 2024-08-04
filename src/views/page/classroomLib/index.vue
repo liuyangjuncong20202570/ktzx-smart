@@ -1,10 +1,10 @@
 <template>
-  <div class="cpirse-lib">
+  <div class="classroomLib-lib">
     <Header title="题库管理" />
 
-    <Kwa type="search" @kwa-event="handleKwaEvent" />
+    <Kwa type="classroomLibSearch" @kwa-event="handleKwaEvent" />
 
-    <div class="cpirse-lib-btn flex-between">
+    <div class="cpirse-lib-btn flex-between" v-if="!(privilege === 'read')">
       <el-checkbox label="全选" @change="handleSelectAll"></el-checkbox>
       <div>
         <el-button type="primary" @click="add">新增题目</el-button>
@@ -32,6 +32,17 @@
         :title="`${i+1}、${course.title} (${TOPICTYPE[course?.questionTypeId] ?? '预留题'})`" 
         :name="course.id"
       >
+        <Topic 
+          v-if="course.topicFlag" 
+          :item="course" 
+          @save="() => {
+            getClassroomLibList()
+            course.topicFlag = false
+          }" 
+          @close="() => {
+            course.topicFlag = false
+          }" 
+        />
         <div class="topic-item">
           <div class="topic-kwa" v-if="course.answers">
             <span style="margin-right: 20px" v-for="(kwa, kwaIdx) in course.kwas" :key="kwaIdx">{{ kwa.kwaName }}</span>
@@ -46,16 +57,22 @@
               <span v-if="answer.isAnswer">正确答案</span>
             </div>
           </div>
-          <div class="topic-item-icon flex-between">
-            <el-icon @click="edit(course)">
-              <Edit />
-            </el-icon>
-            <el-icon @click="copy(course)">
-              <DocumentCopy />
-            </el-icon>
-            <el-icon @click="del(course)">
-              <Delete />
-            </el-icon>
+          <div class="topic-item-icon flex-between cursor-pointer" v-if="!(privilege === 'read')">
+            <template v-if="course.status === 4">
+              <!-- 锁定状态 -->
+              <el-icon title="当前题型已被锁定" style="color: red;"><Lock /></el-icon>
+            </template>
+            <template v-else>
+              <el-icon title="编辑" @click="edit(course)">
+                <Edit />
+              </el-icon>
+              <el-icon title="复制" @click="copy(course)">
+                <DocumentCopy />
+              </el-icon>
+              <el-icon title="删除" @click="del(course)">
+                <Delete />
+              </el-icon>
+            </template>
           </div>
         </div>
       </el-collapse-item>
@@ -71,37 +88,39 @@
 
     <!-- 选择题类型弹窗 -->
     <optionTopic ref="optionTopicRef" @childData="handleChildData" />
+    <!-- 无权限显示 -->
+    <NoAccessPermission v-if="privilege === 'none'" />
   </div>
 </template>
 
 <script>
 import { defineComponent, ref, onMounted } from 'vue'
-import { Edit, DocumentCopy, Delete } from '@element-plus/icons-vue'
+import { Edit, DocumentCopy, Delete, Lock } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import Kwa from '@/components/kwa/index.vue'
 import Header from '../components/header/index.vue'
 import Topic from './components/topic/index.vue'
 import optionTopic from './components/optionTopic/index.vue'
-import { classroomLibList, classroomLibCopy, classroomLibDel, upToCourse } from '@/api/classroomLib.js'
+import { classroomLibList, classroomLibCopy, classroomLibDel, upToCourse, classroomLibWR } from '@/api/classroomLib.js'
 import { TOPICTYPE } from '@/utils/consts'
+import NoAccessPermission from '@/views/page/components/noAccessPermission/index.vue'
 
 export default defineComponent({
   components: {
     Kwa,
+    Lock,
     Topic,
     Header,
     optionTopic,
     Edit,
     DocumentCopy,
-    Delete
+    Delete,
+    NoAccessPermission
   },
   setup() {
     onMounted(() => {
-      // login().then(res => {
-      //   sessionStorage.setItem('token', res?.data)
-      //   console.log('res-----', res)
-      // })
       getClassroomLibList()
+      getWR()
     })
     const item = ref({})
     const topicFlag = ref(false)
@@ -113,6 +132,16 @@ export default defineComponent({
       pageIndex: 1,
       pageSize: 20,
     })
+    const privilege = ref('')
+
+    const getWR = () => {
+      classroomLibWR().then(res => {
+        if (res.code === '200') {
+          privilege.value = res.data
+        }
+      })
+    }
+
     const handleSelectAll = (val) => {
       courseList.value?.forEach((course) => {
         course.isChecked = val
@@ -120,8 +149,8 @@ export default defineComponent({
     }
    
     const edit = (answer) => {
-      item.value = answer
-      topicFlag.value = true
+      // item.value = answer
+      answer.topicFlag = true
     }
     const del = (answer, allIds) => {
       ElMessageBox.confirm(
@@ -192,11 +221,13 @@ export default defineComponent({
 
     const handleSizeChange = (val) => {
       params.value.pageSize = val
+      handleKwaEvent()
       console.log(`${val} items per page`)
     }
 
     const handleCurrentChange = (val) => {
       params.value.pageIndex = val
+      handleKwaEvent()
       console.log(`current page: ${val}`)
     }
 
@@ -255,16 +286,20 @@ export default defineComponent({
       getClassroomLibList ,
       handleCurrentChange,
       massUpload,
+      privilege,
     }
   }
 })
 </script>
 
 <style scoped>
-.cpirse-lib {
+.classroomLib-lib {
   padding: 0 20px 20px 20px;
   background: #fff;
-  border-radius: 8px
+  border-radius: 8px;
+  position: relative;
+  box-sizing: border-box;
+  height: 100%;
 }
 
 .cpirse-lib-btn {
@@ -274,10 +309,8 @@ export default defineComponent({
 .topic-item {
   text-align: left;
   margin: 10px 0;
-  /* box-shadow: 0px 1px 13px #a9a9a9; */
   padding: 10px;
   border-radius: 5px;
-  width: 600px;
   position: relative;
 
   .topic-title {
@@ -302,5 +335,8 @@ export default defineComponent({
       color: #409eff;
     }
   }
+}
+.pagination {
+  margin-top: 10px;
 }
 </style>

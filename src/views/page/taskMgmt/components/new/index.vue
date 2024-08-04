@@ -23,7 +23,7 @@
     </div>
     <template #footer>
       <el-button @click="handleClose">取消</el-button>
-      <el-button @click="save">确定</el-button>
+      <el-button @click="save" type="primary">确定</el-button>
     </template>
   </el-dialog>
 </template>

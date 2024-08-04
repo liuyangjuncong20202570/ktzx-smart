@@ -5,15 +5,25 @@
         </div>
         <div class="task-title">{{ index }}、{{ lib.title }}</div>
         <!-- 多选 -->
-        <el-checkbox-group v-model="lib.selectId" v-if="lib.questionTypeId == '0202'" :disabled="disabled">
-            <el-checkbox v-for="item in lib.answers" :key="item.id" :label="item.itemOption">
-                {{ item.itemContent }}
-            </el-checkbox>
-        </el-checkbox-group>
+        <div v-if="lib.questionTypeId == '0202'">
+            <span v-html="lib.content"></span>
+            <el-checkbox-group v-model="lib.selectId" :disabled="disabled">
+                <el-checkbox v-for="item in lib.answers" :key="item.id" :label="item.itemOption">
+                    {{ item.itemContent }}
+                    <span v-if="item.isAnswer">正确答案</span>
+                </el-checkbox>
+            </el-checkbox-group>
+        </div>
         <!-- 单选、判断 -->
-        <el-radio-group v-model="lib.selectId" v-if="['0201', '0203'].includes(lib.questionTypeId)" :disabled="disabled">
-            <el-radio v-for="item in lib.answers" :key="item.id" :label="item.itemOption">{{ item.itemContent }}</el-radio>
-        </el-radio-group>
+         <div v-if="['0201', '0203'].includes(lib.questionTypeId)">
+            <span v-html="lib.content"></span>
+            <el-radio-group v-model="lib.selectId" :disabled="disabled">
+                <el-radio v-for="item in lib.answers" :key="item.id" :label="item.itemOption">
+                    {{ item.itemContent }}
+                    <span v-if="item.isAnswer">正确答案</span>
+                </el-radio>
+            </el-radio-group>
+         </div>
         <!-- 填空题 -->
         <div v-if="lib.questionTypeId == '0204'">
             <span v-html="lib.content"></span>
@@ -25,18 +35,20 @@
                 v-model="lib.selectId"
                 :disabled="disabled"
                 maxlength="30"
-                style="width: 500px"
+                style="width: 100%"
                 placeholder="请填写答案"    
                 show-word-limit
                 type="textarea"
             />
         </template>
-        
+        <div class="task-score flex-center" v-if="disabled">
+            得分：{{ lib.currentScore ?? 0 }}
+        </div>
     </div>
 </template>
 
 <script setup>
-import { defineProps, onMounted, ref, nextTick } from 'vue'
+import { defineProps, onMounted, ref } from 'vue'
 const props = defineProps({
     disabled: {
         type: String,
@@ -77,14 +89,22 @@ onMounted(() => {
             }
         })
     }
-    console.log('lib', lib)
 })
 </script>
 <style scoped>
 .task-item {
     font-size: 13px;
+    position: relative;
+    border-bottom: 1px solid #ebeef5;
+    margin-bottom: 10px;
 }
 .task-kwa {
     margin-right: 20px;
+}
+.task-score {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0
 }
 </style>

@@ -8,14 +8,25 @@
       <el-table-column property="userName" label="姓名" />
       <el-table-column property="status" label="状态">
         <template #default="scope">
-           <span :style="`color:${statusColors[scope.row.status]}`">{{ ['未完成', '已交卷', '已批改'][scope.row.status] }}</span>
+           <span :style="`color:${statusColors[scope.row.status]}`">{{ ['未完成', '已完成'][scope.row.status] }}</span>
         </template>
       </el-table-column>
       <el-table-column property="address" label="操作">
         <template #default="scope">
           <el-button
+            v-if="scope.row.status === 1"
             type="text"
             size="small"
+            @click="() => {
+              routes.push({
+                path: '/page/ques/view',
+                query: {
+                  type: 'student',
+                  qfId: scope.row.qfId,
+                  stuId: scope.row.userId
+                }
+              })
+            }"
           >
             查看
           </el-button>
@@ -57,5 +68,7 @@ const getStudentList = () => {
   background: #fff;
   padding: 10px;
   border-radius: 8px;
+  height: 100%;
+  box-sizing: border-box;
 }
 </style>

@@ -5,7 +5,7 @@
             :size="formSize" status-icon>
 
             <el-form-item label="题型选择" prop="queTypeId">
-                <el-select v-model="ruleForm.queTypeId" placeholder="请选择">
+                <el-select clearable v-model="ruleForm.queTypeId" placeholder="请选择">
                     <el-option v-for="(item, i) in typeList" :key="i" :label="item.name" :value="item.queTypeId" />
                 </el-select>
             </el-form-item>
@@ -41,15 +41,15 @@
             @selection-change="handleSelectionChange">
             <el-table-column type="selection" />
             <el-table-column property="libNo" label="题号" width="120" />
-            <el-table-column property="titile" label="题目概要" />
+            <el-table-column property="title" label="题目概要" />
             <el-table-column property="questionTypeId" label="题型">
                 <template #default="scope">
                     {{ TOPICTYPE[scope.row.questionTypeId] }}
                 </template>
             </el-table-column>
-            <el-table-column label="难度" property="Address" />
+            <!-- <el-table-column label="难度" property="Address" /> -->
             <el-table-column label="课程" property="courseName" />
-            <el-table-column label="课堂" property="classname" />
+            <el-table-column label="课堂" property="className" />
         </el-table>
 
         <div class="pagination flex-end">
@@ -80,7 +80,8 @@ const route = useRoute();
 const emit = defineEmits(['child-event'])
 const ruleForm = ref({
     pageIndex: 1,
-    pageSize: 20
+    pageSize: 20,
+    libType: 1
 })
 const dialogVisible = ref(false)
 const ruleFormRef = ref(null)

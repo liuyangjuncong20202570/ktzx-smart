@@ -98,13 +98,7 @@ export default defineComponent({
       itemContent: '',
       isAnswer: false
     }
-
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'smooth'
-    })
-
+    
     const resetName = () => {
       options.value.forEach((option, i) => {
         option.name = String.fromCharCode('A'.charCodeAt() + i)
@@ -208,7 +202,7 @@ export default defineComponent({
       const api = !item.value.id ? addCourseLib : courseLibEdit
       api(item.value).then(res => {
         if (res.code === '200') {
-          ElMessage.success(item.id ? '修改成功' : '添加成功')
+          ElMessage.success(item.value.id ? '修改成功' : '添加成功')
           emit('save')
         }
       })

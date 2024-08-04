@@ -12,7 +12,7 @@
         item.content = `<div>${item.content}___</div>`
       })" type="text">插入填空符</el-button>
 
-      <Kwa :defaultValue="keaData" type="courseLibaAdd" @kwa-event="handleKwaEvent" />
+      <Kwa :defaultValue="keaData" type="classroomLibAdd" @kwa-event="handleKwaEvent" />
 
       <el-input
         v-if="headline === '填空题'"
@@ -98,12 +98,6 @@ export default defineComponent({
       itemContent: '',
       isAnswer: false
     }
-
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'smooth'
-    })
 
     const resetName = () => {
       options.value.forEach((option, i) => {
@@ -208,7 +202,7 @@ export default defineComponent({
       const api = !item.value.id ? addClassroomLib : classroomLibEdit
       api(item.value).then(res => {
         if (res.code === '200') {
-          ElMessage.success(item.id ? '修改成功' : '添加成功')
+          ElMessage.success(item.value.id ? '修改成功' : '添加成功')
           emit('save')
         }
       })
