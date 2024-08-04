@@ -19,11 +19,11 @@ const routes = [
         name: 'StudentHomePage',
         component: () => import('../views/studentHomePage.vue')
     },
-    // {
-    //     path: '/homes/studentcourses',
-    //     name: 'StudentCoursePage',
-    //     component: () => import('../views/StudentCoursePage.vue')
-    // },
+    {
+        path: '/homes/studentcourses',
+        name: 'StudentCoursePage',
+        component: () => import('../views/studentCoursePage.vue')
+    },
     {
         path: '/homes/:rolehome(' + rolehome.join('|') + ')',
         name: 'Homepage',
@@ -36,16 +36,16 @@ const routes = [
             },
             // 课程页
             {
-                path: '/exam/classroomquelib',
+                path: '/homes/:rolehome(' + rolehome.join('|') + ')/exam/classroomquelib',
                 component: () => import('../views/page/courseLib/index.vue')
             },
             // 课堂页
             {
-                path: '/exam/classroomquelib',
+                path: '/homes/:rolehome(' + rolehome.join('|') + ')/exam/classroomquelib',
                 component: () => import('../views/page/classroomLib/index.vue')
             },
             {
-                path: '/exam/classroomquelib/classroomQTS',
+                path: '/homes/:rolehome(' + rolehome.join('|') + ')/exam/classroomquelib/classroomQTS',
                 component: () => import('../views/page/classroomLib/type/index.vue')
             },
         ]
@@ -173,10 +173,10 @@ const routes = [
             }
         ]
     },
-    {
-        path: '/:pathMatch(.*)*',
-        redirect: '/login'
-    },
+    // {
+    //     path: '/:pathMatch(.*)*',
+    //     redirect: '/login'
+    // },
 
 ];
 const router = createRouter({
@@ -189,7 +189,8 @@ router.beforeEach((to, from, next) => {
     const storedUserInfo = sessionStorage.getItem('users');
     const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
     if (requiresAuth && !storedUserInfo) {
-        next({ name: 'Login' });
+        // next({ name: 'Login' });
+        next();
     } else {
         next();
     }
