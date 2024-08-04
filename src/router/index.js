@@ -4,9 +4,9 @@
  * @LastEditTime: 2024-07-16 15:01:20
  * @FilePath: \smarttt_ktzx\src\router\index.js
  */
-import {createRouter, createWebHashHistory,onBeforeRouteLeave } from 'vue-router';
+import {createRouter, createWebHashHistory,onBeforeRouteLeave, createWebHistory } from 'vue-router';
 
-const rolehome = ['teacherhomne', 'adminhome', 'superadminhome', 'secretariatehome','coursemanagerhome'];
+const rolehome = ['teacherhomne', 'adminhome', 'superadminhome', 'secretariatehome','coursemanagerhome', 'courseteacherhome'];
 
 const routes = [
     {
@@ -34,17 +34,28 @@ const routes = [
                 name: 'Rolemangt',
                 component: () => import('../components/admin/Rolemangt.vue')
             },
+            // 课程页
+            {
+                path: '/exam/classroomquelib',
+                component: () => import('../views/page/courseLib/index.vue')
+            },
+            // 课堂页
+            {
+                path: '/exam/classroomquelib',
+                component: () => import('../views/page/classroomLib/index.vue')
+            },
+            {
+                path: '/exam/classroomquelib/classroomQTS',
+                component: () => import('../views/page/classroomLib/type/index.vue')
+            },
         ]
-    },
-    {
-        path: '/exam/classroomquelib',
-        component: () => import('../views/page/courseLib/index.vue')
     },
     {
         path: '/page',
         name: 'Page',
         component: () => import('../views/page/index.vue'),
         children: [
+            // 课程页面
             {
                 path: '/page/courseLib',
                 component: () => import('../views/page/courseLib/index.vue')
@@ -57,6 +68,7 @@ const routes = [
                 path: '/page/courseLib/sync',
                 component: () => import('../views/page/courseLib/sync/index.vue')
             },
+            // 课堂页面
             {
                 path: '/page/classroomLib',
                 component: () => import('../views/page/classroomLib/index.vue')
@@ -168,7 +180,8 @@ const routes = [
 
 ];
 const router = createRouter({
-    history: createWebHashHistory(''),
+    // history: createWebHashHistory(''),
+    history: createWebHistory('/'),
     routes,
 });
 router.beforeEach((to, from, next) => {
