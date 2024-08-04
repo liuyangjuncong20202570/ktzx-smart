@@ -5,8 +5,8 @@
     <div class="task-title flex-between">
       <div class="flex-between task-msg">
         <span>当前作业: {{ taskDetail.name }}</span>
-        <span>所属课程: {{ taskDetail.classname }}</span>
-        <span>所属课堂: {{ taskDetail.classname }}</span>
+        <!-- <span>所属课程: {{ taskDetail.classname }}</span>
+        <span>所属课堂: {{ taskDetail.classname }}</span> -->
       </div>
     </div>
     <div v-if="!taskDetail?.items?.length" class="flex-center">暂无数据</div>

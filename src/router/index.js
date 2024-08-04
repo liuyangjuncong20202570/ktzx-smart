@@ -37,6 +37,10 @@ const routes = [
         ]
     },
     {
+        path: '/exam/classroomquelib',
+        component: () => import('../views/page/courseLib/index.vue')
+    },
+    {
         path: '/page',
         name: 'Page',
         component: () => import('../views/page/index.vue'),
