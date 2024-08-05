@@ -74,12 +74,13 @@ onMounted(() => {
 })
 </script>
 <style>
-  .stu-ques-item .el-checkbox__label {
+  .stu-ques-item .el-checkbox__label, .stu-ques-item .el-radio__label {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
   }
 </style>
+
 <style scoped>
 .stu-ques-item {
   font-size: 13px;
@@ -87,7 +88,7 @@ onMounted(() => {
   text-align: left;
   padding-bottom: 10px;
   margin-bottom: 10px;
-  .el-checkbox {
+  .el-checkbox, .el-radio {
     height: 100%;
   }
 }

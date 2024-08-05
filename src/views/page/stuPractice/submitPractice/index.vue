@@ -52,12 +52,12 @@
                     <el-button v-else @click="download((host + '/static/' + item.defaultPath), item.itemName)">下载</el-button>
                   </div>
                 </div>
-                <el-icon class="file-close cursor-pointer">
+                <el-icon class="file-close cursor-pointer" v-if="!disabled">
                   <Close @click="delItemUrl(item.urlArr, urlIdx)" />
                 </el-icon>
               </div>
             </div>
-            <div class="task-upload">
+            <div class="task-upload" v-if="!disabled">
               <el-upload
                 :action="action"
                 :data="data"

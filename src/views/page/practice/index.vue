@@ -69,7 +69,7 @@ const getWR = () => {
 const addPractice = ()=>{
   router.push('/homes/courseteacherhome/exam/experimental/practiceInfo')
 }
-const tableData = reactive<PracticePageVO>([])
+const tableData = ref([])
 const handleSizeChange = ()=>{
   getPracticePage()
 }
@@ -91,9 +91,8 @@ const lookStudent = (row:any)=>{
 const getPracticePage = async () => {
   const data = await practicePage({ pageIndex: pagination.pageIndex, pageSize: pagination.pageSize});
   if (data.code==200) {
-    tableData.length = 0
+    tableData.value = data.data.data
     pagination.total = data.data.recordSize
-    tableData.push(...data.data.data)
   }
 };
 // 编辑数据
@@ -110,18 +109,17 @@ const delPracticeRow = async (id:string)=>{
 }
 // 批量删除实验
 const delPracticeData = async ()=>{
-  const selectRow = multipleTableRef.value.getSelectionRows()
+  const selectRow = multipleTableRef.value?.getSelectionRows()
   if (selectRow.length<=0) {
     ElMessage({message: '请选择要删除的实验',type: 'error'})
     return
   }
-  let ids:string[] = []
-  selectRow.forEach((item: any) =>{
-    ids.push(item.id)
-  })
+  const ids:string[] = selectRow.map((item) => item.id)
+  console.log('ids', ids)
   const resData = await delPractice(ids)
   if (resData.code==200) {
     ElMessage({message: '删除成功！',type: 'success'})
+    multipleTableRef.value?.clearSelection()
     getPracticePage()
   }
 }

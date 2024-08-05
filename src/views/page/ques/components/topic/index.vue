@@ -6,11 +6,13 @@
       <el-input placeholder="题目title，请填写" style="margin-bottom: 10px;" v-model="item.title">
       </el-input>
 
-      <Wangeditor :data="item.content" @change="handleRichEditorChange" />
+      <Wangeditor ref="wangeditor" :data="item.content" @change="handleRichEditorChange" />
 
-      <el-button v-if="headline === '填空题'" @click="(() => {
-        item.content = `<div>${item.content}___</div>`
-      })" type="text">插入填空符</el-button>
+      <el-button 
+        v-if="headline === '填空题'" 
+        @click="insertContent"
+        type="text"
+      >插入填空符</el-button>
 
       <el-input
         v-if="headline === '填空题'"
@@ -72,7 +74,7 @@ export default defineComponent({
     Wangeditor,
     ImageUpload,
   },
-  props: ['item', 'courseList', 'name'],
+  props: ['item', 'courseList', 'name', 'id'],
   setup(props, { emit }) {
     console.log('topic-props', props)
     let {  courseList = [], name = '' } = props
@@ -80,9 +82,10 @@ export default defineComponent({
     const item = ref({})
     const headline = ref(TOPICTYPE[typeId] ?? '预留题')
     const options = ref([])
+    const wangeditor = ref(null)
     const routes = useRouter()
     const route = routes.currentRoute.value
-    const id = route.query?.id
+    const id = route.query?.id || props.id
     // const keaData = ref([])
     item.value = {
       ...props?.item,
@@ -90,7 +93,10 @@ export default defineComponent({
       typeId,
       content
     }
-    console.log('item----------', item.value)
+    
+    const insertContent = () => {
+      if (wangeditor.value) wangeditor.value.insertText()
+    }
 
     // 添加题默认值
     const topicDefaultValue = {
@@ -213,6 +219,8 @@ export default defineComponent({
       save,
       handleClose,
       handleRichEditorChange,
+      insertContent,
+      wangeditor
     };
   }
 });

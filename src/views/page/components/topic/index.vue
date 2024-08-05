@@ -6,11 +6,13 @@
       <el-input placeholder="题目title，请填写" style="margin-bottom: 10px;" v-model="item.title">
       </el-input>
 
-      <Wangeditor :data="item.content" @change="handleRichEditorChange" />
+      <Wangeditor ref="wangeditor" :data="item.content" @change="handleRichEditorChange" />
 
-      <el-button v-if="headline === '填空题'" @click="(() => {
-        item.content = `<div>${item.content}___</div>`
-      })" type="text">插入填空符</el-button>
+      <el-button 
+        v-if="headline === '填空题'" 
+        @click="insertContent"
+        type="text"
+      >插入填空符</el-button>
 
       <Kwa :defaultValue="keaData" type="courseLibaAdd" @kwa-event="handleKwaEvent" />
 
@@ -83,11 +85,16 @@ export default defineComponent({
     const headline = ref(TOPICTYPE[questionTypeId] ?? '预留题')
     const options = ref([])
     const keaData = ref([])
+    const wangeditor = ref(null)
     item.value = {
       ...item.value,
       title,
       questionTypeId,
       content
+    }
+
+    const insertContent = () => {
+      if (wangeditor.value) wangeditor.value.insertText()
     }
 
     // 添加题默认值
@@ -232,7 +239,9 @@ export default defineComponent({
       handleClose,
       handleRichEditorChange,
       handleKwaEvent,
-      keaData
+      keaData,
+      wangeditor,
+      insertContent,
     };
   }
 });

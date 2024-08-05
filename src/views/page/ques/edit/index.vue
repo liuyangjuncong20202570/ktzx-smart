@@ -22,6 +22,7 @@
       ref="topic"
       :item="item" 
       :name="name"
+      :id="id"
       @save="(data) => {
         if (data) id = data
         getCourseLibList()
@@ -64,6 +65,20 @@
             </div>
           </div>
           <div class="topic-item-icon flex-between cursor-pointer">
+            <el-icon title="上移" @click="(() => {
+              if (index !== 0) {
+                swapArrayElements(courseList, index, index - 1)
+              }
+            })">
+              <Top :style="index === 0 ? 'color: #c8c9cb;' : ''" />
+            </el-icon>
+            <el-icon title="下移" @click="(() => {
+              if (index !== courseList.length - 1) {
+                swapArrayElements(courseList, index, index + 1)
+              }
+            })">
+              <Bottom :style="index === courseList.length - 1 ? 'color: #c8c9cb;' : ''" />
+            </el-icon>
             <el-icon title="编辑" @click="() => {
               element.topicFlag = true
             }">
@@ -90,7 +105,7 @@
 <script>
 import vuedraggable from "vuedraggable"
 import { defineComponent, ref, onMounted } from 'vue'
-import { Edit, DocumentCopy, Delete } from '@element-plus/icons-vue'
+import { Edit, DocumentCopy, Delete, Top, Bottom } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import Header from '@/views/page/components/header/index.vue'
 import Topic from '../components/topic/index.vue'
@@ -108,6 +123,8 @@ export default defineComponent({
     DocumentCopy,
     Delete,
     vuedraggable,
+    Top,
+    Bottom,
   },
   setup() {
     const routes = useRouter()
@@ -125,6 +142,10 @@ export default defineComponent({
     const total = ref(0)
     const topic = ref(null)
     const id = ref(route.query?.id ?? '')
+
+    const swapArrayElements = (arr, indexA, indexB) => {
+      arr.splice(indexB, 1, ...arr.splice(indexA, 1, arr[indexB]));
+    }
 
     const handleInput = (val) => {
       name.value = val
@@ -203,7 +224,7 @@ export default defineComponent({
     }
     const copy = (answer, index) => {
       ElMessageBox.confirm(
-        '确定复制此问卷?',
+        '确定复制此题目?',
         '提示',
         {
           confirmButtonText: '确定',
@@ -267,6 +288,7 @@ export default defineComponent({
             name.value = res.data?.name ? res.data.name : '问卷1'
             status.value = res.data?.status
             courseList.value = res?.data?.topics ?? []
+            id.value = res.data?.id
           }
         })
       } else {
@@ -295,7 +317,8 @@ export default defineComponent({
       save,
       publish,
       handleInput,
-      status
+      status,
+      swapArrayElements
     }
   }
 })
@@ -333,9 +356,9 @@ export default defineComponent({
 
   .topic-item-icon {
     position: absolute;
-    right: 10px;
+    right: 0;
     bottom: 10px;
-    width: 60px;
+    width: 100px;
     font-size: 18px;
     color: #103ccc;
   }

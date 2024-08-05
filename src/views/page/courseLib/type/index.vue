@@ -52,7 +52,6 @@ const toggleSelection = (rows) => {
   }
 }
 const handleSelectionChange = (val) => {
-  console.log('val', val)
   multipleSelection.value = val
 }
 
