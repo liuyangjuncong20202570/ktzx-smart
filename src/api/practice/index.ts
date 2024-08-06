@@ -65,3 +65,7 @@ export const studentWR = () => {
 export const practiceDownload = (id) => {
     return request.page.get('/practice/student/download?practiceId=' + id)
 }
+// 查看学生下载
+export const practiceStuDetail = ({ practiceId, stuId }) => {
+    return request.page.get('/practice/student/stuDetail?practiceId=' + practiceId + '&stuId=' + stuId)
+}

@@ -122,6 +122,10 @@ const routes = [
                 component: () => import('../views/page/practice/index.vue')
             },
             {
+                path: pathHeader + '/exam/experimental/view',
+                component: () => import('../views/page/practice/view/index.vue')
+            },
+            {
                 path: pathHeader + '/exam/experimental/student',
                 component: () => import('../views/page/practice/student/index.vue')
             },
@@ -291,8 +295,8 @@ router.beforeEach((to, from, next) => {
     const storedUserInfo = sessionStorage.getItem('users');
     const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
     if (requiresAuth && !storedUserInfo) {
-        // next({ name: 'Login' });
-        next();
+        next({ name: 'Login' });
+        // next();
     } else {
         next();
     }

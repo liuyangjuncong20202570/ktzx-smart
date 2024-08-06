@@ -262,6 +262,7 @@ export default defineComponent({
 }
 
 .topic-right {
+  margin-top: 10px;
   text-align: right;
 }
 </style>

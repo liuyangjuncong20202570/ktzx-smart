@@ -17,3 +17,7 @@ export const downloadFile = (url, fileName) => {
       link.click();
     });
 };
+
+export const swapArrayElements = (arr, indexA, indexB) => {
+  arr.splice(indexB, 1, ...arr.splice(indexA, 1, arr[indexB]));
+};

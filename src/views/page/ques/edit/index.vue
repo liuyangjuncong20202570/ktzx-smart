@@ -50,8 +50,8 @@
         <div class="topic-item" v-else>
           <div>
             <span class="flex-start">
-              <el-checkbox label="" v-model="element.isChecked"></el-checkbox>
-              <span class="topic-title">{{ element.title }}</span>
+              {{ index+1 }}、<el-checkbox label="" v-model="element.isChecked"></el-checkbox>
+              <span class="topic-title">{{ element.title }}({{ TOPICTYPE[element.typeId] }})</span>
             </span>
             <span v-html="element.content"></span>
             <div 
@@ -113,6 +113,7 @@ import optionTopic from '../components/optionTopic/index.vue'
 import { useRouter } from 'vue-router'
 import { queFormDetail, deleteTopic, queFormUpdate, quePublish } from '@/api/ques.js'
 import { TOPICTYPE } from '@/utils/consts'
+import { swapArrayElements } from '@/utils/index.js'
 
 export default defineComponent({
   components: {
@@ -142,10 +143,6 @@ export default defineComponent({
     const total = ref(0)
     const topic = ref(null)
     const id = ref(route.query?.id ?? '')
-
-    const swapArrayElements = (arr, indexA, indexB) => {
-      arr.splice(indexB, 1, ...arr.splice(indexA, 1, arr[indexB]));
-    }
 
     const handleInput = (val) => {
       name.value = val
@@ -202,7 +199,7 @@ export default defineComponent({
     }
     const del = (answer, allIds) => {
       ElMessageBox.confirm(
-        `${allIds && allIds.length ? '确定批量删除?' : '确定删除此问卷?'}`,
+        `${allIds && allIds.length ? '确定删选中的题目?' : '确定删除此题目?'}`,
         '提示',
         {
           confirmButtonText: '确定',
@@ -269,7 +266,7 @@ export default defineComponent({
       if (ids && ids.length) {
         del(null, ids)
       } else {
-        ElMessage.error('请选择要删除的问卷')
+        ElMessage.error('请选择要删除的题目')
       }
     }
 
@@ -318,7 +315,7 @@ export default defineComponent({
       publish,
       handleInput,
       status,
-      swapArrayElements
+      swapArrayElements,
     }
   }
 })

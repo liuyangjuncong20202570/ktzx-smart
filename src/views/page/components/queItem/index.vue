@@ -2,8 +2,9 @@
   <!-- 问卷item组件 -->
   <div class="stu-ques-item">
     <div class="item-title">
-      89S51的内部程序存储器与数据存储器容量各为多少？
+      {{ index+1 }}、{{ row.title }}({{ TOPICTYPE[row.typeId] }})
     </div>
+    <span v-html="row.content"></span>
     <div class="task-select flex-between" v-if="['单选题', '判断题'].includes(TOPICTYPE[row.typeId])">
       <el-radio-group v-model="row.selectId" v-if="['0201', '0203'].includes(row.typeId)" :disabled="disabled">
         <el-radio v-for="item in row.items" :key="item.id" :label="item.itemOption">
@@ -27,18 +28,16 @@
         show-word-limit type="textarea" />
     </div>
 
-    <div class="task-select flex-between" v-if="['填空题'].includes(TOPICTYPE[row.typeId])">
+    <!-- <div class="task-select flex-between" v-if="['填空题'].includes(TOPICTYPE[row.typeId])">
       <span v-html="row.content"></span>
-    </div>
+    </div> -->
 
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick, defineProps } from 'vue'
+import { onMounted, defineProps } from 'vue'
 import { useRouter } from 'vue-router'
-// import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
-// import { myQueFormPager } from '@/api/stuQues.js'
 import { TOPICTYPE } from '@/utils/consts.js'
 const router = useRouter()
 const { currentRoute } = router
@@ -51,6 +50,10 @@ const props = defineProps({
   row: {
     type: Object,
     default: {}
+  },
+  index: {
+    type: Number,
+    default: null
   }
 })
 const { row = {}, disabled = false } = props

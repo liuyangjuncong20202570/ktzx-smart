@@ -22,7 +22,15 @@
       </el-table-column>
       <el-table-column label="操作" prop="operate" >
         <template #default="scope">
-          <!-- <el-button type="primary" :text="true" @click="correct(scope.row)">批改</el-button> -->
+          <el-button type="primary" :text="true" @click="(() => {
+            routes.push({
+              path: '/homes/studenthome/exam/experimental/view',
+              query: {
+                practiceId: scope.row.practiceId,
+                stuId: scope.row.stuId,
+              }
+            })
+          })">查看</el-button>
           <template v-if="scope.row.status==1 && !(privilege === 'read')">
             <el-button type="primary" :text="true" @click="correct(scope.row)">批改</el-button>
           </template>

@@ -3,7 +3,7 @@
         <div class="task-kea flex-start">
             <span v-for="(item, i) in lib.kwas" :key="i">（{{ item.kwaName }}）</span>
         </div>
-        <div class="task-title">{{ index }}、{{ lib.title }}</div>
+        <div class="task-title">{{ index }}、{{ lib.title }}({{ TOPICTYPE[lib.questionTypeId] }})</div>
         <!-- 多选 -->
         <div v-if="lib.questionTypeId == '0202'">
             <span v-html="lib.content"></span>
@@ -49,6 +49,7 @@
 
 <script setup>
 import { defineProps, onMounted, ref } from 'vue'
+import { TOPICTYPE } from '@/utils/consts.js'
 const props = defineProps({
     disabled: {
         type: String,

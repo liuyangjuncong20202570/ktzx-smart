@@ -7,7 +7,7 @@
         style="margin-top: 10px;"
       >暂无数据</div>
       <div class="ques-item-wrap" v-for="(item, i) in detailObj.topics" :key="i">
-        <QueItem :row="item" :disabled="disabled"  />
+        <QueItem :row="item" :index="i" :disabled="disabled"  />
       </div>
     </div>
   </template>

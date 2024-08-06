@@ -8,7 +8,7 @@
         <el-button v-if="!disabled">提交</el-button>
       </div>
       <div v-for="(item, i) in detailObj.topics" :key="i">
-        <QueItem :row="item" :disabled="disabled"  />
+        <QueItem :row="item" :index="i" :disabled="disabled"  />
       </div>
     </div>
   </template>

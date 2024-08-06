@@ -32,8 +32,8 @@
           </div>
           <div>
             <span class="flex-start">
-              <el-checkbox v-model="element.checkbox" label=""></el-checkbox>
-              <span class="topic-title">{{ element.lib.title }}</span>
+              <span style="font-size: 13px;">{{index+1}}、</span><el-checkbox v-model="element.checkbox" label=""></el-checkbox>
+              <span class="topic-title">{{ element.lib.title }}({{ TOPICTYPE[element.lib.questionTypeId] }})</span>
             </span>
             <div v-html="element.lib.content"></div>
             <div v-for="(answer, answerIdx) in element.lib.answers" :key="answerIdx" class="topic-answer-item">
@@ -46,6 +46,20 @@
             </div>
           </div>
           <div class="topic-item-icon flex-between">
+            <el-icon title="上移" @click="(() => {
+              if (index !== 0) {
+                swapArrayElements(taskList, index, index - 1)
+              }
+            })">
+              <Top :style="index === 0 ? 'color: #c8c9cb;' : ''" />
+            </el-icon>
+            <el-icon title="下移" @click="(() => {
+              if (index !== taskList.length - 1) {
+                swapArrayElements(taskList, index, index + 1)
+              }
+            })">
+              <Bottom :style="index === taskList.length - 1 ? 'color: #c8c9cb;' : ''" />
+            </el-icon>
             <el-icon @click="del(element)">
               <Delete />
             </el-icon>
@@ -53,6 +67,7 @@
         </div>
       </template>
     </vuedraggable>
+
     <!-- 无权限显示 -->
     <NoAccessPermission v-if="privilege === 'none'" />
     <Search ref="searchRef" @save="(() => {
@@ -63,18 +78,20 @@
 
 <script setup>
 import vuedraggable from "vuedraggable"
-import { ref, reactive, onMounted, nextTick } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Edit, DocumentCopy, Delete } from '@element-plus/icons-vue'
+import { Top, Bottom, Delete } from '@element-plus/icons-vue'
 // import { courseLibTypeSetStatus } from '@/api/courseLib.js'
 import { previewDetail, taskSave, taskdel, courseLiWR } from '@/api/taskMgmt.js'
 import Header from '@/views/page/components/header/index.vue'
 import Search from './components/search/index.vue'
 import NoAccessPermission from '@/views/page/components/noAccessPermission/index.vue'
+import { swapArrayElements } from '@/utils/index.js'
+import { TOPICTYPE } from '@/utils/consts.js'
+
 const router = useRouter()
 const route = router.currentRoute.value
-
 let drag = ref(false)
 const searchRef = ref(null)
 const taskList = ref([])
@@ -117,6 +134,10 @@ const getPreviewDetail = () => {
     if (res.code === '200') {
       total.value = res.data.totalScore
       taskName.value = res.data.name
+      res.data?.items.forEach((item) => {
+        // 设置默认勾选值
+        item.checkbox = false
+      })
       taskList.value = res.data?.items
     }
   })
@@ -127,21 +148,22 @@ const del = (row) => {
     paperId: route.query.id,
     libIds: [row.lib.id]
   }
-  _taskdel(data)
+  _taskdel(data, '确认要删除此题目吗?')
 }
 
 const allDel = () => {
-  const selectTask = taskList.value.filter((item) => item.checkbox)
+  const selectTask = taskList.value?.filter((item) => item.checkbox)
   const data = {
     paperId: route.query.id,
-    libIds: selectTask.map((item) => item.lib.id)
+    libIds: selectTask?.map((item) => item.lib.id)
   }
-  _taskdel(data)
+  if (!selectTask?.length) return ElMessage.error('请勾选要删除的题目')
+  _taskdel(data, '确定删选中的题目?')
 }
 
-const _taskdel = (data) => {
+const _taskdel = (data, title) => {
   ElMessageBox.confirm(
-    '确认删除此试卷吗?',
+    title,
     '提示',
     {
       confirmButtonText: '确定',

@@ -2,7 +2,7 @@
 <template>
     <!-- 预览 -->
     <div class="task-view">
-      <Header title="提交实验" />
+      <Header :title="disabled ? '查看实验' : '提交实验'" />
       <div class="task-title flex-between">
         <div class="flex-start task-msg">
           <span>当前实验: {{ practiceDetail.name }}</span>
@@ -28,11 +28,12 @@
         v-for="(item, i) in practiceDetail.items" 
         :key="i" 
       >
+
         <template v-if="item.beDefault === 0 && item.beValid">
           <div class="item-title" style="flex-wrap: wrap;">{{ item.itemName }}</div>
           <div class="flex-start">
             <div class="task-upload-url flex-start">
-              <div class="url-wrap" v-for="(url, urlIdx) in item.urlArr" :key="url">
+              <div v-if="item.urlArr && item.urlArr.length" class="url-wrap" v-for="(url, urlIdx) in item.urlArr" :key="url">
                 <!-- isImageURL -->
                 <el-image
                   v-if="isImageURL(url)"
@@ -56,6 +57,7 @@
                   <Close @click="delItemUrl(item.urlArr, urlIdx)" />
                 </el-icon>
               </div>
+              <div v-else>暂无提交实验材料</div>
             </div>
             <div class="task-upload" v-if="!disabled">
               <el-upload

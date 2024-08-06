@@ -5,8 +5,8 @@
     <header class="flex-between" style="margin: 10px 0;">
       <div class="flex-start">
         <span class="task-term">学期</span>
-        <el-select v-model="termId" placeholder="Select" style="width: 240px">
-          <el-option @change="handleTerm" v-for="item in termList" :label="item.termname" :value="item.id"></el-option>
+        <el-select v-model="termId" @change="handleTerm" placeholder="Select" style="width: 240px">
+          <el-option v-for="item in termList" :label="item.termname" :value="item.id"></el-option>
         </el-select>
       </div>
     </header>
@@ -45,10 +45,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElTable, ElMessage } from 'element-plus'
-import { taskList, getTermAll, taskCopy, prevPager } from '@/api/taskMgmt.js'
+import { getTermAll, taskCopy, prevPager } from '@/api/taskMgmt.js'
 import Header from '@/views/page/components/header/index.vue'
 
 const router = useRouter()
@@ -92,8 +92,7 @@ const _getTermAll = () => {
   })
 }
 
-const handleTerm = (termId) => {
-  termId.value = termId
+const handleTerm = () => {
   getTaskList()
 }
 

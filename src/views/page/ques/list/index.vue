@@ -5,7 +5,7 @@
     <header class="flex-end" style="margin: 10px 0;">
 
       <div>
-        <el-button @click="del" type="danger">批量删除</el-button>
+        <el-button @click="del(null, '确定批量删除？')" type="danger">批量删除</el-button>
         <!-- <el-button @click="download">下载所有成绩</el-button> -->
         <el-button @click="addTask" type="primary">新建问卷</el-button>
       </div>
@@ -47,7 +47,7 @@
                 编辑
               </el-button>
 
-              <el-button type="text" @click="del(scope.row)">
+              <el-button type="text" @click="del(scope.row, '确认删除此问卷吗?')">
                 删除
               </el-button>
             </template>
@@ -129,13 +129,13 @@ const handleCurrentChange = (val) => {
   console.log(`current page: ${val}`)
 }
 
-const del = (row) => {
+const del = (row, title) => {
   let ids = []
-  if (row.id) ids.push(row.id)
+  if (row?.id) ids.push(row.id)
   if (delIds.value.length) ids = delIds.value
-  if (!ids.length) return
+  if (!ids.length) return ElMessage.error('请勾选要删除的题目!')
   ElMessageBox.confirm(
-    '确认删除此问卷吗?',
+    title,
     '提示',
     {
       confirmButtonText: '确定',
