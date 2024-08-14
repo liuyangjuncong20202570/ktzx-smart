@@ -1,5 +1,8 @@
 <template>
-    <div id="container"></div>
+    <div style="height: 100%;">
+        <div style="height: 7%; background-color: aqua;"></div>
+        <div id="container"></div>
+    </div>
 </template>
 
 <script setup>
@@ -168,6 +171,35 @@ onMounted(async () => {
     camera.position.z = 4.5;
     camera.lookAt(0, 0, 0);
 
+    // 初始化Raycaster和鼠标向量
+    var raycaster = new THREE.Raycaster();
+    var mouse = new THREE.Vector2();
+
+    // container非全屏，需要获取其位置
+    const containerRect = container.getBoundingClientRect();
+    const onMouseClick = (event) => {
+        // 计算鼠标在container中的位置
+        mouse.x = ((event.clientX - containerRect.left) / containerRect.width) * 2 - 1;
+        mouse.y = -((event.clientY - containerRect.top) / containerRect.height) * 2 + 1;
+
+        // 从相机和鼠标位置更新射线
+        raycaster.setFromCamera(mouse, camera);
+
+        // 计算射线与场景中物体的交集
+        const intersects = raycaster.intersectObjects(scene.children, true);
+
+        if (intersects.length > 0) {
+            // 获取第一个被点击的物体
+            const clickedObject = intersects[0].object;
+            console.log(clickedObject);
+            alert(clickedObject.userData.name);
+        }
+    }
+
+    // 为container添加点击事件监听器
+    container.addEventListener('click', onMouseClick, false);
+
+
     // 三层模型平面的基准大小，其值为圆形平面最大内切正方形的边长，用于调整视角
     let planeSize = 4;
     // 平面之间的距离
@@ -209,8 +241,8 @@ onMounted(async () => {
             unitKwaAmount[kwa.unitid]++;
         })
 
-        unit.size = 5;
-        unit.gridCount = 2;     // 平面中一行或一列上可以有多少个节点，用于创建网格的大小gridCount * gridCount
+        unit.size = 4;
+        unit.gridCount = 1;     // 平面中一行或一列上可以有多少个节点，用于创建网格的大小gridCount * gridCount
         while (unit.gridCount * unit.gridCount <= unitKwaAmount[unit.id]) {
             unit.size++;
             unit.gridCount++;
@@ -499,7 +531,7 @@ onMounted(async () => {
             const textMesh = new THREE.Mesh(textGeometry, textMaterial);
 
             // 文本位置
-            textMesh.position.set(-1 * maxUnitSize / 3.5, -1 * maxUnitSize / 2 - 0.5, 0);
+            textMesh.position.set(-1 * maxUnitSize / 3.5, -1 * maxUnitSize / 2 - 0.3, 0);
             // textMesh.rotation.z = 0.5*Math.PI;
             textMesh.rotation.x = Math.PI;
 
@@ -519,6 +551,10 @@ onMounted(async () => {
                 const sphereGeometry = new THREE.SphereGeometry(0.2, 64, 64); // 半径为0.2，水平和垂直分段数均为32
 
                 const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+                sphere.userData = {
+                    type: 'kwa',
+                    name: kwa.name,
+                };
                 sphere.receiveShadow = true;
                 sphere.position.set(unitPlaneGridPoints[kwa.unitid][index].x,
                     unitPlaneGridPoints[kwa.unitid][index].y,
@@ -547,6 +583,10 @@ onMounted(async () => {
 
                 // 创建文本网格对象
                 const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+                textMesh.userData = {
+                    type: 'kwa-text',
+                    name: kwa.name,
+                };
 
                 // 文本位置
                 textMesh.position.set(-1 * (textWidth / 2), 0, -1 * textHeight);
@@ -570,7 +610,7 @@ onMounted(async () => {
                 const abilityLine = new THREE.Line(abilityLineGeometry, lineMaterial);
                 // 将连线添加为平面的子对象
                 scene.add(abilityLine);
-                
+
                 const keywordVertex = keywordPositionMap.get(kwainfo.keywordid);
                 // 将局部坐标转换为全局坐标
                 const globalKeywordVertex = keywordPlane.localToWorld(keywordVertex.clone());
@@ -643,8 +683,8 @@ onMounted(async () => {
             // console.log(startVertex, endVertex);
 
             // 将局部坐标转换为全局坐标，因为每章里的点的位置是相对于章平面而不是全局的
-            const globalStartVertex = unitPlanes[sectionChapterMap.get(line.startunitid)].localToWorld(startVertex.clone());
-            const globalEndVertex = unitPlanes[sectionChapterMap.get(line.endunitid)].localToWorld(endVertex.clone());
+            const globalStartVertex = unitPlanes[sectionChapterMap.get(line.startunitid)].localToWorld();
+            const globalEndVertex = unitPlanes[sectionChapterMap.get(line.endunitid)].localToWorld();
 
             const pointsVertices = [globalStartVertex, globalEndVertex];
             lineGeometry.setFromPoints(pointsVertices);
@@ -778,7 +818,7 @@ const createGridPointsByNodeSize = (size, gridCount, nodeSize) => {
 };
 
 const findSecondPlaneGridSize = (array, len, maxUnitSize) => {
-    // maxUnitSize += 0.5
+    maxUnitSize += 4;
     let maxX = -0x3f3f3f3f, minX = 0x3f3f3f3f;
     for (let i = 0; i < len; i++) {
         if (maxX < array[i].x + maxUnitSize) maxX = array[i].x + maxUnitSize;
@@ -810,12 +850,11 @@ const fittingString = (str, maxWidth, fontSize) => {
     return res;
 };
 
-
 </script>
 
 <style scoped>
 #container {
     width: 100%;
-    height: 100%;
+    height: 93%;
 }
 </style>

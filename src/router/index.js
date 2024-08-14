@@ -159,11 +159,11 @@ const routes = [
                 name: 'CourseTarget',
                 component: () => import('../components/evaluation/CourseTarget.vue')  
             },
-            {
-                path: 'exam/coursequelib', // 达成性评价模型-课程目标
-                name: 'CourseTarget',
-                component: () => import('../components/evaluation/CourseTarget.vue')
-            },
+            // {
+            //     path: 'exam/coursequelib', // 达成性评价模型-课程目标
+            //     name: 'CourseTarget',
+            //     component: () => import('../components/evaluation/CourseTarget.vue')
+            // },
             {
                 path: 'evasys/accessible/AssessmentTable', // 达成性评价模型-评价表
                 name: 'AssessmentTable',
