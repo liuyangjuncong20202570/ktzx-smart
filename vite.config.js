@@ -11,12 +11,39 @@ export default defineConfig({
     }),
   ],
   server: {
-    port: 8081
+    port: 8081,
+    proxy: {
+      '/api': {
+        target: 'http://60.205.178.180:8080',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\//, '')
+      },
+      '/page': {
+        target: 'http://60.205.178.180:8084',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\//, '')
+      },
+      '/fork': {
+        target: 'http://60.205.178.180:8084',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\//, '')
+      },
+      '/common': {
+        target: 'http://60.205.178.180:8084',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\//, '')
+      },
+      '/term': {
+        target: 'http://60.205.178.180:8084',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\//, '')
+      },
+    }
   },
   base: './',
   resolve: {
     alias: {
-      '@': '/src'
+      '@': '/src',
     }
   },
   build: {

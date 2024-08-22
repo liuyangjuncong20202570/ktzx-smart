@@ -79,7 +79,7 @@
                   <el-sub-menu v-if="hasChildren(menu)" :index="menu.id" :key="menu.id"
                     style="border-top: 1px solid #efefef;">
                     <template #title>
-                      <span>{{ menu.name }}</span>
+                      <span @click="navigateTo(menu.url)">{{ menu.name }}</span>
                     </template>
                     <el-menu-item v-for="child in getChildrenMenus(menu)" :index="child.url" :key="child.id"
                       style="border-top: 1px solid #efefef;" @click="navigateTo(child.url)">
@@ -178,6 +178,7 @@ const getChildrenMenus = (menu) => {
   return menu.children;
 };
 const navigateTo = (url) => {
+  if (!url) return
   router.push(homeurl.value + url);
 
 };
