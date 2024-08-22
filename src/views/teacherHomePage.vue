@@ -29,8 +29,8 @@
         </div>
 
 
-      </el-header>
 
+      </el-header>
       <el-container>
         <el-aside width="200px" style="height: 100%;">
           <div style="width: 100%; height: 150px; padding: 10px 0; background-color: #c8c9cc; display: flex; align-items: center;
@@ -38,16 +38,18 @@
             <!--头像-->
             <div style="width: 76px; height: 105px; margin-left: 10px; overflow: hidden;object-fit: cover;">
               <el-upload style="width: 100%; height: 100%; display: flex;" class="avatar-uploader"
-                action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" :show-file-list="false"
-                :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+                         action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" :show-file-list="false"
+                         :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+
                 <!-- action属性指定了文件上传的目标服务器地址 -->
                 <!-- show-file-list属性设置为false，表示不显示已选择的文件列表 -->
                 <!-- on-success属性是一个事件回调函数，当文件上传成功时，该函数将被调用 -->
                 <!-- before-upload属性是一个事件回调函数，当文件准备上传时，该函数将被调用 -->
                 <!-- 如果imageUrl有值，则显示这个图片，否则不显示 -->
                 <img v-if="imageUrl" :src="imageUrl" class="avatar"
-                  style="width: 100%; height: 120%; object-fit: cover;" />
+                     style="width: 100%; height: 120%; object-fit: cover;" />
                 <!-- 如果imageUrl没有值，则显示提示文本-->
+
                 <el-text v-else size="small" style="width:72px; color:white">点击上传头像</el-text>
               </el-upload>
             </div>
@@ -57,7 +59,7 @@
               </el-row>
               <el-row :gutter="0">
                 <p style="font-size: 14px; margin-left: 2px; color: cornflowerblue; line-height: 0.2;">{{
-                  loginInfo.rolename
+                    loginInfo.rolename
                   }}
                 </p>
               </el-row>
@@ -81,26 +83,31 @@
               </el-row>
             </div>
           </div>
+
           <!-- 使用 el-scrollbar 包裹 el-menu，设置高度为 70% -->
 
           <!--页面左侧导航栏-->
+
           <div style="height: calc(92vh - 150px);">
             <el-scrollbar style="border-right: 1px solid #dedede;">
               <el-menu :default-active="defaultActive">
                 <template v-for="menu in filteredMenus">
                   <el-sub-menu v-if="hasChildren(menu)" :index="menu.id" :key="menu.id"
+
                                style="border-top: 1px solid #efefef;  ">
                     <!--                    @click="navigateTo(menu.url)"-->
                     <template #title>
-                      <span>{{ menu.name }}</span>
+                      <!--0822有更改-->
+                      <span @click="navigateTo(menu.url)">{{ menu.name }}</span>
+
                     </template>
                     <el-menu-item v-for="child in getChildrenMenus(menu)" :index="child.url" :key="child.id"
-                      style="border-top: 1px solid #efefef;" @click="navigateTo(child.url)">
+                                  style="border-top: 1px solid #efefef;" @click="navigateTo(child.url)">
                       <span>{{ child.name }}</span>
                     </el-menu-item>
                   </el-sub-menu>
                   <el-menu-item v-else :index="menu.url" :key="menu.id" @click="navigateTo(menu.url)"
-                    style="border-top: 1px solid #efefef;">
+                                style="border-top: 1px solid #efefef;">
                     <span>{{ menu.name }}</span>
                   </el-menu-item>
                 </template>
@@ -128,7 +135,6 @@ import { Menu as IconMenu, Message, Setting, Plus, Platform, Right } from '@elem
 import type { UploadProps } from 'element-plus'
 import { useProfileStore } from "../stores/profileStore.js";
 
-
 //获取Stroe
 const profileStore = useProfileStore();
 
@@ -137,12 +143,13 @@ const route = useRoute();
 const router = useRouter(); // 获取路由实例
 
 const imageUrl = ref('https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png')
+
 // const imageUrl = ref('')
 
 // 定义处理上传成功的函数
 const handleAvatarSuccess: UploadProps['onSuccess'] = (
-  response, // 上传成功后的响应数据
-  uploadFile // 上传的文件对象
+    response, // 上传成功后的响应数据
+    uploadFile // 上传的文件对象
 ) => {
   // 使用 FileReader API 创建一个临时的 URL，以便可以在网页上查看图片
   imageUrl.value = URL.createObjectURL(uploadFile.raw!)
@@ -171,6 +178,7 @@ function clearLoginInfo() {
   sessionStorage.removeItem('isLoggedIn');
 }
 
+
 //登出的方法
 const handleLogout = () => {
   clearLoginInfo();
@@ -179,7 +187,6 @@ const handleLogout = () => {
 
 // 默认显示菜单
 // const defaultActive = ref('');
-
 const menus = ref([
 ]);
 
@@ -190,6 +197,7 @@ const loginInfo = reactive({
   currentterm: profileStore.currentterm
 });
 
+
 //0310将homeurl修改为响应式计算属性，这样下面的profileStore中的值变了这边也会自动变，解决拼接地址存在问题情况
 
 const homeurl = computed(() => profileStore.profilehomeurl);
@@ -198,9 +206,9 @@ const excludedPids = ['0', '102'];
 //过滤器
 const filteredMenus = computed(() => {
   return menus.value
-    .filter(menu => !excludedPids.includes(menu.pid))
-    //0311加入菜单按顺序排列
-    .sort((a, b) => a.orderno - b.orderno);
+      .filter(menu => !excludedPids.includes(menu.pid))
+      //0311加入菜单按顺序排列
+      .sort((a, b) => a.orderno - b.orderno);
 });
 
 //过滤节点是否有孩子节点
@@ -217,29 +225,37 @@ const getChildrenMenus = (menu) => {
 //路由导航
 const navigateTo = (url) => {
   //前面拼一个/表示绝对路径
+  if (!url) return
   console.log(homeurl.value + url)
   router.push(homeurl.value + url);
 
 };
 
+
 //钩子函数用来刷新后重新获取数据
+
 onMounted(() => {
   const defaultActive = ref('');
   const storedUserInfo = sessionStorage.getItem('users');
   if (storedUserInfo) {
     const userInfo = JSON.parse(storedUserInfo);
+
     // 更新用户信息到Pinia
+
     profileStore.setProfileInfo(userInfo.username, userInfo.rolename, userInfo.catelog, userInfo.homeurl, userInfo.token, userInfo.currentterm);
     loginInfo.username = profileStore.profilename;
     loginInfo.rolename = profileStore.profilerolename;
     loginInfo.catelog = profileStore.profilecatelog;
   } else {
+
     // 如果没有存储的用户信息，可以重定向到登录页面或显示提示信息
+
     sessionStorage.removeItem('users');
     sessionStorage.removeItem('isLoggedIn');
     sessionStorage.removeItem('token');
 
     router.push({ name: 'Login' });
+
     // 或
     // ElMessage.error('请重新登录');
   }
@@ -250,23 +266,21 @@ onMounted(() => {
   // console.log(1111)
   //获取菜单栏的数据
   request.admin.post(`/homes/teacherhome`)
-    .then(res => {
-      console.log(res)
-      // 登录成功
-      if (res.code === 200 && res.data.length > 0) {
-        menus.value = res.data;
-      }
-    }).catch(error => {
-      // 获取失败
-      ElMessage({
-        type: 'error',
-        message: '获取导航失败'
-      });
+      .then(res => {
+        console.log(res)
+        // 登录成功
+
+        if (res.code === 200 && res.data.length > 0) {
+          menus.value = res.data;
+        }
+      }).catch(error => {
+    // 获取失败
+    ElMessage({
+      type: 'error',
+      message: '获取导航失败'
     });
+  });
 });
-
-
-
 
 </script>
 

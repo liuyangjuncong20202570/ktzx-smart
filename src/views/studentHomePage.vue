@@ -2,6 +2,7 @@
   <div style="height: 100vh; background-color: #f0f0f0;">
     <el-container class="layout-container-demo" style="height: 100%;">
       <el-header style="position: relative; text-align:right; background-color: #0064B1; font-size: 15px; height: 8vh">
+
         <!--右侧按钮-->
         <div style="height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 0">
           <div class="left-div" style="flex-grow: 1; display: flex; align-items: center;">
@@ -10,7 +11,6 @@
               自动化专业智能教学平台
             </el-text>
           </div>
-
 
           <div class="right-div" style="flex-grow: 1; display: flex; align-items: center; justify-content: flex-end;">
             <el-dropdown>
@@ -31,7 +31,9 @@
       </el-header>
       <el-container>
         <el-aside width="25%" style="padding: 20px;">
+
           <!--左侧我的课程部分-->
+
           <div class="my-courses-container" style="margin-left:20px;margin-top:10px">
             <div class="header">
               <el-text style="color: white;font-size: large">我的课程</el-text>
@@ -52,13 +54,17 @@
         </el-aside>
 
         <el-main style="padding: 20px;">
+
           <!--右侧内容部分-->
+
           <div class="right-content-container" style="margin-right:20px;margin-top:10px">
             <div class="header">
               <el-text style="color: white;font-size: large">课程详情</el-text>
             </div>
             <div class="content">
+
               <!-- 在 el-main 区域显示路由组件 -->
+
               <router-view></router-view>
             </div>
           </div>
@@ -75,8 +81,9 @@ import request from '../utils/request.js';
 import {ElMessage} from 'element-plus';
 import {useProfileStore} from '../stores/profileStore.js';
 
-// 获取Store
-const profileStore = useProfileStore();
+<<<<<<< HEAD
+    // 获取Store
+    const profileStore = useProfileStore();
 const defaultActive = ref('');
 const router = useRouter(); // 获取路由实例
 
@@ -88,6 +95,7 @@ function clearLoginInfo() {
   sessionStorage.removeItem('users');
   sessionStorage.removeItem('isLoggedIn');
 }
+
 
 // 登出的方法
 const handleLogout = () => {
@@ -104,6 +112,7 @@ const loginInfo = reactive({
   currentterm: profileStore.currentterm,
 });
 
+
 // 计算属性来处理动态 homeurl
 const homeurl = computed(() => profileStore.profilehomeurl);
 
@@ -114,11 +123,14 @@ const navigateTo = (id) => {
   request.admin.get('/homes/switchstucourse?id=' + id)
       .then(res => {
         // 登录成功
+
         if (res.code === 200) {
           courseinfo.value = res.data;
           profileStore.setToken(courseinfo.value.token)
           sessionStorage.setItem('token', courseinfo.value.token);
+
           // router.push(courseinfo.value.courseChineseName);
+
           router.push({
             path: '/homes/studentcourses',
             query: {
@@ -127,7 +139,9 @@ const navigateTo = (id) => {
           });
         }
       }).catch(error => {
+
     // 获取失败
+
     ElMessage({
       type: 'error',
       message: '获取导航失败',
@@ -136,22 +150,28 @@ const navigateTo = (id) => {
 };
 
 // 钩子函数用来刷新后重新获取数据
+
 onMounted(() => {
   const storedUserInfo = sessionStorage.getItem('users');
   if (storedUserInfo) {
     const userInfo = JSON.parse(storedUserInfo);
+
     // 更新用户信息到 Pinia
+
     profileStore.setProfileInfo(userInfo.username, userInfo.rolename, userInfo.catelog, userInfo.homeurl, userInfo.token, userInfo.currentterm);
     loginInfo.username = profileStore.profilename;
     loginInfo.rolename = profileStore.profilerolename;
     loginInfo.catelog = profileStore.profilecatelog;
   } else {
+
     // 如果没有存储的用户信息，可以重定向到登录页面或显示提示信息
+
     sessionStorage.removeItem('users');
     sessionStorage.removeItem('isLoggedIn');
     sessionStorage.removeItem('token');
     router.push({name: 'Login'});
   }
+
   // 获取完 Pinia 中的数据后重新重定向到父页面
   router.push(homeurl.value);
 
@@ -163,7 +183,9 @@ onMounted(() => {
           menus.value = res.data;
         }
       }).catch(error => {
+
     // 获取失败
+
     ElMessage({
       type: 'error',
       message: '获取导航失败',
@@ -222,7 +244,9 @@ onMounted(() => {
   padding: 20px;
 }
 
+
 /* 添加课程列表样式 */
+
 .courses-menu .el-menu-item {
   display: flex;
   align-items: center;
@@ -236,7 +260,9 @@ onMounted(() => {
 }
 
 .course-text {
+
   font-size: 17px; /* 调整字体大小 */
+
   transition: color 0.3s;
 }
 

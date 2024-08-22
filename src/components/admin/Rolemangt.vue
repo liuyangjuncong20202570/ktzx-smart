@@ -176,10 +176,12 @@ const handleClick = (row, field) => {
     row[field] = true;
     setTimeout(() => {
       const inputRef = `input-${row.id}`;
+
       // 假设 inputsRefs.value[inputRef] 是对 el-input 组件的引用
       const inputComponent = inputsRefs.value[inputRef];
 
       // 检查 inputComponent 并尝试获取其内部的 input 元素
+
       if (inputComponent && inputComponent.$refs.input) {
         const nativeInputElement = inputComponent.$refs.input;
         nativeInputElement.focus();
