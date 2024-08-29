@@ -76,10 +76,7 @@
                 </el-form-item>
                 <el-form-item>
                   <el-button type="primary" style="width: 100%;" @click="login">登录</el-button>
-
-
                   <!-- 弹窗登录-->
-
                   <el-dialog :modelValue="showRoleModal" :show-close="false" :close-on-click-modal="false"
                              title="选择角色" width="30%" style="border-radius:10px">
                     <el-radio-group v-model="selectedRoleId">
@@ -113,16 +110,13 @@ import {useProfileStore} from "../stores/profileStore.js";
 
 const profileStore = useProfileStore();
 
-
 //构造登录表单
-
 const loginForm = reactive({
   loginname: "",
   pwd: "",
   catelog: "1",
   loginway: "1",
 })
-
 const loginuserFrom = ref({
   id: "",
   roleid: "",
@@ -130,8 +124,6 @@ const loginuserFrom = ref({
   obsdeep: "",
   catelog: ""
 })
-
-
 
 //学生登录/老师登录（true为学生登录）
 const StudentOrTeacher = ref(true);
@@ -156,14 +148,10 @@ const handleClick = (tab, event) => {
   }
 }
 
-
-
 const roledata = reactive({});
-
 const selectedRoleId = ref(null);
 //默认选择第一个角色序号
 // const selectedRoleId = ref(data.simpleRoleList[0].roleid);
-
 
 const rules = reactive({
   loginname: [
@@ -175,8 +163,6 @@ const rules = reactive({
     {min: 3, max: 15, message: '密码长度在3到15个字符之间', trigger: 'blur'},
   ],
 })
-
-
 //登录
 const login = () => {
   // 验证表单输入

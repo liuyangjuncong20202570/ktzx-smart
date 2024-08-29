@@ -1,7 +1,7 @@
 import {createRouter, createWebHistory,onBeforeRouteLeave,createWebHashHistory } from 'vue-router';
 
 const rolehome =['teacherhomne','adminhome','superadminhome','secretariatehome','academicaffairshome','deanhome',
-    'departmenthome', 'majormanagerhome', 'coursemanagerhome', 'professionhome', 'assistanthome', 'courseteacherhome'];
+    'departmenthome', 'majormanagerhome', 'coursemanagerhome', 'professionhome', 'assistanthome', 'courseteacherhome','studenthome', 'page'];
 // superadminhome 超级管理员首页
 // secretariatehome 教学秘书首页
 // academicaffairshome 教务处首页
@@ -10,8 +10,6 @@ const rolehome =['teacherhomne','adminhome','superadminhome','secretariatehome',
 // majormanagerhome 专业负责人首页 
 // coursemanagerhome 课程负责人首页
 
-
-const rolehome = ['teacherhomne', 'adminhome', 'superadminhome', 'secretariatehome','coursemanagerhome', 'courseteacherhome', 'studenthome', 'page'];
 const pathHeader = `/homes/:rolehome(${rolehome.join('|')})`
 
 console.log('pathHeader', pathHeader)

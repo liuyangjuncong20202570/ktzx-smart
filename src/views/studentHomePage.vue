@@ -81,9 +81,8 @@ import request from '../utils/request.js';
 import {ElMessage} from 'element-plus';
 import {useProfileStore} from '../stores/profileStore.js';
 
-<<<<<<< HEAD
     // 获取Store
-    const profileStore = useProfileStore();
+const profileStore = useProfileStore();
 const defaultActive = ref('');
 const router = useRouter(); // 获取路由实例
 
