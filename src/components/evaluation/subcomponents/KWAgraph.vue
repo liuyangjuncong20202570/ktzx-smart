@@ -1,16 +1,16 @@
 <template>
 	<div v-if="!nodes.length && !edges.length && !combos.length" style="display: flex; justify-content: center; 
-		align-items: center; height: 92vh; background-color: white;" v-loading="loading">
+		align-items: center; height: 100%; background-color: white;" v-loading="loading">
 		<el-empty description="No Data" />
 	</div>
 	<div v-else class="container" id="container"
-		style="height: 92vh; width: 100%; background-color: #fdfdfd; position: relative;"></div>
+		style="height: 100%; width: 100%; background-color: #fdfdfd; position: relative;"></div>
 </template>
 
 <script lang="ts" setup>
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
 import { onMounted, ref } from 'vue';
-import request from '../../utils/request';
+import request from '../../../utils/request';
 import _ from 'lodash';
 
 const courseid = ref('2c918af681fa6ea7018209a505c30672');
@@ -57,7 +57,7 @@ const fittingString = (str, maxWidth, fontSize) => {
 const open1 = () => {
 	ElNotification({
 		title: '按住shift点击节点以创建边，按住ctrl点击边即可删除',
-		duration: 5000,
+		duration: 3000,
 	})
 }
 

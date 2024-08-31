@@ -147,28 +147,28 @@ const routes = [
             {
                 path: 'evasys/formative/KWAgraph', // 形成性评价模型-知识能力图谱
                 name: 'KWAgraph',
-                component: () => import('../components/evaluation/KWAgraph.vue')
+                component: () => import('../components/evaluation/graph.vue')
             },
             {
-                path: 'evasys/3Dgraph', // 形成性评价模型-3D图谱
-                name: '3Dgraph',
-                component: () => import('../components/evaluation/3Dgraph.vue')
+                path: 'evasys/graph', // 形成性评价模型-图谱
+                name: 'graph',
+                component: () => import('../components/evaluation/graph.vue')
             },
             {
                 path: 'evasys/accessible/coursetarget', // 达成性评价模型-课程目标
                 name: 'CourseTarget',
                 component: () => import('../components/evaluation/CourseTarget.vue')  
             },
-            // {
-            //     path: 'exam/coursequelib', // 达成性评价模型-课程目标
-            //     name: 'CourseTarget',
-            //     component: () => import('../components/evaluation/CourseTarget.vue')
-            // },
             {
-                path: 'evasys/accessible/AssessmentTable', // 达成性评价模型-评价表
+                path: 'evaluation/assessmentPlan', // 达成性评价模型-考核方案
                 name: 'AssessmentTable',
                 component: () => import('../components/evaluation/AssessmentTable.vue')
             },
+            {
+                path: 'evaluation/checkitem', // 达成性评价模型-考核项设计
+                name: 'AssessmentPlan',
+                component: () => import('../components/evaluation/AssessmentItems.vue')
+            }
         ]
     },
     {

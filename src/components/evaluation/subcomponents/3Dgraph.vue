@@ -1,8 +1,11 @@
 <template>
-    <div style="height: 100%;">
-        <div style="height: 7%; background-color: aqua;"></div>
-        <div id="container"></div>
+    <div id="container" v-loading="loading" element-loading-background='black'>
+        <!-- 弹窗元素 -->
+        <div v-if="showPopup" :style="popupStyle" class="popup">
+            <div>{{ popupContent }}</div>
+        </div>
     </div>
+
 </template>
 
 <script setup>
@@ -12,8 +15,10 @@ import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { FontLoader } from "three/addons/loaders/FontLoader.js";
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import _ from "lodash";
-import request from "../../utils/request";
+import request from "../../../utils/request";
 import { ElMessage } from "element-plus";
+
+const loading = ref(true);
 
 let data = {
     units: [],
@@ -91,6 +96,14 @@ const getData = async () => {
     }
 };
 
+// 弹窗相关数据
+const showPopup = ref(false);
+const popupContent = ref('');
+const popupStyle = ref({
+    top: '0px',
+    left: '0px',
+});
+
 const acquireAbilities = (resData) => {
     resData.forEach((item) => {
         if (item.children && item.children.length > 0) {
@@ -109,6 +122,8 @@ onMounted(async () => {
     data.targets = [];
 
     await getData();
+
+    loading.value = false;
 
     data.units.forEach((unit) => {
         // 将kwa的id和status之间创建映射，用于确定一章里存在重复的kwa的status
@@ -191,14 +206,43 @@ onMounted(async () => {
         if (intersects.length > 0) {
             // 获取第一个被点击的物体
             const clickedObject = intersects[0].object;
-            console.log(clickedObject);
-            alert(clickedObject.userData.name);
+
+            // 点击节点会显示名称
+            if (clickedObject.userData.type === 'node' || clickedObject.userData.type === 'unit') {
+                popupContent.value = clickedObject.userData.name;
+                // 设置弹框位置
+                popupStyle.value.top = `${event.clientY}px`;
+                popupStyle.value.left = `${event.clientX}px`;
+                showPopup.value = true;
+            }
+            else showPopup.value = false;
         }
+        else showPopup.value = false;
     }
 
     // 为container添加点击事件监听器
     container.addEventListener('click', onMouseClick, false);
 
+    const onMouseMove = (event) => {
+        const containerRect = container.getBoundingClientRect();
+        mouse.x = ((event.clientX - containerRect.left) / containerRect.width) * 2 - 1;
+        mouse.y = -((event.clientY - containerRect.top) / containerRect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+
+        const intersects = raycaster.intersectObjects(scene.children, true);
+
+        if (intersects.length > 0) {
+            const clickedObject = intersects[0].object;
+            if(clickedObject.userData.type === 'node'){
+                container.style.cursor = 'pointer';
+            }
+            else container.style.cursor = 'default';
+        } else {
+            container.style.cursor = 'default';
+        }
+    }
+    container.addEventListener('mousemove', onMouseMove, false);
 
     // 三层模型平面的基准大小，其值为圆形平面最大内切正方形的边长，用于调整视角
     let planeSize = 4;
@@ -338,8 +382,11 @@ onMounted(async () => {
                 break;
         }
         const plane = new THREE.Mesh(planeGeometries[i + 1], material);
+        plane.userData = {
+            type: 'plane',
+        };
         plane.rotation.x = Math.PI / 2;
-        plane.position.y = i * planeDist; // 设置每个平面沿Z轴的距离
+        plane.position.y = (i + 0.5) * planeDist; // 设置每个平面沿Z轴的距离
         scene.add(plane);
         planes.push(plane);
     }
@@ -370,7 +417,7 @@ onMounted(async () => {
     const fontLoader = new FontLoader();
 
     // 加载字体，速度比较慢
-    fontLoader.load('/FangSong_GB2312_Regular.json', function (font) {
+    setTimeout(() => {
         // 创建关键字平面
         const keywordGeometry = new THREE.CircleGeometry(Math.sqrt((keywordPlaneSize * keywordPlaneSize) / 2), 100);
         const keywordPlaneMaterial = new THREE.MeshBasicMaterial({
@@ -380,6 +427,9 @@ onMounted(async () => {
             opacity
         });
         const keywordPlane = new THREE.Mesh(keywordGeometry, keywordPlaneMaterial);
+        keywordPlane.userData = {
+            type: 'plane',
+        };
         keywordPlane.position.set(-1 * Math.sqrt((firstPlaneSize * firstPlaneSize) / 2) / 2, 0, -0.1);
         planes[0].add(keywordPlane);
 
@@ -392,6 +442,9 @@ onMounted(async () => {
             opacity
         });
         const abilityPlane = new THREE.Mesh(abilityGeometry, abilityPlaneMaterial);
+        abilityPlane.userData = {
+            type: 'plane',
+        };
         abilityPlane.position.set(Math.sqrt((firstPlaneSize * firstPlaneSize) / 2) / 2, 0, -0.1);
         planes[0].add(abilityPlane);
 
@@ -406,6 +459,10 @@ onMounted(async () => {
             const keywordPlaneGridPoints = createGridPointsByNodeAmount(keywordPlaneSize, keywordPlaneGridCount, kwAndAbPadding);
 
             const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            sphere.userData = {
+                type: 'node',
+                name: keyword.name,
+            };
             sphere.receiveShadow = true;
             sphere.position.set(keywordPlaneGridPoints[index].x,
                 keywordPlaneGridPoints[index].y,
@@ -417,31 +474,6 @@ onMounted(async () => {
             keyword.position = sphere.position;
             // console.log(keyword);
             keywordPositionMap.set(keyword.id, keyword.position);
-
-            // 创建文本几何体
-            const textGeometry = new TextGeometry(fittingString(keyword.name, 80, 12), {
-                font,
-                size: 0.15,
-                depth: 0.02,
-            });
-
-            textGeometry.computeBoundingBox();
-
-            const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
-            const textHeight = textGeometry.boundingBox.max.y - textGeometry.boundingBox.min.y + 0.1;
-
-            // 创建文本材质
-            const textMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
-
-            // 创建文本网格对象
-            const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-
-            // 文本位置
-            textMesh.position.set(-1 * (textWidth / 2), 0, -1 * textHeight);
-            // textMesh1.rotation.y = Math.PI;
-            textMesh.rotation.x = Math.PI * 1.5;
-
-            sphere.add(textMesh);
         });
         // 创建能力节点
         data.abilities.forEach((ability, index) => {
@@ -453,6 +485,10 @@ onMounted(async () => {
             const abilityPlaneGridPoints = createGridPointsByNodeAmount(abilityPlaneSize, abilityPlaneGridCount, kwAndAbPadding);
 
             const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            sphere.userData = {
+                type: 'node',
+                name: ability.name,
+            };
             sphere.receiveShadow = true;
             sphere.position.set(abilityPlaneGridPoints[index].x,
                 abilityPlaneGridPoints[index].y,
@@ -464,35 +500,13 @@ onMounted(async () => {
             ability.position = sphere.position;
 
             abilityPositionMap.set(ability.id, ability.position);
-
-            // 创建文本几何体
-            const textGeometry = new TextGeometry(fittingString(ability.name, 80, 12), {
-                font,
-                size: 0.15,
-                depth: 0.02,
-            });
-
-            textGeometry.computeBoundingBox();
-
-            const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
-            const textHeight = textGeometry.boundingBox.max.y - textGeometry.boundingBox.min.y + 0.1;
-
-            // 创建文本材质
-            const textMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
-
-            // 创建文本网格对象
-            const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-
-            // 文本位置
-            textMesh.position.set(-1 * (textWidth / 2), 0, -1 * textHeight);
-            // textMesh1.rotation.y = Math.PI;
-            textMesh.rotation.x = Math.PI * 1.5;
-
-            sphere.add(textMesh);
         });
 
         // 生成知识单元平面
         data.units.forEach((unit, index) => {
+            // console.log(unit);
+            unit.kwas = unit.kwas.concat(_.cloneDeep(unit.children_kwas));
+            console.log(unit.kwas);
             // 知识单元的材质
             const unitMaterial = new THREE.MeshBasicMaterial({
                 color: 'grey',
@@ -505,37 +519,16 @@ onMounted(async () => {
 
             // 创建一个知识单元的平面，添加为第二层平面的子对象
             const unitPlane = new THREE.Mesh(unitGeometry, unitMaterial);
+            unitPlane.userData = {
+                type: 'unit',
+                name: unit.name,
+            };
             // unitPlane.rotation.x = Math.PI / 2;
             // console.log(index);
             unitPlane.position.set(secondPlaneGridPoints[index].x,
-                secondPlaneGridPoints[index].y,
-                secondPlaneGridPoints[index].z + 0.1);
+                secondPlaneGridPoints[index].y, -0.1);
 
             planes[1].add(unitPlane);
-
-            // 创建文本几何体
-            const textGeometry = new TextGeometry(unit.name, {
-                font,
-                size: 0.3,
-                depth: 0.02,
-            });
-
-            textGeometry.computeBoundingBox();
-
-            const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
-
-            // 创建文本材质
-            const textMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00 });
-
-            // 创建文本网格对象
-            const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-
-            // 文本位置
-            textMesh.position.set(-1 * maxUnitSize / 3.5, -1 * maxUnitSize / 2 - 0.3, 0);
-            // textMesh.rotation.z = 0.5*Math.PI;
-            textMesh.rotation.x = Math.PI;
-
-            unitPlane.add(textMesh);
 
             if (!unitPlanes[unit.id]) unitPlanes[unit.id] = [];
             unitPlanes[unit.id] = unitPlane;
@@ -552,7 +545,7 @@ onMounted(async () => {
 
                 const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
                 sphere.userData = {
-                    type: 'kwa',
+                    type: 'node',
                     name: kwa.name,
                 };
                 sphere.receiveShadow = true;
@@ -564,36 +557,7 @@ onMounted(async () => {
                 // 将节点的位置信息存储在节点内
                 kwa.position = sphere.position;
 
-                kwasPositionMap.set(JSON.stringify([kwa.kwaid, sectionChapterMap.get(kwa.unitid)]), kwa.position);
-
-                // 创建文本几何体
-                const textGeometry = new TextGeometry(fittingString(kwa.name, 80, 12), {
-                    font,
-                    size: 0.15,
-                    depth: 0.02,
-                });
-
-                textGeometry.computeBoundingBox();
-
-                const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
-                const textHeight = textGeometry.boundingBox.max.y - textGeometry.boundingBox.min.y + 0.1;
-
-                // 创建文本材质
-                const textMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
-
-                // 创建文本网格对象
-                const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-                textMesh.userData = {
-                    type: 'kwa-text',
-                    name: kwa.name,
-                };
-
-                // 文本位置
-                textMesh.position.set(-1 * (textWidth / 2), 0, -1 * textHeight);
-                // textMesh1.rotation.y = Math.PI;
-                textMesh.rotation.x = Math.PI * 1.5;
-
-                sphere.add(textMesh);
+                kwasPositionMap.set(JSON.stringify([kwa.kwaid, sectionChapterMap.get(kwa.unitid)]), kwa.position);``
 
                 const kwainfo = kwadict.find(item => item.id === kwa.kwaid);
                 const startVertex = kwa.position;
@@ -632,6 +596,10 @@ onMounted(async () => {
             const sphereGeometry = new THREE.SphereGeometry(0.2, 64, 64); // 半径为0.2，水平和垂直分段数均为32
 
             const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            sphere.userData = {
+                type: 'node',
+                name: target.name,
+            };
             sphere.receiveShadow = true;
             sphere.position.set(targetPlaneGridPoints[index].x,
                 targetPlaneGridPoints[index].y,
@@ -642,30 +610,33 @@ onMounted(async () => {
             // 将节点的位置信息存储在节点内
             target.position = sphere.position;
 
-            // 创建文本几何体
-            const textGeometry = new TextGeometry(fittingString(target.name, 80, 12), {
-                font,
-                size: 0.15,
-                depth: 0.02,
-            });
+            // // 创建文本几何体
+            // const textGeometry = new TextGeometry(fittingString(target.name, 80, 12), {
+            //     font,
+            //     size: 0.15,
+            //     depth: 0.02,
+            // });
 
-            textGeometry.computeBoundingBox();
+            // textGeometry.computeBoundingBox();
 
-            const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
-            const textHeight = textGeometry.boundingBox.max.y - textGeometry.boundingBox.min.y + 0.1;
+            // const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
+            // const textHeight = textGeometry.boundingBox.max.y - textGeometry.boundingBox.min.y + 0.1;
 
-            // 创建文本材质
-            const textMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
+            // // 创建文本材质
+            // const textMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
 
-            // 创建文本网格对象
-            const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+            // // 创建文本网格对象
+            // const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+            // textMesh.userData = {
+            //     type: 'text',
+            // };
 
-            // 文本位置
-            textMesh.position.set(-1 * (textWidth / 2), 0, -1 * textHeight);
-            // textMesh1.rotation.y = Math.PI;
-            textMesh.rotation.x = Math.PI * 1.5;
+            // // 文本位置
+            // textMesh.position.set(-1 * (textWidth / 2), 0, -1 * textHeight);
+            // // textMesh1.rotation.y = Math.PI;
+            // textMesh.rotation.x = Math.PI * 1.5;
 
-            sphere.add(textMesh);
+            // sphere.add(textMesh);
         })
 
         // 创建知识单元间kwa的连线
@@ -683,8 +654,8 @@ onMounted(async () => {
             // console.log(startVertex, endVertex);
 
             // 将局部坐标转换为全局坐标，因为每章里的点的位置是相对于章平面而不是全局的
-            const globalStartVertex = unitPlanes[sectionChapterMap.get(line.startunitid)].localToWorld();
-            const globalEndVertex = unitPlanes[sectionChapterMap.get(line.endunitid)].localToWorld();
+            const globalStartVertex = unitPlanes[sectionChapterMap.get(line.startunitid)].localToWorld(startVertex.clone());
+            const globalEndVertex = unitPlanes[sectionChapterMap.get(line.endunitid)].localToWorld(endVertex.clone());
 
             const pointsVertices = [globalStartVertex, globalEndVertex];
             lineGeometry.setFromPoints(pointsVertices);
@@ -694,16 +665,7 @@ onMounted(async () => {
             // 将连线添加为平面的子对象
             scene.add(kwaLine);
         })
-
-        // 创建连线
-        // const lineMaterial = new THREE.LineBasicMaterial({ color: 0xf6e432 });
-        // const lineGeometry = new THREE.BufferGeometry();
-        // // 使用球形节点的位置创建连线的顶点
-        // const pointsVertices = [sphere1.position, sphere2.position];
-        // lineGeometry.setFromPoints(pointsVertices);
-        // const line = new THREE.Line(lineGeometry, lineMaterial);
-        // plane.add(line); // 将连线添加为平面的子对象
-    });
+    }, 500);
     // console.log(data)
     // 添加世界坐标辅助器
     const axesHelper = new THREE.AxesHelper(50);
@@ -818,43 +780,54 @@ const createGridPointsByNodeSize = (size, gridCount, nodeSize) => {
 };
 
 const findSecondPlaneGridSize = (array, len, maxUnitSize) => {
-    maxUnitSize += 4;
+    maxUnitSize += 1;
     let maxX = -0x3f3f3f3f, minX = 0x3f3f3f3f;
     for (let i = 0; i < len; i++) {
+        console.log(array[i].x);
         if (maxX < array[i].x + maxUnitSize) maxX = array[i].x + maxUnitSize;
-        else if (minX > array[i].x - maxUnitSize) minX = array[i].x - maxUnitSize;
+        if (minX > array[i].x - maxUnitSize) minX = array[i].x - maxUnitSize;
     }
     return maxX - minX;
 };
 
 // 改变文本宽度与高度
-const fittingString = (str, maxWidth, fontSize) => {
-    let currentWidth = 0;
-    let res = '';
-    const pattern = new RegExp('[\u4E00-\u9FA5]+'); // distinguish the Chinese charactors and letters
-    str.split('').forEach((letter, i) => {
-        if (currentWidth > maxWidth) return;
-        if (pattern.test(letter)) {
-            // Chinese charactors
-            currentWidth += fontSize;
-        } else {
-            // get the width of single letter according to the fontSize
-            currentWidth += G6.Util.getLetterWidth(letter, fontSize);
-        }
-        if (currentWidth > maxWidth) {
-            res += '\n';
-            currentWidth = pattern.test(letter) ? fontSize : G6.Util.getLetterWidth(letter, fontSize);
-        }
-        res += letter;
-    });
-    return res;
-};
+// const fittingString = (str, maxWidth, fontSize) => {
+//     let currentWidth = 0;
+//     let res = '';
+//     const pattern = new RegExp('[\u4E00-\u9FA5]+'); // distinguish the Chinese charactors and letters
+//     str.split('').forEach((letter, i) => {
+//         if (currentWidth > maxWidth) return;
+//         if (pattern.test(letter)) {
+//             // Chinese charactors
+//             currentWidth += fontSize;
+//         } else {
+//             // get the width of single letter according to the fontSize
+//             currentWidth += G6.Util.getLetterWidth(letter, fontSize);
+//         }
+//         if (currentWidth > maxWidth) {
+//             res += '\n';
+//             currentWidth = pattern.test(letter) ? fontSize : G6.Util.getLetterWidth(letter, fontSize);
+//         }
+//         res += letter;
+//     });
+//     return res;
+// };
 
 </script>
 
 <style scoped>
 #container {
     width: 100%;
-    height: 93%;
+    height: 100%;
+}
+
+.popup {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.714);
+    color: black;
+    padding: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 99;
+    border-radius: 7px;
 }
 </style>
