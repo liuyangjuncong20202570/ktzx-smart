@@ -145,7 +145,7 @@ const getChildrenMenus = (menu) => {
 const navigateTo = (url) => {
   //前面拼一个/表示绝对路径
   console.log(homeurl.value + url)
-  // router.push(homeurl.value + url);
+  router.push(homeurl.value + url);
 };
 
 const getmenu = () => {

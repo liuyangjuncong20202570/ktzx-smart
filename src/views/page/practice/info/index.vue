@@ -332,7 +332,7 @@ const saveData = async (formEl: FormInstance | undefined) => {
       }
       if (resData.code==200) {
         ElMessage.success('保存成功！');
-        router.push('/page/practice')
+        router.push('/homes/courseteacherhome/exam/experimental/labmangt')
       }
     } else {
       console.log('error submit!', fields)

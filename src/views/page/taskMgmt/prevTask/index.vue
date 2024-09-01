@@ -19,7 +19,8 @@
         <template #default="scope">
           <el-button type="text" size="small" @click="(() => {
             router.push({
-              path: '/page/taskMgmt/view',
+
+              path: '/homes/courseteacherhome/exam/test/taskMgmt/view',
               query: {
                 id: scope.row.id
               }
