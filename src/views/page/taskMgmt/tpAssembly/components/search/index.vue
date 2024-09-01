@@ -116,11 +116,13 @@ const submitForm = () => {
 
 const handleSizeChange = (val) => {
     ruleForm.value.pageSize = val
+    getTeskSearch()
     console.log(`${val} items per page`)
 }
 
 const handleCurrentChange = (val) => {
     ruleForm.value.pageIndex = val
+    getTeskSearch()
     console.log(`current page: ${val}`)
 }
 

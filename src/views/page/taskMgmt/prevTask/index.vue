@@ -109,11 +109,13 @@ const getTaskList = () => {
 
 const handleSizeChange = (val) => {
   params.value.pageSize = val
+  getTaskList()
   console.log(`${val} items per page`)
 }
 
 const handleCurrentChange = (val) => {
   params.value.pageIndex = val
+  getTaskList()
   console.log(`current page: ${val}`)
 }
 </script>
