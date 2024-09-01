@@ -54,7 +54,7 @@ function createAPI(url) {   // 构建不同端口的异步请求数据
         response => {
             let res = response.data;
             // 课程、课堂、问卷、实验、组卷异常提示
-            if (res.result === false) {
+            if (res?.result === false) {
                 ElMessage.error(res.message)
             }
             // console.log('res----', res)
