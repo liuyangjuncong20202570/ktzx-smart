@@ -19,7 +19,8 @@
         <template #default="scope">
           <el-button type="text" size="small" @click="(() => {
             router.push({
-              path: '/page/taskMgmt/view',
+
+              path: '/homes/courseteacherhome/exam/test/taskMgmt/view',
               query: {
                 id: scope.row.id
               }
@@ -108,11 +109,13 @@ const getTaskList = () => {
 
 const handleSizeChange = (val) => {
   params.value.pageSize = val
+  getTaskList()
   console.log(`${val} items per page`)
 }
 
 const handleCurrentChange = (val) => {
   params.value.pageIndex = val
+  getTaskList()
   console.log(`current page: ${val}`)
 }
 </script>

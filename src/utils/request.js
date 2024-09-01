@@ -53,9 +53,10 @@ function createAPI(url) {   // 构建不同端口的异步请求数据
     axiosData.interceptors.response.use(
         response => {
             let res = response.data;
-            // if (res.code != '200') {
-            //     ElMessage.error(res.message)
-            // }
+            // 不是200抛出错误信息、请根据各个项目返回值添加条件
+            if (res.code != '200') {
+                ElMessage.error(res.message)
+            }
             // console.log('res----', res)
             // 如果是返回的文件
             if (response.config.responseType === 'blob') {
