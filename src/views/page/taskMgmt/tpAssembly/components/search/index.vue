@@ -129,7 +129,7 @@ const handleCurrentChange = (val) => {
 }
 
 const getTeskSearch = () => {
-    teskSearch(ruleForm.value).then(res => {
+    teskSearch({...ruleForm.value, pagerId: route.query.id}).then(res => {
         console.log('res', res)
         if (res.code === '200') {
             const { recordSize, data } = res.data || {}
