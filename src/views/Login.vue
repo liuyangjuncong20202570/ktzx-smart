@@ -247,7 +247,9 @@ const userlogin = () => {
           console.log("userlogin_success")
           setprofile(res.data)
 
-          router.push(res.data.homeurl);
+          router.push(res.data.homeurl).then(() => {
+            window.location.reload(); // 在导航后强制刷新页面
+          });
 
         } else if (res.code === 404) {
           router.push('/login');
