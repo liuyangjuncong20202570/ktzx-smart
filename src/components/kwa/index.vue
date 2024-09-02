@@ -208,14 +208,16 @@ const getCourseLibKwa = () => {
 };
 // 题型
 const getCourseLibType = () => {
-  // classroomLibSearch: 课程题库，courseLibSearch: 课堂题库
-  const libTypeApi = type === 'classroomLibSearch' ? classroomLibType : courseLibType
-  libTypeApi().then((res) => {
-    if (res.code === "200") {
-      courseType.value = res.data?.filter((f) => f.status);
-    }
-  });
-};
+  if (['classroomLibSearch', 'courseLibSearch'].includes(type)) {
+    // classroomLibSearch: 课程题库，courseLibSearch: 课堂题库
+    const libTypeApi = type === 'classroomLibSearch' ? classroomLibType : courseLibType
+    libTypeApi().then((res) => {
+      if (res.code === "200") {
+        courseType.value = res.data?.filter((f) => f.status);
+      }
+    })
+  }
+}
 
 const handleChange = () => {
   console.log(form.value);

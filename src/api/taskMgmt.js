@@ -85,3 +85,7 @@ export const courseLiWR = () => {
 export const studentDownload = (id) => {
     return request.page.get('/paper/student/download?testId=' + id)
 }
+// 搜索页题型选择
+export const queType = (type) => {
+    return request.page.get('/paper/edit/queType?type=' + type)
+}
