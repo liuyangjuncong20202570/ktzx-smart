@@ -50,8 +50,8 @@
         <div class="topic-item" v-else>
           <div>
             <span class="flex-start">
-              {{ index+1 }}、<el-checkbox label="" v-model="element.isChecked"></el-checkbox>
-              <span class="topic-title">{{ element.title }}({{ TOPICTYPE[element.typeId] }})</span>
+              <el-checkbox label="" v-model="element.isChecked"></el-checkbox>
+              <span class="topic-title">{{ index+1 }}、{{ element.title }}({{ TOPICTYPE[element.typeId] }})</span>
             </span>
             <span v-html="element.content"></span>
             <div 

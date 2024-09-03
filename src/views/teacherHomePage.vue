@@ -14,17 +14,28 @@
           </div>
 
           <div class="right-div" style="flex-grow: 1; display: flex; align-items: center; justify-content: flex-end;">
-            <el-dropdown>
+            <el-dropdown @visible-change="handleVisibleChange">
               <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item>查看详情</el-dropdown-item>
+                  <template v-if="!showRoles">
+                  <el-dropdown-item @click="getRolelist">切换角色</el-dropdown-item>
                   <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
+                  </template>
+                  <template v-else>
+                    <el-dropdown-item
+                        v-for="role in roleList"
+                        :key="role.roleid"
+                        @click="switchRole(role)"
+                    >
+                      {{role.rolename}}
+                    </el-dropdown-item>
+                  </template>
+
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <el-text style="font-size: calc(1vw + 3px); color: white; margin-left: 10px;">{{ loginInfo.username
-              }}</el-text>
+            <el-text style="font-size: calc(1vw + 3px); color: white; margin-left: 10px;">{{ loginInfo.username }}</el-text>
           </div>
         </div>
 
@@ -231,6 +242,106 @@ const navigateTo = (url) => {
 
 };
 
+const roleList = ref([]);
+const showRoles = ref(false);
+const loginuserFrom = ref({
+  id: "",
+  roleid: "",
+  obsid: "",
+  obsdeep: "",
+  catelog: ""
+})
+//切换角色
+const getRolelist = () => {
+  request.admin.post(`/homes/switchrole`)
+      .then(res => {
+        if (res.code === 200 && res.data.length > 0) {
+          showRoles.value = true;
+          console.log("切换角色")
+          console.log(res.data)
+          roleList.value = res.data;
+
+        } else {
+          ElMessage({
+            type: 'error',
+            message: '获取角色列表失败或列表为空'
+          });
+        }
+      }).catch(error => {
+    ElMessage({
+      type: 'error',
+      message: '获取角色列表失败'
+    });
+  });
+};
+
+const switchRole = (role) => {
+  console.log(`切换到角色: ${role.roleid}`);
+  // 切换角色的逻辑
+  loginuserFrom.value.id = role.id;
+  loginuserFrom.value.roleid = role.roleid;
+  loginuserFrom.value.rolename = role.rolename;
+  loginuserFrom.value.obsid = role.obsid;
+  loginuserFrom.value.obsdeep = role.obsdeep;
+  userlogin(loginuserFrom)
+  showRoles.value = false;
+};
+
+
+const userlogin = (loginuserFrom) => {
+  request.admin.post('/login/user', loginuserFrom.value)
+      .then(res => {
+        console.log(res)
+        if (res.code === 200) {
+          console.log("userlogin_success")
+          setprofile(res.data)
+          router.push(res.data.homeurl).then(() => {
+            window.location.reload(); // 在导航后强制刷新页面
+          });
+        } else if (res.code === 404) {
+          router.push('/login');
+        }
+
+      })
+      .catch(error => {
+
+        // 登录失败
+
+        ElMessage({
+          type: 'error',
+          message: '登录失败'
+        });
+      })
+}
+
+const setprofile = (data) => {
+  profileStore.setProfileInfo(
+      data.username
+      , data.rolename
+      , data.catelog
+      , data.homeurl
+      , data.token
+      , data.currentterm);
+  const userInfo = {
+    username: data.username,
+    rolename: data.rolename,
+    catelog: data.catelog,
+    homeurl: data.homeurl,
+    token: data.token,
+    currentterm: data.currentterm
+  };
+
+  sessionStorage.setItem('users', JSON.stringify(userInfo));
+  sessionStorage.setItem('isLoggedIn', 'true');
+  sessionStorage.setItem('token', data.token);
+}
+
+const handleVisibleChange = (visible) => {
+  if (!visible && showRoles.value) {
+    // 当下拉菜单关闭时，重置状态
+    showRoles.value = false;
+  }
+};
 
 //钩子函数用来刷新后重新获取数据
 

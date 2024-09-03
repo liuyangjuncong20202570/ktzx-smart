@@ -11,7 +11,10 @@
             </el-form-item>
 
             <el-form-item label="题库" prop="libType">
-                <el-radio-group v-model="ruleForm.libType">
+                <el-radio-group @change="(() => {
+                    ruleForm.queTypeId = ''
+                    getCourseLibTypeList()
+                })" v-model="ruleForm.libType">
                     <el-radio :label="1">课程题库</el-radio>
                     <el-radio :label="2">课堂题库</el-radio>
                 </el-radio-group>
@@ -71,9 +74,8 @@
 import { ref, defineEmits } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { teskSearch, searchToPaper } from '@/api/taskMgmt.js'
+import { teskSearch, searchToPaper, queType } from '@/api/taskMgmt.js'
 import Kwa from '@/components/kwa/index.vue'
-import { courseLibTypeList } from '@/api/courseLib.js'
 import { TOPICTYPE } from '@/utils/consts.js'
 const route = useRoute();
 
@@ -116,16 +118,18 @@ const submitForm = () => {
 
 const handleSizeChange = (val) => {
     ruleForm.value.pageSize = val
+    getTeskSearch()
     console.log(`${val} items per page`)
 }
 
 const handleCurrentChange = (val) => {
     ruleForm.value.pageIndex = val
+    getTeskSearch()
     console.log(`current page: ${val}`)
 }
 
 const getTeskSearch = () => {
-    teskSearch(ruleForm.value).then(res => {
+    teskSearch({...ruleForm.value, pagerId: route.query.id}).then(res => {
         console.log('res', res)
         if (res.code === '200') {
             const { recordSize, data } = res.data || {}
@@ -142,7 +146,8 @@ const resetForm = () => {
 }
 
 const getCourseLibTypeList = () => {
-    courseLibTypeList().then(res => {
+    const type = ruleForm.value.libType === 1 ? 'course' : 'classroom'
+    queType(type).then(res => {
         if (res.code === '200') {
             typeList.value = res?.data
         }
