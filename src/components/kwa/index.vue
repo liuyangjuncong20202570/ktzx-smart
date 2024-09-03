@@ -112,7 +112,7 @@ import {
   courseLibType,
   taskKwa,
 } from "@/api/courseLib";
-import { classroomLibKwaTree, classroomLibKwaMap } from '@/api/classroomLib.js'
+import { classroomLibKwaTree, classroomLibKwaMap, classroomLibType } from '@/api/classroomLib.js'
 const emit = defineEmits(["child-event"]);
 const props = defineProps({
   type: {
@@ -208,12 +208,16 @@ const getCourseLibKwa = () => {
 };
 // 题型
 const getCourseLibType = () => {
-  courseLibType().then((res) => {
-    if (res.code === "200") {
-      courseType.value = res.data?.filter((f) => f.status);
-    }
-  });
-};
+  if (['classroomLibSearch', 'courseLibSearch'].includes(type)) {
+    // classroomLibSearch: 课程题库，courseLibSearch: 课堂题库
+    const libTypeApi = type === 'classroomLibSearch' ? classroomLibType : courseLibType
+    libTypeApi().then((res) => {
+      if (res.code === "200") {
+        courseType.value = res.data?.filter((f) => f.status);
+      }
+    })
+  }
+}
 
 const handleChange = () => {
   console.log(form.value);

@@ -6,7 +6,7 @@
       <div class="flex-start task-name">
         <span>作业名称</span>
         <el-input v-model="taskName" style="width: 200px;"></el-input>
-        <el-button type="primary" style="margin-left: 10px;" @click="openSearch">搜索</el-button>
+        <el-button type="primary" style="margin-left: 10px;" @click="openSearch">添加题目</el-button>
       </div>
 
       <div class="flex-start task-name">
@@ -32,7 +32,8 @@
           </div>
           <div>
             <span class="flex-start">
-              <span style="font-size: 13px;">{{index+1}}、</span><el-checkbox v-model="element.checkbox" label=""></el-checkbox>
+              <el-checkbox v-model="element.checkbox" label=""></el-checkbox>
+              <span style="font-size: 13px;">{{index+1}}、</span>
               <span class="topic-title">{{ element.lib.title }}({{ TOPICTYPE[element.lib.questionTypeId] }})</span>
             </span>
             <div v-html="element.lib.content"></div>

@@ -53,8 +53,8 @@ function createAPI(url) {   // 构建不同端口的异步请求数据
     axiosData.interceptors.response.use(
         response => {
             let res = response.data;
-            // 不是200抛出错误信息、请根据各个项目返回值添加条件
-            if (res.code != '200') {
+            // 课程、课堂、问卷、实验、组卷异常提示
+            if (res?.result === false) {
                 ElMessage.error(res.message)
             }
             // console.log('res----', res)

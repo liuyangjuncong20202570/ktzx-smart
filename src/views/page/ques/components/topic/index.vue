@@ -106,11 +106,11 @@ export default defineComponent({
       itemContent: '',
     }
 
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'smooth'
-    })
+    // window.scrollTo({
+    //   top: 0,
+    //   left: 0,
+    //   behavior: 'smooth'
+    // })
 
     const resetName = () => {
       options.value.forEach((option, i) => {

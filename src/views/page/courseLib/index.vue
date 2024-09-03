@@ -31,9 +31,14 @@
       <el-collapse-item 
         v-for="(course, i) in courseList" 
         :key="course.id" 
-        :title="`${i+1}、${course.title}(${TOPICTYPE[course?.questionTypeId] ?? '预留题'})`" 
         :name="course.id"
       >
+        <template #title>
+          <span class="flex-start">
+            <el-checkbox @click.stop label="" v-model="course.isChecked"></el-checkbox>
+            {{ `${i+1}、${course.title}(${TOPICTYPE[course?.questionTypeId] ?? '预留题'})` }}
+          </span>
+        </template>
         <Topic 
           v-if="course.topicFlag"
           :item="course" 
@@ -50,10 +55,6 @@
             <span style="margin-right: 20px" v-for="(kwa, kwaIdx) in course.kwas" :key="kwaIdx">{{ kwa.kwaName }}</span>
           </div>
           <div>
-            <span class="flex-start">
-              <el-checkbox label="" v-model="course.isChecked"></el-checkbox>
-              <span class="topic-title">{{ course.title }}</span>
-            </span>
             <div v-if="['单选题', '多选题', '判断题'].includes(TOPICTYPE[course.questionTypeId])" class="topic-answer-item" v-for="(answer, answerIdx) in course.answers" :key="answerIdx">
               {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}
               <span v-if="answer.isAnswer">正确答案</span>
