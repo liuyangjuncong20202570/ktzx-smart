@@ -52,7 +52,7 @@
         </span>
       </template>
     </el-dialog>
-  </div>
+  </div>g
 </template>
 
 <script setup>
@@ -200,6 +200,7 @@ const deleteFile = async (file) => {
     });
     await request.course.get(`/coursemangt/courseresources/delete/${file.filename}`)
         .then(res => {
+          console.log("res",res)
           if (res.code === 200) {
             ElMessage.success('删除成功');
             fetchCourseList();

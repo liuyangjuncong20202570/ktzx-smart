@@ -2,6 +2,7 @@
   <div style="height: 100vh;">
     <el-container class="layout-container-demo" style="height: 100%;">
       <el-header style="position: relative; text-align:right; background-color: #0064B1; font-size: 15px; height: 8vh">
+
         <!--右侧按钮-->
         <div style="height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 0">
           <div class="left-div" style="flex-grow: 1; display: flex; align-items: center;  ">
@@ -23,15 +24,15 @@
             </el-text>
           </div>
         </div>
-
-
       </el-header>
 
       <el-container>
         <el-aside width="200px" style="height: 100%;">
+
           <!-- 使用 el-scrollbar 包裹 el-menu，设置高度为 70% -->
 
           <!--页面左侧导航栏-->
+
           <div style="height: calc(92vh - 150px);">
             <el-scrollbar>
               <el-menu :default-active="defaultActive">
@@ -57,7 +58,9 @@
         </el-aside>
 
         <el-main>
+
           <!-- 在 el-main 区域显示路由组件 -->
+
           <router-view></router-view>
         </el-main>
 
@@ -70,6 +73,7 @@
 import {ref, reactive, computed, onMounted, toRaw} from 'vue'
 import {useRoute, useRouter} from 'vue-router';
 import request from "../utils/request.js";
+
 import {ElMessage,} from 'element-plus'
 import {Menu as IconMenu, Message, Setting, Plus, Platform, Right} from '@element-plus/icons-vue'
 import type {UploadProps} from 'element-plus'
@@ -92,11 +96,14 @@ function clearLoginInfo() {
   sessionStorage.removeItem('isLoggedIn');
 }
 
+
 //登出的方法
+
 const handleLogout = () => {
   clearLoginInfo();
   router.push({name: 'Login'});
 };
+
 
 // 默认显示菜单
 // const defaultActive = ref('');
@@ -109,6 +116,7 @@ const loginInfo = reactive({
   catelog: profileStore.profilecatelog,
   currentterm: profileStore.currentterm
 });
+
 
 //0310将homeurl修改为响应式计算属性，这样下面的profileStore中的值变了这边也会自动变，解决拼接地址存在问题情况
 
@@ -138,19 +146,22 @@ const navigateTo = (url) => {
   //前面拼一个/表示绝对路径
   console.log(homeurl.value + url)
   // router.push(homeurl.value + url);
-
 };
 
 const getmenu = () => {
   request.admin.post(`/homes/studentmenu`)
       .then(res => {
+
         console.log(res)
         // 登录成功
+
         if (res.code === 200) {
           menus.value = res.data;
         }
       }).catch(error => {
+
     // 获取失败
+
     ElMessage({
       type: 'error',
       message: '获取导航失败'
@@ -158,12 +169,13 @@ const getmenu = () => {
   });
 }
 
+
 //钩子函数用来刷新后重新获取数据
+
 onMounted(() => {
   courseChineseName.value = <string>route.query.courseChineseName || '未提供课程名称';
   getmenu()
 });
-
 
 </script>
 
@@ -192,5 +204,4 @@ onMounted(() => {
   height: 100%;
   right: 20px;
 }
-
 </style>
