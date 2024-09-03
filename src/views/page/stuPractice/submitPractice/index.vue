@@ -57,7 +57,7 @@
                   <Close @click="delItemUrl(item.urlArr, urlIdx)" />
                 </el-icon>
               </div>
-              <div v-else>暂无提交实验材料</div>
+              <div v-else-if="disabled">暂无提交实验材料</div>
             </div>
             <div class="task-upload" v-if="!disabled">
               <el-upload

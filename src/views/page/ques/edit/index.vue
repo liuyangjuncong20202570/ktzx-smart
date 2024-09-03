@@ -286,6 +286,9 @@ export default defineComponent({
             status.value = res.data?.status
             courseList.value = res?.data?.topics ?? []
             id.value = res.data?.id
+            courseList.value?.forEach((item) => {
+              item.isChecked = false
+            })
           }
         })
       } else {

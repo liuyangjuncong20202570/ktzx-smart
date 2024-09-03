@@ -52,6 +52,7 @@
           <div class="topic-kwa" v-if="course.answers">
             <span style="margin-right: 20px" v-for="(kwa, kwaIdx) in course.kwas" :key="kwaIdx">{{ kwa.kwaName }}</span>
           </div>
+          <div class="flex-start" v-html="course.content"></div>
           <div>
             <div class="topic-answer-item" v-for="(answer, answerIdx) in course.answers" :key="answerIdx">
               {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}
@@ -309,8 +310,7 @@ export default defineComponent({
 
 .topic-item {
   text-align: left;
-  margin: 10px 0;
-  padding: 10px;
+  padding: 0 10px;
   border-radius: 5px;
   position: relative;
 
@@ -320,8 +320,7 @@ export default defineComponent({
 
   .topic-item-icon {
     position: absolute;
-    right: 10px;
-    bottom: 10px;
+    right: 0;
     width: 60px;
     font-size: 18px;
     color: #103ccc;

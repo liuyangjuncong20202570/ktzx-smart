@@ -76,7 +76,7 @@ const pagination = reactive({
 const tableData = reactive<StudentPracticePageVO>([]);
 
 const correct = (data:any) =>{
-  routes.push({path:'/page/correct',query:{sid:data.stuId,pid:data.practiceId}})
+  routes.push({path:'/homes/courseteacherhome/exam/experimental/correct',query:{sid:data.stuId,pid:data.practiceId}})
 }
 const loadScore = () => {
   practiceDownload(id).then(res => {
