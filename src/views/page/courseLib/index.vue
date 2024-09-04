@@ -54,14 +54,10 @@
           <div class="topic-kwa" v-if="course.answers">
             <span style="margin-right: 20px" v-for="(kwa, kwaIdx) in course.kwas" :key="kwaIdx">{{ kwa.kwaName }}</span>
           </div>
-          <div>
-            <div v-if="['单选题', '多选题', '判断题'].includes(TOPICTYPE[course.questionTypeId])" class="topic-answer-item" v-for="(answer, answerIdx) in course.answers" :key="answerIdx">
-              {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}
-              <span v-if="answer.isAnswer">正确答案</span>
-            </div>
-            <div v-else>
-              <span v-html="course.content"></span>
-            </div>
+          <div class="flex-start" v-html="course.content"></div>
+          <div v-if="['单选题', '多选题', '判断题'].includes(TOPICTYPE[course.questionTypeId])" class="topic-answer-item" v-for="(answer, answerIdx) in course.answers" :key="answerIdx">
+            {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}
+            <span v-if="answer.isAnswer">正确答案</span>
           </div>
           <div class="topic-item-icon flex-between cursor-pointer" v-if="!(privilege === 'read')">
             <template v-if="course.status === 4">
@@ -298,9 +294,7 @@ export default defineComponent({
 
 .topic-item {
   text-align: left;
-  margin: 10px 0;
-  /* box-shadow: 0px 1px 13px #a9a9a9; */
-  padding: 10px;
+  padding: 0 10px;
   border-radius: 5px;
   position: relative;
 
@@ -310,8 +304,7 @@ export default defineComponent({
 
   .topic-item-icon {
     position: absolute;
-    right: 10px;
-    bottom: 10px;
+    right: 0;
     width: 60px;
     font-size: 18px;
     color: #103ccc;

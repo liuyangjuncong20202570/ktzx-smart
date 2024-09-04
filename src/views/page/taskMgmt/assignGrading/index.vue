@@ -37,16 +37,19 @@
             </div>
           </div>
 
-          <div class="task-select flex-between" v-if="['简答题'].includes(TOPICTYPE[item.lib.questionTypeId])">
-            <el-input
-              style="width: 400px"
-              :autosize="{ minRows: 4, maxRows: 6 }"
-              type="textarea"
-              v-model="item.lib.answer"
-              disabled
-            />
+          <div class="task-select flex-between" v-else>
             <div>
-              <el-checkbox-group disabled="disabled" v-model="item.lib.check" :min="0" :max="1" @change="handleCheck($event, item)">
+              <el-input
+                v-if="['简答题'].includes(TOPICTYPE[item.lib.questionTypeId])"
+                style="width: 400px"
+                :autosize="{ minRows: 4, maxRows: 6 }"
+                type="textarea"
+                v-model="item.lib.answer"
+                disabled
+              />
+            </div>
+            <div>
+              <el-checkbox-group :disabled="disabled" v-model="item.lib.check" :min="0" :max="1" @change="handleCheck($event, item)">
                 <el-checkbox :label="1">
                   A
                 </el-checkbox>
@@ -147,7 +150,7 @@
                 newContent+=content
                 if (idx < contentItems.length-1) {
                   item.lib.selectId.push(item.id+idx)
-                  newContent += `<input id="${item.id+idx}" disabled value="${value ? value[idx] : ''}" />`
+                  newContent += `<input id="${item.id+idx}" disabled value="${value ?? value[idx]}" />`
                 }
               })
               item.lib.content = newContent
@@ -193,7 +196,7 @@
     correctSubmit({ scoreMap, testId, stuId }).then(res => {
       if (res.code === '200') {
         ElMessage.success('保存成功')
-        routes.push('/page/taskMgmt')
+        routes.push('/homes/courseteacherhome/exam/test/testmangt')
       }
     })
   }
@@ -201,7 +204,6 @@
   
   <style scoped>
   .assign-wrap {
-    height: 100%;
     border-radius: 8px;
     background: #fff;
     padding: 10px;
