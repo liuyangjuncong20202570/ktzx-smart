@@ -20,6 +20,10 @@ export const useProfileStore = defineStore('profile', () => {
         currentterm.value = term;
     }
 
+    function setToken(token) {
+        profiletoken.value = token;
+    }
+
     function initProfileStore() {
         const storedUserInfo = sessionStorage.getItem('users');
         if (storedUserInfo) {
@@ -40,5 +44,6 @@ export const useProfileStore = defineStore('profile', () => {
         profiletoken,
         currentterm,
         setProfileInfo,
+        setToken,
     }
 })

@@ -115,16 +115,6 @@ const initialize = () => {
     item.editingobsname = false;
     item.editingLevelcode = false;
     item.editingRemark = false;
-    if (item.obsname.includes('未命名节点')) {
-        if (item.obsname.length > 5) {
-          let num = '';
-          for(let i = 6; item.obsname[i] !== ')'; i++){
-            num += item.obsname[i];
-          }
-          if(nullRoleNum.value < Number(num)) nullRoleNum.value = Number(num);
-        }
-        else if (item.obsname.length === 5 && nullRoleNum.value === 0) nullRoleNum.value++;
-    }
   });
 };
 
@@ -188,7 +178,7 @@ const exportData = () => {
 const handleRoleAdd = ()=>{
   nullRoleNum.value++;
   const newCollege = ref({
-    obsname : nullRoleNum.value > 1 ? '未命名节点(' + nullRoleNum.value + ')' : '未命名节点',
+    obsname : '未命名节点',
     remark : ""}
   )
 

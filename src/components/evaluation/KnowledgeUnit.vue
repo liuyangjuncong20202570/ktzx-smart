@@ -494,4 +494,5 @@ const deleteSel = () => {
   background-color: rgb(250, 250, 250);
   /*color:royalblue*/
 }
+
 </style>

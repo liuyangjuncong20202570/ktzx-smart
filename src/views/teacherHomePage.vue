@@ -1,11 +1,11 @@
 <template>
   <div style="height: 100vh;">
     <el-container class="layout-container-demo" style="height: 100%;">
-      <el-header style="position: relative; text-align:right; background-color: #0064B1; font-size: 15px; height: 8%">
+      <el-header style="position: relative; text-align:right; background-color: #0064B1; font-size: 15px; height: 8vh">
         <!--右侧按钮-->
         <div style="height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 0">
           <div class="left-div" style="flex-grow: 1; display: flex; align-items: center;  ">
-            <img src="../assets/images/logo.png" style="height: 5.5vh;"/>
+            <img src="../assets/images/logo.png" style="height: 5.5vh;" />
             <el-text style="font-size: calc(1vw + 6px); color: white; margin-left: 10px;">自动化专业智能教学平台</el-text>
           </div>
 
@@ -14,90 +14,117 @@
           </div>
 
           <div class="right-div" style="flex-grow: 1; display: flex; align-items: center; justify-content: flex-end;">
-            <el-dropdown>
-              <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"/>
+            <el-dropdown @visible-change="handleVisibleChange">
+              <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item>查看详情</el-dropdown-item>
+                  <template v-if="!showRoles">
+                  <el-dropdown-item @click="getRolelist">切换角色</el-dropdown-item>
                   <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
+                  </template>
+                  <template v-else>
+                    <el-dropdown-item
+                        v-for="role in roleList"
+                        :key="role.roleid"
+                        @click="switchRole(role)"
+                    >
+                      {{role.rolename}}
+                    </el-dropdown-item>
+                  </template>
+
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <el-text style="font-size: calc(1vw + 3px); color: white; margin-left: 10px;">{{loginInfo.username}}</el-text>
+            <el-text style="font-size: calc(1vw + 3px); color: white; margin-left: 10px;">{{ loginInfo.username }}</el-text>
           </div>
         </div>
 
 
+
       </el-header>
-
       <el-container>
-        <el-aside width="200px">
-
-          <div
-              style="width: 100%; height: auto; padding: 10px 0; background-color: #c8c9cc; display: flex; align-items: center;">
+        <el-aside width="200px" style="height: 100%;">
+          <div style="width: 100%; height: 150px; padding: 10px 0; background-color: #c8c9cc; display: flex; align-items: center;
+                    box-sizing: border-box;">
             <!--头像-->
             <div style="width: 76px; height: 105px; margin-left: 10px; overflow: hidden;object-fit: cover;">
               <el-upload style="width: 100%; height: 100%; display: flex;" class="avatar-uploader"
                          action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" :show-file-list="false"
                          :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+
                 <!-- action属性指定了文件上传的目标服务器地址 -->
                 <!-- show-file-list属性设置为false，表示不显示已选择的文件列表 -->
                 <!-- on-success属性是一个事件回调函数，当文件上传成功时，该函数将被调用 -->
                 <!-- before-upload属性是一个事件回调函数，当文件准备上传时，该函数将被调用 -->
                 <!-- 如果imageUrl有值，则显示这个图片，否则不显示 -->
-                <img v-if="imageUrl" :src="imageUrl" class="avatar" style="width: 100%; height: 120%; object-fit: cover;"/>
+                <img v-if="imageUrl" :src="imageUrl" class="avatar"
+                     style="width: 100%; height: 120%; object-fit: cover;" />
                 <!-- 如果imageUrl没有值，则显示提示文本-->
+
                 <el-text v-else size="small" style="width:72px; color:white">点击上传头像</el-text>
               </el-upload>
             </div>
             <div style="width: 88px; margin: 0 15px 0 15px">
               <el-row :gutter="0">
-                <p style="font-size:14px;margin-left:1px;line-height:0.3;">{{loginInfo.username}}</p>
+                <p style="font-size: 14px; line-height: 15px;">{{ loginInfo.username }}</p>
               </el-row>
               <el-row :gutter="0">
-                <p style="font-size:14px;margin-left: 2px;color:cornflowerblue;line-height:0.2;">{{loginInfo.rolename}}</p>
+                <p style="font-size: 14px; margin-left: 2px; color: cornflowerblue; line-height: 0.2;">{{
+                    loginInfo.rolename
+                  }}
+                </p>
               </el-row>
-              <el-row :gutter="0" style="height:20px;margin-top: 20px">
+              <el-row :gutter="0" style="height: 20px; margin-top: 20px">
                 <el-col :span="5">
-                  <el-icon style="float:left;margin-top:2px;margin-left:1px;color:blue">
-                    <Platform/>
+                  <el-icon style="float: left; margin-top: 2px; margin-left: 1px; color: blue">
+                    <Platform />
                   </el-icon>
                 </el-col>
                 <el-col :span="7" style="">
-                  <p style="font-size:10px;line-height:0">在线</p>
+                  <p style="font-size: 10px; line-height: 0">在线</p>
                 </el-col>
                 <el-col :span="5">
-                  <el-icon style="float:left;margin-top:2px;margin-left:3px">
-                    <Right/>
+                  <el-icon style="float: left; margin-top: 2px; margin-left: 3px">
+                    <Right />
                   </el-icon>
                 </el-col>
                 <el-col :span="7" style="">
-                  <p style="font-size:10px;line-height:0">注销</p>
+                  <p style="font-size: 10px; line-height: 0">注销</p>
                 </el-col>
               </el-row>
             </div>
           </div>
+
           <!-- 使用 el-scrollbar 包裹 el-menu，设置高度为 70% -->
 
           <!--页面左侧导航栏-->
-          <el-scrollbar style="height: 70%">
-            <el-menu :default-active="defaultActive">
-              <template v-for="menu in filteredMenus">
-                <el-sub-menu v-if="hasChildren(menu)" :index="menu.id" :key="menu.id">
-                  <template #name>
+
+          <div style="height: calc(92vh - 150px);">
+            <el-scrollbar style="border-right: 1px solid #dedede;">
+              <el-menu :default-active="defaultActive">
+                <template v-for="menu in filteredMenus">
+                  <el-sub-menu v-if="hasChildren(menu)" :index="menu.id" :key="menu.id"
+
+                               style="border-top: 1px solid #efefef;  ">
+                    <!--                    @click="navigateTo(menu.url)"-->
+                    <template #title>
+                      <!--0822有更改-->
+                      <span @click="navigateTo(menu.url)">{{ menu.name }}</span>
+
+                    </template>
+                    <el-menu-item v-for="child in getChildrenMenus(menu)" :index="child.url" :key="child.id"
+                                  style="border-top: 1px solid #efefef;" @click="navigateTo(child.url)">
+                      <span>{{ child.name }}</span>
+                    </el-menu-item>
+                  </el-sub-menu>
+                  <el-menu-item v-else :index="menu.url" :key="menu.id" @click="navigateTo(menu.url)"
+                                style="border-top: 1px solid #efefef;">
                     <span>{{ menu.name }}</span>
-                  </template>
-                  <el-menu-item v-for="child in getChildrenMenus(menu.id)" :index="child.url" :key="child.id"
-                                @click="navigateTo(child.url)">
-                    <span>{{ child.name }}</span>
                   </el-menu-item>
-                </el-sub-menu>
-                <el-menu-item v-else :index="menu.url" :key="menu.id" @click="navigateTo(menu.url)">
-                  <span>{{ menu.name }}</span>
-                </el-menu-item>
-              </template>
-            </el-menu>
-          </el-scrollbar>
+                </template>
+              </el-menu>
+            </el-scrollbar>
+          </div>
         </el-aside>
 
         <el-main>
@@ -111,14 +138,13 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, reactive,computed, onMounted,toRaw } from 'vue'
-import {useRoute, useRouter} from 'vue-router';
+import { ref, reactive, computed, onMounted, toRaw } from 'vue'
+import { useRoute, useRouter } from 'vue-router';
 import request from "../utils/request.js";
-import {ElMessage,} from 'element-plus'
-import {Menu as IconMenu, Message, Setting, Plus, Platform, Right} from '@element-plus/icons-vue'
-import type {UploadProps} from 'element-plus'
-import {useProfileStore} from "../stores/profileStore.js";
-
+import { ElMessage, } from 'element-plus'
+import { Menu as IconMenu, Message, Setting, Plus, Platform, Right } from '@element-plus/icons-vue'
+import type { UploadProps } from 'element-plus'
+import { useProfileStore } from "../stores/profileStore.js";
 
 //获取Stroe
 const profileStore = useProfileStore();
@@ -128,6 +154,7 @@ const route = useRoute();
 const router = useRouter(); // 获取路由实例
 
 const imageUrl = ref('https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png')
+
 // const imageUrl = ref('')
 
 // 定义处理上传成功的函数
@@ -162,24 +189,25 @@ function clearLoginInfo() {
   sessionStorage.removeItem('isLoggedIn');
 }
 
+
 //登出的方法
 const handleLogout = () => {
   clearLoginInfo();
-  router.push({name: 'Login'}); // 假设您的登录路由的名字是 'Login'
+  router.push({ name: 'Login' }); // 假设您的登录路由的名字是 'Login'
 };
 
 // 默认显示菜单
 // const defaultActive = ref('');
-
 const menus = ref([
 ]);
 
-const loginInfo = reactive ({
-  username:profileStore.profilename,
+const loginInfo = reactive({
+  username: profileStore.profilename,
   rolename: profileStore.profilerolename,
   catelog: profileStore.profilecatelog,
   currentterm: profileStore.currentterm
 });
+
 
 //0310将homeurl修改为响应式计算属性，这样下面的profileStore中的值变了这边也会自动变，解决拼接地址存在问题情况
 
@@ -187,61 +215,173 @@ const homeurl = computed(() => profileStore.profilehomeurl);
 const excludedPids = ['0', '102'];
 
 //过滤器
-  const filteredMenus = computed(() => {
-    return menus.value
-        .filter(menu => !excludedPids.includes(menu.pid))
-        //0311加入菜单按顺序排列
-        .sort((a,b) =>a.orderno - b.orderno);
-  });
+const filteredMenus = computed(() => {
+  return menus.value
+      .filter(menu => !excludedPids.includes(menu.pid))
+      //0311加入菜单按顺序排列
+      .sort((a, b) => a.orderno - b.orderno);
+});
 
 //过滤节点是否有孩子节点
-  const hasChildren = (menu) => {
-    return menus.value.some(child => child.pid === menu.id);
-  };
+const hasChildren = (menu) => {
+  // console.log(menu);
+  if (menu.children && menu.children.length > 0) return true;
+  return false;
+  // return menus.value.some(child => child.pid === menu.id);
+};
 //获取节点的孩子节点
-  const getChildrenMenus = (parentId) => {
-    return menus.value.filter(menu => menu.pid === parentId);
-  };
+const getChildrenMenus = (menu) => {
+  return menu.children;
+};
 //路由导航
 const navigateTo = (url) => {
   //前面拼一个/表示绝对路径
+  if (!url) return
   console.log(homeurl.value + url)
   router.push(homeurl.value + url);
 
 };
 
+const roleList = ref([]);
+const showRoles = ref(false);
+const loginuserFrom = ref({
+  id: "",
+  roleid: "",
+  obsid: "",
+  obsdeep: "",
+  catelog: ""
+})
+//切换角色
+const getRolelist = () => {
+  request.admin.post(`/homes/switchrole`)
+      .then(res => {
+        if (res.code === 200 && res.data.length > 0) {
+          showRoles.value = true;
+          console.log("切换角色")
+          console.log(res.data)
+          roleList.value = res.data;
+
+        } else {
+          ElMessage({
+            type: 'error',
+            message: '获取角色列表失败或列表为空'
+          });
+        }
+      }).catch(error => {
+    ElMessage({
+      type: 'error',
+      message: '获取角色列表失败'
+    });
+  });
+};
+
+const switchRole = (role) => {
+  console.log(`切换到角色: ${role.roleid}`);
+  // 切换角色的逻辑
+  loginuserFrom.value.id = role.id;
+  loginuserFrom.value.roleid = role.roleid;
+  loginuserFrom.value.rolename = role.rolename;
+  loginuserFrom.value.obsid = role.obsid;
+  loginuserFrom.value.obsdeep = role.obsdeep;
+  userlogin(loginuserFrom)
+  showRoles.value = false;
+};
+
+
+const userlogin = (loginuserFrom) => {
+  request.admin.post('/login/user', loginuserFrom.value)
+      .then(res => {
+        console.log(res)
+        if (res.code === 200) {
+          console.log("userlogin_success")
+          setprofile(res.data)
+          router.push(res.data.homeurl).then(() => {
+            window.location.reload(); // 在导航后强制刷新页面
+          });
+        } else if (res.code === 404) {
+          router.push('/login');
+        }
+
+      })
+      .catch(error => {
+
+        // 登录失败
+
+        ElMessage({
+          type: 'error',
+          message: '登录失败'
+        });
+      })
+}
+
+const setprofile = (data) => {
+  profileStore.setProfileInfo(
+      data.username
+      , data.rolename
+      , data.catelog
+      , data.homeurl
+      , data.token
+      , data.currentterm);
+  const userInfo = {
+    username: data.username,
+    rolename: data.rolename,
+    catelog: data.catelog,
+    homeurl: data.homeurl,
+    token: data.token,
+    currentterm: data.currentterm
+  };
+
+  sessionStorage.setItem('users', JSON.stringify(userInfo));
+  sessionStorage.setItem('isLoggedIn', 'true');
+  sessionStorage.setItem('token', data.token);
+}
+
+const handleVisibleChange = (visible) => {
+  if (!visible && showRoles.value) {
+    // 当下拉菜单关闭时，重置状态
+    showRoles.value = false;
+  }
+};
+
 //钩子函数用来刷新后重新获取数据
+
 onMounted(() => {
   const defaultActive = ref('');
   const storedUserInfo = sessionStorage.getItem('users');
   if (storedUserInfo) {
     const userInfo = JSON.parse(storedUserInfo);
+
     // 更新用户信息到Pinia
+
     profileStore.setProfileInfo(userInfo.username, userInfo.rolename, userInfo.catelog, userInfo.homeurl, userInfo.token, userInfo.currentterm);
     loginInfo.username = profileStore.profilename;
     loginInfo.rolename = profileStore.profilerolename;
     loginInfo.catelog = profileStore.profilecatelog;
   } else {
+
     // 如果没有存储的用户信息，可以重定向到登录页面或显示提示信息
+
     sessionStorage.removeItem('users');
     sessionStorage.removeItem('isLoggedIn');
     sessionStorage.removeItem('token');
 
     // router.push({ name: 'Login' });
+
     // 或
     // ElMessage.error('请重新登录');
   }
   //获取完pinia中的数据后重新重定向到父页面
   // router.push(homeurl.value);
 
-// request.admin.post(`${homeurl}`,loginInfo)
+  // request.admin.post(`${homeurl}`,loginInfo)
   // console.log(1111)
-//获取菜单栏的数据
+  //获取菜单栏的数据
   request.admin.post(`/homes/teacherhome`)
       .then(res => {
         console.log(res)
         // 登录成功
-        if (res.code === 200 && res.data.length > 0)  {
+
+        if (res.code === 200 && res.data.length > 0) {
           menus.value = res.data;
         }
       }).catch(error => {
@@ -252,9 +392,6 @@ onMounted(() => {
     });
   });
 });
-
-
-
 
 </script>
 

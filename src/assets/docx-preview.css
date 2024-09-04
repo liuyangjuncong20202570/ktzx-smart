@@ -1,0 +1,34 @@
+/* docx-preview.css */
+.docx {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+.docx .p {
+    margin: 0;
+    padding: 0 0 10px 0;
+}
+
+.docx .r {
+    display: inline;
+}
+
+.docx .r .t {
+    white-space: pre-wrap;
+}
+
+.docx .b {
+    font-weight: bold;
+}
+
+.docx .i {
+    font-style: italic;
+}
+
+.docx .u {
+    text-decoration: underline;
+}
+
+.docx .strike {
+    text-decoration: line-through;
+}

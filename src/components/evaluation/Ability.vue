@@ -277,7 +277,7 @@ const openDictionary = () => {
     relatedKWA.value = [];
     dictionarySelected_backup.value = dictionarySelected.value;
     // console.log(dictionarySelected.value);
-    request.evaluation.get('/coursemangt/ability').then((res) => {
+    request.evaluation.get('/evaluation/ability').then((res) => {
         if (res.code === 200) {
             dictionaryData.value = res.data;
             // console.log(dictionaryData.value);

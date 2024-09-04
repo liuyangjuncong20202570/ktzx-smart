@@ -9,19 +9,18 @@
 		</el-header>
 
 		<el-main style="padding: 0;">
-			<div style="height: 25px; display: flex; justify-content: space-between; flex: auto; text-align: center;
-				background-color: whitesmoke;">
-				<div style="width: 390px; color: gray">名称</div>
-				<div style="width: 59vw;">
+			<div style="height: 25px; display: flex; justify-content: space-between; flex: auto; color: gray;
+				background-color: whitesmoke; min-width: 1236px;">
+				<div style="min-width: 385px;">名称</div>
+				<div style="min-width: 850px; width: 58vw;">
 					<div style="display: flex; flex: auto; justify-content: space-between;">
-						<div style="width: 200px; border-right: 1px solid #bbbbbb; border-left: 1px solid #bbbbbb;
-							color: gray">层级码</div>
-            <!--						<div style="width: calc(59vw - 200px); color: gray;">备注</div>-->
+						<div style="width: 200px; border-right: 1px solid #bbbbbb; border-left: 1px solid #bbbbbb;">层级码</div>
+						<div style="min-width: 700px; width: 100%;">备注</div>
 					</div>
 				</div>
 			</div>
 
-			<div class="tree-container" style="height: calc(100% - 25px); overflow: auto;">
+			<div class="tree-container" style="height: calc(100% - 25px); overflow: auto; min-width: 1236px;">
 				<el-tree :data="treeData" draggable :props="defaultProps" node-key="id" :expand-on-click-node="true"
 					ref="nodeExpand" @node-click="handleNodeClick" :default-expanded-keys="expandedKeys"
 					:default-expand-all="expandAll" @node-drag-start="handleDragStart" @node-drag-end="handleDragEnd"
@@ -40,8 +39,8 @@
 									@click="confirmDeleteNodes(node.data)">删除</el-button>
 								<template #reference>
 									<!-- 这里用一个临时量来存新节点，否则直接绑定node.data.obsname输入框会出问题 -->
-                  <el-input ref="nodeInput" v-if="node.data.inputVisible" v-model="node.data.tempData"
-                            @blur="handleBlur(node.data)" placeholder="请输入节点名称" @contextmenu.stop
+									<el-input ref="nodeInput" v-if="node.data.inputVisible" v-model="node.data.tempData"
+										@blur="handleBlur(node.data)" placeholder="请输入节点名称" @contextmenu.stop
 										draggable="false" style="height:25px; width: 200px;"></el-input>
 									<div style="width: auto;">
 										<el-icon v-if="node.data.children" color="orange">
@@ -55,14 +54,15 @@
 								</template>
 							</el-popover>
 
-							<div style="width: 59vw;">
+							<div style="min-width: 850px; width: 58vw;">
 								<div style="display: flex; flex: auto; justify-content: space-between;">
 									<div style="width: 200px;">
 										{{ node.data.levelcode }}
 									</div>
-                  <!--									<div class="overflow-text" v-bind:title="node.data.remark">-->
-                  <!--										{{ node.data.remark }}-->
-                  <!--									</div>-->
+									<div style="min-width: 700px; width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+										v-bind:title="node.data.remark">
+										<!-- {{ node.data.remark }} -->
+									</div>
 								</div>
 							</div>
 						</div>
@@ -79,7 +79,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type Node from 'element-plus/es/components/tree/src/model/node'
 import type { DragEvents } from 'element-plus/es/components/tree/src/model/useDragNode'
 import type { NodeDropType, } from 'element-plus/es/components/tree/src/tree.type'
-import {ref, reactive, onMounted, nextTick, onBeforeUnmount, toRaw} from 'vue'
+import { ref, reactive, onMounted, nextTick, onBeforeUnmount, toRaw } from 'vue'
 import request from '../../utils/request'
 import { exportTreeToCSV } from "../../utils/exportTreeToCSV";
 import { expandKeys } from 'element-plus/es/components/table-v2/src/common'
@@ -103,7 +103,7 @@ const changeTreeExpand = () => {
 	let allNodes = nodeExpand.value.store._getAllNodes();
 	for (let i = 0; i < length; i++) {
 		allNodes[i].expanded = expandAll.value;
-		if(expandAll.value) expandedKeys.value.push(allNodes[i].key);
+		if (expandAll.value) expandedKeys.value.push(allNodes[i].key);
 	}
 	// console.log(expandedKeys.value);
 }
@@ -124,7 +124,7 @@ const getTreeData = () => {
 			nullNodeNum.value = 0;
 			initialize(treeData.value);
 			// console.log("getTreeData 被触发");
-      console.log(treeData.value)
+			console.log(treeData.value)
 		}
 	}).catch(() => {
 		ElMessage({
@@ -140,18 +140,6 @@ const initialize = (nodes) => {
 		node.popVisible = false;
 		node.inputVisible = false;
 		node.tempData = '';
-
-		if (node.obsname.includes('未命名节点')) {
-			if (node.obsname.length > 5) {
-				let num = '';
-				for (let i = 6; node.obsname[i] !== ')'; i++) {
-					num += node.obsname[i];
-				}
-				if (nullNodeNum.value < Number(num)) nullNodeNum.value = Number(num);
-				
-			}
-			else if (node.obsname.length === 5 && nullNodeNum.value === 0) nullNodeNum.value++;
-		}
 
 		if (node.children && node.children.length > 0) {
 			initialize(node.children); // 递归子节点
@@ -197,7 +185,7 @@ const confirmDeleteNodes = (deletedNode) => {
 
 const deleteNodes = (deletedNode) => {
 	let idlist = [];
-	if(deletedNode.children && deletedNode.children.length > 0){
+	if (deletedNode.children && deletedNode.children.length > 0) {
 		idlist = findChildNodes(deletedNode.children, [deletedNode.id]);
 	}
 	else idlist.push(deletedNode.id);
@@ -213,10 +201,10 @@ const deleteNodes = (deletedNode) => {
 				getTreeData();
 
 				idlist.forEach((id) => {	// 删除被删除节点的默认展开数据
-                    let index = -1;
-                    index = expandedKeys.value.indexOf(id);
-                    if(index > -1) expandedKeys.value.splice(index, 1);
-                })
+					let index = -1;
+					index = expandedKeys.value.indexOf(id);
+					if (index > -1) expandedKeys.value.splice(index, 1);
+				})
 				console.log(expandedKeys.value);
 			}
 		}).catch(error => {
@@ -228,13 +216,13 @@ const deleteNodes = (deletedNode) => {
 };
 
 const findChildNodes = (nodes, array = []) => {  // 查找某一节点的所有子节点id
-    nodes.forEach((item) => {
-        array.push(item.id);
-        if(item.children && item.children.length > 0){
-            array = findChildNodes(item.children, array);
-        }
-    })
-    return array;
+	nodes.forEach((item) => {
+		array.push(item.id);
+		if (item.children && item.children.length > 0) {
+			array = findChildNodes(item.children, array);
+		}
+	})
+	return array;
 };
 /********************************************************/
 /**********************导出功能****************************/
@@ -293,7 +281,7 @@ const addSiblingNode = async (addedNode) => {
 		obsdeep: addedNode.obsdeep.toString(), //点击的obs的obsdeep
 		type: "1", // type为1为同级新增，type为0为下级新增
 		smObs: { // 新增的数据
-			obsname: nullNodeNum.value > 1 ? '未命名节点(' + nullNodeNum.value + ')' : '未命名节点',
+			obsname: '未命名节点',
 			remark: ""
 		}
 	};
@@ -324,7 +312,7 @@ const addChildNode = (addedNode) => {
 			obsdeep: addedNode.obsdeep.toString(),//点击的obs的obsdeep
 			type: "2",//type为1为同级新增，type为0为下级新增
 			smObs: {//新增的数据
-				obsname: nullNodeNum.value > 1 ? '未命名节点(' + nullNodeNum.value + ')' : '未命名节点',
+				obsname: '未命名节点',
 				remark: ""
 			}
 		}
@@ -487,51 +475,51 @@ onBeforeUnmount(() => {
 /***********************************************/
 const nodeInput = ref(null);
 const editNode = (node) => {
-  node.tempData = node.obsname;
-  node.inputVisible = true;
-  node.popVisible = false;
-  nextTick(() => {
-    if (nodeInput.value && nodeInput.value.$refs.input) {
-      const inputElement = nodeInput.value.$refs.input;
-      inputElement.focus();
-      const len = inputElement.value.length;
-      inputElement.setSelectionRange(len, len);
-    }
-  });
+	node.tempData = node.obsname;
+	node.inputVisible = true;
+	node.popVisible = false;
+	nextTick(() => {
+		if (nodeInput.value && nodeInput.value.$refs.input) {
+			const inputElement = nodeInput.value.$refs.input;
+			inputElement.focus();
+			const len = inputElement.value.length;
+			inputElement.setSelectionRange(len, len);
+		}
+	});
 };
 
 const handleBlur = (node) => {
-  nextTick(() => {
-    node.popVisible = false;
-    if (node.tempData !== node.obsname) {
-      const editdata = ref({
-        id: node.id,
-        obsname: node.tempData,
-        remark: ''
-      })
-      request.admin.post('/sysmangt/units/update', editdata.value)
-          .then(res => {
-            if (res.code === 200) {
-              ElMessage({
-                type: 'success',
-                message: `修改教学单位名称成功`
-              })
-              getTreeData();
-            }
-          }).catch(error => {
-        ElMessage({
-          type: 'error',
-          message: '修改教学单位名称失败'
-        });
-      });
-    } else {
-      ElMessage({
-        type: 'info',
-        message: '无修改字段'
-      });
-    }
-    node.inputVisible = false;
-  });
+	nextTick(() => {
+		node.popVisible = false;
+		if (node.tempData !== node.obsname) {
+			const editdata = ref({
+				id: node.id,
+				obsname: node.tempData,
+				remark: ''
+			})
+			request.admin.post('/sysmangt/units/update', editdata.value)
+				.then(res => {
+					if (res.code === 200) {
+						ElMessage({
+							type: 'success',
+							message: `修改教学单位名称成功`
+						})
+						getTreeData();
+					}
+				}).catch(error => {
+					ElMessage({
+						type: 'error',
+						message: '修改教学单位名称失败'
+					});
+				});
+		} else {
+			ElMessage({
+				type: 'info',
+				message: '无修改字段'
+			});
+		}
+		node.inputVisible = false;
+	});
 };
 
 
@@ -543,26 +531,21 @@ onMounted(() => {
 })
 </script>
 <style scoped>
-
-.overflow-text {
-    width: calc(59vw - 200px);
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
 /* 去掉滚动条 */
-.tree-container::-webkit-scrollbar {	/* 针对Chrome, Safari, Edge, 和 Opera */
+.tree-container::-webkit-scrollbar {
+	/* 针对Chrome, Safari, Edge, 和 Opera */
 	display: none;
 }
 
-.element {		/* 针对Firefox */
-  /* scrollbar-width: none; */
+.element {
+	/* 针对Firefox */
+	/* scrollbar-width: none; */
 }
 
-.element {		/* 针对IE和Edge旧版本 */
-  /* -ms-overflow-style: none; */
+.element {
+	/* 针对IE和Edge旧版本 */
+	/* -ms-overflow-style: none; */
 }
+
 /*************/
-
 </style>

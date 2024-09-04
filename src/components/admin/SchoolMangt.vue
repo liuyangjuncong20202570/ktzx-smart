@@ -73,55 +73,7 @@ import _ from 'lodash';
 import { nextTick, onMounted, ref } from 'vue';
 import request from '../../utils/request';
 
-const form = ref({
-    id: '',
-    obsname: '北方工业大学',
-    remark: '大专',
-    stLevelList: [
-        {
-            id: '',
-            levelname: '学校',
-            obsdeep: 0,
-            teacher: '0',
-            student: '0'
-        },
-        {
-            id: '',
-            levelname: '学院',
-            obsdeep: 0,
-            teacher: '0',
-            student: '0'
-        },
-        {
-            id: '',
-            levelname: '系',
-            obsdeep: 0,
-            teacher: '0',
-            student: '0'
-        },
-        {
-            id: '',
-            levelname: '专业',
-            obsdeep: 0,
-            teacher: '0',
-            student: '0'
-        },
-        {
-            id: '',
-            levelname: '班级',
-            obsdeep: 0,
-            teacher: '0',
-            student: '0'
-        },
-        {
-            id: '',
-            levelname: '小组',
-            obsdeep: 0,
-            teacher: '0',
-            student: '0'
-        },
-    ]
-});
+const form = ref({});
 
 const form_backup = ref({});
 

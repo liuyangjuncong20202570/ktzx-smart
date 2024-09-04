@@ -24,7 +24,6 @@
                 </el-radio-group>
               </div>
               <el-form :model="loginForm" :rules="rules" ref="ruleFormRef" size="large">
-
                 <el-form-item prop="loginname">
                   <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="loginForm.loginname"
                             :rules="rules.loginname">
@@ -36,7 +35,9 @@
                 </el-form-item>
                 <el-form-item>
                   <el-button type="primary" style="width: 100%;" @click="login">登录</el-button>
+
                   <!-- 弹窗登录-->
+
                   <el-dialog :modelValue="showRoleModal" :show-close="false" :close-on-click-modal="false"
                              title="选择角色" width="30%" style="border-radius:10px">
                     <el-radio-group v-model="selectedRoleId">
@@ -49,7 +50,6 @@
                       <el-button type="primary" @click="confirmRole">确认</el-button>
                     </template>
                   </el-dialog>
-
                 </el-form-item>
               </el-form>
             </el-tab-pane>
@@ -57,6 +57,7 @@
             <!--老师账号登录-->
             <el-tab-pane label="教师登录" name="2">
               <!--选择登录方式-->
+
               <div style="height: auto">
                 <el-radio-group v-model="loginForm.loginway" style="display: flex; justify-content: space-around;">
                   <el-radio label="1" style="margin: 0">用户名密码登录</el-radio>
@@ -75,7 +76,6 @@
                 </el-form-item>
                 <el-form-item>
                   <el-button type="primary" style="width: 100%;" @click="login">登录</el-button>
-
                   <!-- 弹窗登录-->
                   <el-dialog :modelValue="showRoleModal" :show-close="false" :close-on-click-modal="false"
                              title="选择角色" width="30%" style="border-radius:10px">
@@ -117,7 +117,6 @@ const loginForm = reactive({
   catelog: "1",
   loginway: "1",
 })
-
 const loginuserFrom = ref({
   id: "",
   roleid: "",
@@ -125,7 +124,6 @@ const loginuserFrom = ref({
   obsdeep: "",
   catelog: ""
 })
-
 
 //学生登录/老师登录（true为学生登录）
 const StudentOrTeacher = ref(true);
@@ -143,19 +141,17 @@ const handleClick = (tab, event) => {
       StudentOrTeacher.value = true;
       iAgree.style.display = "none";
     } else if (loginForm.catelog === "1") {// 学生登录
+
       StudentOrTeacher.value = false;
       iAgree.style.display = "block";
     }
   }
 }
 
-
 const roledata = reactive({});
-
 const selectedRoleId = ref(null);
 //默认选择第一个角色序号
 // const selectedRoleId = ref(data.simpleRoleList[0].roleid);
-
 
 const rules = reactive({
   loginname: [
@@ -167,7 +163,6 @@ const rules = reactive({
     {min: 3, max: 15, message: '密码长度在3到15个字符之间', trigger: 'blur'},
   ],
 })
-
 //登录
 const login = () => {
   // 验证表单输入
@@ -184,28 +179,41 @@ const login = () => {
               loginuserFrom.value.id = res.data.userid;
               loginuserFrom.value.catelog = res.data.catelog;
 
-              if (rolesCount === 1) {
-                loginuserFrom.value.roleid = res.data.simpleRoleList[0].roleid;
-                loginuserFrom.value.obsid = res.data.simpleRoleList[0].obsid;
-                loginuserFrom.value.obsdeep = res.data.simpleRoleList[0].obsdeep;
-                userlogin()
+              const logincatelog = res.data.catelog;
+
+              console.log("logincatelog", logincatelog)
+              if (logincatelog === '1') {
+                console.log(res.data)
+                setprofile(res.data);
+                router.push(res.data.homeurl);
+
               } else {
-                Object.assign(roledata, res.data);
-                console.log(roledata)
-                //打开弹窗选择角色
-                showRoleModal.value = true;
+                if (rolesCount === 1) {
+                  loginuserFrom.value.roleid = res.data.simpleRoleList[0].roleid;
+                  loginuserFrom.value.obsid = res.data.simpleRoleList[0].obsid;
+                  loginuserFrom.value.obsdeep = res.data.simpleRoleList[0].obsdeep;
+                  userlogin()
+                } else {
+                  Object.assign(roledata, res.data);
+                  //打开弹窗选择角色
+                  showRoleModal.value = true;
+                }
               }
             }
 
           }).catch(error => {
-            // 登录失败
+
+        // 登录失败
+
         ElMessage({
           type: 'error',
           message: '登录失败'
         });
       });
     } else {
+
       // 输入无效
+
       ElMessage({
         type: 'error',
         message: '用户名或密码错误'
@@ -215,7 +223,9 @@ const login = () => {
 };
 
 
-//登录验证跳转
+
+//弹窗选择角色信息
+
 const confirmRole = () => {
   const selectedRole = roledata.simpleRoleList.find(role => role.roleid === selectedRoleId.value);
   if (selectedRole) {
@@ -227,10 +237,6 @@ const confirmRole = () => {
   showRoleModal.value = false;
 
 };
-onMounted(() => {
-  sessionStorage.removeItem('users');
-})
-
 //二次请求
 const userlogin = () => {
   console.log("userlogin")
@@ -239,34 +245,21 @@ const userlogin = () => {
         console.log(res)
         if (res.code === 200) {
           console.log("userlogin_success")
-          profileStore.setProfileInfo(
-              res.data.username
-              , res.data.rolename
-              , res.data.catelog
-              , res.data.homeurl
-              , res.data.token
-              , res.data.currentterm);
-          const userInfo = {
-            username: res.data.username,
-            rolename: res.data.rolename,
-            catelog: res.data.catelog,
-            homeurl: res.data.homeurl,
-            token: res.data.token,
-            currentterm: res.data.currentterm
-          };
+          setprofile(res.data)
 
-          sessionStorage.setItem('users', JSON.stringify(userInfo));
-          sessionStorage.setItem('isLoggedIn', 'true');
-          sessionStorage.setItem('token', res.data.token);
-          console.log(res.data.homeurl)
-          router.push(res.data.homeurl);
+          router.push(res.data.homeurl).then(() => {
+            window.location.reload(); // 在导航后强制刷新页面
+          });
+
         } else if (res.code === 404) {
           router.push('/login');
         }
 
       })
       .catch(error => {
+
         // 登录失败
+
         ElMessage({
           type: 'error',
           message: '登录失败'
@@ -275,6 +268,33 @@ const userlogin = () => {
 }
 
 
+//存入本地 sessionStorage
+
+const setprofile = (data) => {
+  profileStore.setProfileInfo(
+      data.username
+      , data.rolename
+      , data.catelog
+      , data.homeurl
+      , data.token
+      , data.currentterm);
+  const userInfo = {
+    username: data.username,
+    rolename: data.rolename,
+    catelog: data.catelog,
+    homeurl: data.homeurl,
+    token: data.token,
+    currentterm: data.currentterm
+  };
+
+  sessionStorage.setItem('users', JSON.stringify(userInfo));
+  sessionStorage.setItem('isLoggedIn', 'true');
+  sessionStorage.setItem('token', data.token);
+}
+
+onMounted(() => {
+  sessionStorage.removeItem('users');
+})
 
 
 </script>
@@ -291,13 +311,13 @@ const userlogin = () => {
 }
 
 .background-image {
+
   /* 设置背景图片 */
   background-image: url('../assets/images/login.jpg');
   /* 其他的背景样式，例如背景重复、位置等 */
+
   background-repeat: no-repeat;
   background-size: cover;
   width: 95vw;
 }
-
-
 </style>

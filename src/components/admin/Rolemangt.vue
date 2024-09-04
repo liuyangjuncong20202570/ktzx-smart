@@ -66,7 +66,7 @@
 	</el-container>
 </template>
 <script setup>
-import {reactive, ref, computed, onMounted, nextTick,toRaw} from "vue";
+import {ref, computed, onMounted, nextTick,toRaw} from "vue";
 import request from "../../utils/request.js";
 import { ElMessage, ElMessageBox } from 'element-plus';
 import isEqual from 'lodash/isEqual.js'
@@ -107,17 +107,6 @@ const initialize = () => {
     item.editingHomeName = false;
     item.editingHomeUrl = false;
     item.editingRemark = false;
-    
-    if (item.rolename.includes('未命名角色')) {
-      if (item.rolename.length > 5) {
-          let num = '';
-          for(let i = 6; item.rolwname[i] !== ')'; i++){
-              num += item.rolename[i];
-          }
-          if(nullRoleNum.value < Number(num)) nullRoleNum.value = Number(num);
-      }
-      else if (item.rolename.length === 5 && nullRoleNum.value === 0) nullRoleNum.value++;
-    }
   });
 };
 
@@ -128,7 +117,7 @@ const handleRoleAdd = () => {
   nullRoleNum.value++;
   const tempRoleinfo = ref({
     rolecode:"99",
-    rolename:nullRoleNum.value > 1 ? '未命名角色(' + nullRoleNum.value + ')' : '未命名角色',
+    rolename: '未命名角色',
     remark:"",
     homename:"",
     homeurl:""
@@ -187,10 +176,12 @@ const handleClick = (row, field) => {
     row[field] = true;
     setTimeout(() => {
       const inputRef = `input-${row.id}`;
+
       // 假设 inputsRefs.value[inputRef] 是对 el-input 组件的引用
       const inputComponent = inputsRefs.value[inputRef];
 
       // 检查 inputComponent 并尝试获取其内部的 input 元素
+
       if (inputComponent && inputComponent.$refs.input) {
         const nativeInputElement = inputComponent.$refs.input;
         nativeInputElement.focus();

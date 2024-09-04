@@ -1,6 +1,6 @@
-import {defineConfig} from "vite";
-import vue from "@vitejs/plugin-vue";
-import legacy from '@vitejs/plugin-legacy'
+import {defineConfig} from 'vite';
+import vue from '@vitejs/plugin-vue';
+import legacy from '@vitejs/plugin-legacy';
 
 export default defineConfig({
   plugins: [
@@ -10,11 +10,55 @@ export default defineConfig({
       additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
     }),
   ],
-  server:{
-    port:8081
+  server: {
+    port: 8081,
+      proxy: {
+          '/api': {
+              target: 'http://60.205.178.180:8080',
+              changeOrigin: true,
+              rewrite: (path) => path.replace(/^\//, '')
+          },
+          '/page': {
+              target: 'http://60.205.178.180:8084',
+              changeOrigin: true,
+              rewrite: (path) => path.replace(/^\//, '')
+          },
+          '/fork': {
+              target: 'http://60.205.178.180:8084',
+              changeOrigin: true,
+              rewrite: (path) => path.replace(/^\//, '')
+          },
+          '/common': {
+              target: 'http://60.205.178.180:8084',
+              changeOrigin: true,
+              rewrite: (path) => path.replace(/^\//, '')
+          },
+          '/term': {
+              target: 'http://60.205.178.180:8084',
+              changeOrigin: true,
+              rewrite: (path) => path.replace(/^\//, '')
+          },
+      }
   },
-  base: './',
+  base: '/',
+  resolve: {
+    alias: {
+      '@': '/src'
+    }
+  },
   build: {
-    sourcemap: true  // 开启生产环境的 source maps
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('pdfjs-dist')) {
+            return 'pdfjs-dist';
+          }
+        }
+      }
+    }
+  },
+  optimizeDeps: {
+    include: ['pdfjs-dist']
   }
-})
+});

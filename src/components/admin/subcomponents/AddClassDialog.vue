@@ -7,26 +7,34 @@
         <!-- 对话框头部区域 -->
         <el-header style="height: auto; padding: 2px 0px; width:100%; display: flex; align-items: center;">
         </el-header>
-        <el-main style="padding-left:0">
+        <el-main>
           <el-form ref="formRef" :model="newform"  :rules="rules" label-width="100px">
-            <el-form-item label="选择专业" prop="username">
+            <el-form-item label="选择专业" prop="id">
 <!--              <el-input v-model=""></el-input>-->
               <el-select-v2
                   v-model="newform.id"
                   :options="options"
                   placeholder="选择专业"
-                  size="large"
-                  style="width: 240px"
               />
             </el-form-item>
             <el-form-item label="班级名称" prop="classname">
-              <el-input v-model="newform.classname" ></el-input>
+              <el-input v-model="newform.classname" placeholder="请输入班级名"></el-input>
             </el-form-item>
+            <!--            <el-form-item label="年级" prop="grade">-->
+            <!--              <el-input  v-model="newform.grade"></el-input>-->
+            <!--            </el-form-item>-->
             <el-form-item label="年级" prop="grade">
-              <el-input  v-model="newform.grade"></el-input>
+              <el-select v-model="newform.grade" placeholder="请选择年级">
+                <el-option
+                    v-for="year in recentYears"
+                    :key="year"
+                    :label="year"
+                    :value="year">
+                </el-option>
+              </el-select>
             </el-form-item>
             <el-form-item label="备注" prop="remark">
-              <el-input v-model="newform.remark"></el-input>
+              <el-input v-model="newform.remark" placeholder="请输入备注"></el-input>
             </el-form-item>
             <el-form-item>
               <el-button type="info" large style="width: 40%" @click="closeDialog">取消</el-button>
@@ -40,7 +48,7 @@
 </template>
 
 <script setup>
-import {ref, reactive, defineExpose, watch, nextTick, onMounted, getCurrentInstance} from 'vue';
+import {ref, reactive, defineExpose, computed, watch, nextTick, onMounted, getCurrentInstance} from 'vue';
 
 import {ElMessage} from "element-plus";
 import {Document, Folder} from "@element-plus/icons-vue";
@@ -54,6 +62,11 @@ const newform = reactive({
   classname: '',
   grade: '',
   remark: ''
+});
+
+const recentYears = computed(() => {
+  const currentYear = new Date().getFullYear();
+  return [currentYear - 2, currentYear - 1, currentYear, currentYear + 1, currentYear + 2];
 });
 
 const rules = reactive({
