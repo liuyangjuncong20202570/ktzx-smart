@@ -316,7 +316,6 @@ router.beforeEach((to, from, next) => {
 
     // 检查目标路由是否需要认证（假设需要认证的路由有一个'meta'字段）
     const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-
     if (requiresAuth && !storedUserInfo) {
         // 如果目标路由需要认证，但没有存储的用户信息，则重定向到登录页面
         next({ name: 'Login' });

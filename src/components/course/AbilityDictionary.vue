@@ -155,6 +155,7 @@ const getTreeData = () => {
 
 onMounted(() => {
     // initialize(treeData.value);
+  console.log("开始开始")
     getTreeData();
     document.addEventListener('click', closePopNode);
 });
