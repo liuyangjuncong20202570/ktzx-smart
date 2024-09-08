@@ -6,7 +6,7 @@
 -->
 <template>
   <el-card class="experimental-practiceInfo-wrap">
-    <Header :title="`${isDetail ? '编辑' : '新建'}实验`" />
+    <Header :title="`${isDetail ? '编辑' : '新建'}实验`" :pathData="pathData" />
     <div class="practice-tool">
       <el-form :model="practiceForm" label-width="auto" :inline="true" :rules="rules" ref="practiceFormRef">
         <el-form-item label="实验名称" prop="name">
@@ -116,7 +116,7 @@ import Upload from "@/components/upload/index.vue";
 import { VideoPlayer } from '@videojs-player/vue'
 import Header from '@/views/page/components/header/index.vue'
 import 'video.js/dist/video-js.css'
-import { ElMessage, FormInstance, FormRules } from "element-plus";
+import { ElMessage, FormInstance, FormRules, ElMessageBox } from "element-plus";
 import { useRouter } from 'vue-router'
 const routes = useRouter()
 const { currentRoute } = routes
@@ -170,6 +170,16 @@ const playerOptions = ref({
     fullscreenToggle: true // 全屏按钮
   }
 })
+const pathData = [
+  {
+    name: '实验管理',
+    path: '/homes/courseteacherhome/exam/experimental/labmangt'
+  },
+  {
+    name: isDetail.value ? '编辑实验' : '新建实验',
+    path: ''
+  }
+]
 let selectRowKeyData = reactive<PracticeTemplateVO>({});
 let uploadRowData = reactive<PracticeTemplateVO>({});
 const tableData = reactive<PracticeTemplateVO>([]);
@@ -288,61 +298,71 @@ const openKwa = (data: PracticeTemplateVO) => {
   isOpenDialog.value = true;
 };
 const saveData = async (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  await formEl.validate( async (valid, fields) => {
-    if (valid) {
-      let arr:ParamVO[] = []
-      let kwaArr:KwaParamVO[] = []
-      let defaultParam:DefaultParamVO = {
-        name:practiceForm.name,
-        templateCode:tableData[0].templateCode,
-        totalScore:practiceForm.totalScore,
-        items:[]
-      }
-      if (isDetail.value) {
-        defaultParam.id = route.query.id;
-      }
-      tableData.forEach((_item: any) => {
-        kwaArr.length = 0
-        if (_item.kwaId) {
-          kwaArr = [{
-            itemId: _item.id,
-            kwaId: _item.kwaId,
-            kwaName: _item.kwaName,
-          }]
-        }
-        if (_item.kwas&&_item.kwas.length>0&&isDetail.value) {
-          kwaArr[0].id = _item.kwas[0].id
-          kwaArr[0].practiceId = _item.kwas[0].practiceId
-        }
-        console.info(888)
-        console.info(kwaArr)
-        arr.push({
-          beDefault: _item.beDefault,
-          beValid: _item.beValid?1:0,
-          defaultPath: _item.defaultPath,
-          id: _item.id,
-          itemName: _item.itemName,
-          weight: _item.weight,
-          stuVisible: _item.stuVisible?1:0,
-          kwas: [...kwaArr],
-        });
-      });
-      defaultParam.items = arr
-      let resData:ResVO = {}
-      if (isDetail.value) { //编辑调用更新接口
-        resData =  await practiceUpdate(defaultParam)
-      }else { //新增调用save接口
-        resData = await savePractice(defaultParam)
-      }
-      if (resData.code==200) {
-        ElMessage.success('保存成功！');
-        routes.push('/homes/courseteacherhome/exam/experimental/labmangt')
-      }
-    } else {
-      console.log('error submit!', fields)
+  ElMessageBox.confirm(
+    '确定保存吗?',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     }
-  })
+  ).then(async() => {
+    if (!formEl) return
+    await formEl.validate( async (valid, fields) => {
+      if (valid) {
+        let arr:ParamVO[] = []
+        let kwaArr:KwaParamVO[] = []
+        let defaultParam:DefaultParamVO = {
+          name:practiceForm.name,
+          templateCode:tableData[0].templateCode,
+          totalScore:practiceForm.totalScore,
+          items:[]
+        }
+        if (isDetail.value) {
+          defaultParam.id = route.query.id;
+        }
+        tableData.forEach((_item: any) => {
+          kwaArr.length = 0
+          if (_item.kwaId) {
+            kwaArr = [{
+              itemId: _item.id,
+              kwaId: _item.kwaId,
+              kwaName: _item.kwaName,
+            }]
+          }
+          if (_item.kwas&&_item.kwas.length>0&&isDetail.value) {
+            kwaArr[0].id = _item.kwas[0].id
+            kwaArr[0].practiceId = _item.kwas[0].practiceId
+          }
+          console.info(888)
+          console.info(kwaArr)
+          arr.push({
+            beDefault: _item.beDefault,
+            beValid: _item.beValid?1:0,
+            defaultPath: _item.defaultPath,
+            id: _item.id,
+            itemName: _item.itemName,
+            weight: _item.weight,
+            stuVisible: _item.stuVisible?1:0,
+            kwas: [...kwaArr],
+          });
+        });
+        defaultParam.items = arr
+        let resData:ResVO = {}
+        if (isDetail.value) { //编辑调用更新接口
+          resData =  await practiceUpdate(defaultParam)
+        }else { //新增调用save接口
+          resData = await savePractice(defaultParam)
+        }
+        if (resData.code==200) {
+          ElMessage.success('保存成功！');
+          routes.push('/homes/courseteacherhome/exam/experimental/labmangt')
+        }
+      } else {
+        console.log('error submit!', fields)
+      }
+    })
+  }).catch(() => { })
 };
 // 新增加载默认模版
 const getTemplateList = async () => {

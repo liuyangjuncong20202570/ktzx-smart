@@ -1,6 +1,6 @@
 <template>
     <div class="task-list">
-      <Header title="我的作业" />
+      <Header title="我的作业" :pathData="pathData" />
       <div class="flex-start task-title">
         <span>已布置作业：{{ summaryMsg?.publishTimes ?? '0' }}次</span>
         <span>已完成作业：{{ summaryMsg?.finishedTimes ?? '0' }}次</span>
@@ -76,6 +76,12 @@
     pageIndex: 1,
     pageSize: 20
   })
+  const pathData = [
+    {
+      name: '我的作业',
+      path: ''
+    }
+  ]
   onMounted(() => {
     getJobList()
     getAnswerSummary()

@@ -1,13 +1,13 @@
 <template>
   <div class="test-list-wrap">
-    <Header title="问卷列表" />
+    <Header title="问卷列表" :pathData="pathData" />
 
     <header class="flex-end" style="margin: 10px 0;">
 
       <div>
-        <el-button @click="del(null, '确定批量删除？')" type="danger">批量删除</el-button>
+        <el-button @click="del(null, '确定批量删除？')" :icon="Delete" type="danger">批量删除</el-button>
         <!-- <el-button @click="download">下载所有成绩</el-button> -->
-        <el-button @click="addTask" type="primary">新建问卷</el-button>
+        <el-button @click="addTask" :icon="Plus" type="primary">新建问卷</el-button>
       </div>
     </header>
 
@@ -74,6 +74,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
+import { Delete, Plus } from '@element-plus/icons-vue'
 import { queFormPager, queFormDel, queFormWR, quePublish } from '@/api/ques.js'
 import Header from '@/views/page/components/header/index.vue'
 import NoAccessPermission from '@/views/page/components/noAccessPermission/index.vue'
@@ -88,6 +89,13 @@ const params = ref({
   pageSize: 20,
 })
 const privilege = ref('')
+
+const pathData = [
+  {
+    name: '问卷列表',
+    path: ''
+  }
+]
 
 onMounted(() => {
   getWR()

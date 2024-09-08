@@ -20,6 +20,7 @@
         style="width: 100%;margin-bottom: 10px;"
         :rows="4"
         type="textarea"
+        maxlength="3000"
       />
 
       <div 

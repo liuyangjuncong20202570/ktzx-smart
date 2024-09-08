@@ -1,15 +1,15 @@
 <template>
   <!-- 作业批改页面 -->
     <div class="assign-wrap">
-      <Header :title="disabled ? '作业查看' : '作业批改'" /> 
+      <Header :title="disabled ? '作业查看' : '作业批改'" :pathData="pathData" /> 
       <div class="flex-between assign-title">
         <div class="flex-start">
           <span>总分：</span>
           <el-input disabled v-model="total" style="width: 60px;"></el-input>
         </div>
         <div v-if="!disabled">
-          <el-button @click="auto">自动批改</el-button>
-          <el-button @click="save">保存</el-button>
+          <el-button type="primary" @click="auto">自动批改</el-button>
+          <el-button type="primary" @click="save">保存</el-button>
         </div>
       </div>
       <div class="assign-content">
@@ -41,6 +41,7 @@
                 type="textarea"
                 v-model="item.lib.answer"
                 disabled
+                maxlength="3000"
               />
             </div>
             <div>
@@ -75,7 +76,7 @@
   import { correctDetail, correctAuto, correctSubmit } from '@/api/taskMgmt.js'
   import Header from '@/views/page/components/header/index.vue'
   import { TOPICTYPE } from '@/utils/consts.js'
-  import { ElMessage } from 'element-plus'
+  import { ElMessage, ElMessageBox } from 'element-plus'
   const routes = useRouter()
   const { currentRoute } = routes
   const route = currentRoute.value
@@ -85,6 +86,25 @@
   const autoObj = ref({})
   const total = ref(0)
   const disabled = type === 'view' ? true : false
+
+  const pathData = [
+    {
+      name: '作业管理',
+      path: '/homes/courseteacherhome/exam/test/testmangt'
+    },
+    {
+      name: '作业学生列表',
+      path: '/homes/courseteacherhome/exam/test/taskList',
+      query: {
+        id:  route.query.id,
+        privilege:  route.query.privilege,
+      }
+    },
+    {
+      name: disabled ? '作业预览' : '作业批改',
+      path: ''
+    },
+  ]
 
   const taskList = ref([])
   onMounted(() => {
@@ -186,17 +206,27 @@
   }
   // 提交
   const save = () => {
-    const scoreMap = {}
-    taskList.value.map((item) => {
-      scoreMap[item.lib.id] = Number(item.lib.value) ?? 0
-    })
-
-    correctSubmit({ scoreMap, testId, stuId }).then(res => {
-      if (res.code === '200') {
-        ElMessage.success('保存成功')
-        routes.push('/homes/courseteacherhome/exam/test/testmangt')
+    ElMessageBox.confirm(
+      '确定保存吗?',
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       }
-    })
+    ).then(() => {
+      const scoreMap = {}
+      taskList.value.map((item) => {
+        scoreMap[item.lib.id] = Number(item.lib.value) ?? 0
+      })
+
+      correctSubmit({ scoreMap, testId, stuId }).then(res => {
+        if (res.code === '200') {
+          ElMessage.success('保存成功')
+          routes.push('/homes/courseteacherhome/exam/test/testmangt')
+        }
+      })
+    }).catch(() => { })
   }
   </script>
   

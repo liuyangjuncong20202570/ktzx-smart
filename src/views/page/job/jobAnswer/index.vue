@@ -2,7 +2,7 @@
 <template>
     <!-- 预览 -->
     <div class="task-view">
-      <Header title="作业答题" />
+      <Header title="作业答题" :pathData="pathData" />
       <div class="task-title flex-between">
         <div class="flex-start task-msg">
           <span>当前作业: {{ taskDetail.name }}</span>
@@ -14,8 +14,8 @@
           <p v-if="scoreObj.fullMarks">总分：{{ scoreObj.fullMarks }}</p>
         </div>
         <div v-if="taskDetail && taskDetail?.items?.length && !disabled">
-          <el-button @click="save">保存</el-button>
-          <el-button @click="submit">交卷</el-button>
+          <el-button type="primary" @click="save">保存</el-button>
+          <el-button type="primary" @click="submit">交卷</el-button>
         </div>
       </div>
       <div v-if="!taskDetail?.items?.length" class="flex-center">暂无数据</div>
@@ -28,7 +28,7 @@
   <script setup>
   import { onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import { ElMessage } from 'element-plus'
+  import { ElMessage, ElMessageBox } from 'element-plus'
   import Header from '@/views/page/components/header/index.vue'
   import TaskItem from '@/views/page/components/taskItem/index.vue'
   import { answerDetail, answerSave, answerSubmit } from '@/api/job.js'
@@ -44,6 +44,16 @@
     total: 0,
     fullMarks: 0,
   })
+  const pathData = [
+    {
+      name: '我的作业',
+      path: '/homes/studenthome/exam/myhomework'
+    },
+    {
+      name: type === 'edit' ? '作业答题' : '作业预览',
+      path: ''
+    }
+  ]
   onMounted(() => {
     answerDetail(id).then(res => {
       if (res.code === '200' && res.data) {
@@ -117,28 +127,48 @@
     return itemMap
   }
   const save = () => {
-    const params = {
-      itemMap: itemMaps(),
-      testId: id
-    }
-    console.log(params)
-    answerSave(params).then(res => {
-      if (res.code === '200') {
-        ElMessage.success('保存成功')
+    ElMessageBox.confirm(
+      '确定保存吗?',
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       }
-    })
+    ).then(() => {
+      const params = {
+        itemMap: itemMaps(),
+        testId: id
+      }
+      console.log(params)
+      answerSave(params).then(res => {
+        if (res.code === '200') {
+          ElMessage.success('保存成功')
+        }
+      })
+    }).catch(() => { })
   }
   const submit = () => {
-    const params = {
-      itemMap: itemMaps(),
-      testId: id
-    }
-    answerSubmit(params).then(res => {
-      if (res.code === '200') {
-        ElMessage.success('提交成功')
-        routes.push('/homes/studenthome/exam/myhomework')
+    ElMessageBox.confirm(
+      '确定提交吗?',
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       }
-    })
+    ).then(() => {
+      const params = {
+        itemMap: itemMaps(),
+        testId: id
+      }
+      answerSubmit(params).then(res => {
+        if (res.code === '200') {
+          ElMessage.success('提交成功')
+          routes.push('/homes/studenthome/exam/myhomework')
+        }
+      })
+    }).catch(() => { })
   }
   </script>
   <style scoped>

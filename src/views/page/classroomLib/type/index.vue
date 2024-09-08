@@ -1,6 +1,6 @@
 <template>
   <div class="course-type">
-    <Header title="题库管理" />
+    <Header title="题库设定" :pathData="pathData" />
     <div style="margin-top: 20px" class="flex-end">
       <el-button type="primary" @click="save()" v-if="!(privilege === 'read')">保存</el-button>
     </div>
@@ -18,7 +18,7 @@
 
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-import { ElTable, ElMessage } from 'element-plus'
+import { ElTable, ElMessage, ElMessageBox  } from 'element-plus'
 import { classroomLibTypeList, classroomLibTypeSetStatus, classroomLibWR } from '@/api/classroomLib.js'
 import Header from '../../components/header/index.vue'
 import NoAccessPermission from '@/views/page/components/noAccessPermission/index.vue'
@@ -31,6 +31,13 @@ const multipleTableRef = ref()
 const multipleSelection = ref([])
 const typeList = ref([])
 const privilege = ref('')
+
+const pathData = [
+  {
+    name: '题库设定',
+    path: ''
+  }
+]
 
 const getWR = () => {
   classroomLibWR().then(res => {
@@ -69,22 +76,32 @@ const getClassroomLibTypeList = () => {
 }
 
 const save = () => {
-  const selectionRows = multipleTableRef.value?.getSelectionRows()
-  const queTypeIds = selectionRows.map((item) => item.queTypeId)
-  const params = typeList.value.map((item) => {
-    const { queTypeId } = item
-    const flag = queTypeIds.indexOf(item.queTypeId) !== -1
-    return {
-      queTypeId,
-      status: flag ? 1 : 0
+  ElMessageBox.confirm(
+    '确定保存吗?',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     }
-  })
-  classroomLibTypeSetStatus(params).then(res => {
-    if (res.code === '200') {
-      ElMessage.success('设置成功')
-      getClassroomLibTypeList()
-    }
-  })
+  ).then(() => {
+    const selectionRows = multipleTableRef.value?.getSelectionRows()
+    const queTypeIds = selectionRows.map((item) => item.queTypeId)
+    const params = typeList.value.map((item) => {
+      const { queTypeId } = item
+      const flag = queTypeIds.indexOf(item.queTypeId) !== -1
+      return {
+        queTypeId,
+        status: flag ? 1 : 0
+      }
+    })
+    classroomLibTypeSetStatus(params).then(res => {
+      if (res.code === '200') {
+        ElMessage.success('设置成功')
+        getClassroomLibTypeList()
+      }
+    })
+  }).catch(() => { })
 }
 </script>
 <style scoped>

@@ -53,7 +53,7 @@
                     </el-table-column>
                     <!-- <el-table-column label="难度" property="Address" /> -->
                     <el-table-column label="课程" property="courseName" />
-                    <el-table-column label="课堂" property="className" />
+                    <el-table-column label="课堂" property="classroomName" />
                 </el-table>
 
                 <div class="pagination flex-end">
@@ -65,9 +65,9 @@
             <el-tab-pane>
                 <template #label>
                     已选
-                    <span style="color: red;">({{ multipleSelection.length }})</span>
+                    <span style="color: red;">({{ selectedTableData.length }})</span>
                 </template>
-                <el-table :data="multipleSelection" style="width: 100%">
+                <el-table :data="selectedTableData" style="width: 100%">
                     <!-- <el-table-column type="selection" /> -->
                     <el-table-column property="libNo" label="题号" width="120" />
                     <el-table-column property="title" label="题目概要" /> 
@@ -105,7 +105,7 @@
 <script setup>
 import { ref, defineEmits, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { teskSearch, searchToPaper, queType } from '@/api/taskMgmt.js'
 import Kwa from '@/components/kwa/index.vue'
 import { TOPICTYPE } from '@/utils/consts.js'
@@ -124,6 +124,7 @@ const kwaRef = ref(null)
 const tableData = ref([])
 const total = ref(0)
 const multipleSelection = ref([])
+const selectedTableData = ref([])
 const multipleTableRef = ref(null)
 
 const init = () => {
@@ -131,17 +132,48 @@ const init = () => {
     getCourseLibTypeList()
     nextTick(() => {
         resetForm()
+        multipleTableRef.value?.clearSelection()
+        selectedTableData.value = []
+        tableData.value = []
     })
 }
 
 const handleDelete = (index, row) => {
-    multipleSelection.value.splice(index, 1)
-    multipleTableRef.value.toggleRowSelection(row, undefined)
+    ElMessageBox.confirm(
+        '确定删除吗?',
+        '提示',
+    {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+    }
+    ).then(() => {
+        selectedTableData.value.splice(index, 1)
+        const idx = multipleSelection.value.findIndex((item) => item.id === row.id)
+        if (idx != -1) {
+            const selectItem = multipleSelection.value[idx]
+            multipleSelection.value.splice(idx, 1)
+            nextTick(() => {
+                multipleTableRef.value.toggleRowSelection(selectItem, undefined)
+            })
+        }
+        ElMessage({
+            type: 'success',
+            message: '删除成功',
+        })
+    }).catch(() => { })
 }
 
 const handleSelectionChange = (val) => {
   console.log('val', val)
   multipleSelection.value = val
+  // 已选
+  const selectIds = selectedTableData.value.map((item) => item.id)
+  multipleSelection.value.forEach((item) => {
+    if (selectIds.indexOf(item.id) === -1) {
+        selectedTableData.value.push({ ...item })
+    }
+  })
 }
 
 const kwaEvent = (val) => {
@@ -197,7 +229,7 @@ const getCourseLibTypeList = () => {
 
 const save = () => {
     const data = {
-        libIds: multipleSelection?.value.map((item) => item.id),
+        libIds: selectedTableData?.value.map((item) => item.id),
         pagerId: route.query.id
     }
     searchToPaper(data).then(res => {

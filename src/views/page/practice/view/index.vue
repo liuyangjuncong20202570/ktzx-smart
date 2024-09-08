@@ -1,8 +1,9 @@
 <!-- 作业答题 -->
 <template>
+
     <!-- 预览 -->
     <div class="task-view">
-      <Header title="查看实验" />
+      <Header title="查看实验" :pathData="pathData" />
       <div class="task-title flex-between">
         <div class="flex-start task-msg">
           <span>当前实验: {{ practiceDetail.name }}</span>
@@ -44,13 +45,39 @@
                 />
                 <div class="file-msg flex-center" v-else>
                   <div>
-                    <div class="file-name">{{ getFileExtensionFromUrl(url) }}</div>
-                    <el-button v-if="getFileExtensionFromUrl(url) === 'pdf'" @click="lock(host + '/static/' + item.defaultPath)">查看</el-button>
+                    <div class="file-name">格式：{{ getFileExtensionFromUrl(url) }}</div>
+                    <el-button v-if="getFileExtensionFromUrl(url) === 'pdf'" @click="lock(url || host + '/static/' + item.defaultPath)">查看</el-button>
                     <el-button v-else @click="download((host + '/static/' + item.defaultPath), item.itemName)">下载</el-button>
                   </div>
                 </div>
               </div>
               <div v-else class="flex-center" style="width: 100%;">暂无提交实验材料</div>
+            </div>
+            <div class="item-right">
+              <el-checkbox-group v-model="item.check" disabled :min="0" @change="handleCheck($event, item)">
+                <el-checkbox :label="1">
+                  A
+                </el-checkbox>
+                <el-checkbox :label="0.8">
+                  B
+                </el-checkbox>
+                <el-checkbox :label="0.6">
+                  C
+                </el-checkbox>
+                <el-checkbox :label="0.4">
+                  D
+                </el-checkbox>
+              </el-checkbox-group>
+              <div class="flex-between" style="margin: 10px 0 15px 0;">
+                <el-button type="text" style="margin-right: 8px;">总分:</el-button>
+                <el-input style="width: 60px;" disabled v-model="item.score"></el-input>
+                <el-button type="text" style="margin-right: 8px;">得分:</el-button>
+                <el-input style="width: 60px;" disabled v-model="item.goal"></el-input>
+              </div>
+              <div class="flex-center" style="margin-bottom: 10px;" v-for="(v, idx) in taskData" :key="idx">
+                <el-button type="text" style="margin-right: 8px;">{{ v.name }}</el-button>
+                <el-input-number disabled @change="handleScore($event, item)" v-model="item[v.value]" :min="0" :max="item.score" />
+              </div>
             </div>
           </div>
         </template>
@@ -73,6 +100,44 @@
   const teacherTask = ref([])
   const practiceDetail = ref({})
 
+  const pathData = [
+    {
+      name: '实验管理',
+      path: '/homes/courseteacherhome/exam/experimental/labmangt'
+    },
+    {
+      name: '实验学生列表',
+      path: '/homes/courseteacherhome/exam/experimental/student',
+      query: {
+        id: route.query.id,
+        privilege: route.query.privilege,
+      }
+    },
+    {
+      name: '实验查看',
+      path: ''
+    },
+  ]
+
+  const taskData = [
+    {
+      name: '报告格式:',
+      value: 'format'
+    },
+    {
+      name: '报告字数:',
+      value: 'num'
+    },
+    {
+      name: '结构合理:',
+      value: 'structure'
+    },
+    {
+      name: '内容充实:',
+      value: 'content'
+    }
+  ]
+
   onMounted(() => {
     getStuDetail()
   })
@@ -91,6 +156,7 @@
         practiceDetail.value = res?.data
         teacherTask.value = res?.data?.items?.filter((item) => item.beDefault === 1)
         const answerMap = res?.data?.stu?.answerMap
+        const correctMap = res?.data?.stu?.correctMap
         if (answerMap) {
           // 内容回显
           practiceDetail.value?.items?.forEach((item) => {
@@ -99,6 +165,16 @@
                 return host + '/static/' + url
               })
             }
+          })
+        }
+
+        if (correctMap) {
+          practiceDetail.value?.items?.forEach((item, i) => {
+            item.goal = 0
+            taskData.forEach((f,idx) => {
+              item[f.value] = correctMap[item.id][idx]
+              item.goal+=correctMap[item.id][idx]
+            })
           })
         }
       }
@@ -111,12 +187,8 @@
   ) => {
     if (response?.code === '200') {
       const updateUrl = host + '/static/' + response.data
-      // item.itemPicture = imgUrl
-      // imageUrl.value = imgUrl
       item.urlArr = item.urlArr ?? []
       item.urlArr.push(updateUrl)
-      console.log('item-url-arr', item)
-      console.log('handleAvatarSuccess', response, uploadFile)
     }
   }
   </script>
@@ -187,5 +259,8 @@
   .task-upload-url {
     width: 100%;
     min-height: 178px;
+  }
+  .item-right {
+    width: 220px;
   }
   </style>

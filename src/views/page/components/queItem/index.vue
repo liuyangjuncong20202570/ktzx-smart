@@ -25,12 +25,19 @@
           <img v-if="item.itemPicture" :src="item.itemPicture" />
         </el-checkbox>
       </el-checkbox-group>
-      <el-input v-if="!row?.selectId?.length" v-model="row.other" :disabled="row?.selectId?.length || disabled" style="width: 500px;margin-top: 10px;" placeholder="其他 请输入"
-        show-word-limit type="textarea" />
+      <el-input 
+        v-if="!row?.selectId?.length" 
+        v-model="row.other" 
+        :disabled="row?.selectId?.length || disabled" 
+        style="width: 500px;margin-top: 10px;" 
+        placeholder="其他 请输入"
+        show-word-limit type="textarea"
+        maxlength="3000"
+      />
     </div>
 
     <div class="task-select flex-between" v-if="['简答题'].includes(TOPICTYPE[row.typeId])">
-      <el-input v-model="row.selectId" :disabled="disabled" maxlength="30" style="width: 500px" placeholder="请填写答案"
+      <el-input v-model="row.selectId" :disabled="disabled" maxlength="3000" style="width: 500px" placeholder="请填写答案"
         show-word-limit type="textarea" />
     </div>
 

@@ -34,7 +34,7 @@
             <el-input
                 v-model="lib.selectId"
                 :disabled="disabled"
-                maxlength="30"
+                maxlength="3000"
                 style="width: 100%"
                 placeholder="请填写答案"    
                 show-word-limit
@@ -47,7 +47,7 @@
             <el-input
                 v-model="lib.selectId"
                 :disabled="disabled"
-                maxlength="30"
+                maxlength="3000"
                 style="width: 100%"
                 placeholder="请填写答案"    
                 show-word-limit

@@ -1,8 +1,8 @@
 <template>
   <div class="course-type">
-    <Header title="题库管理" />
+    <Header title="题库设定" :pathData="pathData" />
     <div style="margin-top: 20px" class="flex-end" v-if="!(privilege === 'read')">
-      <el-button type="primary" @click="save()">保存</el-button>
+      <el-button type="primary" @click="save">保存</el-button>
     </div>
     <el-table ref="multipleTableRef" :data="typeList" style="width: 100%;" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" />
@@ -18,7 +18,7 @@
 
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-import { ElTable, ElMessage } from 'element-plus'
+import { ElTable, ElMessage, ElMessageBox  } from 'element-plus'
 import { courseLibTypeList, courseLibTypeSetStatus, courseLibWR } from '@/api/courseLib.js'
 import Header from '../../components/header/index.vue'
 import NoAccessPermission from '@/views/page/components/noAccessPermission/index.vue'
@@ -31,6 +31,13 @@ const multipleTableRef = ref()
 const multipleSelection = ref([])
 const typeList = ref([])
 const privilege = ref('')
+
+const pathData = [
+  {
+    name: '题库设定',
+    path: ''
+  }
+]
 
 const getCourseLibWR = () => {
   courseLibWR().then(res => {
@@ -68,22 +75,32 @@ const getCourseLibTypeList = () => {
 }
 
 const save = () => {
-  const selectionRows = multipleTableRef.value?.getSelectionRows()
-  const queTypeIds = selectionRows.map((item) => item.queTypeId)
-  const params = typeList.value.map((item) => {
-    const { queTypeId } = item
-    const flag = queTypeIds.indexOf(item.queTypeId) !== -1
-    return {
-      queTypeId,
-      status: flag ? 1 : 0
+  ElMessageBox.confirm(
+    '确定保存吗?',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     }
-  })
-  courseLibTypeSetStatus(params).then(res => {
-    if (res.code === '200') {
-      ElMessage.success('设置成功')
-      getCourseLibTypeList()
-    }
-  })
+  ).then(() => {
+    const selectionRows = multipleTableRef.value?.getSelectionRows()
+    const queTypeIds = selectionRows.map((item) => item.queTypeId)
+    const params = typeList.value.map((item) => {
+      const { queTypeId } = item
+      const flag = queTypeIds.indexOf(item.queTypeId) !== -1
+      return {
+        queTypeId,
+        status: flag ? 1 : 0
+      }
+    })
+    courseLibTypeSetStatus(params).then(res => {
+      if (res.code === '200') {
+        ElMessage.success('设置成功')
+        getCourseLibTypeList()
+      }
+    })
+  }).catch(() => { })
 }
 </script>
 <style scoped>

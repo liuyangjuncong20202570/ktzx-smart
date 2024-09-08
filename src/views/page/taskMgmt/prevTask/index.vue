@@ -1,6 +1,6 @@
 <template>
   <div class="test-list-wrap">
-    <Header title="往届作业" />
+    <Header title="往届作业" :pathData="pathData" />
 
     <header class="flex-between" style="margin: 10px 0;">
       <div class="flex-start">
@@ -19,7 +19,6 @@
         <template #default="scope">
           <el-button type="text" size="small" @click="(() => {
             router.push({
-
               path: '/homes/courseteacherhome/exam/test/taskMgmt/view',
               query: {
                 id: scope.row.id
@@ -48,7 +47,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElTable, ElMessage } from 'element-plus'
+import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
 import { getTermAll, taskCopy, prevPager } from '@/api/taskMgmt.js'
 import Header from '@/views/page/components/header/index.vue'
 
@@ -64,18 +63,35 @@ const params = ref({
   termId: ''
 })
 
+const pathData = [
+  {
+    name: '往届作业',
+    path: ''
+  }
+]
+
 onMounted(() => {
   _getTermAll()
 })
 
 const copy = (id) => {
-  taskCopy(id).then(res => {
-    if (res.code === '200') {
-      ElMessage.success('复制成功')
-      params.pageIndex = 1
-      getTaskList()
+  ElMessageBox.confirm(
+    '确定复制吗?',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     }
-  })
+  ).then(() => {
+    taskCopy(id).then(res => {
+      if (res.code === '200') {
+        ElMessage.success('复制成功')
+        params.pageIndex = 1
+        getTaskList()
+      }
+    })
+  }).catch(() => { })
 }
 
 const _getTermAll = () => {

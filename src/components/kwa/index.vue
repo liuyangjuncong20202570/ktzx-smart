@@ -92,7 +92,7 @@
       </el-form-item>
 
       <el-form-item label="能力">
-        <el-checkbox-group :max="1" v-model="form.abilityIds" @change="handleChange">
+        <el-checkbox-group v-model="form.abilityIds" @change="handleChange">
           <el-checkbox
             v-for="(value, key, i) in kwaMap?.abilityMap"
             :label="key"
@@ -135,6 +135,7 @@ const abilityList = ref([]);
 
 const init = () => {
   form.value = {};
+  emit("kwa-event", form.value);
 };
 
 const getCourseLibKwa = () => {

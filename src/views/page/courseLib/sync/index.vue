@@ -1,6 +1,6 @@
 <template>
   <div class="course-lib-sync">
-    <Header title="题库同步" />
+    <Header :pathData="pathData" title="题库同步" />
     <el-table ref="tableRef" row-key="date" :data="tableData" style="width: 100%">
       <el-table-column type="index" width="50" />
       <el-table-column prop="address" label="题型">
@@ -36,7 +36,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { ElTable, ElMessage } from 'element-plus'
+import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
 import { courseLibSyncPager, syncAccept, syncReject, courseLibWR } from '@/api/courseLib.js'
 import Header from '../../components/header/index.vue'
 import NoAccessPermission from '@/views/page/components/noAccessPermission/index.vue'
@@ -55,6 +55,13 @@ const tableRef = ref()
 const total = ref(0)
 const tableData = ref([])
 const privilege = ref('')
+
+const pathData = [
+  {
+    name: '题库同步',
+    path: ''
+  }
+]
 
 const getCourseLibWR = () => {
   courseLibWR().then(res => {
@@ -84,21 +91,41 @@ const getCourseLibSyncPager = () => {
 }
 
 const reception = (id) => {
-  syncAccept([id]).then(res => {
-    if (res.code === '200') {
-      getCourseLibSyncPager()
-      ElMessage.success('接收成功')
+  ElMessageBox.confirm(
+    '确定接收吗?',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     }
-  })
+  ).then(() => {
+    syncAccept([id]).then(res => {
+      if (res.code === '200') {
+        getCourseLibSyncPager()
+        ElMessage.success('接收成功')
+      }
+    })
+  }).catch(() => { })
 }
 
 const refuse = (id) => {
-  syncReject([id]).then(res => {
-    if (res.code === '200') {
-      getCourseLibSyncPager()
-      ElMessage.success('拒绝成功')
+  ElMessageBox.confirm(
+    '确定拒绝吗?',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     }
-  })
+  ).then(() => {
+    syncReject([id]).then(res => {
+      if (res.code === '200') {
+        getCourseLibSyncPager()
+        ElMessage.success('拒绝成功')
+      }
+    })
+  }).catch(() => { })
 }
 </script>
 <style>

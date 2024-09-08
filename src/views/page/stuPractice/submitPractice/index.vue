@@ -2,14 +2,14 @@
 <template>
     <!-- 预览 -->
     <div class="task-view">
-      <Header :title="disabled ? '查看实验' : '提交实验'" />
+      <Header :title="disabled ? '查看实验' : '提交实验'" :pathData="pathData" />
       <div class="task-title flex-between">
         <div class="flex-start task-msg">
           <span>当前实验: {{ practiceDetail.name }}</span>
         </div>
         <div v-if="practiceDetail && practiceDetail?.items?.length && !disabled">
-          <el-button @click="submit('save')">保存</el-button>
-          <el-button @click="submit('submit')">提交</el-button>
+          <el-button type="primary" @click="submit('save')">保存</el-button>
+          <el-button type="primary" @click="submit('submit')">提交</el-button>
         </div>
       </div>
       <div v-if="!practiceDetail?.items?.length" class="flex-center">暂无数据</div>
@@ -31,9 +31,9 @@
 
         <template v-if="item.beDefault === 0 && item.beValid">
           <div class="item-title" style="flex-wrap: wrap;">{{ item.itemName }}</div>
-          <div class="flex-start">
-            <div class="task-upload-url flex-start">
-              <div v-if="item.urlArr && item.urlArr.length" class="url-wrap" v-for="(url, urlIdx) in item.urlArr" :key="url">
+          <div class="flex-start" style="min-height: 178px;">
+            <div class="task-upload-url flex-start" v-if="item.urlArr && item.urlArr.length">
+              <div class="url-wrap" v-for="(url, urlIdx) in item.urlArr" :key="url">
                 <!-- isImageURL -->
                 <el-image
                   v-if="isImageURL(url)"
@@ -48,17 +48,17 @@
                 />
                 <div class="file-msg flex-center" v-else>
                   <div>
-                    <div class="file-name">{{ getFileExtensionFromUrl(url) }}</div>
-                    <el-button v-if="getFileExtensionFromUrl(url) === 'pdf'" @click="lock(host + '/static/' + item.defaultPath)">查看</el-button>
-                    <el-button v-else @click="download((host + '/static/' + item.defaultPath), item.itemName)">下载</el-button>
+                    <div class="file-name">格式：{{ getFileExtensionFromUrl(url) }}</div>
+                    <el-button v-if="getFileExtensionFromUrl(url) === 'pdf'" @click="lock(url || host + '/static/' + item.defaultPath)">查看</el-button>
+                    <el-button v-else @click="download((url || (host + '/static/' + item.defaultPath)), item.itemName)">下载</el-button>
                   </div>
                 </div>
                 <el-icon class="file-close cursor-pointer" v-if="!disabled">
                   <Close @click="delItemUrl(item.urlArr, urlIdx)" />
                 </el-icon>
               </div>
-              <div v-else-if="disabled">暂无提交实验材料</div>
             </div>
+            <div class="task-no-data" v-else-if="disabled">暂无提交实验材料</div>
             <div class="task-upload" v-if="!disabled">
               <el-upload
                 :action="action"
@@ -80,7 +80,7 @@
   import { onMounted, ref } from 'vue'
   import { Plus, Close } from '@element-plus/icons-vue'
   import { useRouter } from 'vue-router'
-  import { ElMessage } from 'element-plus'
+  import { ElMessage, ElMessageBox } from 'element-plus'
   import Header from '@/views/page/components/header/index.vue'
   import { stuDetail, practiceSave, practiceSubmit } from '@/api/stuPractice.js'
   import { host } from '@/api/host.js'
@@ -94,6 +94,18 @@
   const action = ref(host + '/common/upload')
   const data = ref({})
   const teacherTask = ref([])
+
+  const pathData = [
+    {
+      name: '我的实验',
+      path: '/homes/studenthome/exam/myexperiment'
+    },
+    {
+      name: type === 'view' ? '查看实验' : '编辑实验',
+      path: ''
+    }
+  ]
+
   data.value = {
     tag: 'test'
   }
@@ -105,31 +117,41 @@
   })
 
   const submit = (name) => {
-    const answerMap = {}
-    practiceDetail.value?.items?.forEach((item) => {
-      let _urlArr = []
-      // 截取学生提交的资料url，提交到后台
-      if (item.beDefault === 0 && item.urlArr && item.urlArr.length > 0) {
-        _urlArr = item.urlArr.map((m) => {
-          const value = m?.split('/static/')[1]
-          if (value) return value
-        })
+    ElMessageBox.confirm(
+      `确定${name === 'save' ? '保存' : '提交'}吗？`,
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       }
-      answerMap[item.id] = (item.beDefault === 0 ? _urlArr : [item.defaultPath]) ?? []
-    })
-    const params = {
-      practiceId,
-      answerMap
-    }
-    const api = name === 'save' ? practiceSave : practiceSubmit
-    api(params).then(res => {
-      if (res.code === '200') {
-        ElMessage.success(name === 'save' ? '保存成功' : '提交成功')
-        if (name === 'submit') {
-          routes.push('/homes/studenthome/exam/myexperiment')
+    ).then(() => {
+      const answerMap = {}
+      practiceDetail.value?.items?.forEach((item) => {
+        let _urlArr = []
+        // 截取学生提交的资料url，提交到后台
+        if (item.beDefault === 0 && item.urlArr && item.urlArr.length > 0) {
+          _urlArr = item.urlArr.map((m) => {
+            const value = m?.split('/static/')[1]
+            if (value) return value
+          })
         }
+        answerMap[item.id] = (item.beDefault === 0 ? _urlArr : [item.defaultPath]) ?? []
+      })
+      const params = {
+        practiceId,
+        answerMap
       }
-    })
+      const api = name === 'save' ? practiceSave : practiceSubmit
+      api(params).then(res => {
+        if (res.code === '200') {
+          ElMessage.success(name === 'save' ? '保存成功' : '提交成功')
+          if (name === 'submit') {
+            routes.push('/homes/studenthome/exam/myexperiment')
+          }
+        }
+      })
+    }).catch(() => { })
   }
 
   const delItemUrl = (urlArr, idx) => {
@@ -223,6 +245,8 @@
     padding: 10px 0;
   }
   .item-title {
+    font-size: 13px;
+    font-weight: bold;
     margin-bottom: 10px;
     border-bottom: 1px solid rgba(116, 116, 116, 0.543);
   }
@@ -266,5 +290,9 @@
   }
   .task-upload-url {
     min-height: 178px;
+  }
+  .task-no-data {
+    width: 100%;
+    text-align: center;
   }
   </style>

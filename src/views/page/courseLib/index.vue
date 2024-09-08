@@ -1,6 +1,6 @@
 <template>
   <div class="cpirse-lib">
-    <Header title="题库管理" />
+    <Header title="课程题库" :pathData="pathData" />
 
     <Kwa type="courseLibSearch" @kwa-event="handleKwaEvent" />
 
@@ -8,9 +8,9 @@
       <el-checkbox label="全选" @change="handleSelectAll"></el-checkbox>
       <div>
         <template v-if="!(privilege === 'read')">
-          <el-button type="primary" @click="add">新增题目</el-button>
-          <el-button type="danger" @click="batchDel">批量删除</el-button>
-          <el-button type="primary">批量导入</el-button>
+          <el-button type="primary" :icon="Plus" @click="add">新增题目</el-button>
+          <el-button type="danger" :icon="Delete" @click="batchDel">批量删除</el-button>
+          <el-button type="primary" :icon="Upload">批量导入</el-button>
         </template>
       </div>
     </div>
@@ -35,7 +35,7 @@
       >
         <template #title>
           <div class="flex-start" style="flex-wrap: wrap; height: 50px;width: 100%;text-align: left;">
-            <el-checkbox @click.stop label="" v-model="course.isChecked"></el-checkbox>
+            <el-checkbox style="transform: translateY(12px);" @click.stop label="" v-model="course.isChecked"></el-checkbox>
             <div style="width: calc(100% - 30px);">
               <div class="topic-kwa wdd-ellipsis" v-if="course.answers">
                 <span style="margin-right: 20px" v-for="(kwa, kwaIdx) in course.kwas" :key="kwaIdx">{{ kwa.kwaName }}</span>
@@ -57,12 +57,24 @@
             course.topicFlag = false
           }" 
         />
+        
         <div class="topic-item">
           <div class="flex-start" v-html="course.content"></div>
           <div v-if="['单选题', '多选题', '判断题'].includes(TOPICTYPE[course.questionTypeId])" class="topic-answer-item" v-for="(answer, answerIdx) in course.answers" :key="answerIdx">
             {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}
             <span v-if="answer.isAnswer">正确答案</span>
           </div>
+          
+          <el-input
+            v-if="['编程题', '简答题'].includes(TOPICTYPE[course.questionTypeId]) && course.answer"
+            placeholder="请输入建议答案"
+            v-model="course.answer"
+            disabled
+            style="width: 100%;margin-bottom: 10px;"
+            :rows="4"
+            type="textarea"
+            maxlength="3000"
+          />
           <div class="topic-item-icon flex-between cursor-pointer" v-if="!(privilege === 'read')">
             <template v-if="course.status === 4">
               <!-- 锁定状态 -->
@@ -101,7 +113,7 @@
 
 <script>
 import { defineComponent, ref, onMounted } from 'vue'
-import { Edit, DocumentCopy, Delete, Lock } from '@element-plus/icons-vue'
+import { Edit, DocumentCopy, Delete, Lock, Upload, Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import Kwa from '@/components/kwa/index.vue'
 import Header from '../components/header/index.vue'
@@ -121,7 +133,9 @@ export default defineComponent({
     Edit,
     DocumentCopy,
     Delete,
-    NoAccessPermission
+    NoAccessPermission,
+    Upload,
+    Plus
   },
   setup() {
     onMounted(() => {
@@ -139,6 +153,13 @@ export default defineComponent({
       pageIndex: 1,
       pageSize: 20,
     })
+
+    const pathData = [
+      {
+        name: '课程题库',
+        path: ''
+      }
+    ]
 
     const getCourseLibWR = () => {
       courseLibWR().then(res => {
@@ -277,6 +298,10 @@ export default defineComponent({
       handleCurrentChange,
       TOPICTYPE,
       privilege,
+      Plus,
+      Upload,
+      Delete,
+      pathData,
     }
   }
 })
@@ -320,6 +345,7 @@ export default defineComponent({
   padding: 0 10px;
   border-radius: 5px;
   position: relative;
+  margin-left: 11px;
 
   .topic-title {
     font-size: 14px;

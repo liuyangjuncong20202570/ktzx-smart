@@ -1,6 +1,6 @@
 <template>
   <div class="task-list">
-    <Header title="问卷列表" />
+    <Header title="问卷列表" :pathData="pathData" />
     <!-- 作业列表 -->
     <el-table ref="multipleTableRef" :data="tableData" style="width: 100%;margin-top: 10px;"
       @selection-change="handleSelectionChange">
@@ -65,6 +65,12 @@ const params = ref({
   pageIndex: 1,
   pageSize: 20
 })
+const pathData = [
+  {
+    name: '问卷列表',
+    path: ''
+  }
+]
 onMounted(() => {
   getMyQueFormPager()
 })

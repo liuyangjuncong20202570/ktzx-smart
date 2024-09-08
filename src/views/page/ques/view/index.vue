@@ -1,6 +1,6 @@
 <template>
     <div class="stu-ques-list">
-      <Header title="问卷预览" />
+      <Header title="问卷预览" :pathData="pathData" />
       <div 
         v-if="!detailObj?.topics?.length" 
         class="flex-center" 
@@ -22,10 +22,44 @@
   const router = useRouter()
   const { currentRoute } = router
   const route = currentRoute.value
-  const { id, qfId, stuId, type } = route.query
+  const { id, qfId, stuId, type, privilege } = route.query
   console.log('route.query', route.query)
   const disabled = true
   const detailObj = ref({})
+
+  let pathData = []
+
+  if (type === 'student') {
+    pathData = [
+      {
+        name: '问卷列表',
+        path: '/homes/courseteacherhome/exam/questionnaire'
+      },
+      {
+        name:  '问卷学生列表',
+        path: '/homes/courseteacherhome/exam/studentList',
+        query: {
+          id,
+          privilege
+        }
+      },
+      {
+        name:  '问卷预览',
+        path: ''
+      }
+    ]
+  } else {
+    pathData = [
+      {
+        name: '问卷列表',
+        path: '/homes/courseteacherhome/exam/questionnaire'
+      },
+      {
+        name:  '问卷预览',
+        path: ''
+      }
+    ]
+  }
 
   onMounted(() => {
     getMyQueFormDetail()

@@ -1,8 +1,8 @@
 <template>
   <div class="practice">
-    <Header title="实验批改" />
+    <Header title="实验批改" :pathData="pathData" />
     <div class="flex-end practice-submit">
-      <el-button @click="submit">提交</el-button>
+      <el-button type="primary" @click="submit">提交</el-button>
     </div>
 
     <div v-for="(item, i) in items" :key="item.id">
@@ -28,7 +28,8 @@
                   </div>
                 </div>
               </div>
-              <div class="task-upload">
+              <!-- 不是批改才显示上传 -->
+              <div class="task-upload" v-if="type != 'homeworkCorrecting'">
                 <el-upload :action="action" :data="data" :show-file-list="false"
                   :on-success="(response, file) => handleAvatarSuccess(response, file, item)">
                   <!-- <img v-if="imageUrl" :src="imageUrl" class="avatar" /> -->
@@ -40,7 +41,7 @@
             </div>
           </div>
 
-          <div class="item-right" v-if="item.urlArr && item.urlArr.length">
+          <div class="item-right">
             <el-checkbox-group v-model="item.check" :min="0" @change="handleCheck($event, item)">
               <el-checkbox :label="1">
                 A
@@ -79,7 +80,7 @@ import { useRouter } from 'vue-router'
 import { studentCorrect, studentSave } from '@/api/practice/index.ts'
 import { host } from '@/api/host.js'
 import { getFileExtensionFromUrl, isImageURL, downloadFile } from '@/utils/index.js'
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import Header from '@/views/page/components/header/index.vue'
 
 const router = useRouter()
@@ -87,6 +88,7 @@ const { currentRoute } = router
 const route = currentRoute.value
 const stuId = route.query.sid
 const practiceId = route.query.pid
+const type = route.query.type
 
 const taskData = [
   {
@@ -108,6 +110,25 @@ const taskData = [
 ]
 
 const items = ref([])
+
+const pathData = [
+  {
+    name: '实验管理',
+    path: '/homes/courseteacherhome/exam/experimental/labmangt'
+  },
+  {
+    name: '实验学生列表',
+    path: '/homes/courseteacherhome/exam/experimental/student',
+    query: {
+      id: route.query.id,
+      privilege: route.query.privilege,
+    }
+  },
+  {
+    name: '实验批改',
+    path: ''
+  },
+]
 
 onMounted(() => {
   getStudentCorrect()
@@ -131,14 +152,20 @@ const handleCheck = (val, item) => {
       item.goal+=item[f.value]
     }
   })
-  // item.lib.value = parseFloat((item.score * val).toFixed(2))
-  // scoreToatl()
+}
+
+const changeGoal = (item) => {
+  item.goal = 0
+  taskData.forEach((f) => {
+    if (item[f.value]) {
+      item.goal+=item[f.value]
+    }
+  })
 }
 
 const handleScore = (val, item) => {
   // console.log('handleScore', val, item)
-  // item.lib.value = val
-  // scoreToatl()
+  changeGoal(item)
 }
 
 const lock = (url) => {
@@ -150,28 +177,38 @@ const download = (url, name) => {
 }
 
 const submit = () => {
-  const correctMap = {}
-  items.value.forEach((item) => {
-    if (item.urlArr && item.urlArr.length) {
-      const itemTotal = []
-      taskData.forEach((t) => {
-        itemTotal.push(item[t.value] ?? 0)
-      })
-      correctMap[item.id] = itemTotal
-    } else {
-      correctMap[item.id] = [0, 0, 0, 0]
+  ElMessageBox.confirm(
+    '确定提交吗?',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     }
-  })
-  studentSave({
-    correctMap,
-    stuId, 
-    practiceId
-  }).then(res => {
-    if (res.code === '200') {
-      ElMessage.success('提交成功')
-    }
-  })
-  console.log('correctMap', correctMap)
+  ).then(() => {
+    const correctMap = {}
+    items.value.forEach((item) => {
+      if (item.urlArr && item.urlArr.length) {
+        const itemTotal = []
+        taskData.forEach((t) => {
+          itemTotal.push(item[t.value] ?? 0)
+        })
+        correctMap[item.id] = itemTotal
+      } else {
+        correctMap[item.id] = [0, 0, 0, 0]
+      }
+    })
+    studentSave({
+      correctMap,
+      stuId, 
+      practiceId
+    }).then(res => {
+      if (res.code === '200') {
+        ElMessage.success('提交成功')
+        router.back(-1)
+      }
+    })
+  }).catch(() => { })
 }
 
 const getStudentCorrect = () => {
@@ -183,12 +220,15 @@ const getStudentCorrect = () => {
       // 内容回显
       if (answerMap) {
         items.value?.forEach((item) => {
-          item.total = 23
           if (item.beDefault === 0 && answerMap[item.id]) {
             item.urlArr = answerMap[item.id]?.map((url) => {
               return host + '/static/' + url
             })
           }
+          taskData.forEach((f) => {
+            item[f.value] = 0
+          })
+          item.goal = 0
         })
       }
       console.log('items', items)

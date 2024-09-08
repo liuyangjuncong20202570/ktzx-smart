@@ -1,23 +1,22 @@
 <template>
   <!-- 试题组卷 -->
   <div class="tpAssembly-type">
-    <Header title="试题组卷" />
-    <div class="task-msg">
+    <Header title="试题组卷" :pathData="pathData" />
+    <div class="task-msg flex-start">
       <div class="flex-start task-name">
         <span>作业名称</span>
         <el-input v-model="taskName" style="width: 200px;"></el-input>
-        <el-button type="primary" style="margin-left: 10px;" @click="openSearch">添加题目</el-button>
       </div>
-
-      <div class="flex-start task-name">
-        <span>总分</span> <el-input v-model="total" disabled style="width: 60px;"></el-input>
+      <div class="flex-start task-name" style="width: 100px;margin-left: 10px;">
+        <span>总分</span> <el-input v-model="total" disabled style="min-width: 60px;"></el-input>
       </div>
     </div>
 
     <div class="cpirse-lib-btn flex-between">
       <el-checkbox label="全选" @change="handleSelectAll"></el-checkbox>
       <div>
-        <el-button type="danger" @click="allDel">批量删除</el-button>
+        <el-button type="primary" :icon="Plus" style="margin-left: 10px;" @click="openSearch">添加题目</el-button>
+        <el-button type="danger" :icon="Delete" @click="allDel">批量删除</el-button>
         <el-button type="primary" @click="save">保存</el-button>
       </div>
     </div>
@@ -36,14 +35,16 @@
               <span style="font-size: 13px;">{{index+1}}、</span>
               <span class="topic-title">{{ element.lib.title }}({{ TOPICTYPE[element.lib.questionTypeId] }})</span>
             </span>
-            <div v-html="element.lib.content"></div>
-            <div v-for="(answer, answerIdx) in element.lib.answers" :key="answerIdx" class="topic-answer-item">
-              {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}
-              <span v-if="answer.isAnswer">标准答案</span>
-            </div>
-            <div class="flex-start task-grade">
-              <span>分数：</span> 
-              <el-input v-model="element.score" @input="handleScore" style="width: 60px;" oninput="value=value.replace(/^0|[^0-9]/g,'')"></el-input>
+            <div class="topic-contents">
+              <div v-html="element.lib.content"></div>
+              <div v-for="(answer, answerIdx) in element.lib.answers" :key="answerIdx" class="topic-answer-item">
+                {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}
+                <span v-if="answer.isAnswer">标准答案</span>
+              </div>
+              <div class="flex-start task-grade">
+                <span>分数：</span> 
+                <el-input v-model="element.score" @input="handleScore" style="width: 60px;" oninput="value=value.replace(/^0|[^0-9]/g,'')"></el-input>
+              </div>
             </div>
           </div>
           <div class="topic-item-icon flex-between">
@@ -82,7 +83,7 @@ import vuedraggable from "vuedraggable"
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Top, Bottom, Delete } from '@element-plus/icons-vue'
+import { Top, Bottom, Delete, Plus } from '@element-plus/icons-vue'
 // import { courseLibTypeSetStatus } from '@/api/courseLib.js'
 import { previewDetail, taskSave, taskdel, courseLiWR } from '@/api/taskMgmt.js'
 import Header from '@/views/page/components/header/index.vue'
@@ -99,6 +100,18 @@ const taskList = ref([])
 const taskName = ref('')
 const total = ref(0)
 const privilege = ref('')
+
+const pathData = [
+  {
+    name: '作业管理',
+    path: '/homes/courseteacherhome/exam/test/testmangt'
+  },
+  {
+    name: '试题组卷',
+    path: ''
+  },
+]
+
 const getWR = () => {
   courseLiWR().then(res => {
     if (res.code === '200') {
@@ -182,24 +195,34 @@ const _taskdel = (data, title) => {
 }
 
 const save = () => {
-  const questionDtos = taskList.value?.map((item) => {
-    return {
-      libId: item.lib.id,
-      score: Number(item.score || 0)
+  ElMessageBox.confirm(
+    '确定保存吗?',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     }
-  })
-  const data = {
-    id: route.query.id,
-    name: taskName.value,
-    questionDtos
-  }
-  taskSave(data).then(res => {
-    if (res.code === '200') {
-      ElMessage.success('保存成功')
-      router.push('/homes/courseteacherhome/exam/test/testmangt')
+  ).then(() => {
+    const questionDtos = taskList.value?.map((item) => {
+      return {
+        libId: item.lib.id,
+        score: Number(item.score || 0)
+      }
+    })
+    const data = {
+      id: route.query.id,
+      name: taskName.value,
+      questionDtos
     }
-  })
-  console.log('data', data)
+    taskSave(data).then(res => {
+      if (res.code === '200') {
+        ElMessage.success('保存成功')
+        router.push('/homes/courseteacherhome/exam/test/testmangt')
+      }
+    })
+    console.log('data', data)
+  }).catch(() => { })
 }
 
 </script>
@@ -263,11 +286,17 @@ const save = () => {
 
   .task-grade {
     font-size: 12px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
   }
 }
 
 .topic-kwa {
   font-size: 13px;
-  margin-right: 10px;
+  margin-left: 22px;
+}
+.topic-contents {
+  margin-left: 22px;
 }
 </style>
