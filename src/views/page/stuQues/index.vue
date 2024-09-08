@@ -92,8 +92,7 @@ const getMyQueFormPager = () => {
 <style scoped>
 .task-list {
   background: #fff;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 0 10px 10px 10px;
   font-size: 13px;
   height: 100%;
   box-sizing: border-box;

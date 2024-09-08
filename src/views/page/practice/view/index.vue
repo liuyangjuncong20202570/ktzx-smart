@@ -50,7 +50,7 @@
                   </div>
                 </div>
               </div>
-              <div v-else>暂无提交实验材料</div>
+              <div v-else class="flex-center" style="width: 100%;">暂无提交实验材料</div>
             </div>
           </div>
         </template>
@@ -126,8 +126,7 @@
     padding-bottom: 10px;
     position: relative;
     background: #fff;
-    padding: 10px;
-    border-radius: 8px;
+    padding: 0 10px 10px 10px;
     font-size: 13px;
     color: #000000;
   }
@@ -142,6 +141,8 @@
     padding: 10px 0;
   }
   .item-title {
+    font-size: 14px;
+    font-weight: bold;
     margin-bottom: 10px;
     border-bottom: 1px solid rgba(116, 116, 116, 0.543);
   }
@@ -184,6 +185,7 @@
     border-radius: 5px;
   }
   .task-upload-url {
+    width: 100%;
     min-height: 178px;
   }
   </style>

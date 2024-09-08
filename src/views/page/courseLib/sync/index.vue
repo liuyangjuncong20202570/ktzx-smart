@@ -104,8 +104,7 @@ const refuse = (id) => {
 <style>
 .course-lib-sync {
   background: #fff;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 0 20px 20px 20px;
   position: relative;
   box-sizing: border-box;
   height: 100%;

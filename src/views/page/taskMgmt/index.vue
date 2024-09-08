@@ -58,7 +58,7 @@
                 复制
               </el-button>
 
-              <el-button v-if="[0, 1].includes(scope.row.status)" type="text" @click="edit(scope.row.id)">
+              <el-button :disabled="scope.row.locked" v-if="[0, 1].includes(scope.row.status)" type="text" @click="edit(scope.row.id)">
                 编辑
               </el-button>
 
@@ -70,7 +70,7 @@
                 {{ scope.row.locked ? '解锁' : '锁定' }}
               </el-button>
 
-              <el-button v-if="[0, 1].includes(scope.row.status)" type="text" @click="del(scope.row)">
+              <el-button :disabled="scope.row.locked" v-if="[0, 1].includes(scope.row.status)" type="text" @click="del(scope.row)">
                 删除
               </el-button>
 
@@ -186,7 +186,6 @@ const edit = (id) => {
 const _getTermAll = () => {
   getTermAll().then(res => {
     if (res.code === '200') {
-      // 
       termList.value = res.data?.filter((item) => item.iscurrentterm === '1')
       if (termList?.value?.length) {
         // 默认展示第一个学期
@@ -267,8 +266,7 @@ const handleSelectionChange = (val) => {
 <style scoped>
 .test-list-wrap {
   background: #fff;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 0 10px 10px 10px;
   position: relative;
   box-sizing: border-box;
   height: 100%;

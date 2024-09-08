@@ -207,8 +207,7 @@ const save = () => {
 .tpAssembly-type {
   text-align: left;
   background: #fff;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 0 10px 10px 10px;
   position: relative;
   color: #000000;
   height: 100%;
@@ -240,6 +239,7 @@ const save = () => {
 
   .topic-title {
     font-size: 14px;
+    font-weight: bold;
   }
 
   .topic-item-icon {
@@ -267,6 +267,7 @@ const save = () => {
 }
 
 .topic-kwa {
+  font-size: 13px;
   margin-right: 10px;
 }
 </style>

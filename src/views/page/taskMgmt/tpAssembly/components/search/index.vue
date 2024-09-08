@@ -4,15 +4,15 @@
         <el-form ref="ruleFormRef" :model="ruleForm" label-width="auto" class="demo-ruleForm"
             :size="formSize" status-icon>
 
-            <el-form-item label="题型选择" prop="queTypeId">
-                <el-select clearable v-model="ruleForm.queTypeId" placeholder="请选择">
+            <el-form-item label="题型选择" prop="queTypeIds">
+                <el-select clearable v-model="ruleForm.queTypeIds" placeholder="请选择">
                     <el-option v-for="(item, i) in typeList" :key="i" :label="item.name" :value="item.queTypeId" />
                 </el-select>
             </el-form-item>
 
             <el-form-item label="题库" prop="libType">
                 <el-radio-group @change="(() => {
-                    ruleForm.queTypeId = ''
+                    ruleForm.queTypeIds = ''
                     getCourseLibTypeList()
                 })" v-model="ruleForm.libType">
                     <el-radio :label="1">课程题库</el-radio>
@@ -39,28 +39,60 @@
                 </div>
             </el-form-item>
         </el-form>
+        <el-tabs type="border-card">
+            <el-tab-pane label="搜索结果">
+                <el-table ref="multipleTableRef" :data="tableData" style="width: 100%"
+                    @selection-change="handleSelectionChange">
+                    <el-table-column type="selection" />
+                    <el-table-column property="libNo" label="题号" width="120" />
+                    <el-table-column property="title" label="题目概要" /> 
+                    <el-table-column property="questionTypeId" label="题型">
+                        <template #default="scope">
+                            {{ TOPICTYPE[scope.row.questionTypeId] }}
+                        </template>
+                    </el-table-column>
+                    <!-- <el-table-column label="难度" property="Address" /> -->
+                    <el-table-column label="课程" property="courseName" />
+                    <el-table-column label="课堂" property="className" />
+                </el-table>
 
-        <el-table ref="multipleTableRef" :data="tableData" style="width: 100%"
-            @selection-change="handleSelectionChange">
-            <el-table-column type="selection" />
-            <el-table-column property="libNo" label="题号" width="120" />
-            <el-table-column property="title" label="题目概要" />
-            <el-table-column property="questionTypeId" label="题型">
-                <template #default="scope">
-                    {{ TOPICTYPE[scope.row.questionTypeId] }}
+                <div class="pagination flex-end">
+                    <el-pagination :currentPage="ruleForm.pageIndex" :page-size="ruleForm.pageSize"
+                        :page-sizes="[10, 20, 30, 40]" layout="total, sizes, prev, pager, next, jumper" :total="total"
+                        @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+                </div>
+            </el-tab-pane>
+            <el-tab-pane>
+                <template #label>
+                    已选
+                    <span style="color: red;">({{ multipleSelection.length }})</span>
                 </template>
-            </el-table-column>
-            <!-- <el-table-column label="难度" property="Address" /> -->
-            <el-table-column label="课程" property="courseName" />
-            <el-table-column label="课堂" property="className" />
-        </el-table>
-
-        <div class="pagination flex-end">
-            <el-pagination :currentPage="ruleForm.pageIndex" :page-size="ruleForm.pageSize"
-                :page-sizes="[10, 20, 30, 40]" layout="total, sizes, prev, pager, next, jumper" :total="total"
-                @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-        </div>
-
+                <el-table :data="multipleSelection" style="width: 100%">
+                    <!-- <el-table-column type="selection" /> -->
+                    <el-table-column property="libNo" label="题号" width="120" />
+                    <el-table-column property="title" label="题目概要" /> 
+                    <el-table-column property="questionTypeId" label="题型">
+                        <template #default="scope">
+                            {{ TOPICTYPE[scope.row.questionTypeId] }}
+                        </template>
+                    </el-table-column>
+                    <!-- <el-table-column label="难度" property="Address" /> -->
+                    <el-table-column label="课程" property="courseName" />
+                    <el-table-column label="课堂" property="className" />
+                    <el-table-column label="操作">
+                        <template #default="scope">
+                            <el-button
+                                size="small"
+                                type="danger"
+                                @click="handleDelete(scope.$index, scope.row)"
+                            >
+                                删除
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-tab-pane>
+        </el-tabs>
         <template #footer>
             <div class="flex-end">
                 <el-button @click="handleClose">取消</el-button>
@@ -92,6 +124,7 @@ const kwaRef = ref(null)
 const tableData = ref([])
 const total = ref(0)
 const multipleSelection = ref([])
+const multipleTableRef = ref(null)
 
 const init = () => {
     handleOpen()
@@ -99,6 +132,11 @@ const init = () => {
     nextTick(() => {
         resetForm()
     })
+}
+
+const handleDelete = (index, row) => {
+    multipleSelection.value.splice(index, 1)
+    multipleTableRef.value.toggleRowSelection(row, undefined)
 }
 
 const handleSelectionChange = (val) => {
@@ -132,7 +170,7 @@ const handleCurrentChange = (val) => {
 }
 
 const getTeskSearch = () => {
-    teskSearch({...ruleForm.value, pagerId: route.query.id}).then(res => {
+    teskSearch({...ruleForm.value, pagerId: route.query.id, queTypeIds: ruleForm.value.queTypeIds ? [ruleForm.value.queTypeIds] : []}).then(res => {
         console.log('res', res)
         if (res.code === '200') {
             const { recordSize, data } = res.data || {}

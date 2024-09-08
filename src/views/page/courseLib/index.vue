@@ -34,10 +34,17 @@
         :name="course.id"
       >
         <template #title>
-          <span class="flex-start">
+          <div class="flex-start" style="flex-wrap: wrap; height: 50px;width: 100%;text-align: left;">
             <el-checkbox @click.stop label="" v-model="course.isChecked"></el-checkbox>
-            {{ `${i+1}、${course.title}(${TOPICTYPE[course?.questionTypeId] ?? '预留题'})` }}
-          </span>
+            <div style="width: calc(100% - 30px);">
+              <div class="topic-kwa wdd-ellipsis" v-if="course.answers">
+                <span style="margin-right: 20px" v-for="(kwa, kwaIdx) in course.kwas" :key="kwaIdx">{{ kwa.kwaName }}</span>
+              </div>
+              <div class="topic-header wdd-ellipsis">
+                {{ `${i+1}、${course.title}(${TOPICTYPE[course?.questionTypeId] ?? '预留题'})` }}
+              </div>
+            </div>
+          </div>
         </template>
         <Topic 
           v-if="course.topicFlag"
@@ -51,9 +58,6 @@
           }" 
         />
         <div class="topic-item">
-          <div class="topic-kwa" v-if="course.answers">
-            <span style="margin-right: 20px" v-for="(kwa, kwaIdx) in course.kwas" :key="kwaIdx">{{ kwa.kwaName }}</span>
-          </div>
           <div class="flex-start" v-html="course.content"></div>
           <div v-if="['单选题', '多选题', '判断题'].includes(TOPICTYPE[course.questionTypeId])" class="topic-answer-item" v-for="(answer, answerIdx) in course.answers" :key="answerIdx">
             {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}
@@ -277,15 +281,34 @@ export default defineComponent({
   }
 })
 </script>
-
+<style>
+.cpirse-lib .el-collapse-item__header {
+  height: 60px !important;
+}
+</style>
 <style scoped>
 .cpirse-lib {
   padding: 0 20px 20px 20px;
   background: #fff;
-  border-radius: 8px;
   position: relative;
   box-sizing: border-box;
   height: 100%;
+}
+
+.topic-header {
+  text-align: left;
+  line-height: 25px;
+  width: 98%;
+  height: 25px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.topic-kwa {
+  width: 98%;
+  height: 25px;
+  line-height: 25px;
+  transform: translateY(5px);
 }
 
 .cpirse-lib-btn {

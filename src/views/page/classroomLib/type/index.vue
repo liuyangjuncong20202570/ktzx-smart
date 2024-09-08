@@ -90,8 +90,7 @@ const save = () => {
 <style scoped>
 .course-type {
   background: #fff;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 0 10px 10px 10px;
   position: relative;
   box-sizing: border-box;
   height: 100%;

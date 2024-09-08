@@ -42,8 +42,7 @@ onMounted(() => {
   padding-bottom: 10px;
   position: relative;
   background: #fff;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 0 10px 10px 10px;
   height: 100%;
   box-sizing: border-box;
   color: #000000;
@@ -53,6 +52,8 @@ onMounted(() => {
   margin: 10px 0;
 }
 .task-msg {
+  font-size: 14px;
+  font-weight: bold;
   min-width: 400px;
 }
 </style>

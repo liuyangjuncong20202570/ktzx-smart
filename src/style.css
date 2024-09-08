@@ -64,6 +64,7 @@ button:focus-visible {
   margin: 0 auto;
   text-align: center;
   color: #000000;  /*新增*/
+  background-color: #FFFFFF;
 }
 
 @media (prefers-color-scheme: light) {

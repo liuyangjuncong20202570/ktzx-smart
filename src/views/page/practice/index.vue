@@ -1,10 +1,11 @@
 <template>
   <el-card class="practice-wrap">
+    <Header title="实验管理" />
     <div class="practice-tool" v-if="!(privilege === 'read')">
       <el-button type="danger" :icon="Delete" @click="delPracticeData">批量删除</el-button>
       <el-button type="primary" :icon="Plus" @click="addPractice">新建实验</el-button>
     </div>
-    <el-table ref="multipleTableRef" :data="tableData" style="width: 100%" :border="true" :row-key="(row: any)=> row.id">
+    <el-table ref="multipleTableRef" :data="tableData" style="width: 100%" :row-key="(row: any)=> row.id">
       <el-table-column lebel="选择" type="selection" width="55" fixed="left" :reserve-selection="true"  />
       <el-table-column label="题目" prop="name" fixed="left"></el-table-column>
       <el-table-column label="创建时间" prop="updateTime"  />
@@ -22,8 +23,8 @@
           <template v-else>
             <el-button type="primary" :text="true" @click="lookStudent(scope.row)">查看学生</el-button>
           </template>
-          <el-button v-if="!(privilege === 'read')" type="primary" :text="true" @click="editPractice(scope.row)">编辑</el-button>
-          <el-button v-if="!(privilege === 'read')" type="danger" :text="true" @click="delPracticeRow(scope.row.id)">删除</el-button>
+          <el-button :disabled="scope.row.status" v-if="!(privilege === 'read')" type="primary" :text="true" @click="editPractice(scope.row)">编辑</el-button>
+          <el-button :disabled="scope.row.status" v-if="!(privilege === 'read')" type="danger" :text="true" @click="delPracticeRow(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -51,6 +52,7 @@ import { practicePage,delPractice,publishPractice, studentWR } from "@/api/pract
 import { PracticePageVO } from "@/api/practice/type.ts";
 import { ElMessage } from "element-plus";
 import NoAccessPermission from '@/views/page/components/noAccessPermission/index.vue'
+import Header from '@/views/page/components/header/index.vue'
 
 const pagination = reactive({
   pageIndex:1,
@@ -128,11 +130,17 @@ onMounted(() => {
   getWR()
 });
 </script>
+<style>
+.practice-wrap .el-card__body {
+  padding: 0 20px 20px 20px !important;
+}
+</style>
 <style scoped>
   .practice-wrap {
     position: relative;
   }
   .practice-tool {
+    margin-top: 10px;
     padding-bottom: 10px;
     display: flex;
     justify-content: flex-end;

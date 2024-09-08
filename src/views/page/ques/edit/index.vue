@@ -104,7 +104,7 @@
 
 <script>
 import vuedraggable from "vuedraggable"
-import { defineComponent, ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted, nextTick } from 'vue'
 import { Edit, DocumentCopy, Delete, Top, Bottom } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import Header from '@/views/page/components/header/index.vue'
@@ -149,10 +149,17 @@ export default defineComponent({
     }
 
     const save = () => {
+      const newTopics = [ ...courseList.value ]
+      newTopics.forEach((topics) => {
+        if (topics.hasOwnProperty('isChecked')) {
+          delete topics.isChecked
+        }
+      })
+      console.log('newTopics', newTopics)
       queFormUpdate(
         {
           id: id.value,
-          topics: courseList.value,
+          topics: newTopics,
           name: name.value
         }
       ).then(res => {
@@ -233,6 +240,7 @@ export default defineComponent({
         const _answer = { ...answer }
         if (_answer.id) delete _answer.id
         if (_answer.qfId) delete _answer.qfId
+        if (_answer.hasOwnProperty('isChecked')) delete _answer.isChecked
         if (_answer.items && _answer.items.length) {
           // 数组数据也需要复制，避免污染原数据
           _answer.items = answer.items.map((m) => { return { ...m } })
@@ -241,9 +249,15 @@ export default defineComponent({
           })
         }
         courseList.value.unshift(_answer)
+        const newTopics = [ ...courseList.value ]
+        newTopics.forEach((topics) => {
+          if (topics.hasOwnProperty('isChecked')) {
+            delete topics.isChecked
+          }
+        })
         queFormUpdate({
           id: id.value,
-          topics: courseList.value,
+          topics: newTopics,
           name: name.value
         }).then(res => {
           if (res.code === '200') {
@@ -286,8 +300,10 @@ export default defineComponent({
             status.value = res.data?.status
             courseList.value = res?.data?.topics ?? []
             id.value = res.data?.id
-            courseList.value?.forEach((item) => {
-              item.isChecked = false
+            nextTick(() => {
+              courseList.value?.forEach((item) => {
+                item.isChecked = false
+              })
             })
           }
         })
@@ -328,7 +344,6 @@ export default defineComponent({
 .ques-lib {
   padding: 0 20px 20px 20px;
   background: #fff;
-  border-radius: 8px;
   font-size: 13px;
   color: #000000;
 }

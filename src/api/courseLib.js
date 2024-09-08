@@ -17,7 +17,7 @@ export const taskKwa = () => {
 }
 // 课堂题型
 export const courseLibType = () => {
-    return request.page.get('/courseLib/type/list')
+    return request.page.get('/courseLib/queType/list')
 }
 // 课堂列表
 export const courseLibList = (data) => {

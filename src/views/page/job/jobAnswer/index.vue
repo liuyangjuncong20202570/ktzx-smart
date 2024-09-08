@@ -77,7 +77,7 @@
                 item.lib.content = newContent
                 console.log('item.lib', item.lib)
             } else if (answerMap) {
-              if (TOPICTYPE[item.lib.questionTypeId] === '多选题') {
+              if (['多选题', '判断题'].includes(TOPICTYPE[item.lib.questionTypeId])) {
                 item.lib.selectId = value && value.length ? value : []
               }else {
                 item.lib.selectId = value ? value[0] : ''
@@ -148,8 +148,7 @@
     padding-bottom: 10px;
     position: relative;
     background: #fff;
-    padding: 10px;
-    border-radius: 8px;
+    padding: 0 10px 10px 10px;
     color: #000000;
     height: 100%;
     box-sizing: border-box;

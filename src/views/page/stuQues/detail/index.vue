@@ -5,7 +5,7 @@
         <div>
           当前问卷：{{ detailObj.name }}
         </div>
-        <el-button v-if="!disabled">提交</el-button>
+        <el-button v-if="!disabled" @click="submit">提交</el-button>
       </div>
       <div v-for="(item, i) in detailObj.topics" :key="i">
         <QueItem :row="item" :index="i" :disabled="disabled"  />
@@ -57,7 +57,17 @@
                 console.log('item.lib', item)
             } else if (answerMap) {
               if (TOPICTYPE[item.typeId] === '多选题') {
-                item.selectId = value && value.length ? value : []
+                // 其他输入项
+                const isOther = value?.map((valueItem) => {
+                  if (valueItem.indexOf('other:') !== -1) {
+                    return valueItem
+                  }
+                })[0] ?? ''
+                if (value && isOther) {
+                  item.other = isOther.split(':')[1]
+                } else {
+                  item.selectId = value && value.length ? value : []
+                }
               }else {
                 item.selectId = value ? value[0] : ''
               }
@@ -88,7 +98,7 @@
       } else {
         itemMap = {
           ...itemMap,
-          [item.id]: Array.isArray(item.selectId) ? item.selectId : [item.selectId]
+          [item.id]: (Array.isArray(item.selectId) || item.other) ? (item.other ? [`other:${item.other}`] : item.selectId) : [item.selectId]
         }
       }
     }
@@ -116,8 +126,7 @@
   <style scoped>
   .stu-ques-list {
     background: #fff;
-    padding: 10px;
-    border-radius: 8px;
+    padding: 0 10px 10px 10px;
     font-size: 13px;
     height: 100%;
     box-sizing: border-box;

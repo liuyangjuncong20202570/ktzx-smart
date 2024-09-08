@@ -29,14 +29,15 @@
       </el-form-item>
 
       <el-form-item label="题型">
-        <el-radio-group v-model="form.queTypeId" @change="handleChange">
-          <el-radio
+        <el-checkbox label="0" style="margin-right: 30px" @change="queTypeIdAll">全部</el-checkbox>
+        <el-checkbox-group v-model="form.queTypeIds" @change="handleChange">
+          <el-checkbox
             v-for="(item, i) in courseType"
-            :key="i"
             :label="item.queTypeId"
-            >{{ item.name }}</el-radio
+            :key="i"
+            >{{ item.name }}</el-checkbox
           >
-        </el-radio-group>
+        </el-checkbox-group>
       </el-form-item>
     </el-form>
 
@@ -219,8 +220,17 @@ const getCourseLibType = () => {
   }
 }
 
-const handleChange = () => {
-  console.log(form.value);
+const queTypeIdAll = (value) => {
+  if (value) {
+    const queTypeIds = courseType.value.map((course) => course.queTypeId)
+    form.value.queTypeIds = [ ...queTypeIds ]
+  } else {
+    form.value.queTypeIds = []
+  }
+  emit("kwa-event", form.value);
+}
+
+const handleChange = (changeValue) => {
   // 获取添加kwa能力
   if (['classroomLibAdd', 'courseLibaAdd'].includes(type) && form.value.treeIds) {
     abilityList.value = [];
@@ -231,7 +241,6 @@ const handleChange = () => {
       let list =
         kwaTree.value.find((kwa) => kwa.keyId === item)?.abilityList || [];
       abilityList.value = [...abilityList.value, ...list];
-      console.log("treeItem", abilityList);
     });
   }
 

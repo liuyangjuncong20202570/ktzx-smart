@@ -31,7 +31,7 @@
 
 
       </el-header>
-      <el-container>
+      <el-container style="width: 100%;overflow-x: hidden;">
         <el-aside width="200px" style="height: 100%;">
           <div style="width: 100%; height: 150px; padding: 10px 0; background-color: #c8c9cc; display: flex; align-items: center;
                     box-sizing: border-box;">

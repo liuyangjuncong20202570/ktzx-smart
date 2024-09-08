@@ -122,8 +122,7 @@ const handleCurrentChange = (val) => {
 <style scoped>
 .test-list-wrap {
   background: #fff;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 0 10px 10px 10px;
 }
 
 .pagination {

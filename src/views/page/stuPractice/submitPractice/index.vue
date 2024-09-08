@@ -208,8 +208,7 @@
     padding-bottom: 10px;
     position: relative;
     background: #fff;
-    padding: 10px;
-    border-radius: 8px;
+    padding: 0 10px 10px 10px;
     font-size: 13px;
     color: #000000;
   }

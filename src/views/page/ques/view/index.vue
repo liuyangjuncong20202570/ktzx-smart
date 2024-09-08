@@ -58,7 +58,17 @@
                 console.log('item.lib', item)
             } else if (answerMap) {
               if (TOPICTYPE[item.typeId] === '多选题') {
-                item.selectId = value && value.length ? value : []
+                // 其他输入项
+                const isOther = value?.map((valueItem) => {
+                  if (valueItem.indexOf('other:') !== -1) {
+                    return valueItem
+                  }
+                })[0] ?? ''
+                if (value && isOther) {
+                  item.other = isOther.split(':')[1]
+                } else {
+                  item.selectId = value && value.length ? value : []
+                }
               }else {
                 item.selectId = value ? value[0] : ''
               }
@@ -72,8 +82,7 @@
   <style scoped>
   .stu-ques-list {
     background: #fff;
-    padding: 10px;
-    border-radius: 8px;
+    padding: 0 10px 10px 10px;
     font-size: 13px;
     height: 100%;
     box-sizing: border-box;

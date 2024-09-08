@@ -5,12 +5,13 @@
  * @FilePath: \smarttt_ktzx\src\views\page\practice\student\index.vue
 -->
 <template>
-  <el-card>
+  <el-card class="experimental-student-wrap">
+    <Header title="实验学生列表" />
     <div class="practice-tool">
       <el-button type="danger" :icon="Download" @click="loadScore">成绩下载</el-button>
       <!-- <el-button type="primary" :icon="Download" @click="loadData">数据下载</el-button> -->
     </div>
-    <el-table ref="multipleTableRef" :data="tableData" style="width: 100%" :border="true">
+    <el-table ref="multipleTableRef" :data="tableData" style="width: 100%">
       <el-table-column lebel="序号" type="index" fixed="left" />
       <el-table-column label="学号" prop="stuNo" />
       <el-table-column label="姓名" prop="name" />
@@ -61,6 +62,7 @@ import { host } from '@/api/host.js'
 import { studentList, practiceDownload } from "@/api/practice/index.ts";
 import { ResVO ,StudentPracticePageVO} from "@/api/practice/type.ts";
 import { downloadFile } from '@/utils/index'
+import Header from '@/views/page/components/header/index.vue'
 
 const routes = useRouter()
 const { currentRoute } = routes
@@ -70,7 +72,7 @@ const id = route.query.id
 const statusMap = reactive(new Map([[0,'已发布'],[1,'已作答'],[2,'已批改']]))
 const pagination = reactive({
   pageIndex:1,
-  pageSize:10,
+  pageSize:40,
   total:0
 })
 const tableData = reactive<StudentPracticePageVO>([]);
@@ -109,9 +111,14 @@ onMounted(() => {
   loadStudentData();
 });
 </script>
-
+<style>
+.experimental-student-wrap .el-card__body {
+  padding: 0 20px 20px 20px !important;
+}
+</style>
 <style scoped>
 .practice-tool {
+  margin-top: 10px;
   padding-bottom: 10px;
   display: flex;
   justify-content: flex-end;

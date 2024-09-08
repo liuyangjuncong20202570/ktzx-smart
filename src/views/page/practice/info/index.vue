@@ -5,7 +5,8 @@
  * @FilePath: \smarttt_ktzx\src\views\page\practice\info\index.vue
 -->
 <template>
-  <el-card>
+  <el-card class="experimental-practiceInfo-wrap">
+    <Header :title="`${isDetail ? '编辑' : '新建'}实验`" />
     <div class="practice-tool">
       <el-form :model="practiceForm" label-width="auto" :inline="true" :rules="rules" ref="practiceFormRef">
         <el-form-item label="实验名称" prop="name">
@@ -110,12 +111,16 @@ import { getTemplate,savePractice,practiceDetail,kwaTree, practiceUpdate } from 
 import { PracticeTemplateVO,ParamVO ,DefaultParamVO,KwaVO,KwaParamVO,ResVO } from "@/api/practice/type.ts";
 import { RuleForm } from "./type";
 import { host } from "@/api/host.js";
-import router from "@/router/index.js";
 import Kwa from "../components/kwa.vue";
 import Upload from "@/components/upload/index.vue";
 import { VideoPlayer } from '@videojs-player/vue'
+import Header from '@/views/page/components/header/index.vue'
 import 'video.js/dist/video-js.css'
 import { ElMessage, FormInstance, FormRules } from "element-plus";
+import { useRouter } from 'vue-router'
+const routes = useRouter()
+const { currentRoute } = routes
+const route = currentRoute.value
 const practiceFormRef = ref<FormInstance>()
 const practiceForm = reactive({
   name: "",
@@ -295,7 +300,7 @@ const saveData = async (formEl: FormInstance | undefined) => {
         items:[]
       }
       if (isDetail.value) {
-        defaultParam.id = router.currentRoute.value.query.id;
+        defaultParam.id = route.query.id;
       }
       tableData.forEach((_item: any) => {
         kwaArr.length = 0
@@ -332,7 +337,7 @@ const saveData = async (formEl: FormInstance | undefined) => {
       }
       if (resData.code==200) {
         ElMessage.success('保存成功！');
-        router.push('/homes/courseteacherhome/exam/experimental/labmangt')
+        routes.push('/homes/courseteacherhome/exam/experimental/labmangt')
       }
     } else {
       console.log('error submit!', fields)
@@ -375,7 +380,7 @@ const calculateFullName =  (kwaId?: any)=>{
 }
 // 编辑根据数据ID查询详情信息
 const getDracticeDetail = async () =>{
-  const queryParam = router.currentRoute.value.query.id;
+  const queryParam = route.query.id;
   const resData = await practiceDetail(queryParam)
   if (resData.code==200) {
     let arr = JSON.parse(JSON.stringify(resData.data.items))
@@ -393,7 +398,7 @@ const getDracticeDetail = async () =>{
   }
 }
 onMounted(async () => {
-  isDetail.value= router.currentRoute.value.query.id?true:false
+  isDetail.value= route.query.id?true:false
   if (isDetail.value) {
     await getKwaData()
     getDracticeDetail()
@@ -403,8 +408,14 @@ onMounted(async () => {
   
 });
 </script>
+<style>
+.experimental-practiceInfo-wrap .el-card__body {
+  padding: 0 20px 20px 20px !important;
+}
+</style>
 <style scoped>
 .practice-tool {
+  margin-top: 10px;
   padding-bottom: 10px;
   display: flex;
   justify-content: space-between;
