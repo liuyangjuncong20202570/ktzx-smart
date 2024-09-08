@@ -277,12 +277,11 @@ const changeStatus = (selectedRow) => {
       if (res.code === 200) {
         ElMessage({
           type: 'success',
-          message: '修改当前学期成功'
+          message: '修改当前学期成功,重新登录即可生效'
         });
         //这里刷新dom
         // nullRoleNum.value = 0;
         nextTick(() => {
-
           getTableData();
 
         })

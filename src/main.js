@@ -12,10 +12,17 @@ import './assets/css/global.css'
 import * as Icons from '@element-plus/icons-vue'
 
 const pinia = createPinia();
-createApp(App).use(router).use(pinia).use(ElementPlus, {locale: zhCn})
-    .directive('blur-on-click', blurOnClick)
-    .directive('click-outside',clickOutside)
-    .use(Icons)
-    .mount('#app')
+const app = createApp(App);
 
-    
+// 注册每个图标组件
+Object.keys(Icons).forEach(key => {
+    app.component(key, Icons[key]);
+});
+
+app
+    .use(router)
+    .use(pinia)
+    .use(ElementPlus, { locale: zhCn })
+    .directive('blur-on-click', blurOnClick)
+    .directive('click-outside', clickOutside)
+    .mount('#app')

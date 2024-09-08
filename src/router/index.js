@@ -181,12 +181,12 @@ const routes = [
             {
                 path: 'evasys/formative/KWAgraph', // 形成性评价模型-知识能力图谱
                 name: 'KWAgraph',
-                component: () => import('../components/evaluation/KWAgraph.vue')
+                component: () => import('../components/evaluation/graph.vue')
             },
             {
-                path: 'evasys/3Dgraph', // 形成性评价模型-3D图谱
-                name: '3Dgraph',
-                component: () => import('../components/evaluation/3Dgraph.vue')
+                path: 'evasys/graph', // 形成性评价模型-图谱
+                name: 'graph',
+                component: () => import('../components/evaluation/graph.vue')
             },
             {
                 path: 'evasys/accessible/coursetarget', // 达成性评价模型-课程目标
@@ -316,7 +316,6 @@ router.beforeEach((to, from, next) => {
 
     // 检查目标路由是否需要认证（假设需要认证的路由有一个'meta'字段）
     const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-
     if (requiresAuth && !storedUserInfo) {
         // 如果目标路由需要认证，但没有存储的用户信息，则重定向到登录页面
         next({ name: 'Login' });

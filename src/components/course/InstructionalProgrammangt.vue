@@ -26,9 +26,9 @@
         <el-table-column prop="createtime" label="上传时间"></el-table-column>
         <el-table-column label="操作">
           <template #default="scope">
-            <el-button size="small" @click="previewFile(scope.row)">预览</el-button>
-            <el-button size="small" @click="downloadFile(scope.row)">下载</el-button>
-            <el-button size="small" @click="deleteFile(scope.row)">删除</el-button>
+            <el-button size="small" v-blur-on-click @click="previewFile(scope.row)">预览</el-button>
+            <el-button size="small" v-blur-on-click @click="downloadFile(scope.row)">下载</el-button>
+            <el-button size="small" v-blur-on-click @click="deleteFile(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -147,7 +147,7 @@ const beforeUpload = (file) => {
 };
 
 const previewFile = async (file) => {
-  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/instructionalprogram/download/${file.filename}`;
+  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/instructionalprogram/download/${encodeURIComponent(file.filename)}`;
   console.log('Preview file URL:', fileUrl);  // 检查 URL 是否正确
   const isPDF = file.filename.toLowerCase().endsWith('.pdf');
   const isWord = file.filename.toLowerCase().endsWith('.docx');
@@ -166,7 +166,7 @@ const previewFile = async (file) => {
 
 
 const downloadFile = (file) => {
-  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/instructionalprogram/download/${file.filename}`;
+  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/instructionalprogram/download/${encodeURIComponent(file.filename)}`;
   fetch(fileUrl)
       .then(response => {
         if (response.ok) {

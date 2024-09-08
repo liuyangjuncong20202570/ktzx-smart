@@ -147,7 +147,7 @@ const beforeUpload = (file) => {
 };
 
 const previewFile = async (file) => {
-  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/classroommangt/lessonplan/download/${file.filename}`;
+  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/classroommangt/lessonplan/download/${encodeURIComponent(file.filename)}`;
   console.log('Preview file URL:', fileUrl);  // 检查 URL 是否正确
   const isPDF = file.filename.toLowerCase().endsWith('.pdf');
   const isWord = file.filename.toLowerCase().endsWith('.docx');
@@ -166,7 +166,7 @@ const previewFile = async (file) => {
 
 
 const downloadFile = (file) => {
-  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/classroommangt/lessonplan/download/${file.filename}`;
+  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/classroommangt/lessonplan/download/${encodeURIComponent(file.filename)}`;
   fetch(fileUrl)
       .then(response => {
         if (response.ok) {
@@ -193,7 +193,7 @@ const downloadFile = (file) => {
 
 const deleteFile = async (file) => {
   try {
-    await ElMessageBox.confirm('此操作将永久删除该课程大纲, 是否继续?', '提示', {
+    await ElMessageBox.confirm('此操作将永久删除该课程教案, 是否继续?', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning',
