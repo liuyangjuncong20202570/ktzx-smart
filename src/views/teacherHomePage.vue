@@ -28,7 +28,7 @@
           </div>
 
           <div style="flex-grow: 2; text-align: center">
-            <el-text style="font-size: calc(1.5vw + 6px); color: white">2024春季学期</el-text>
+            <el-text style="font-size: calc(1.5vw + 6px); color: white">{{ currentterm }}</el-text>
           </div>
 
           <div
@@ -213,8 +213,8 @@ const profileStore = useProfileStore();
 const defaultActive = ref('');
 const route = useRoute();
 const router = useRouter(); // 获取路由实例
-
 const imageUrl = ref('https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png');
+const currentterm = ref('');
 
 // const imageUrl = ref('')
 
@@ -257,7 +257,6 @@ const handleLogout = () => {
 };
 
 // 默认显示菜单
-// const defaultActive = ref('');
 const menus = ref([]);
 
 const loginInfo = reactive({
@@ -317,8 +316,6 @@ const getRolelist = () => {
     .then(res => {
       if (res.code === 200 && res.data.length > 0) {
         showRoles.value = true;
-        console.log('切换角色');
-        console.log(res.data);
         roleList.value = res.data;
       } else {
         ElMessage({
@@ -364,7 +361,6 @@ const userlogin = loginuserFrom => {
     })
     .catch(error => {
       // 登录失败
-
       ElMessage({
         type: 'error',
         message: '登录失败'
@@ -405,13 +401,20 @@ const handleVisibleChange = visible => {
 //钩子函数用来刷新后重新获取数据
 
 onMounted(() => {
-  const defaultActive = ref('');
+  const role = route.params.rolehome; // 获取当前路由参数中的 rolehome 值
+  const basePath = `/homes/${role}`;
+  if (route.path !== basePath) {
+    router.replace(basePath); // 重定向到基础路径
+  }
+
+  defaultActive.value = '';
   const storedUserInfo = sessionStorage.getItem('users');
   if (storedUserInfo) {
     const userInfo = JSON.parse(storedUserInfo);
-
+    //设置当前学期
+    currentterm.value = userInfo.currentterm;
     // 更新用户信息到Pinia
-
+    // console.log("term",userInfo.currentterm)
     profileStore.setProfileInfo(
       userInfo.username,
       userInfo.rolename,
@@ -430,13 +433,13 @@ onMounted(() => {
     sessionStorage.removeItem('isLoggedIn');
     sessionStorage.removeItem('token');
 
-    router.push({ name: 'Login' });
+    // router.push({ name: 'Login' });
 
     // 或
     // ElMessage.error('请重新登录');
   }
   //获取完pinia中的数据后重新重定向到父页面
-  router.push(homeurl.value);
+  // router.push(homeurl.value);
 
   // request.admin.post(`${homeurl}`,loginInfo)
   // console.log(1111)
