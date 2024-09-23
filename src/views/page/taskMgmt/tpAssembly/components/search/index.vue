@@ -71,7 +71,7 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue'
+import { ref, defineEmits, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { teskSearch, searchToPaper, queType } from '@/api/taskMgmt.js'
@@ -96,6 +96,9 @@ const multipleSelection = ref([])
 const init = () => {
     handleOpen()
     getCourseLibTypeList()
+    nextTick(() => {
+        resetForm()
+    })
 }
 
 const handleSelectionChange = (val) => {

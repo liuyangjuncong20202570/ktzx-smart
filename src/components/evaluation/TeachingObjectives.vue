@@ -19,7 +19,6 @@
                         {{ row.row.name }}
                     </template>
                 </el-table-column>
-
                 <el-table-column prop="keywordname" label="关键字" min-width="140">
                     <template v-slot="row">
                         <el-popover :visible="row.row.keywordPopVisible" placement="right-end" width="600">

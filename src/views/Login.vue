@@ -34,7 +34,7 @@
                             :rules="rules.pwd" show-password></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" style="width: 100%;" @click="login">登录</el-button>
+                  <el-button type="primary" v-blur-on-click style="width: 100%;" @click="login">登录</el-button>
 
                   <!-- 弹窗登录-->
 
@@ -75,7 +75,7 @@
                             :rules="rules.pwd" show-password></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" style="width: 100%;" @click="login">登录</el-button>
+                  <el-button type="primary" v-blur-on-click style="width: 100%;" @click="login">登录</el-button>
                   <!-- 弹窗登录-->
                   <el-dialog :modelValue="showRoleModal" :show-close="false" :close-on-click-modal="false"
                              title="选择角色" width="30%" style="border-radius:10px">
@@ -165,15 +165,20 @@ const rules = reactive({
 })
 //登录
 const login = () => {
+  console.log("loginForm",loginForm)
   // 验证表单输入
   proxy.$refs.ruleFormRef.validate((valid) => {
     if (valid) {
       //请求登录接口
       request.admin.post('/login', loginForm)
           .then(res => {
-            // console.log(res);
             // 登录成功
-            if (res.code === 200) {
+            if (res.code === 400) {
+              ElMessage({
+                type: 'error',
+                message: res.msg,
+              });
+            } else if (res.code === 200) {
               //处理不同角色的跳转逻辑
               const rolesCount = res.data.rolescount;
               loginuserFrom.value.id = res.data.userid;
@@ -200,7 +205,6 @@ const login = () => {
                 }
               }
             }
-
           }).catch(error => {
 
         // 登录失败

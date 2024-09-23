@@ -147,7 +147,7 @@ const beforeUpload = (file) => {
 };
 
 const previewFile = async (file) => {
-  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/classroommangt/academiccalendar/download/${file.filename}`;
+  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/classroommangt/academiccalendar/download/${encodeURIComponent(file.filename)}`;
   console.log('Preview file URL:', fileUrl);  // 检查 URL 是否正确
   const isPDF = file.filename.toLowerCase().endsWith('.pdf');
   const isWord = file.filename.toLowerCase().endsWith('.docx');
@@ -166,7 +166,7 @@ const previewFile = async (file) => {
 
 
 const downloadFile = (file) => {
-  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/classroommangt/academiccalendar/download/${file.filename}`;
+  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/classroommangt/academiccalendar/download/${encodeURIComponent(file.filename)}`;
   fetch(fileUrl)
       .then(response => {
         if (response.ok) {
