@@ -780,12 +780,12 @@ const createGridPointsByNodeSize = (size, gridCount, nodeSize) => {
 };
 
 const findSecondPlaneGridSize = (array, len, maxUnitSize) => {
-    maxUnitSize += 1;
+    maxUnitSize += 0;
     let maxX = -0x3f3f3f3f, minX = 0x3f3f3f3f;
     for (let i = 0; i < len; i++) {
         console.log(array[i].x);
-        if (maxX < array[i].x + maxUnitSize) maxX = array[i].x + maxUnitSize;
-        if (minX > array[i].x - maxUnitSize) minX = array[i].x - maxUnitSize;
+        if (maxX < array[i].x + maxUnitSize) maxX = array[i].x
+        if (minX > array[i].x - maxUnitSize) minX = array[i].x;
     }
     return maxX - minX;
 };

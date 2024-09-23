@@ -198,6 +198,11 @@ const routes = [
                 name: 'AssessmentTable',
                 component: () => import('../components/evaluation/AssessmentTable.vue')
             },
+            {
+                path: 'evaluation/checkitem', // 达成性评价模型-考核项
+                name: 'AssessmentItems',
+                component: () => import('../components/evaluation/AssessmentItems.vue')
+            },
             // 0822
             // 课程页
             {

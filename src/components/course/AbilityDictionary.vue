@@ -40,7 +40,7 @@
                                         @blur="blurInput(node.data, 'editingName')" placeholder="请输入节点名称"
                                         @contextmenu.stop draggable="false" style="height: 20px; width: 150px;"
                                         :ref="el => setInputRef(el, node.data)"></el-input>
-                                    <div v-else style="width: auto; height: 20px;"
+                                    <div v-else style="width: 150px; height: 20px;"
                                         @dblclick="handleClick(node.data, 'editingName')">
                                         <el-icon v-if="node.data.children" color="orange">
                                             <Folder />
@@ -70,8 +70,9 @@
                                             @blur="blurInput(node.data, 'editingRemark')" placeholder="请输入备注"
                                             @contextmenu.stop draggable="false" style="height: 20px; width: 100%;"
                                             :ref="el => setInputRef(el, node.data)"></el-input>
-                                        <div v-else style="width: 100%; height: 20px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
-										    v-bind:title="node.data.remark">
+                                        <div v-else
+                                            style="width: 100%; height: 20px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                                            v-bind:title="node.data.remark">
                                             {{ node.data.remark }}
                                         </div>
                                     </div>
@@ -120,7 +121,7 @@ const initialize = (nodes) => {
         node.editingRemark = false;
         // node.id = id.value ++;
 
-        if (node.name.includes('未命名能力')) {
+        if (node.name.includes('未命名节点')) {
             if (node.name.length > 5 && node.name[5] === '(') {
                 let num = '';
                 for (let i = 6; node.name[i] !== ')'; i++) {
@@ -251,7 +252,7 @@ const addSiblingNode = (node) => {
         abilitydeep: node.abilitydeep,
         type: '1',
         cmAbility: {
-            name: nullNodeNum.value > 1 ? '未命名能力(' + nullNodeNum.value + ')' : '未命名能力',
+            name: nullNodeNum.value > 1 ? '未命名节点(' + nullNodeNum.value + ')' : '未命名节点',
             remark: ''
         }
     };
@@ -275,7 +276,7 @@ const addChildNode = (node) => {
         abilitydeep: node.abilitydeep,
         type: '0',
         cmAbility: {
-            name: nullNodeNum.value > 1 ? '未命名能力(' + nullNodeNum.value + ')' : '未命名能力',
+            name: nullNodeNum.value > 1 ? '未命名节点(' + nullNodeNum.value + ')' : '未命名节点',
             remark: ''
         }
     }
@@ -359,9 +360,25 @@ const setInputRef = (el, node) => {
     }
 };
 
-const blurInput = (node, field) => {
+const blurInput = async (node, field) => {
     node[field] = false;
-}
+    console.log(node);
+    const postData = {
+        id: node.id,
+        name: node.name,
+    };
+
+    try {
+        const res = await request.evaluation.post(`/evaluation/ability/update`, postData);
+        if (res.code === 200) {
+            ElMessage.success('修改成功');
+        }
+        else ElMessage.error(res.msg);
+    } catch (error) {
+        ElMessage.error(res.msg);
+    };
+
+};
 
 /********************************************/
 </script>
