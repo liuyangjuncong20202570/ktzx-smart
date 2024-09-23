@@ -104,10 +104,10 @@
       :destroy-on-close="true"
       :show-close="false"
       :close-on-click-modal="false"
-      style="width: 20vw; padding-top: 0"
+      style="padding-top: 0"
       v-model="insertStudentVisible"
     >
-      <InsertStudent :classroom-id="parseToken.obsid" @close-tab="handleCloseTab" />
+      <InsertStudent :parse-Token="parseToken" @close-tab="handleCloseTab" />
     </el-dialog>
     <!-- 插入学生结束 -->
   </div>
@@ -162,7 +162,7 @@ const fileName = ref(''); //文件名
 const uploadRef = ref(null);
 
 const handleUpload = () => {
-  //importdialogViaible.value = true;
+  importdialogViaible.value = true;
 };
 
 const handleFileChange = file => {
@@ -186,6 +186,7 @@ const submitUpload = async () => {
     if (res.code === 200) {
       ElMessage.success('文件上传成功！');
       importdialogViaible.value = false;
+      location.reload();
       // getPeopleList();
     } else {
       ElMessage.error(res.message || '上传失败！');
@@ -210,11 +211,11 @@ const columns = ref([
     label: '学号'
   },
   {
-    prop: 'username',
+    prop: 'userName',
     label: '姓名'
   },
   {
-    prop: 'classno',
+    prop: 'obsName',
     label: '班级'
   }
 ]);
@@ -263,11 +264,15 @@ const parseToken = parseJWT(token);
 const TeacherInClassStore = useTeacherInClass();
 const { stuList } = storeToRefs(TeacherInClassStore);
 onMounted(async () => {
-  await TeacherInClassStore.fetchStudentList(parseToken);
+  TeacherInClassStore.fetchStudentList(parseToken).then(res => {
+    tableData.value = stuList.value;
+    filteredData.value = stuList.value;
+    total.value = tableData.value.length;
+  });
 });
-tableData.value = stuList.value;
-filteredData.value = stuList.value;
-total.value = tableData.value.length;
+// tableData.value = stuList.value;
+// filteredData.value = stuList.value;
+// total.value = tableData.value.length;
 /* ********************初始化页面数据******************** */
 
 /* ********************删除选中数据******************** */
