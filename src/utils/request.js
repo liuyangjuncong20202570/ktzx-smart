@@ -5,7 +5,7 @@ import { ElMessage } from 'element-plus'
 const request = {
     admin: createAPI('http://localhost:8080/api'),
     course: createAPI('http://localhost:8082/api'),
-    evaluation: createAPI('http://localhost:8083'),
+    evaluation: createAPI('http://localhost:8083/api'),
     page: createAPI('http://60.205.178.180:8084/page'),
     fork: createAPI('http://60.205.178.180:8084/fork'),
     common: createAPI('http://60.205.178.180:8084/common'),
