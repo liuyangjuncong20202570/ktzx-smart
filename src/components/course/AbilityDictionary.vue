@@ -198,6 +198,7 @@ import parseJWT from '@/utils/parseJWT.js';
 import { Folder, Document } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import request from '../../utils/request';
 
 const defaultProps = {
@@ -245,8 +246,28 @@ const initialize = nodes => {
 };
 
 const getTreeData = () => {
-  // 获取Token中的obsid
+  // TODO:对路由进行判断
+  const route = useRoute();
+  let apiPath = '';
+  if(route.fullPath === '/homes/professionhome/evaluation/ability'){
+        request.evaluation
+    .get('/evaluation/getability/allability')
+    .then(res => {
+      if (res.code === 200) {
+        treeData.value = res.data;
+        nullNodeNum.value = 0;
+        initialize(treeData.value);
+        // console.log(treeData.value);
+      }
+    })
+    .catch(error => {
+      ElMessage({
+        type: 'error',
+        message: '获取能力数据失败' + error
+      });
+    });
 
+  }else{
   request.evaluation
     .get('/evaluation/ability?courseId=' + parseJWT(sessionStorage.getItem('token')).obsid)
     .then(res => {
@@ -264,9 +285,14 @@ const getTreeData = () => {
       });
     });
 };
+  }
+
+
 
 onMounted(() => {
   // initialize(treeData.value);
+  const router = useRoute();
+  console.log(router);
   console.log('开始开始');
   getTreeData();
   document.addEventListener('click', closePopNode);
@@ -375,7 +401,7 @@ const addSiblingNode = node => {
     .post('/evaluation/ability/create', newNode)
     .then(res => {
       if (res.code === 200) {
-        console.log('first');
+        // console.log('first');
         getTreeData();
       }
     })
