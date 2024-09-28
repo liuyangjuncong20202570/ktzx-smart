@@ -32,9 +32,14 @@
                                         @click="row.row.keywordPopVisible = false;">取消</el-button>
                                 </div>
                             </el-header>
-                            <el-table :data="filterKeywordData" height="300" @row-click="chooseKeyword"
-                                highlight-current-row ref="keywordHighLightRow" stripe>
+                            <el-table :data="filterKeywordData" height="300" stripe>
                                 <!-- <el-table-column prop="id" label="序码"></el-table-column> -->
+                                <el-table-column width="40">
+                                    <template v-slot="row">
+                                        <el-checkbox v-model="kwdSelFlag[row.row.id]"
+                                            @change="chooseKeyword(row.row)" />
+                                    </template>
+                                </el-table-column>
                                 <el-table-column>
                                     <template v-slot="row">
                                         {{ row.$index + 1 }}
@@ -77,9 +82,13 @@
                                         @click="row.row.abilityPopVisible = false;">取消</el-button>
                                 </div>
                             </el-header>
-                            <el-table :data="filterAbilityData" height="300" highlight-current-row
-                                @row-click="chooseAbility" ref="abilityHighLightRow" stripe>
+                            <el-table :data="filterAbilityData" height="300" stripe>
                                 <!-- <el-table-column prop="id" label="序码"></el-table-column> -->
+                                <el-table-column width="40">
+                                    <template v-slot="row">
+                                        <el-checkbox v-model="abSelFlag[row.row.id]" @change="chooseAbility(row.row)" />
+                                    </template>
+                                </el-table-column>
                                 <el-table-column>
                                     <template v-slot="row">
                                         {{ row.$index + 1 }}
@@ -168,9 +177,9 @@ const filterAbilityData = computed(() =>    // 实际显示的能力表源数据
     )
 )
 
-const selectedKeyword = ref({});    // 记录某行哪一个关键字被选择了，防止每次打开表后不进行操作会导致原数据丢失
+const selectedKeyword = ref();    // 记录某行哪一个关键字被选择了，防止每次打开表后不进行操作会导致原数据丢失
 
-const selectedAbility = ref({});    // 记录某行哪一个能力被选择了，防止每次打开表后不进行操作会导致原数据丢失
+const selectedAbility = ref();    // 记录某行哪一个能力被选择了，防止每次打开表后不进行操作会导致原数据丢失
 
 const openedKeywordPop = ref(null);     // 记录哪行的关键字表被打开了
 
@@ -286,7 +295,7 @@ const addKWA = () => {      // 新增KWA
     })
 };
 
-/*判定哪些行被选中*/
+/*判定主表格中哪些行被选中*/
 const tableSelect = (selection) => {
     tableSelected.value = selection;
 };
@@ -340,7 +349,7 @@ const deleteKWA = () => {
 
 const createNewKWA = (data) => {
     request.evaluation.post('/evaluation/kwadict/create', data).then((res) => {
-        if (res.code === 200){
+        if (res.code === 200) {
             getKWAData();
             ElMessage.success('新增成功');
         }
@@ -356,6 +365,9 @@ const createNewKWA = (data) => {
 
 
 /**************关键字表格的函数***************/
+
+const kwdSelFlag = ref({});     // 存储关键字表格每一行是否被选中的标志
+
 const openKeywordDictionary = (row) => {
     // console.log(row.row);
     if (openedKeywordPop.value) openedKeywordPop.value.keywordPopVisible = false;    // 关掉其他打开的popover
@@ -371,13 +383,13 @@ const openKeywordDictionary = (row) => {
 
             let selectedKeywordIndex = -1;  // 记录当前显示的关键字在关键字表中的下标
             for (let i = 0; i < keywordData.value.length; i++) {
+                kwdSelFlag.value[keywordData.value[i].id] = false;
                 if (keywordData.value[i].id === row.row.keywordid) {
                     selectedKeyword.value = keywordData.value[i];    // 保存当前用户选择的关键字，防止用户不进行操作导致表格单元置空
                     selectedKeywordIndex = i;
+                    kwdSelFlag.value[keywordData.value[i].id] = true;
                 }
             }
-            // 每次打开关键字表格高亮已经被选择的关键字
-            keywordHighLightRow.value!.setCurrentRow(keywordData.value[selectedKeywordIndex]);
         }
         else {
             ElMessage.error(res.msg);
@@ -388,21 +400,21 @@ const openKeywordDictionary = (row) => {
 
 }
 
-const chooseKeyword = (row, column, cell, event) => {
-    selectedKeyword.value = row;
-    // console.log(row);
+const chooseKeyword = (data) => {
+    kwdSelFlag.value[selectedKeyword.value.id] = false;
+    selectedKeyword.value = data;
 };
 
 const setKeyword = (row) => {
     let created = false;    // 判断该行数据是否在数据库里
-    if(row.row.abilityid && row.row.keywordid) created = true;  // 如果当前行的关键字和能力在选择前不为空则说明这条数据存在于数据库中
+    if (row.row.abilityid && row.row.keywordid) created = true;  // 如果当前行的关键字和能力在选择前不为空则说明这条数据存在于数据库中
 
     const oldKeyword = row.row.keywordname;
     row.row.keywordname = selectedKeyword.value.name;
     row.row.keywordid = selectedKeyword.value.id;
     if (row.row.keywordname || row.row.abilityname) row.row.name = row.row.keywordname + '-' + row.row.abilityname;
     if (row.row.abilityid && row.row.keywordid) {
-        if(!created){
+        if (!created) {
             createNewKWA(row.row);
         }
         else if (created && oldKeyword !== row.row.keywordname) {
@@ -421,17 +433,17 @@ const setKeyword = (row) => {
             })
         }
     }
+
     selectedKeyword.value = {};
     row.row.keywordPopVisible = false;
 };
-
-const keywordHighLightRow = ref<InstanceType<typeof ElTable>>()
 
 /*******************************************/
 
 
 /**************能力表格的函数***************/
-const abilityHighLightRow = ref<InstanceType<typeof ElTable>>();
+
+const abSelFlag = ref({});      // 存储能力表格中每一行是否被勾选的标志
 
 const openAbilityDictionary = (row) => {    // 打开能力弹框
     // console.log(row.row)
@@ -448,13 +460,13 @@ const openAbilityDictionary = (row) => {    // 打开能力弹框
             // console.log(abilityData.value);
             let selectedAbilityIndex = -1;  // 记录当前显示的能力在能力表中的下标
             for (let i = 0; i < abilityData.value.length; i++) {
+                abSelFlag.value[abilityData.value[i].id] = false;
                 if (abilityData.value[i].id === row.row.abilityid) {
                     selectedAbility.value = abilityData.value[i]; // 保存当前选择的能力，以防止用户不进行任何操作关闭弹框导致表格单元置空
                     selectedAbilityIndex = i;
+                    abSelFlag.value[abilityData.value[i].id] = true;
                 }
             }
-            // 每次打开能力表格高亮已经被选择的能力
-            abilityHighLightRow.value!.setCurrentRow(abilityData.value[selectedAbilityIndex]);
         }
         else {
             ElMessage.error(res.msg);
@@ -466,14 +478,15 @@ const openAbilityDictionary = (row) => {    // 打开能力弹框
 
 }
 
-const chooseAbility = (row) => {   // 记录哪个能力被选择
-    selectedAbility.value = row;
+const chooseAbility = (data) => {   // 记录哪个能力被选择
+    abSelFlag.value[selectedAbility.value.id] = false;
+    selectedAbility.value = data;
     // console.log(row.name);
 };
 
 const setAbility = (row) => {   // 点击确定后将选择的能力赋值给KWA表数据
     let created = false;    // 判断该行数据是否在数据库里
-    if(row.row.abilityid && row.row.keywordid) created = true;  // 如果当前行的关键字和能力在选择前不为空则说明这条数据存在于数据库中
+    if (row.row.abilityid && row.row.keywordid) created = true;  // 如果当前行的关键字和能力在选择前不为空则说明这条数据存在于数据库中
 
     const oldAbilityName = row.row.abilityname;
     row.row.abilityname = selectedAbility.value.name;
@@ -481,7 +494,7 @@ const setAbility = (row) => {   // 点击确定后将选择的能力赋值给KWA
     if (row.row.keywordname || row.row.abilityname) row.row.name = row.row.keywordname + '-' + row.row.abilityname;
     // console.log(row.row);
     if (row.row.abilityid && row.row.keywordid) {
-        if(!created) {
+        if (!created) {
             createNewKWA(row.row);
         }
         else if (created && oldAbilityName !== row.row.abilityname) {

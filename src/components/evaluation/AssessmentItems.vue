@@ -100,6 +100,7 @@ const loadData = () => {
 	request.evaluation.get('/evaluation/checkitem?courseid=' + courseId).then((res) => {
 		if (res.code === 200) {
 			tableData.value = res.data;
+			console.log(res.data);
 			initialize();
 		} else {
 			ElMessage.error(res.msg);
@@ -111,8 +112,8 @@ const loadData = () => {
 
 const initialize = () => {
 	for (let i = tableData.value.length - 1; i >= 0; i--) {
-		ElMessage.success(tableData.value[i].pid);
-		ElMessage.success(tableData.value[i].checkitemdeep.toString);
+		// ElMessage.success(tableData.value[i].pid);
+		// ElMessage.success(tableData.value[i].checkitemdeep);
 		// if(tableData.value)
 
 	}

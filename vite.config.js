@@ -1,4 +1,4 @@
-import {defineConfig} from 'vite';
+import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import legacy from '@vitejs/plugin-legacy';
 
@@ -7,38 +7,40 @@ export default defineConfig({
     vue(),
     legacy({
       targets: ['ie>=11'],
-      additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
-    }),
+      additionalLegacyPolyfills: ['regenerator-runtime/runtime']
+    })
   ],
   server: {
     port: 8081,
-      proxy: {
-          '/api': {
-              target: 'http://60.205.178.180:8080',
-              changeOrigin: true,
-              rewrite: (path) => path.replace(/^\//, '')
-          },
-          '/page': {
-              target: 'http://60.205.178.180:8084',
-              changeOrigin: true,
-              rewrite: (path) => path.replace(/^\//, '')
-          },
-          '/fork': {
-              target: 'http://60.205.178.180:8084',
-              changeOrigin: true,
-              rewrite: (path) => path.replace(/^\//, '')
-          },
-          '/common': {
-              target: 'http://60.205.178.180:8084',
-              changeOrigin: true,
-              rewrite: (path) => path.replace(/^\//, '')
-          },
-          '/term': {
-              target: 'http://60.205.178.180:8084',
-              changeOrigin: true,
-              rewrite: (path) => path.replace(/^\//, '')
-          },
+    proxy: {
+      '/api': {
+        // target: 'http://60.205.178.180:8080',
+        target: 'http://127.0.0.1:8082',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\//, '')
+      },
+
+      '/page': {
+        target: 'http://60.205.178.180:8084',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\//, '')
+      },
+      '/fork': {
+        target: 'http://60.205.178.180:8084',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\//, '')
+      },
+      '/common': {
+        target: 'http://60.205.178.180:8084',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\//, '')
+      },
+      '/term': {
+        target: 'http://60.205.178.180:8084',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\//, '')
       }
+    }
   },
   base: '/',
   resolve: {

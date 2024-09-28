@@ -75,7 +75,7 @@
 
 <script lang="ts" setup>
 import { Document, Folder } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox, ElMessageBoxOptions } from 'element-plus'
 import type Node from 'element-plus/es/components/tree/src/model/node'
 import type { DragEvents } from 'element-plus/es/components/tree/src/model/useDragNode'
 import type { NodeDropType, } from 'element-plus/es/components/tree/src/tree.type'
@@ -154,33 +154,50 @@ const initialize = (nodes) => {
 
 
 /*********************删除节点****************************/
-const confirmDeleteNodes = (deletedNode) => {
-	// console.log(deletedNode)
 	// 检查节点是否有子节点
-	if (/* deletedNode.children && deletedNode.children.length > 0 */0) {
+	// if ( deletedNode.children && deletedNode.children.length > 0 ) {
 		// 如果有子节点，显示错误提示并阻止删除
 		// ElMessage({
 		// 	type: 'error',
 		// 	message: '请先删除子节点',
 		// });
 		// deletedNode.popVisible = false;
-	} else {
-		// 如果没有子节点，询问用户是否真的要删除该节点
-		ElMessageBox.confirm(
-			`是否删除节点 "${deletedNode.obsname}"?`, // 使用节点的名字
-			'警告',
-			{
-				confirmButtonText: '确定',
-				cancelButtonText: '取消',
-				type: 'warning',
-			}
-		).then(() => {
-			deleteNodes(deletedNode);
-		}).catch(() => {
-			// 用户取消操作
-			deletedNode.popVisible = false; // 假设这样可以关闭弹窗
-		});
-	}
+	// }
+const confirmDeleteNodes = (deletedNode) => {
+  // 第一次弹窗的提示信息
+  const message = deletedNode.children && deletedNode.children.length > 0
+      ? `是否删除节点 "${deletedNode.obsname}"，及其子节点?`
+      : `是否删除节点 "${deletedNode.obsname}"?`;
+
+  ElMessageBox.confirm(
+      message, // 第一次弹窗提示
+      '警告',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      } as ElMessageBoxOptions
+  ).then(() => {
+    // 如果用户点击了“确定”，则弹出二次确认
+    ElMessageBox.confirm(
+        `确定要删除该节点吗？`, // 二次确认提示
+        '请再次确认',
+        {
+          confirmButtonText: '是',
+          cancelButtonText: '否',
+          type: 'warning',
+        } as ElMessageBoxOptions
+    ).then(() => {
+      // 如果用户在二次确认中点击“是”，则执行删除操作
+      deleteNodes(deletedNode);
+    }).catch(() => {
+      // 用户在二次确认中点击了“否”，关闭弹窗
+      deletedNode.popVisible = false;
+    });
+  }).catch(() => {
+    // 用户在第一次弹窗中点击了“取消”，关闭弹窗
+    deletedNode.popVisible = false;
+  });
 }
 
 const deleteNodes = (deletedNode) => {
@@ -206,7 +223,12 @@ const deleteNodes = (deletedNode) => {
 					if (index > -1) expandedKeys.value.splice(index, 1);
 				})
 				console.log(expandedKeys.value);
-			}
+			}else if(res.code === 404){
+        ElMessage({
+          type: 'error',
+          message: `批量删除教学单位出错`
+        })
+      }
 		}).catch(error => {
 			ElMessage({
 				type: 'error',
@@ -495,6 +517,7 @@ const handleBlur = (node) => {
 			const editdata = ref({
 				id: node.id,
 				obsname: node.tempData,
+        obsdeep: node.obsdeep,
 				remark: ''
 			})
 			request.admin.post('/sysmangt/units/update', editdata.value)

@@ -54,7 +54,7 @@
                 </div>
                     </template>
                 </el-table-column>
-            <el-table-column label="专业负责人" min-width="100">
+            <el-table-column label="课程负责人" min-width="100">
               <template #default="{ row }">
                 <div style="display: flex; align-items: center;">
                   <div style="flex-grow: 1; display: flex; flex-wrap: wrap;">
