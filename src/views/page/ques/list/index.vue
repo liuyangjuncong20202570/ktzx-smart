@@ -1,13 +1,13 @@
 <template>
   <div class="test-list-wrap">
-    <Header title="问卷列表" />
+    <Header title="问卷列表" :pathData="pathData" />
 
     <header class="flex-end" style="margin: 10px 0;">
 
       <div>
-        <el-button @click="del(null, '确定批量删除？')" type="danger">批量删除</el-button>
+        <el-button @click="del(null, '确定批量删除？')" :icon="Delete" type="danger">批量删除</el-button>
         <!-- <el-button @click="download">下载所有成绩</el-button> -->
-        <el-button @click="addTask" type="primary">新建问卷</el-button>
+        <el-button @click="addTask" :icon="Plus" type="primary">新建问卷</el-button>
       </div>
     </header>
 
@@ -43,14 +43,17 @@
             </el-button>
 
             <template v-if="!(privilege === 'read')">
-              <el-button type="text" @click="edit(scope.row.id)">
+              <el-button :disabled="scope.row.status" type="text" @click="edit(scope.row.id)">
                 编辑
               </el-button>
 
-              <el-button type="text" @click="del(scope.row, '确认删除此问卷吗?')">
+              <el-button :disabled="scope.row.status" type="text" @click="del(scope.row, '确认删除此问卷吗?')">
                 删除
               </el-button>
             </template>
+            <el-button v-if="!scope.row.status" type="text" @click="publish(scope.row.id)">
+              发布
+            </el-button>
           </div>
 
         </template>
@@ -71,7 +74,8 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
-import { queFormPager, queFormDel, queFormWR } from '@/api/ques.js'
+import { Delete, Plus } from '@element-plus/icons-vue'
+import { queFormPager, queFormDel, queFormWR, quePublish } from '@/api/ques.js'
 import Header from '@/views/page/components/header/index.vue'
 import NoAccessPermission from '@/views/page/components/noAccessPermission/index.vue'
 
@@ -85,6 +89,13 @@ const params = ref({
   pageSize: 20,
 })
 const privilege = ref('')
+
+const pathData = [
+  {
+    name: '问卷列表',
+    path: ''
+  }
+]
 
 onMounted(() => {
   getWR()
@@ -106,6 +117,29 @@ const edit = (id) => {
       id
     }
   })
+}
+
+const publish = (id) => {
+  ElMessageBox.confirm(
+    '确定发布此问卷?',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(() => {
+    quePublish(id).then(res => {
+      if (res.code === '200') {
+        ElMessage({
+          type: 'success',
+          message: '发布成功',
+        })
+        getQuesList()
+      }
+    })
+  }).catch((err) => { console.log(err) })
+  
 }
 
 const getQuesList = () => {
@@ -171,8 +205,7 @@ const handleSelectionChange = (val) => {
 <style scoped>
 .test-list-wrap {
   background: #fff;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 0 10px 10px 10px;
   position: relative;
   height: 100%;
   box-sizing: border-box;

@@ -1,6 +1,6 @@
 <template>
   <div class="task-list">
-    <Header title="作业学生列表" />
+    <Header title="作业学生列表" :pathData='pathData' />
     <div class="flex-end" style="margin-top: 10px;" v-if="tableData && tableData.length">
       <el-button type="danger" :icon="Download" @click="download">成绩下载</el-button>
     </div>
@@ -11,12 +11,13 @@
       <el-table-column property="userName" label="姓名" />
       <el-table-column property="status" label="状态">
         <template #default="scope">
-           <span :style="`color:${statusColors[scope.row.status]}`">{{ ['未完成', '已交卷', '已批改'][scope.row.status] }}</span>
+           <span class="task-status" :style="`background:${statusColors[scope.row.status]}`"></span>
         </template>
       </el-table-column>
       <el-table-column property="totalScore" label="总评成绩" />
       <el-table-column property="address" label="操作" v-if="!(privilege === 'read')">
         <template #default="scope">
+          <span v-if="scope.row.status === 0">--</span>
           <el-button
             type="text"
             size="small"
@@ -27,7 +28,8 @@
                 query: {
                   testId: scope.row.testId,
                   stuId: scope.row.stuId,
-                  type: 'edit'
+                  type: 'edit',
+                  ...route.query
                 }
               })
             })"
@@ -45,7 +47,8 @@
                 query: {
                   testId: scope.row.testId,
                   stuId: scope.row.stuId,
-                  type: 'view'
+                  type: 'view',
+                  ...route.query
                 }
               })
             })"
@@ -73,6 +76,18 @@ const id = route.query.id
 const privilege = route.query?.privilege
 const tableData = ref([])
 const statusColors = ['red', '#169bd5' ,'#169bd5']
+
+const pathData = [
+  {
+    name: '作业管理',
+    path: '/homes/courseteacherhome/exam/test/testmangt'
+  },
+  {
+    name: '作业学生列表',
+    path: ''
+  },
+]
+
 onMounted(() => {
   getStudentList()
 })
@@ -91,6 +106,10 @@ const getStudentList = () => {
   studentList(id).then(res => {
     if (res.code === '200') {
       tableData.value = res.data
+      // totalScore
+      tableData.value.forEach((item) => {
+        if (item.totalScore == null) item.totalScore = '--'
+      })
     }
   })
 }
@@ -100,7 +119,12 @@ const getStudentList = () => {
 <style scoped>
 .task-list {
   background: #fff;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 0 10px 10px 10px;
+}
+.task-status {
+  border-radius: 50%;
+  display: inline-block;
+  width: 15px;
+  height: 15px;
 }
 </style>

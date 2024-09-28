@@ -1,6 +1,6 @@
 <template>
   <div class="test-list-wrap">
-    <Header title="试卷列表" />
+    <Header title="作业管理" :pathData="pathData" />
 
     <header class="flex-between" style="margin: 10px 0;">
       <div class="flex-start">
@@ -12,9 +12,9 @@
 
       <div>
         <template v-if="!(privilege === 'read')">
-          <el-button @click="del" type="danger">批量删除</el-button>
+          <el-button @click="del" :icon="Delete" type="danger">批量删除</el-button>
           <!-- <el-button @click="download">下载所有成绩</el-button> -->
-          <el-button @click="addTask" type="primary">新建作业</el-button>
+          <el-button @click="addTask" :icon="Plus" type="primary">新建作业</el-button>
         </template>
       </div>
     </header>
@@ -58,7 +58,7 @@
                 复制
               </el-button>
 
-              <el-button v-if="[0, 1].includes(scope.row.status)" type="text" @click="edit(scope.row.id)">
+              <el-button :disabled="scope.row.locked" v-if="[0, 1].includes(scope.row.status)" type="text" @click="edit(scope.row.id)">
                 编辑
               </el-button>
 
@@ -70,7 +70,7 @@
                 {{ scope.row.locked ? '解锁' : '锁定' }}
               </el-button>
 
-              <el-button v-if="[0, 1].includes(scope.row.status)" type="text" @click="del(scope.row)">
+              <el-button :disabled="scope.row.locked" v-if="[0, 1].includes(scope.row.status)" type="text" @click="del(scope.row)">
                 删除
               </el-button>
 
@@ -104,6 +104,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
+import { Delete, Plus } from '@element-plus/icons-vue'
 import { taskList, getTermAll, queFormDel, taskCopy, taskPublish, taskLock, taskUnlock, courseLiWR } from '@/api/taskMgmt.js'
 import Header from '@/views/page/components/header/index.vue'
 import New from './components/new/index.vue'
@@ -123,6 +124,14 @@ const params = ref({
   termId: ''
 })
 const privilege = ref('')
+
+const pathData = [
+  {
+    name: '作业管理',
+    path: ''
+  }
+]
+
 const getWR = () => {
   courseLiWR().then(res => {
     if (res.code === '200') {
@@ -137,32 +146,62 @@ onMounted(() => {
 })
 
 const copy = (id) => {
-  taskCopy(id).then(res => {
-    if (res.code === '200') {
-      ElMessage.success('复制成功')
-      params.pageIndex = 1
-      getTaskList()
+  ElMessageBox.confirm(
+    '确定复制吗?',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     }
-  })
+  ).then(() => {
+    taskCopy(id).then(res => {
+      if (res.code === '200') {
+        ElMessage.success('复制成功')
+        params.pageIndex = 1
+        getTaskList()
+      }
+    })
+  }).catch(() => { })
 }
 
 const publish = (id) => {
-  taskPublish(id).then(res => {
-    if (res.code === '200') {
-      ElMessage.success('发布成功')
-      getTaskList()
+  ElMessageBox.confirm(
+    '确定发布吗?',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     }
-  })
+  ).then(() => {
+    taskPublish(id).then(res => {
+      if (res.code === '200') {
+        ElMessage.success('发布成功')
+        getTaskList()
+      }
+    })
+  }).catch(() => { })
 }
 
 const lock = (row) => {
-  const api = row.locked ? taskUnlock : taskLock
-  api(row.id).then(res => {
-    if (res.code === '200') {
-      ElMessage.success(row.locked ? '解锁成功' : '锁定成功')
-      getTaskList()
+  ElMessageBox.confirm(
+    `确定${row.locked ? '解锁' : '加锁'}吗?`,
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     }
-  })
+  ).then(() => {
+    const api = row.locked ? taskUnlock : taskLock
+      api(row.id).then(res => {
+        if (res.code === '200') {
+          ElMessage.success(row.locked ? '解锁成功' : '锁定成功')
+          getTaskList()
+        }
+      })
+  }).catch(() => { })
 }
 
 const unlock = (id) => {
@@ -186,7 +225,6 @@ const edit = (id) => {
 const _getTermAll = () => {
   getTermAll().then(res => {
     if (res.code === '200') {
-      // 
       termList.value = res.data?.filter((item) => item.iscurrentterm === '1')
       if (termList?.value?.length) {
         // 默认展示第一个学期
@@ -267,8 +305,7 @@ const handleSelectionChange = (val) => {
 <style scoped>
 .test-list-wrap {
   background: #fff;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 0 10px 10px 10px;
   position: relative;
   box-sizing: border-box;
   height: 100%;

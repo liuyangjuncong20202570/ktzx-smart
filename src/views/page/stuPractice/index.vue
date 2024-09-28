@@ -1,6 +1,6 @@
 <template>
     <div class="task-list">
-      <Header title="我的实验" />
+      <Header title="我的实验" :pathData="pathData" />
       <!-- 作业列表 -->
       <el-table ref="multipleTableRef" :data="tableData" style="width: 100%;margin-top: 10px;" @selection-change="handleSelectionChange">
         <el-table-column type="index" label="序号" width="80" />
@@ -78,6 +78,12 @@
     pageIndex: 1,
     pageSize: 20
   })
+  const pathData = [
+    {
+      name: '我的实验',
+      path: ''
+    }
+  ]
   onMounted(() => {
     getPracticeList()
   })
@@ -109,8 +115,7 @@
   <style scoped>
   .task-list {
     background: #fff;
-    padding: 10px;
-    border-radius: 8px;
+    padding: 0 10px 10px 10px;
     font-size: 13px;
   }
   .task-title {

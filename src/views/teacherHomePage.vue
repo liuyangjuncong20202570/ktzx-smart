@@ -63,7 +63,7 @@
           </div>
         </div>
       </el-header>
-      <el-container>
+      <el-container style="width: 100%;overflow-x: hidden;">
         <el-aside width="200px" style="height: 100%">
           <div
             style="
