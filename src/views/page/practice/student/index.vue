@@ -5,16 +5,17 @@
  * @FilePath: \smarttt_ktzx\src\views\page\practice\student\index.vue
 -->
 <template>
-  <el-card>
+  <el-card class="experimental-student-wrap">
+    <Header title="实验学生列表" :pathData="pathData" />
     <div class="practice-tool">
       <el-button type="danger" :icon="Download" @click="loadScore">成绩下载</el-button>
       <!-- <el-button type="primary" :icon="Download" @click="loadData">数据下载</el-button> -->
     </div>
-    <el-table ref="multipleTableRef" :data="tableData" style="width: 100%" :border="true">
+    <el-table ref="multipleTableRef" :data="tableData" style="width: 100%">
       <el-table-column lebel="序号" type="index" fixed="left" />
       <el-table-column label="学号" prop="stuNo" />
       <el-table-column label="姓名" prop="name" />
-      <el-table-column label="总评成绩" prop="answerPercent" ></el-table-column>
+      <el-table-column label="总评成绩" prop="resultScore" ></el-table-column>
       <el-table-column label="状态" prop="status" >
         <template #default="scope">
          <span>{{statusMap.get(scope.row.status)  }}</span>
@@ -28,6 +29,7 @@
               query: {
                 practiceId: scope.row.practiceId,
                 stuId: scope.row.stuId,
+                ...route.query
               }
             })
           })">查看</el-button>
@@ -61,6 +63,7 @@ import { host } from '@/api/host.js'
 import { studentList, practiceDownload } from "@/api/practice/index.ts";
 import { ResVO ,StudentPracticePageVO} from "@/api/practice/type.ts";
 import { downloadFile } from '@/utils/index'
+import Header from '@/views/page/components/header/index.vue'
 
 const routes = useRouter()
 const { currentRoute } = routes
@@ -70,13 +73,24 @@ const id = route.query.id
 const statusMap = reactive(new Map([[0,'已发布'],[1,'已作答'],[2,'已批改']]))
 const pagination = reactive({
   pageIndex:1,
-  pageSize:10,
+  pageSize:40,
   total:0
 })
 const tableData = reactive<StudentPracticePageVO>([]);
 
+const pathData = [
+  {
+    name: '实验管理',
+    path: '/homes/courseteacherhome/exam/experimental/labmangt'
+  },
+  {
+    name: '实验学生列表',
+    path: ''
+  }
+]
+
 const correct = (data:any) =>{
-  routes.push({path:'/homes/courseteacherhome/exam/experimental/correct',query:{sid:data.stuId,pid:data.practiceId}})
+  routes.push({path:'/homes/courseteacherhome/exam/experimental/correct',query:{sid:data.stuId,pid:data.practiceId,type:'homeworkCorrecting', ...route.query}})
 }
 const loadScore = () => {
   practiceDownload(id).then(res => {
@@ -109,9 +123,14 @@ onMounted(() => {
   loadStudentData();
 });
 </script>
-
+<style>
+.experimental-student-wrap .el-card__body {
+  padding: 0 20px 20px 20px !important;
+}
+</style>
 <style scoped>
 .practice-tool {
+  margin-top: 10px;
   padding-bottom: 10px;
   display: flex;
   justify-content: flex-end;

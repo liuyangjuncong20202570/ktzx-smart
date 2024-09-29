@@ -26,7 +26,7 @@
         </div>
       </el-header>
 
-      <el-container>
+      <el-container style="width: 100%;overflow-x: hidden;">
         <el-aside width="200px" style="height: 100%;">
 
           <!-- 使用 el-scrollbar 包裹 el-menu，设置高度为 70% -->

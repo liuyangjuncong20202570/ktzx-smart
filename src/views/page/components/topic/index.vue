@@ -22,6 +22,7 @@
         style="width: 100%;margin-bottom: 10px;"
         :rows="4"
         type="textarea"
+        maxlength="3000"
       />
 
       <div 
@@ -252,8 +253,13 @@ export default defineComponent({
   border-bottom: 1px solid #e1e1e1;
   padding-bottom: 10px;
   box-shadow: 0px 1px 13px #a9a9a9;
-  padding: 10px;
+  padding: 0 10px 10px 10px;
   border-radius: 5px;
+}
+
+h3 {
+  padding: 10PX 0;
+  margin: 0;
 }
 
 .topic-content {
@@ -268,6 +274,7 @@ export default defineComponent({
 }
 
 .option-left {
+  font-size: 13px;
   width: 280px;
 }
 

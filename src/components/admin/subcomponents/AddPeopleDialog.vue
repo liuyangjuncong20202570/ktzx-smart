@@ -50,7 +50,7 @@
               ></el-cascader>
             </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="newform.remark"></el-input>
+              <el-input type="textarea" v-model="newform.remark" maxlength="3000"></el-input>
             </el-form-item>
             <el-form-item>
               <el-button type="info" large style="width: 40%" @click="closeDialog">取消</el-button>

@@ -190,6 +190,7 @@ const routes = [
       {
         path: 'evasys/formative/ability', // 形成性评价模型-能力
         name: 'Ability',
+        meta:1,
         component: () => import('../components/evaluation/Ability.vue')
       },
       {

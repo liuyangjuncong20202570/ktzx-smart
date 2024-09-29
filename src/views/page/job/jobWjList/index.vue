@@ -73,7 +73,6 @@
   <style scoped>
   .task-list {
     background: #fff;
-    padding: 10px;
-    border-radius: 8px;
+    padding: 0 10px 10px 10px;
   }
   </style>

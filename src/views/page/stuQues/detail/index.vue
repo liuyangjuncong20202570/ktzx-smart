@@ -1,11 +1,11 @@
 <template>
     <div class="stu-ques-list">
-      <Header title="问卷答题" />
+      <Header title="问卷答题" :pathData="pathData" />
       <div class="ques-title flex-between">
         <div>
           当前问卷：{{ detailObj.name }}
         </div>
-        <el-button v-if="!disabled">提交</el-button>
+        <el-button v-if="!disabled" type="primary" @click="submit">提交</el-button>
       </div>
       <div v-for="(item, i) in detailObj.topics" :key="i">
         <QueItem :row="item" :index="i" :disabled="disabled"  />
@@ -27,6 +27,17 @@
   const id = route.query.id
   const disabled = route.query.type === 'edit' ? false : true
   const detailObj = ref({})
+
+  const pathData = [
+    {
+      name: '问卷列表',
+      path: '/homes/studenthome/exam/myquestionnaire'
+    },
+    {
+      name: route.query.type === 'view' ? '查看问卷' : '编辑问卷',
+      path: ''
+    }
+  ]
 
   onMounted(() => {
     getMyQueFormDetail()
@@ -57,7 +68,17 @@
                 console.log('item.lib', item)
             } else if (answerMap) {
               if (TOPICTYPE[item.typeId] === '多选题') {
-                item.selectId = value && value.length ? value : []
+                // 其他输入项
+                const isOther = value?.map((valueItem) => {
+                  if (valueItem.indexOf('other:') !== -1) {
+                    return valueItem
+                  }
+                })[0] ?? ''
+                if (value && isOther) {
+                  item.other = isOther.split(':')[1]
+                } else {
+                  item.selectId = value && value.length ? value : []
+                }
               }else {
                 item.selectId = value ? value[0] : ''
               }
@@ -88,7 +109,7 @@
       } else {
         itemMap = {
           ...itemMap,
-          [item.id]: Array.isArray(item.selectId) ? item.selectId : [item.selectId]
+          [item.id]: (Array.isArray(item.selectId) || item.other) ? (item.other ? [`other:${item.other}`] : item.selectId) : [item.selectId]
         }
       }
     }
@@ -96,19 +117,26 @@
   }
 
   const submit = () => {
-    console.log(detailObj.value)
-    console.log(itemMaps())
-    const itemMap = itemMaps()
-    console.log('itemMap', itemMap)
-    myQueFormSubmit({
-      qfId: id,
-      itemMap
-    }).then(res => {
-      if (res.code === '200') {
-        ElMessage.success('提交成功')
-        router.push('/homes/studenthome/exam/myquestionnaire')
+    ElMessageBox.confirm(
+      '确定提交吗?',
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       }
-    })
+    ).then(() => {
+      const itemMap = itemMaps()
+      myQueFormSubmit({
+        qfId: id,
+        itemMap
+      }).then(res => {
+        if (res.code === '200') {
+          ElMessage.success('提交成功')
+          router.push('/homes/studenthome/exam/myquestionnaire')
+        }
+      })
+    }).catch(() => { })
   }
 
   </script>
@@ -116,8 +144,7 @@
   <style scoped>
   .stu-ques-list {
     background: #fff;
-    padding: 10px;
-    border-radius: 8px;
+    padding: 0 10px 10px 10px;
     font-size: 13px;
     height: 100%;
     box-sizing: border-box;

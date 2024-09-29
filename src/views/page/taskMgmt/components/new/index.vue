@@ -74,7 +74,7 @@ defineExpose({
 .task-card {
   width: 300px;
   background: #d7d7d7;
-  padding: 10px;
+  padding: 0 10px 10px 10px;
   margin: 0 10px;
   border-radius: 5px;
 }

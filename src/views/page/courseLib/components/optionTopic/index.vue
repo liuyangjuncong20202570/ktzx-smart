@@ -18,7 +18,7 @@
 
 <script>
 import { defineComponent, ref } from 'vue'
-import { courseLibTypeList } from '@/api/courseLib.js' 
+import { courseLibType } from '@/api/courseLib.js' 
 
 export default defineComponent({
   setup(props, { emit }) {
@@ -44,7 +44,7 @@ export default defineComponent({
     }
 
     const getCourseLibTypeList = () => {
-      courseLibTypeList().then(res => {
+      courseLibType().then(res => {
         if (res.code === '200') {
           libTypeList.value = res?.data.filter((item) => item.status)
         }

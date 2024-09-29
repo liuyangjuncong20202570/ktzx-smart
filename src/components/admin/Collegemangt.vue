@@ -5,7 +5,8 @@
         style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
       <el-button type="success" style="margin-left: 0.8vw;" @click="exportData">导出学院</el-button>
       <el-button type="primary" style="margin-left: 0.8vw;" @click="handleRoleAdd">新增学院</el-button>
-      <el-button type="danger" @click="handleRoleDel">删除学院</el-button>
+      <!--LQ提出删除前端所有有关删除按键-->
+<!--      <el-button type="danger" @click="handleRoleDel">删除学院</el-button>-->
 <!--      <el-button type="success" @click="">保存</el-button>-->
     </el-header>
     <el-main style="padding: 0;overflow: auto;">

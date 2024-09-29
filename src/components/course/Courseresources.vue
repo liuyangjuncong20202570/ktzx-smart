@@ -61,6 +61,7 @@ import {ElMessage, ElMessageBox} from 'element-plus';
 import request from '../../utils/request.js';
 import PdfPreview from './Utilcomponents/PdfPreview.vue';
 import WordPreview from './Utilcomponents/WordPreview.vue';
+import {uploadTeachingFile} from '../../utils/uploadTeachingFile.js';
 
 const filelist = ref([]);
 const previewVisible = ref(false);
@@ -105,45 +106,23 @@ const formattedFilelist = computed(() => {
 });
 
 const beforeUpload = (file) => {
-  const isDoc = file.type === 'application/msword'; // 检查是否为 .doc 文件
-  const isDocx = file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-  const isPDF = file.type === 'application/pdf';
 
-  if (isDoc) {
-    ElMessage.error('不能上传 .doc 格式的文件，请上传 .docx 或 .pdf 格式的文件!');
-    return false;
-  }
+  const uploadUrl = '/coursemangt/courseresources/upload';
+  uploadTeachingFile(file, uploadUrl,
+      (res) => {
+        // 成功回调
+        console.log('上传成功:', res);
+        // 处理成功后的逻辑
+        fetchCourseList();
+      },
+      (res) => {
+        // 失败回调
+        console.log('上传失败:', res);
+        // 处理失败后的逻辑
+      }
+  );
 
-  if (!isDocx && !isPDF) {
-    ElMessage.error('只能上传 .docx 或 .pdf 格式的文件!');
-    return false;
-  }
 
-  const isLt20M = file.size / 1024 / 1024 < 20;
-  if (!isLt20M) {
-    ElMessage.error('上传文件大小不能超过 20MB!');
-    return false;
-  }
-
-  const formData = new FormData();
-  formData.append('file', file);
-
-  request.course.post('/coursemangt/courseresources/upload', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  }).then(res => {
-    if (res.code === 200) {
-      ElMessage.success(`${file.name} 上传成功`);
-      fetchCourseList();
-    } else {
-      ElMessage.error(`${file.name} 上传失败: ${res.msg}`);
-    }
-  }).catch(() => {
-    ElMessage.error(`${file.name} 上传失败`);
-  });
-
-  return false;
 };
 
 const previewFile = async (file) => {
@@ -198,7 +177,7 @@ const deleteFile = async (file) => {
       cancelButtonText: '取消',
       type: 'warning',
     });
-    await request.course.get(`/coursemangt/courseresources/delete/${file.filename}`)
+    await request.course.get(`/coursemangt/courseresources/delete/${encodeURIComponent(file.filename)}`)
         .then(res => {
           console.log("res",res)
           if (res.code === 200) {
