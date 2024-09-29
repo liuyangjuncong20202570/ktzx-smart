@@ -106,7 +106,7 @@ const obsmenulist = ref([]);
 function init(form,oriobsmenulist) {
   dialogVisible.value = true;
   obsmenulist.value = oriobsmenulist.value;
-  console.log(123)
+  // console.log(123)
   // console.log(oriobsmenulist.value)
   //将父组件中的form传入子组件中的form
   for (const key in form) {

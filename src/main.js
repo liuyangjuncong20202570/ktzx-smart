@@ -10,6 +10,13 @@ import {clickOutside} from './directives/clickOutside.js'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import './assets/css/global.css'
 import * as Icons from '@element-plus/icons-vue'
+// 完整导入 UI 组件库
+import VxeUI from 'vxe-pc-ui'
+import 'vxe-pc-ui/lib/style.css'
+// 完整导入 表格库
+import VxeUITable from 'vxe-table'
+import 'vxe-table/lib/style.css'
+
 
 const pinia = createPinia();
 const app = createApp(App);
@@ -23,6 +30,7 @@ app
     .use(router)
     .use(pinia)
     .use(ElementPlus, { locale: zhCn })
+    .use(VxeUI).use(VxeUITable)
     .directive('blur-on-click', blurOnClick)
     .directive('click-outside', clickOutside)
     .mount('#app')

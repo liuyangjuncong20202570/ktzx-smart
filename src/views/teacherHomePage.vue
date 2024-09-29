@@ -23,7 +23,7 @@
           <div class="left-div" style="flex-grow: 1; display: flex; align-items: center">
             <img src="../assets/images/logo.png" style="height: 5.5vh" />
             <el-text style="font-size: calc(1vw + 6px); color: white; margin-left: 10px"
-              >专业智能教学平台</el-text
+              >智能教学平台</el-text
             >
           </div>
 
