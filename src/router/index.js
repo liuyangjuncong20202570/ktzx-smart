@@ -188,7 +188,8 @@ const routes = [
         component: () => import('../components/evaluation/Keyword.vue')
       },
       {
-        path: 'evasys/formative/ability', // 形成性评价模型-能力
+        //1004hhy修改
+        path: 'evaluation/getability', // 形成性评价模型-能力
         name: 'Ability',
         meta:1,
         component: () => import('../components/evaluation/Ability.vue')
