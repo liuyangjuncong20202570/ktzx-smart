@@ -257,7 +257,7 @@ const getData = res => {
 const getTreeData = () => {
   // TODO:对路由进行判断
   const route = useRoute();
-  if (route.fullPath === '/homes/professionhome/evaluation/ability') {
+  if (route?.fullPath === '/homes/professionhome/evaluation/ability') {
     request.evaluation
       .get('/evaluation/getability/allability')
       .then(res => {
