@@ -1,4 +1,3 @@
-
 .flex-start {
     display: flex;
     justify-content: flex-start;
@@ -25,6 +24,12 @@
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.wdd-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 button {

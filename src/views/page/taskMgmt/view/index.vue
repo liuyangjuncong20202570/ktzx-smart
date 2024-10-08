@@ -1,7 +1,7 @@
 <template>
   <!-- 预览 -->
   <div class="task-view">
-    <Header title="作业预览" />
+    <Header title="作业预览" :pathData="pathData" />
     <div class="task-title flex-between">
       <div class="flex-between task-msg">
         <span>当前作业: {{ taskDetail.name }}</span>
@@ -28,6 +28,18 @@ const route = currentRoute.value
 const id = route.query?.id
 const privilege = route.query?.privilege
 const taskDetail = ref([])
+
+const pathData = [
+  {
+    name: '作业管理',
+    path: '/homes/courseteacherhome/exam/test/testmangt'
+  },
+  {
+    name: '作业预览',
+    path: ''
+  },
+]
+
 onMounted(() => {
   previewDetail(id).then(res => {
     if (res.code === '200') {
@@ -42,8 +54,7 @@ onMounted(() => {
   padding-bottom: 10px;
   position: relative;
   background: #fff;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 0 10px 10px 10px;
   height: 100%;
   box-sizing: border-box;
   color: #000000;
@@ -53,6 +64,8 @@ onMounted(() => {
   margin: 10px 0;
 }
 .task-msg {
+  font-size: 14px;
+  font-weight: bold;
   min-width: 400px;
 }
 </style>

@@ -504,9 +504,9 @@ onMounted(async () => {
 
         // 生成知识单元平面
         data.units.forEach((unit, index) => {
-            // console.log(unit);
+            console.log(unit);
             unit.kwas = unit.kwas.concat(_.cloneDeep(unit.children_kwas));
-            console.log(unit.kwas);
+            // console.log(unit.kwas);
             // 知识单元的材质
             const unitMaterial = new THREE.MeshBasicMaterial({
                 color: 'grey',
@@ -783,7 +783,7 @@ const findSecondPlaneGridSize = (array, len, maxUnitSize) => {
     maxUnitSize += 0;
     let maxX = -0x3f3f3f3f, minX = 0x3f3f3f3f;
     for (let i = 0; i < len; i++) {
-        console.log(array[i].x);
+        // console.log(array[i].x);
         if (maxX < array[i].x + maxUnitSize) maxX = array[i].x
         if (minX > array[i].x - maxUnitSize) minX = array[i].x;
     }

@@ -197,8 +197,10 @@ const relatedKWA = ref([]);
 
 const getAbility = () => {
   request.evaluation
-    .get(`/evaluation/getability?courseid=${courseid.value}`)
-    .then(res => {
+    // .get(`/evaluation/getability?courseid=${courseid.value}`)
+      //1004hhy修改将接口由 `/evaluation/getability?courseid=${courseid.value}` 改为`/evaluation/getability`
+      .get(`/evaluation/getability`)
+      .then(res => {
       if (res.code === 200) {
         data.value = res.data;
         tableData.value = [];
@@ -329,8 +331,9 @@ const openDictionary = () => {
   relatedKWA.value = [];
   dictionarySelected_backup.value = dictionarySelected.value;
   // console.log(dictionarySelected.value);
-  request.evaluation
-    .get('/evaluation/ability?courseId=' + parseJWT(sessionStorage.getItem('token')).obsid)
+  request.evaluation.get('/evaluation/getability/allability')
+      //1004hhy修改，此处为形成性评价模型-能力页面，调用获取能力接口，即'/evaluation/getability/allability'
+    // .get('/evaluation/ability?courseId=' + parseJWT(sessionStorage.getItem('token')).obsid)
     .then(res => {
       if (res.code === 200) {
         dictionaryData.value = res.data;

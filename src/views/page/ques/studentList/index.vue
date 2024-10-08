@@ -1,6 +1,6 @@
 <template>
   <div class="task-list">
-    <Header title="问卷学生列表" />
+    <Header title="问卷学生列表" :pathData="pathData" />
     <!-- 作业列表 -->
     <el-table ref="multipleTableRef" :data="tableData" style="width: 100%;margin-top: 10px;" @selection-change="handleSelectionChange">
       <el-table-column type="index" label="序号" width="80" />
@@ -23,7 +23,8 @@
                 query: {
                   type: 'student',
                   qfId: scope.row.qfId,
-                  stuId: scope.row.userId
+                  stuId: scope.row.userId,
+                  ...route.query
                 }
               })
             }"
@@ -48,6 +49,16 @@ const route = currentRoute.value
 const id = route.query.id
 const tableData = ref([])
 const statusColors = ['red', '#169bd5' ,'#169bd5']
+const pathData = [
+  {
+    name: '问卷列表',
+    path: '/homes/courseteacherhome/exam/questionnaire'
+  },
+  {
+    name:  '问卷学生列表',
+    path: ''
+  }
+]
 onMounted(() => {
   getStudentList()
 })
@@ -66,8 +77,7 @@ const getStudentList = () => {
 <style scoped>
 .task-list {
   background: #fff;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 0 10px 10px 10px;
   height: 100%;
   box-sizing: border-box;
 }

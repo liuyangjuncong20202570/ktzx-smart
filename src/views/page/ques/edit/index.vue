@@ -1,6 +1,6 @@
 <template>
   <div class="ques-lib">
-    <Header :title=" id ? '编辑问卷' : '新建问卷'" />
+    <Header :title=" id ? '编辑问卷' : '新建问卷'" :pathData="pathData" />
     <div class="ques-publish flex-between">
       <div class="flex-start">
         问卷名称: <el-input style="width: 150px;margin-left: 10px;" v-model="name" @input="handleInput"></el-input>
@@ -9,10 +9,10 @@
     <div class="ques-lib-btn flex-between">
       <el-checkbox label="全选" @change="handleSelectAll"></el-checkbox>
       <div>
-        <el-button type="text" @click="add">新增题目</el-button>
-        <el-button type="danger" @click="batchDel" :disabled="!(courseList && courseList.length)">批量删除</el-button>
+        <el-button type="primary" :icon="Plus" @click="add">新增题目</el-button>
+        <el-button type="danger" :icon="Delete" @click="batchDel" :disabled="!(courseList && courseList.length)">批量删除</el-button>
         <el-button type="primary" @click="save" :disabled="!(courseList && courseList.length)">保存</el-button>
-        <el-button type="primary" @click="publish" :disabled="!(courseList && courseList.length)" v-if="status === 0">发布</el-button>
+        <el-button type="primary" :icon="Upload" @click="publish" :disabled="!(courseList && courseList.length)" v-if="status === 0">发布</el-button>
       </div>
     </div>
 
@@ -53,16 +53,18 @@
               <el-checkbox label="" v-model="element.isChecked"></el-checkbox>
               <span class="topic-title">{{ index+1 }}、{{ element.title }}({{ TOPICTYPE[element.typeId] }})</span>
             </span>
+           <div class="topic-contents">
             <span v-html="element.content"></span>
-            <div 
-              v-if="['单选题', '多选题', '判断题'].includes(TOPICTYPE[element.typeId])" 
-              class="topic-answer-item" 
-              v-for="(answer, answerIdx) in element.items" 
-              :key="answerIdx"
-            >
-              {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}
-              <img v-if="answer.itemPicture" :src="answer.itemPicture" />
-            </div>
+              <div 
+                v-if="['单选题', '多选题', '判断题'].includes(TOPICTYPE[element.typeId])" 
+                class="topic-answer-item" 
+                v-for="(answer, answerIdx) in element.items" 
+                :key="answerIdx"
+              >
+                {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}
+                <img v-if="answer.itemPicture" :src="answer.itemPicture" />
+              </div>
+           </div>
           </div>
           <div class="topic-item-icon flex-between cursor-pointer">
             <el-icon title="上移" @click="(() => {
@@ -104,8 +106,8 @@
 
 <script>
 import vuedraggable from "vuedraggable"
-import { defineComponent, ref, onMounted } from 'vue'
-import { Edit, DocumentCopy, Delete, Top, Bottom } from '@element-plus/icons-vue'
+import { defineComponent, ref, onMounted, nextTick } from 'vue'
+import { Edit, DocumentCopy, Delete, Top, Bottom, Upload, Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import Header from '@/views/page/components/header/index.vue'
 import Topic from '../components/topic/index.vue'
@@ -144,22 +146,50 @@ export default defineComponent({
     const topic = ref(null)
     const id = ref(route.query?.id ?? '')
 
+    const pathData = [
+      {
+        name: '问卷列表',
+        path: '/homes/courseteacherhome/exam/questionnaire'
+      },
+      {
+        name:  id ? '编辑问卷' : '新建问卷',
+        path: ''
+      }
+    ]
+
     const handleInput = (val) => {
       name.value = val
     }
 
     const save = () => {
-      queFormUpdate(
+      ElMessageBox.confirm(
+        '确定保存吗?',
+        '提示',
         {
-          id: id.value,
-          topics: courseList.value,
-          name: name.value
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
         }
-      ).then(res => {
-        if (res.code === '200') {
-          ElMessage.success('保存成功')
-        }
-      })
+      ).then(() => {
+        const newTopics = [ ...courseList.value ]
+        newTopics.forEach((topics) => {
+          if (topics.hasOwnProperty('isChecked')) {
+            delete topics.isChecked
+          }
+        })
+        console.log('newTopics', newTopics)
+        queFormUpdate(
+          {
+            id: id.value,
+            topics: newTopics,
+            name: name.value
+          }
+        ).then(res => {
+          if (res.code === '200') {
+            ElMessage.success('保存成功')
+          }
+        })
+      }).catch(() => { })
     }
 
     const publish = () => {
@@ -233,6 +263,7 @@ export default defineComponent({
         const _answer = { ...answer }
         if (_answer.id) delete _answer.id
         if (_answer.qfId) delete _answer.qfId
+        if (_answer.hasOwnProperty('isChecked')) delete _answer.isChecked
         if (_answer.items && _answer.items.length) {
           // 数组数据也需要复制，避免污染原数据
           _answer.items = answer.items.map((m) => { return { ...m } })
@@ -241,9 +272,15 @@ export default defineComponent({
           })
         }
         courseList.value.unshift(_answer)
+        const newTopics = [ ...courseList.value ]
+        newTopics.forEach((topics) => {
+          if (topics.hasOwnProperty('isChecked')) {
+            delete topics.isChecked
+          }
+        })
         queFormUpdate({
           id: id.value,
-          topics: courseList.value,
+          topics: newTopics,
           name: name.value
         }).then(res => {
           if (res.code === '200') {
@@ -286,8 +323,10 @@ export default defineComponent({
             status.value = res.data?.status
             courseList.value = res?.data?.topics ?? []
             id.value = res.data?.id
-            courseList.value?.forEach((item) => {
-              item.isChecked = false
+            nextTick(() => {
+              courseList.value?.forEach((item) => {
+                item.isChecked = false
+              })
             })
           }
         })
@@ -319,6 +358,10 @@ export default defineComponent({
       handleInput,
       status,
       swapArrayElements,
+      Upload,
+      Plus,
+      Delete,
+      pathData
     }
   }
 })
@@ -328,7 +371,6 @@ export default defineComponent({
 .ques-lib {
   padding: 0 20px 20px 20px;
   background: #fff;
-  border-radius: 8px;
   font-size: 13px;
   color: #000000;
 }
@@ -376,5 +418,8 @@ export default defineComponent({
       color: #409eff;
     }
   }
+}
+.topic-contents {
+  margin-left: 22px;
 }
 </style>

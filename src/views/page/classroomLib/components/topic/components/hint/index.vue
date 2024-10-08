@@ -10,6 +10,7 @@
                 item.itemAnalysis = itemAnalysis
                 console.log('item.itemAnalysis', itemAnalysis)
                 visible = false
+                emit('save', itemAnalysis)
             }">
                 确定
             </el-button>
@@ -33,17 +34,19 @@ export default defineComponent({
         Tickets,
     },
     props: ['item'],
-    setup(props) {
+    setup(props, { emit }) {
         const item = props.item || {}
         watch(props.item, (newValue, oldValue) => {
-            console.log(`count 从 ${oldValue} 变为了 ${newValue}`);
+            console.log('newValue', newValue);
+            console.log('oldValue', oldValue);
         });
         const visible = ref(false)
         const itemAnalysis = ref('')
         return {
             visible,
             itemAnalysis,
-            item
+            item,
+            emit
         }
     }
 })

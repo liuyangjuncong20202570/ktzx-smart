@@ -23,7 +23,7 @@
           <div class="left-div" style="flex-grow: 1; display: flex; align-items: center">
             <img src="../assets/images/logo.png" style="height: 5.5vh" />
             <el-text style="font-size: calc(1vw + 6px); color: white; margin-left: 10px"
-              >专业智能教学平台</el-text
+              >智能教学平台</el-text
             >
           </div>
 
@@ -63,7 +63,7 @@
           </div>
         </div>
       </el-header>
-      <el-container>
+      <el-container style="width: 100%;overflow-x: hidden;">
         <el-aside width="200px" style="height: 100%">
           <div
             style="
@@ -159,7 +159,6 @@
                     :key="menu.id"
                     style="border-top: 1px solid #efefef"
                   >
-                    <!--                    @click="navigateTo(menu.url)"-->
                     <template #title>
                       <!--0822有更改-->
                       <span @click="navigateTo(menu.url)">{{ menu.name }}</span>
@@ -210,7 +209,7 @@ import { useProfileStore } from '../stores/profileStore.js';
 //获取Stroe
 const profileStore = useProfileStore();
 
-const defaultActive = ref('');
+const defaultActive = ref('not-selected');
 const route = useRoute();
 const router = useRouter(); // 获取路由实例
 const imageUrl = ref('https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png');
@@ -401,13 +400,14 @@ const handleVisibleChange = visible => {
 //钩子函数用来刷新后重新获取数据
 
 onMounted(() => {
+  defaultActive.value = 'not-selected';
   const role = route.params.rolehome; // 获取当前路由参数中的 rolehome 值
   const basePath = `/homes/${role}`;
   if (route.path !== basePath) {
     router.replace(basePath); // 重定向到基础路径
   }
 
-  defaultActive.value = '';
+
   const storedUserInfo = sessionStorage.getItem('users');
   if (storedUserInfo) {
     const userInfo = JSON.parse(storedUserInfo);
@@ -448,6 +448,7 @@ onMounted(() => {
     .post(`/homes/teacherhome`)
     .then(res => {
       console.log(res);
+      console.log("defaultActive",defaultActive.value)
       // 登录成功
 
       if (res.code === 200 && res.data.length > 0) {

@@ -19,6 +19,7 @@
                         {{ row.row.name }}
                     </template>
                 </el-table-column>
+
                 <el-table-column prop="keywordname" label="关键字" min-width="140">
                     <template v-slot="row">
                         <el-popover :visible="row.row.keywordPopVisible" placement="right-end" width="600">
@@ -401,7 +402,7 @@ const openKeywordDictionary = (row) => {
 }
 
 const chooseKeyword = (data) => {
-    kwdSelFlag.value[selectedKeyword.value.id] = false;
+    if(selectedKeyword.value) kwdSelFlag.value[selectedKeyword.value.id] = false;
     selectedKeyword.value = data;
 };
 
@@ -479,7 +480,7 @@ const openAbilityDictionary = (row) => {    // 打开能力弹框
 }
 
 const chooseAbility = (data) => {   // 记录哪个能力被选择
-    abSelFlag.value[selectedAbility.value.id] = false;
+    if(selectedAbility.value) abSelFlag.value[selectedAbility.value.id] = false;
     selectedAbility.value = data;
     // console.log(row.name);
 };
@@ -523,5 +524,9 @@ const setAbility = (row) => {   // 点击确定后将选择的能力赋值给KWA
 <style scoped>
 .edit-icon {
     cursor: pointer;
+}
+
+.el-table {
+    background-color: red;
 }
 </style>

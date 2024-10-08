@@ -6,7 +6,7 @@
     </div>
     <span v-html="row.content"></span>
     <div class="task-select flex-between" v-if="['单选题', '判断题'].includes(TOPICTYPE[row.typeId])">
-      <el-radio-group v-model="row.selectId" v-if="['0201', '0203'].includes(row.typeId)" :disabled="disabled">
+      <el-radio-group v-model="row.selectId" :disabled="disabled">
         <el-radio v-for="item in row.items" :key="item.id" :label="item.itemOption">
           {{ item.itemContent }}
           <img v-if="item.itemPicture" :src="item.itemPicture" />
@@ -14,17 +14,30 @@
       </el-radio-group>
     </div>
 
-    <div class="task-select flex-between" v-if="['多选题'].includes(TOPICTYPE[row.typeId])">
-      <el-checkbox-group v-model="row.selectId" v-if="row.typeId == '0202'" :disabled="disabled">
+    <div class="task-select" v-if="['多选题'].includes(TOPICTYPE[row.typeId])">
+      <el-checkbox-group v-model="row.selectId" v-if="row.typeId == '0202'" :disabled="disabled" @change="((val) => {
+          if (val.length) {
+            row.other = ''
+          }
+        })">
         <el-checkbox v-for="item in row.items" :key="item.id" :label="item.itemOption">
           {{ item.itemContent }}
           <img v-if="item.itemPicture" :src="item.itemPicture" />
         </el-checkbox>
       </el-checkbox-group>
+      <el-input 
+        v-if="!row?.selectId?.length" 
+        v-model="row.other" 
+        :disabled="row?.selectId?.length || disabled" 
+        style="width: 500px;margin-top: 10px;" 
+        placeholder="其他 请输入"
+        show-word-limit type="textarea"
+        maxlength="3000"
+      />
     </div>
 
     <div class="task-select flex-between" v-if="['简答题'].includes(TOPICTYPE[row.typeId])">
-      <el-input v-model="row.selectId" :disabled="disabled" maxlength="30" style="width: 500px" placeholder="请填写答案"
+      <el-input v-model="row.selectId" :disabled="disabled" maxlength="3000" style="width: 500px" placeholder="请填写答案"
         show-word-limit type="textarea" />
     </div>
 
@@ -94,5 +107,9 @@ onMounted(() => {
   .el-checkbox, .el-radio {
     height: 100%;
   }
+}
+.item-title {
+  font-size: 14px;
+  font-weight: bold;
 }
 </style>

@@ -29,7 +29,7 @@
           </div>
         </div>
       </el-header>
-      <el-container>
+      <el-container style="width: 100%;overflow-x: hidden;">
         <el-aside width="25%" style="padding: 20px;">
 
           <!--左侧我的课程部分-->

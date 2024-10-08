@@ -4,7 +4,8 @@
     <el-header
         style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
       <el-button type="primary" style="margin-left: 0.8vw;" @click="handleClassAdd">新增班级</el-button>
-      <el-button type="danger" @click="deleteClass">删除班级</el-button>
+      <!--LQ提出删除前端所有有关删除按键-->
+<!--      <el-button type="danger" @click="deleteClass">删除班级</el-button>-->
       <el-button v-if="selectedClassesId.length === 1" type="success" @click="editClass">编辑班级</el-button>
       <AddClassDialog v-show="ADDdialogVisible" ref="ADDDialogShow" @formSubmitted="getTableData"/>
       <EditClassDialog v-show="EditdialogVisible" ref="EditDialogShow" @formSubmitted="getTableData"/>

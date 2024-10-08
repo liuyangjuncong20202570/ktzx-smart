@@ -269,25 +269,40 @@ const getTreeData = () => {
           message: '获取能力数据失败' + error
         });
       });
-  } else {
-    request.evaluation
-      .get('/evaluation/ability?courseId=' + parseJWT(sessionStorage.getItem('token')).obsid)
-      .then(res => {
-        getData(res);
-        // if (res.code === 200) {
-        //   treeData.value = res.data;
-        //   nullNodeNum.value = 0;
-        //   initialize(treeData.value);
-        //   // console.log(treeData.value);
-        // }
-      })
-      .catch(error => {
-        ElMessage({
-          type: 'error',
-          message: '获取能力数据失败' + error
-        });
-      });
-  }
+
+  // // TODO:对路由进行判断
+  // const route = useRoute();
+  // if (route.fullPath === '/homes/professionhome/evaluation/ability') {
+  //   request.evaluation
+  //     .get('/evaluation/getability/allability')
+  //     .then(res => {
+  //       getData(res);
+  //     })
+  //     .catch(error => {
+  //       ElMessage({
+  //         type: 'error',
+  //         message: '获取能力数据失败' + error
+  //       });
+  //     });
+  // } else {
+  //   request.evaluation
+  //     .get('/evaluation/ability?courseId=' + parseJWT(sessionStorage.getItem('token')).obsid)
+  //     .then(res => {
+  //       getData(res);
+  //       // if (res.code === 200) {
+  //       //   treeData.value = res.data;
+  //       //   nullNodeNum.value = 0;
+  //       //   initialize(treeData.value);
+  //       //   // console.log(treeData.value);
+  //       // }
+  //     })
+  //     .catch(error => {
+  //       ElMessage({
+  //         type: 'error',
+  //         message: '获取能力数据失败' + error
+  //       });
+  //     });
+  // }
 };
 
 onMounted(() => {

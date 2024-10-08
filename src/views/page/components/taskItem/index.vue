@@ -1,11 +1,11 @@
 <template>
     <div class="task-item">
         <div class="task-kea flex-start">
-            <span v-for="(item, i) in lib.kwas" :key="i">（{{ item.kwaName }}）</span>
+            <span v-for="(item, i) in lib.kwas" :key="i">{{ item.kwaName }}</span>
         </div>
         <div class="task-title">{{ index }}、{{ lib.title }}({{ TOPICTYPE[lib.questionTypeId] }})</div>
-        <!-- 多选 -->
-        <div v-if="lib.questionTypeId == '0202'">
+        <!-- 多选、判断 -->
+        <div v-if="['0202', '0203'].includes(lib.questionTypeId)">
             <span v-html="lib.content"></span>
             <el-checkbox-group v-model="lib.selectId" :disabled="disabled">
                 <el-checkbox v-for="item in lib.answers" :key="item.id" :label="item.itemOption">
@@ -14,8 +14,8 @@
                 </el-checkbox>
             </el-checkbox-group>
         </div>
-        <!-- 单选、判断 -->
-         <div v-if="['0201', '0203'].includes(lib.questionTypeId)">
+        <!-- 单选 -->
+        <div v-else-if="['0201'].includes(lib.questionTypeId)">
             <span v-html="lib.content"></span>
             <el-radio-group v-model="lib.selectId" :disabled="disabled">
                 <el-radio v-for="item in lib.answers" :key="item.id" :label="item.itemOption">
@@ -25,16 +25,29 @@
             </el-radio-group>
          </div>
         <!-- 填空题 -->
-        <div v-if="lib.questionTypeId == '0204'">
+        <div v-else-if="lib.questionTypeId == '0204'">
             <span v-html="lib.content"></span>
         </div>
         <!-- 简单题 -->
-        <template v-if="lib.questionTypeId == '0205'">
+        <template v-else-if="lib.questionTypeId == '0205'">
             <span v-html="lib.content"></span>
             <el-input
                 v-model="lib.selectId"
                 :disabled="disabled"
-                maxlength="30"
+                maxlength="3000"
+                style="width: 100%"
+                placeholder="请填写答案"    
+                show-word-limit
+                type="textarea"
+            />
+        </template>
+        <!-- 其他题 -->
+        <template v-else>
+            <span v-html="lib.content"></span>
+            <el-input
+                v-model="lib.selectId"
+                :disabled="disabled"
+                maxlength="3000"
                 style="width: 100%"
                 placeholder="请填写答案"    
                 show-word-limit
@@ -73,13 +86,13 @@ const type = ref(props.type)
 onMounted(() => {
     if (type.value !== 'job') {
         lib.value?.answers?.forEach((item) => {
-            if  (['0201', '0203'].includes(lib.value.questionTypeId)) {
+            if  (['0201'].includes(lib.value.questionTypeId)) {
                 if (item.isAnswer) {
                     lib.value.selectId = item.id
                 }
             }
 
-            if (['0202'].includes(lib.value.questionTypeId)) {
+            if (['0202', '0203'].includes(lib.value.questionTypeId)) {
                 if (item.isAnswer) {
                     if (!lib.value.selectId) {
                         lib.value.selectId = [item.id]
@@ -107,5 +120,12 @@ onMounted(() => {
     top: 0;
     right: 0;
     bottom: 0
+}
+.task-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+.task-kea span {
+    margin-right: 20px;
 }
 </style>

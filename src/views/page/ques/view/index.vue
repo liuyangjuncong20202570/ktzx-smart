@@ -1,6 +1,6 @@
 <template>
     <div class="stu-ques-list">
-      <Header title="问卷预览" />
+      <Header title="问卷预览" :pathData="pathData" />
       <div 
         v-if="!detailObj?.topics?.length" 
         class="flex-center" 
@@ -22,10 +22,44 @@
   const router = useRouter()
   const { currentRoute } = router
   const route = currentRoute.value
-  const { id, qfId, stuId, type } = route.query
+  const { id, qfId, stuId, type, privilege } = route.query
   console.log('route.query', route.query)
   const disabled = true
   const detailObj = ref({})
+
+  let pathData = []
+
+  if (type === 'student') {
+    pathData = [
+      {
+        name: '问卷列表',
+        path: '/homes/courseteacherhome/exam/questionnaire'
+      },
+      {
+        name:  '问卷学生列表',
+        path: '/homes/courseteacherhome/exam/studentList',
+        query: {
+          id,
+          privilege
+        }
+      },
+      {
+        name:  '问卷预览',
+        path: ''
+      }
+    ]
+  } else {
+    pathData = [
+      {
+        name: '问卷列表',
+        path: '/homes/courseteacherhome/exam/questionnaire'
+      },
+      {
+        name:  '问卷预览',
+        path: ''
+      }
+    ]
+  }
 
   onMounted(() => {
     getMyQueFormDetail()
@@ -58,7 +92,17 @@
                 console.log('item.lib', item)
             } else if (answerMap) {
               if (TOPICTYPE[item.typeId] === '多选题') {
-                item.selectId = value && value.length ? value : []
+                // 其他输入项
+                const isOther = value?.map((valueItem) => {
+                  if (valueItem.indexOf('other:') !== -1) {
+                    return valueItem
+                  }
+                })[0] ?? ''
+                if (value && isOther) {
+                  item.other = isOther.split(':')[1]
+                } else {
+                  item.selectId = value && value.length ? value : []
+                }
               }else {
                 item.selectId = value ? value[0] : ''
               }
@@ -72,8 +116,7 @@
   <style scoped>
   .stu-ques-list {
     background: #fff;
-    padding: 10px;
-    border-radius: 8px;
+    padding: 0 10px 10px 10px;
     font-size: 13px;
     height: 100%;
     box-sizing: border-box;

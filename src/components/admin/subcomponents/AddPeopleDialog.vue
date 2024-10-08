@@ -50,7 +50,7 @@
               ></el-cascader>
             </el-form-item>
             <el-form-item label="备注">
-              <el-input type="textarea" v-model="newform.remark"></el-input>
+              <el-input type="textarea" v-model="newform.remark" maxlength="3000"></el-input>
             </el-form-item>
             <el-form-item>
               <el-button type="info" large style="width: 40%" @click="closeDialog">取消</el-button>
@@ -106,7 +106,7 @@ const obsmenulist = ref([]);
 function init(form,oriobsmenulist) {
   dialogVisible.value = true;
   obsmenulist.value = oriobsmenulist.value;
-  console.log(123)
+  // console.log(123)
   // console.log(oriobsmenulist.value)
   //将父组件中的form传入子组件中的form
   for (const key in form) {
