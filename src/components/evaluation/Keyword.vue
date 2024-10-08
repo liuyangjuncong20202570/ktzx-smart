@@ -4,55 +4,37 @@
 			<el-button type="success" style="margin-left: 0.8vw;" @click="addKeyword">新增</el-button>
 			<!-- <el-button type="primary" @click="openDictionary">从关键字字典选择</el-button> -->
 			<el-button type="danger" @click="openDeleteDialog">删除</el-button>
-      <el-button v-blur-on-click type="info" @click="importData">导入</el-button>
+			<el-button v-blur-on-click type="info" @click="importData">导入</el-button>
 
-      <el-button type="primary">保存</el-button>
+			<el-button type="primary">保存</el-button>
 			<el-input v-model="tableSearchData" style="margin-left: 0.8vw; width: 250px" placeholder="查找关键字">
 				<template #append><el-button :icon="Search" /></template>
 			</el-input>
 
-      <el-dialog
-          :destroy-on-close="true"
-          :show-close="false"
-          :close-on-click-modal="false"
-          style="width: 20vw; padding-top: 0"
-          v-model="importdialogViaible"
-      >
-        <h2 style="margin-top: 0">导入关键字</h2>
-        <el-upload
-            class="upload-demo"
-            ref="uploadRef"
-            auto-upload="false"
-            show-file-list="false"
-            :before-upload="beforeUpload"
-            style="margin-bottom: 20px;width:18vw;margin-left:10px"
-        >
-          <!-- 使用输入框作为上传的触发器 -->
-          <el-input
-              slot="trigger"
-              v-model="fileName"
-              placeholder="未选择文件"
-              readonly
-              style="cursor: pointer; text-align:center;width:18vw"
-          ></el-input>
-        </el-upload>
+			<el-dialog :destroy-on-close="true" :show-close="false" :close-on-click-modal="false"
+				style="width: 22vw; padding-top: 0" v-model="importdialogViaible">
+				<h2 style="margin-top: 0">导入关键字</h2>
+				<el-upload class="upload-demo" ref="uploadRef" :auto-upload="true" :show-file-list="false"
+					:before-upload="beforeUpload" style="margin-bottom: 20px;width:18vw;margin-left:10px">
+					<!-- 使用输入框作为上传的触发器 -->
+					<el-input slot="trigger" v-model="fileName" placeholder="未选择文件" readonly
+						style="cursor: pointer; text-align:center;width:18vw"></el-input>
+				</el-upload>
 
-        <div style="text-align: center; margin-bottom: 20px">
-          <!-- 添加内联样式 -->
-          <!-- 下载链接 -->
-          <a href="/file/关键字导入模板.xlsx" download>点击下载模板文件</a>
-        </div>
+				<div style="text-align: center; margin-bottom: 20px">
+					<!-- 添加内联样式 -->
+					<!-- 下载链接 -->
+					<a href="/file/关键字导入模板.xlsx" download>点击下载模板文件</a>
+				</div>
 
-        <div style="text-align: right">
-          <!-- 添加内联样式 -->
-          <!-- 上传按钮 -->
-          <el-button style="margin-right: 10px" @click="closeimportdialogViable"
-          >关闭</el-button
-          >
-          <!-- 添加内联样式 -->
-          <el-button type="success" @click="submitUpload">上传</el-button>
-        </div>
-      </el-dialog>
+				<div style="text-align: right">
+					<!-- 添加内联样式 -->
+					<!-- 上传按钮 -->
+					<el-button style="margin-right: 10px" @click="closeimportdialogViable">关闭</el-button>
+					<!-- 添加内联样式 -->
+					<el-button type="success" @click="submitUpload">上传</el-button>
+				</div>
+			</el-dialog>
 		</el-header>
 		<el-main style="padding: 0;">
 
@@ -94,7 +76,8 @@
 			</el-dialog>
 			<!-------------------------------------------------------------------------------------->
 
-			<el-table :data="filteredTableData" stripe style="width: 100%" @selection-change="handleSelectionChange" size="large">
+			<el-table :data="filteredTableData" stripe style="width: 100%" @selection-change="handleSelectionChange"
+				size="large">
 				<el-table-column type="selection" width="55"></el-table-column>
 				<el-table-column prop="showId" label="序号" width="60"></el-table-column>
 				<el-table-column prop="name" label="名称" width="240">
@@ -314,52 +297,52 @@ const importdialogViaible = ref(false)
 const uploadRef = ref(null);
 const fileName = ref(''); // 文件名
 const fileToUpload = ref(null); // 要上传的文件对象
-const importData =()=>{
-  importdialogViaible.value = true;
+const importData = () => {
+	importdialogViaible.value = true;
 
 }
 
 function handleFileChange(file) {
-  if (file) {
-    fileName.value = file.name; // 显示文件名
-    fileToUpload.value = file; // 保存文件对象
-  }
+	if (file) {
+		fileName.value = file.name; // 显示文件名
+		fileToUpload.value = file; // 保存文件对象
+	}
 }
 
 function beforeUpload(file) {
-  handleFileChange(file); // 在上传前处理文件变化
-  return false; // 阻止默认上传行为
+	handleFileChange(file); // 在上传前处理文件变化
+	return false; // 阻止默认上传行为
 }
 
 function submitUpload() {
-  if (fileToUpload.value) {
-    const formData = new FormData();
-    formData.append('file', fileToUpload.value);
-    console.log(formData);
-    request.admin
-        .post('/evaluation/keywords/import', formData)
-        .then(res => {
-          // 处理响应
-          if (res.code === 200) {
-            ElMessage.success('文件上传成功！');
-            importdialogViaible.value = false;
-            loadData();
-          } else {
-            ElMessage.error(res.message || '上传失败！');
-          }
-        })
-        .catch(error => {
-          ElMessage.error(error.message || '上传时发生错误！');
-        });
-  } else {
-    ElMessage.warning('请先选择一个文件！');
-  }
+	if (fileToUpload.value) {
+		const formData = new FormData();
+		formData.append('file', fileToUpload.value);
+		console.log(formData);
+		request.evaluation
+			.post('/evaluation/keywords/import', formData)
+			.then(res => {
+				// 处理响应
+				if (res.code === 200) {
+					ElMessage.success('文件上传成功！');
+					importdialogViaible.value = false;
+					loadData();
+				} else {
+					ElMessage.error(res.message || '上传失败！');
+				}
+			})
+			.catch(error => {
+				ElMessage.error(error.message || '上传时发生错误！');
+			});
+	} else {
+		ElMessage.warning('请先选择一个文件！');
+	}
 }
 
 const closeimportdialogViable = () => {
-  importdialogViaible.value = false;
-  fileName.value = '';
-  fileToUpload.value = null;
+	importdialogViaible.value = false;
+	fileName.value = '';
+	fileToUpload.value = null;
 };
 
 const saveEditRef = (row, field) => {
