@@ -1,20 +1,27 @@
 <template>
   <el-container style="height: 92vh">
-    <el-header style="
+    <el-header
+      style="
         height: auto;
         padding: 5px 0px;
         width: 100%;
         background-color: #deebf7;
         display: flex;
         align-items: center;
-      ">
-      <el-button type="primary" style="margin-left: 0.8vw" @click="exportData">导出到Excel</el-button>
-      <el-button type="danger" @click="changeTreeExpand" style="margin-left: 0.8vw">全部展开/关闭</el-button>
+      "
+    >
+      <el-button type="primary" style="margin-left: 0.8vw" @click="exportData"
+        >导出到Excel</el-button
+      >
+      <el-button type="danger" @click="changeTreeExpand" style="margin-left: 0.8vw"
+        >全部展开/关闭</el-button
+      >
       <el-button type="success" style="margin-left: 0.8vw">保存</el-button>
     </el-header>
 
     <el-main style="padding: 0">
-      <div style="
+      <div
+        style="
           height: 25px;
           display: flex;
           justify-content: space-between;
@@ -23,16 +30,19 @@
           background-color: whitesmoke;
           min-width: 1190px;
           color: gray;
-        ">
+        "
+      >
         <div style="min-width: 340px">名称</div>
         <div style="min-width: 850px; width: 59vw">
           <div style="display: flex; flex: auto; justify-content: space-between">
-            <div style="
+            <div
+              style="
                 width: 150px;
                 border-right: 1px solid #bbbbbb;
                 border-left: 1px solid #bbbbbb;
                 color: gray;
-              ">
+              "
+            >
               系数
             </div>
             <div style="min-width: 750px; width: 100%">备注</div>
@@ -40,26 +50,74 @@
         </div>
       </div>
 
-      <div class="tree-container" style="height: calc(100% - 25px); overflow: auto; min-width: 1190px">
-        <el-tree :data="treeData" draggable node-key="id" :props="defaultProps" :expand-on-click-node="false"
-          ref="nodeExpand" :default-expand-all="expandAll" :default-expanded-keys="expandedKeys" @node-drag-start=""
-          @node-drag-end="" @node-contextmenu="clickNode" @node-expand="openNode" @node-collapse="closeNode">
+      <div
+        class="tree-container"
+        style="height: calc(100% - 25px); overflow: auto; min-width: 1190px"
+      >
+        <el-tree
+          :data="treeData"
+          draggable
+          node-key="id"
+          :props="defaultProps"
+          :expand-on-click-node="false"
+          ref="nodeExpand"
+          :default-expand-all="expandAll"
+          :default-expanded-keys="expandedKeys"
+          @node-drag-start=""
+          @node-drag-end=""
+          @node-contextmenu="clickNode"
+          @node-expand="openNode"
+          @node-collapse="closeNode"
+        >
           <template #default="{ node }">
-            <div style="display: flex; justify-content: space-between; flex: auto; text-align: left">
-              <el-popover :visible="node.data.popVisible" placement="right"
-                popper-style="background-color: rgba(255, 255, 255, 0.5)">
-                <el-button style="margin-top: 6px; width: 100%" type="primary" plain round
-                  @click="addSiblingNode(node.data)">同级新增</el-button><br />
-                <el-button style="margin-top: 6px; width: 100%" type="primary" plain round
-                  @click="addChildNode(node.data)">下级新增</el-button><br />
-                <el-button style="margin-top: 6px; width: 100%" type="danger" plain round
-                  @click="confirmDeleteNodes(node.data)">删除</el-button>
+            <div
+              style="display: flex; justify-content: space-between; flex: auto; text-align: left"
+            >
+              <el-popover
+                :visible="node.data.popVisible"
+                placement="right"
+                popper-style="background-color: rgba(255, 255, 255, 0.5)"
+              >
+                <el-button
+                  style="margin-top: 6px; width: 100%"
+                  type="primary"
+                  plain
+                  round
+                  @click="addSiblingNode(node.data)"
+                  >同级新增</el-button
+                ><br />
+                <el-button
+                  style="margin-top: 6px; width: 100%"
+                  type="primary"
+                  plain
+                  round
+                  @click="addChildNode(node.data)"
+                  >下级新增</el-button
+                ><br />
+                <el-button
+                  style="margin-top: 6px; width: 100%"
+                  type="danger"
+                  plain
+                  round
+                  @click="confirmDeleteNodes(node.data)"
+                  >删除</el-button
+                >
                 <template #reference>
-                  <el-input v-if="node.data.editingName" v-model="node.data.name"
-                    @blur="blurInput(node.data, 'editingName')" placeholder="请输入节点名称" @contextmenu.stop
-                    draggable="false" style="height: 20px; width: 150px"
-                    :ref="el => setInputRef(el, node.data)"></el-input>
-                  <div v-else style="width: 150px; height: 20px" @dblclick="handleClick(node.data, 'editingName')">
+                  <el-input
+                    v-if="node.data.editingName"
+                    v-model="node.data.name"
+                    @blur="blurInput(node.data, 'editingName')"
+                    placeholder="请输入节点名称"
+                    @contextmenu.stop
+                    draggable="false"
+                    style="height: 20px; width: 150px"
+                    :ref="el => setInputRef(el, node.data)"
+                  ></el-input>
+                  <div
+                    v-else
+                    style="width: 150px; height: 20px"
+                    @dblclick="handleClick(node.data, 'editingName')"
+                  >
                     <el-icon v-if="node.data.children" color="orange">
                       <Folder />
                     </el-icon>
@@ -73,33 +131,55 @@
 
               <div style="min-width: 850px; width: 59vw">
                 <div style="display: flex; flex: auto; justify-content: space-between">
-                  <div style="width: 150px; text-align: center; height: 100%; overflow: hidden"
-                    @dblclick="handleClick(node.data, 'editingDatavalue')">
-                    <el-input v-if="node.data.editingDatavalue" v-model="node.data.datavalue"
-                      @blur="blurInput(node.data, 'editingDatavalue')" placeholder="请输入数值" @contextmenu.stop
-                      draggable="false" style="height: 20px; width: 100%"
-                      :ref="el => setInputRef(el, node.data)"></el-input>
+                  <div
+                    style="width: 150px; text-align: center; height: 100%; overflow: hidden"
+                    @dblclick="handleClick(node.data, 'editingDatavalue')"
+                  >
+                    <el-input
+                      v-if="node.data.editingDatavalue"
+                      v-model="node.data.datavalue"
+                      @blur="blurInput(node.data, 'editingDatavalue')"
+                      placeholder="请输入数值"
+                      @contextmenu.stop
+                      draggable="false"
+                      style="height: 20px; width: 100%"
+                      :ref="el => setInputRef(el, node.data)"
+                    ></el-input>
                     <div style="width: 100%; height: 20px" v-else>{{ node.data.datavalue }}</div>
                   </div>
-                  <div style="
+                  <div
+                    style="
                       min-width: 750px;
                       width: 100%;
                       height: 100%;
                       overflow: hidden;
                       white-space: nowrap;
                       text-overflow: ellipsis;
-                    " v-bind:title="node.data.remark" @dblclick="handleClick(node.data, 'editingRemark')">
-                    <el-input v-if="node.data.editingRemark" v-model="node.data.remark"
-                      @blur="blurInput(node.data, 'editingRemark')" placeholder="请输入备注" @contextmenu.stop
-                      draggable="false" style="height: 20px; width: 100%"
-                      :ref="el => setInputRef(el, node.data)"></el-input>
-                    <div v-else style="
+                    "
+                    v-bind:title="node.data.remark"
+                    @dblclick="handleClick(node.data, 'editingRemark')"
+                  >
+                    <el-input
+                      v-if="node.data.editingRemark"
+                      v-model="node.data.remark"
+                      @blur="blurInput(node.data, 'editingRemark')"
+                      placeholder="请输入备注"
+                      @contextmenu.stop
+                      draggable="false"
+                      style="height: 20px; width: 100%"
+                      :ref="el => setInputRef(el, node.data)"
+                    ></el-input>
+                    <div
+                      v-else
+                      style="
                         width: 100%;
                         height: 20px;
                         overflow: hidden;
                         white-space: nowrap;
                         text-overflow: ellipsis;
-                      " v-bind:title="node.data.remark">
+                      "
+                      v-bind:title="node.data.remark"
+                    >
                       {{ node.data.remark }}
                     </div>
                   </div>
@@ -175,54 +255,50 @@ const getData = res => {
 };
 
 const getTreeData = () => {
-  // TODO:对路由进行判断
-  const route = useRoute();
-  if (route?.fullPath === '/homes/professionhome/evaluation/ability') {
-    request.evaluation
-      .get('/evaluation/getability/allability')
-      .then(res => {
-        getData(res);
-      })
-      .catch(error => {
-        ElMessage({
-          type: 'error',
-          message: '获取能力数据失败' + error
-        });
+  request.evaluation
+    .get('evaluation/ability')
+    .then(res => {
+      getData(res);
+    })
+    .catch(error => {
+      ElMessage({
+        type: 'error',
+        message: '获取能力数据失败' + error
       });
+    });
 
-    // // TODO:对路由进行判断
-    // const route = useRoute();
-    // if (route.fullPath === '/homes/professionhome/evaluation/ability') {
-    //   request.evaluation
-    //     .get('/evaluation/getability/allability')
-    //     .then(res => {
-    //       getData(res);
-    //     })
-    //     .catch(error => {
-    //       ElMessage({
-    //         type: 'error',
-    //         message: '获取能力数据失败' + error
-    //       });
-    //     });
-    // } else {
-    //   request.evaluation
-    //     .get('/evaluation/ability?courseId=' + parseJWT(sessionStorage.getItem('token')).obsid)
-    //     .then(res => {
-    //       getData(res);
-    //       // if (res.code === 200) {
-    //       //   treeData.value = res.data;
-    //       //   nullNodeNum.value = 0;
-    //       //   initialize(treeData.value);
-    //       //   // console.log(treeData.value);
-    //       // }
-    //     })
-    //     .catch(error => {
-    //       ElMessage({
-    //         type: 'error',
-    //         message: '获取能力数据失败' + error
-    //       });
-    //     });
-  }
+  // // TODO:对路由进行判断
+  // const route = useRoute();
+  // if (route.fullPath === '/homes/professionhome/evaluation/ability') {
+  //   request.evaluation
+  //     .get('/evaluation/getability/allability')
+  //     .then(res => {
+  //       getData(res);
+  //     })
+  //     .catch(error => {
+  //       ElMessage({
+  //         type: 'error',
+  //         message: '获取能力数据失败' + error
+  //       });
+  //     });
+  // } else {
+  //   request.evaluation
+  //     .get('/evaluation/ability?courseId=' + parseJWT(sessionStorage.getItem('token')).obsid)
+  //     .then(res => {
+  //       getData(res);
+  //       // if (res.code === 200) {
+  //       //   treeData.value = res.data;
+  //       //   nullNodeNum.value = 0;
+  //       //   initialize(treeData.value);
+  //       //   // console.log(treeData.value);
+  //       // }
+  //     })
+  //     .catch(error => {
+  //       ElMessage({
+  //         type: 'error',
+  //         message: '获取能力数据失败' + error
+  //       });
+  //     });
 };
 
 onMounted(() => {
@@ -416,7 +492,7 @@ const confirmDeleteNodes = node => {
           ElMessage.error('删除失败' + error);
         });
     })
-    .catch(() => { });
+    .catch(() => {});
   node.popVisible = false;
 };
 
