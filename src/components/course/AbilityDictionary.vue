@@ -299,6 +299,7 @@ const getTreeData = () => {
   //         message: '获取能力数据失败' + error
   //       });
   //     });
+  // }
 };
 
 onMounted(() => {
@@ -540,6 +541,7 @@ const blurInput = async (node, field) => {
 </script>
 
 <style scoped>
+/* 去掉滚动条 */
 .tree-container::-webkit-scrollbar {
   /* 针对Chrome, Safari, Edge, 和 Opera */
   display: none;
@@ -554,4 +556,6 @@ const blurInput = async (node, field) => {
   /* 针对IE和Edge旧版本 */
   -ms-overflow-style: none;
 }
+
+/*************/
 </style>
