@@ -1,6 +1,9 @@
 <!-- 使用vxe-table组件开发 -->
 <template>
-	<div id="container" style="height: calc(92vh - 90px); overflow: auto; width: 100%;">
+	<el-header style="height: 40px; padding: 5px 0px; width: 100%; text-align: left; background-color: #deebf7;">
+		<el-button type="success" @click="save()" style="margin-left: 0.8vw;">保存</el-button>
+	</el-header>
+	<div id="container" style="height: calc(92vh - 130px); width: 100%;">
 		<vxe-grid v-bind="gridOptions" v-on="gridEvents" :edit-config="gridOptions.editConfig"
 			@edit-closed="handleEditClosed"></vxe-grid>
 	</div>
@@ -15,7 +18,7 @@
 				<div v-else style="height: 28px; color: black;">{{ scope.row.usualSum }}</div>
 			</template>
 		</el-table-column>
-		<el-table-column width="148" show-overflow-tooltip align="center">
+		<el-table-column width="270" show-overflow-tooltip align="center">
 			<template v-slot="scope">
 				<div v-if="scope.row.finalSum !== 100" style="color: red;">
 					合计需为100（当前为：{{ scope.row.finalSum }}）
@@ -44,7 +47,7 @@
 				</div>
 			</template>
 		</el-table-column>
-		<el-table-column show-overflow-tooltip width="148" align="center">
+		<el-table-column show-overflow-tooltip width="270" align="center">
 			<template v-slot="scope">
 				<el-input v-if="scope.row.edit[scope.row.finalId]" style="height: 28px;"
 					:ref="el => setInputRef(el, scope.row.finalId)" @blur="handleBlur(scope.row, scope.row.finalId)"
@@ -110,6 +113,9 @@ const container = ref();
 
 const courseid = '2c918af681fa6ea7018209a505c30672';
 
+const usualLeafIds = ref();		// 存储平时项
+const finalLeafIds = ref();
+
 const footer1Data = ref([
 	{
 		name: '分数合计',
@@ -117,7 +123,6 @@ const footer1Data = ref([
 		finalSum: 0
 	}
 ])
-
 const footer2Data = ref([
 	{
 		name: '总评占比',
@@ -126,6 +131,8 @@ const footer2Data = ref([
 ])
 
 const rightClickItem = ref();		// 存储被右键的考核项
+
+// 用于渲染表格的数据
 const gridOptions = ref({
 	size: 'mini',
 	border: true,
@@ -177,14 +184,14 @@ onMounted(async () => {
 	await getData();
 })
 
-const info = ref();
+const info = ref();		// 存储后端传来的的数据
 
 const getData = (async () => {
 	try {
-		const res = await request.evaluation.get(`/evaluation/assessmentPlan/getAssessmentTable?courseid=${courseid}`);
+		const res = await request.evaluation.get(`/evaluation/assessmentPlan/getAssessmentTable`);
 		if (res.code === 200) {
 			info.value = res.data;
-			console.log(info.value);
+			// console.log(info.value);
 			initialize(info.value);
 		} else {
 			ElMessage.error(res.msg);
@@ -194,14 +201,11 @@ const getData = (async () => {
 	}
 })
 
-const usualLeafIds = ref();
-const finalLeafIds = ref();
-
 const initialize = ((info) => {
 	usualLeafIds.value = getLeafIds(info.head[0]);		// 获取平时项的所有考核项id
 	finalLeafIds.value = getLeafIds(info.head[1]);		// 获取期末项的所有考核项id
 
-	creatHeader(info.head, 0, usualLeafIds.value.length);    // 创建表头
+	creatHeader(info.head, 0);    // 创建表头
 
 	info.items.forEach((item) => {      // 处理数据单元格
 		item.target = item.name;		// 这里新加target是为了对应表格的课程目标列以显示数据，那列的field键值为'target'
@@ -214,57 +218,25 @@ const initialize = ((info) => {
 
 	footer2Data.value[0].usualId = info.head[0].id;
 	footer2Data.value[0].finalId = info.head[1].id;
-	footer2Data.value[0][info.head[0].id] = info.percent[info.head[0].id];
-	footer2Data.value[0][info.head[1].id] = info.percent[info.head[1].id];
+	footer2Data.value[0][info.head[0].id] = Number(info.percent[info.head[0].id]);
+	footer2Data.value[0][info.head[1].id] = Number(info.percent[info.head[1].id]);
 	footer2Data.value[0].edit[info.head[0].id] = false;
 	footer2Data.value[0].edit[info.head[1].id] = false;
 });
 
 
-const creatHeader = (head, floor = 0, leafNodeNum) => {
+const creatHeader = (head, floor = 0) => {
 	head.forEach((node, idx) => {
 		node.title = node.itemName;
 		node.field = node.id;
-		if (node.children && node.children.length > 0) creatHeader(node.children, floor + 1, leafNodeNum);
+		if (node.children && node.children.length > 0) creatHeader(node.children, floor + 1);
 		else {
-			node.editRender = { name: 'input' };
-			if (finalLeafIds.value.includes(node.id)) node.width = 130 / (finalLeafIds.value.length);
-			// node.titlePrefix = { content: '自定义前缀图标', icon: 'vxe-icon-question-circle-fill' };
-			// node.width = ((container.value.clientWidth - (240 + 130 + )) / (leafNodeNum)).toFixed(1);	// 舍去小数点用于表格单元宽度去抖
-			// for (let i = 0; i < 2; i++) {
-			// 	node.children.push({
-			// 		field: 'target',
-			// 		title: '课程目标',
-			// 		width: 240,
-			// 		editRender: {
-			// 			name: 'input'
-			// 		},
-			// 		children: [
-			// 			{
-			// 				field: 'target',
-			// 				title: '课程目标',
-			// 				width: 240,
-			// 				editRender: {
-			// 					name: 'input'
-			// 				},
-			// 				width: (container.value.clientWidth - (240 + 130 + 15)) / 8
-			// 			},
-			// 			{
-			// 				field: 'target',
-			// 				title: '课程目标',
-			// 				width: 240,
-			// 				editRender: {
-			// 					name: 'input'
-			// 				},
-			// 				width: (container.value.clientWidth - (240 + 130 + 15)) / 8
-			// 			},
-			// 		]
-			// 	})
-			// }
+			node.editRender = { name: 'input' };	// 多级表头的子节点对应的单元格可编辑
+			// 期末项宽度为251
+			if (finalLeafIds.value.includes(node.id)) node.width = (251 / (finalLeafIds.value.length)).toFixed(0);
 		}
 	})
 	if (!floor) {
-		head[head.length - 1].width = 130;		// 设置期末列的宽度
 		gridOptions.value.columns = [{
 			field: 'target',
 			title: '课程目标',
@@ -300,6 +272,7 @@ const calcSumScore = (array, ids) => {
 
 /**********************表格数据单元双击编辑*********************/
 const oldData = ref();
+const postData = ref({});		// 存储批量传到后端的数据
 
 const gridEvents = {
 	cellDblclick({ row, column }) {
@@ -313,41 +286,26 @@ const gridEvents = {
 }
 
 const handleEditClosed = async ({ row, column }) => {
-	let num = Number(row[column.field] ? row[column.field] : 0);
-	if (Number.isNaN(num)) {
+	row[column.field] = row[column.field] ? Number(row[column.field]) : 0;	// 清空数值则设为0
+	let num = row[column.field];
+	if (Number.isNaN(num)) {			// 判断输入的是不是数字
 		row[column.field] = oldData.value;
 		return;
 	}
 	if (row[column.field] !== oldData.value) {		// 当数据变化时再执行
-		if (num < 0) {
+		if (!postData.value.items) postData.value.items = {};		// 初始化post的数据
+		row[column.field] = Number(Number(row[column.field]).toFixed(0));		// 若输入小数则四舍五入为整数
+		if (num < 0) {			// 若输入负数则撤销本次操作
 			row[column.field] = oldData.value;
 			return;
 		}
+
+		if(!postData.value.items) postData.value.items = {};
+		if(!postData.value.items[row.id]) postData.value.items[row.id] = {}; 		// 以课程目标的id为键存储其内部所有考核项
+		postData.value.items[row.id][column.field] = row[column.field];				// 以考核项的id为键存储其分数
+		// 每次改变考核项的分数重新计算
 		footer1Data.value[0].usualSum = calcSumScore(gridOptions.value.data, usualLeafIds.value);
 		footer1Data.value[0].finalSum = calcSumScore(gridOptions.value.data, finalLeafIds.value);
-		if ((usualLeafIds.value.includes(column.field) && footer1Data.value[0].usualSum !== 100) ||
-			(finalLeafIds.value.includes(column.field) && footer1Data.value[0].finalSum !== 100)) {
-			ElMessage.warning('分数合计不为100, 无法保存');
-		}
-
-		const postData = {
-			courseid,
-			coursetargetId: row.id,
-			checkitemId: column.field,
-			standardScore: Number(row[column.field]).toFixed(0),
-		};
-
-		try {
-			const res = await request.evaluation.post('/evaluation/assessmentPlan/updateStandardScore', postData);
-			if (res.code === 200) {
-				ElMessage.success('修改成功');
-				await getData();
-			} else {
-				ElMessage.error(res.msg);
-			}
-		} catch (error) {
-			ElMessage.error('修改失败' + error);
-		}
 	}
 
 };
@@ -355,6 +313,27 @@ const handleEditClosed = async ({ row, column }) => {
 const tableRowClassName = ({ row, rowIndex }) => {
 	return 'footer-row'
 }
+
+const save = async () => {
+	if (Object.keys(postData.value).length === 0) return;		// 未改变任何值则不执行
+	if (footer1Data.value[0].usualSum !== 100 || footer1Data.value[0].finalSum !== 100 ||
+		footer2Data.value[0][footer2Data.value[0].usualId] + footer2Data.value[0][footer2Data.value[0].finalId] !== 100) {
+		ElMessage.error('数据不合法，无法保存');
+		return;
+	}
+	// 数据合理再传给后端
+	try {
+		const res = await request.evaluation.post(`/evaluation/assessmentPlan/updateAssessmentTable`, postData.value);
+		if (res.code === 200) {
+			ElMessage.success('修改成功');
+			await getData();
+		} else {
+			ElMessage.error(res.msg);
+		}
+	} catch (error) {
+		ElMessage.error('修改失败' + error);
+	}
+};
 
 /**********************双击修改总评占比栏**********************/
 const inputsRefs = ref({});
@@ -382,22 +361,11 @@ const handleBlur = (row, field) => {
 	nextTick(async () => {
 		row.edit[field] = false;
 		if (row[field] !== oldPercent.value) {
+			row[field] = Number(Number(row[field]).toFixed(0));
 			if (row[field] === '') row[field] = 0;
-			const postData = {
-				id: field,
-				percent: row[field],
-			};
-			try {
-				const res = await request.evaluation.post('/evaluation/assessmentPlan/updatePercent', postData);
-				if (res.code === 200) {
-					ElMessage.success('修改成功');
-					await getData();
-				} else {
-					ElMessage.error(res.msg);
-				}
-			} catch (error) {
-				ElMessage.error('修改失败' + error);
-			}
+
+			if(!postData.value.percent) postData.value.percent = {};
+			postData.value.percent[field] = row[field];			// 以id为键存储其总评占比
 		}
 	});
 };
