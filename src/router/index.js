@@ -220,6 +220,11 @@ const routes = [
         component: () => import('../components/evaluation/CourseTarget.vue')
       },
       {
+        path: 'evaluation/AssessmentItems',
+        name: 'AssessmentItems',
+        component: () => import('../components/evaluation/AssessmentItems.vue')
+      },
+      {
         path: 'evaluation/assessmentPlan', // 达成性评价模型-考核方案
         name: 'AssessmentTable',
         component: () => import('../components/evaluation/AssessmentTable.vue')

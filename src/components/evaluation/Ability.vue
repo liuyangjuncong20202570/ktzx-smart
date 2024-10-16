@@ -114,7 +114,7 @@
   <el-dialog
     v-model="abilityDictionaryVisible"
     width="1000"
-    style="height: 360px; background-color: #eef3f6; max-width: 1000px; overflow: auto"
+    style="height: 360px; max-width: 1000px; overflow: auto"
     :close-on-click-modal="false"
     :show-close="false"
     destroy-on-close
