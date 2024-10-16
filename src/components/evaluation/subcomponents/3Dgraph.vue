@@ -299,7 +299,7 @@ onMounted(async () => {
 		unit.kwas = unit.kwas.concat(uniqueChildKwas);
 
 		if (!unitKwaAmount[unit.id]) unitKwaAmount[unit.id] = 0;
-		unitKwaAmount[unit.id] = unit.kwas.length;		// 记录记录每一章整合完所有节的kwa数量
+		unitKwaAmount[unit.id] = unit.kwas.length;		// 记录记录每一章整合完其内所有小节后的kwa数量
 
 		unit.size = 2;		// 每一章平面的大小
 		unit.gridCount = 1; // 平面中一行或一列上可以有多少个节点，用于创建网格的大小gridCount * gridCount
@@ -315,8 +315,8 @@ onMounted(async () => {
 	const unitPlanePadding = 0.5;
 	// 创建第二层平面的网格点
 	const secondPlaneGridPoints = createGridPointsByNodeSize(
-		100, // 假定的第二层平面的大小，为了计算指定数量及大小的节点的分布，这个值需要取得比较大使其能容纳所有结点
-		4,
+		9999, // 假定的第二层平面的大小，为了计算指定数量及大小的节点的分布，这个值需要取得比较大使其能容纳所有结点
+		data.units.length,
 		maxUnitSize
 	);
 	// 第二层平面的大小
@@ -324,7 +324,7 @@ onMounted(async () => {
 		? findSecondPlaneGridSize(
 			secondPlaneGridPoints,
 			data.units.length,
-			Math.sqrt((maxUnitSize * maxUnitSize) / 2)
+			maxUnitSize / 2
 		)
 		: 4;
 
@@ -870,40 +870,16 @@ const createGridPointsByNodeSize = (size, gridCount, nodeSize) => {
 	return points.map((p) => p.point);
 };
 
-const findSecondPlaneGridSize = (array, len, maxUnitSize) => {
-	maxUnitSize += 0;
-	let maxX = -0x3f3f3f3f,
-		minX = 0x3f3f3f3f;
+const findSecondPlaneGridSize = (array, len, maxUnitSizeR) => {
+	// 第二层平面（知识单元平面）的直径
+	let d = -0x3f3f3f3f;
 	for (let i = 0; i < len; i++) {
-		// console.log(array[i].x);
-		if (maxX < array[i].x + maxUnitSize) maxX = array[i].x;
-		if (minX > array[i].x - maxUnitSize) minX = array[i].x;
+		// 找到最大的正方形对角线长
+		const res = Math.sqrt(Math.pow(Math.abs(array[i].x) + maxUnitSizeR, 2) + Math.pow(Math.abs(array[i].y) + maxUnitSizeR, 2)) * 2;
+		if(d < res) d = res;
 	}
-	return maxX - minX;
-};
-
-// 改变文本宽度与高度
-// const fittingString = (str, maxWidth, fontSize) => {
-//     let currentWidth = 0;
-//     let res = '';
-//     const pattern = new RegExp('[\u4E00-\u9FA5]+'); // distinguish the Chinese charactors and letters
-//     str.split('').forEach((letter, i) => {
-//         if (currentWidth > maxWidth) return;
-//         if (pattern.test(letter)) {
-//             // Chinese charactors
-//             currentWidth += fontSize;
-//         } else {
-//             // get the width of single letter according to the fontSize
-//             currentWidth += G6.Util.getLetterWidth(letter, fontSize);
-//         }
-//         if (currentWidth > maxWidth) {
-//             res += '\n';
-//             currentWidth = pattern.test(letter) ? fontSize : G6.Util.getLetterWidth(letter, fontSize);
-//         }
-//         res += letter;
-//     });
-//     return res;
-// };
+	return (d - 0.15 * d) > 4 ? (d - 0.15 * d) : 4;		// 最小直径是4
+}
 </script>
 
 <style scoped>
