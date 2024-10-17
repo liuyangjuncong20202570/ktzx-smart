@@ -49,7 +49,6 @@
           </div>
         </div>
       </div>
-
       <div
         class="tree-container"
         style="height: calc(100% - 25px); overflow: auto; min-width: 1190px"
@@ -195,6 +194,8 @@
 
 <script setup>
 import parseJWT from '@/utils/parseJWT.js';
+import exportCode from '@/assets/js/commonData.js';
+import useAbility from '@/stores/useAbility.js';
 import { Folder, Document } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
@@ -205,6 +206,12 @@ const defaultProps = {
   children: 'children',
   label: 'name'
 };
+
+const props = defineProps({
+  badge: {
+    type: String
+  }
+});
 
 const treeData = ref([]);
 
@@ -254,55 +261,69 @@ const getData = res => {
   }
 };
 
-const getTreeData = () => {
-  //1004hhy修改，此处不需要判断，直接调用能力字典的获取接口即可
-  // 能力字典接口：/evaluation/getability
-  request.evaluation
-    .get('/evaluation/getability')
-    .then(res => {
-      getData(res);
-    })
-    .catch(error => {
-      ElMessage({
-        type: 'error',
-        message: '获取能力数据失败' + error
-      });
-    });
-
-  // // TODO:对路由进行判断
-  // const route = useRoute();
-  // if (route.fullPath === '/homes/professionhome/evaluation/ability') {
-  //   request.evaluation
-  //     .get('/evaluation/getability/allability')
-  //     .then(res => {
-  //       getData(res);
-  //     })
-  //     .catch(error => {
-  //       ElMessage({
-  //         type: 'error',
-  //         message: '获取能力数据失败' + error
-  //       });
-  //     });
-  // } else {
-  //   request.evaluation
-  //     .get('/evaluation/ability?courseId=' + parseJWT(sessionStorage.getItem('token')).obsid)
-  //     .then(res => {
-  //       getData(res);
-  //       // if (res.code === 200) {
-  //       //   treeData.value = res.data;
-  //       //   nullNodeNum.value = 0;
-  //       //   initialize(treeData.value);
-  //       //   // console.log(treeData.value);
-  //       // }
-  //     })
-  //     .catch(error => {
-  //       ElMessage({
-  //         type: 'error',
-  //         message: '获取能力数据失败' + error
-  //       });
-  //     });
-  // }
+// 声明ability钩子
+const abilityStore = useAbility();
+const getTreeData = async () => {
+  switch (props.badge) {
+    case exportCode.PROFESSIONHOME:
+      await abilityStore.fetchProfessionAbility();
+      getData(abilityStore.initializeData);
+      break;
+    case exportCode.COURSEMANAGERHOME:
+      await abilityStore.fetchCourseAbility();
+      getData(abilityStore.initializeData);
+      break;
+    default:
+      console.log('暂未处理');
+  }
 };
+
+// const getTreeData = () => {
+//   //1004hhy修改，此处不需要判断，直接调用能力字典的获取接口即可
+//   // 能力字典接口：/evaluation/getability
+//   // 根据路由所传数据进行所需接口调用
+//   if (props.badge === 'coursemanagerhome') {
+//     request.evaluation
+//       // .get('/evaluation/ability')
+//       .get('/evaluation/getability')
+//       .then(res => {
+//         getData(res);
+//       })
+//       .catch(error => {
+//         ElMessage({
+//           type: 'error',
+//           message: '获取能力数据失败' + error
+//         });
+//       });
+//   } else if (props.badge === 'professionhome') {
+//     request.evaluation
+//       .get('/evaluation/ability')
+//       // .get('/evaluation/getability')
+//       .then(res => {
+//         getData(res);
+//       })
+//       .catch(error => {
+//         ElMessage({
+//           type: 'error',
+//           message: '获取能力数据失败' + error
+//         });
+//       });
+//   }
+//   // if(){
+//   // }
+//   // request.evaluation
+//   //   .get('/evaluation/ability')
+//   //   // .get('/evaluation/getability')
+//   //   .then(res => {
+//   //     getData(res);
+//   //   })
+//   //   .catch(error => {
+//   //     ElMessage({
+//   //       type: 'error',
+//   //       message: '获取能力数据失败' + error
+//   //     });
+//   //   });
+// };
 
 onMounted(() => {
   // initialize(treeData.value);
