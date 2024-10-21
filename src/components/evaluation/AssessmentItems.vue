@@ -75,7 +75,15 @@
         </el-table-column>
 
         <!-- 备注列 -->
-        <el-table-column prop="remark" label="备注" />
+        <el-table-column prop="remark" label="备注">
+          <template #default="tableRowData">
+            <span v-if="editRemarkRef !== tableRowData.row.id"
+                  @dblclick="editEditRemarkRef(tableRowData.row)">{{ tableRowData.row.remark || "双击添加备注" }}</span>
+            <el-input ref="inputRemarkRef" v-else v-model="tableRowData.row.remark"
+                      @blur="saveEditRemarkRef(tableRowData.row)"
+                      @keyup.enter="saveEditRemarkRef(tableRowData.row)"></el-input>
+          </template>
+        </el-table-column>
       </el-table>
     </el-main>
   </el-container>
@@ -90,6 +98,7 @@ import request from "../../utils/request";
 //---------------------------------------------数据存储区
 const editNameRef = ref(-1);
 const inputNameRef = ref('');
+const editRemarkRef = ref(-1);
 const inputRemarkRef = ref('');
 const tableSearchData = ref('');
 const tableData = ref([])
@@ -97,21 +106,26 @@ const tableData = ref([])
 const deleteDialogVisible = ref(false);
 const selectedRows = ref([])
 const selectRow = ref(null);
-//测试用header，需要删除
-const headers = {
-  headers: {
-  'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvYnNpZCI6IjJjOTE4YWY2ODFmYTZlYTcwMTgyMDlhNTA1YzMwNjcyIiwicm9sZWlkIjoiNTE2NzYxMDQ5LTIzNDUxMmYzLTdjMTktNDU4MC1hYmUyLWViZmIxZGQ4ZGIyMSIsImlkIjoiMSIsImV4cCI6MTcyODQ0MjI2OCwib2JzZGVlcCI6LTF9.h7aPj5QPd5Hia6ilmmzuh8_n-4nbY2qVZnhEeF6MALA'
-}}
 //---------------------------------------------处理方法区
 const editEditNameRef = (row) => {
   inputNameRef.value = row.itemName;
-  editNameRef.value = row.id,true;
+  editNameRef.value = row.id;
   setTimeout(() => {
     inputNameRef.value.focus();
   }, 0);
 }
 const saveEditNameRef = (row) => {
   editNameRef.value = -1;
+}
+const editEditRemarkRef = (row) => {
+  inputRemarkRef.value = row.remark;
+  editRemarkRef.value = row.id;
+  setTimeout(() => {
+    inputRemarkRef.value.focus();
+  }, 0);
+}
+const saveEditRemarkRef = (row) => {
+  editRemarkRef.value = -1;
 }
 //复选框
 const handleSelectionChange = (selection) => {
@@ -128,7 +142,7 @@ onMounted(() => {
 });
 
 const loadData = () => {
-  request.evaluation.get('/evaluation/checkitem',headers).then((res) => {
+  request.evaluation.get('/evaluation/checkitem').then((res) => {
     if(res.code === 200){
       tableData.value = res.data;
     }else{
@@ -154,7 +168,7 @@ const addChild = (type) => {
       remark: null
     },
   }
-  request.evaluation.post('/evaluation/checkitem/create',data, headers).then((res) => {
+  request.evaluation.post('/evaluation/checkitem/create',data).then((res) => {
     if(res.code === 200){
       loadData();
       ElMessage.success('新增成功');
@@ -170,7 +184,15 @@ const upgradeLevel = () => {
     ElMessage.warning("未选择考核项");
     return;
   }
-  request.evaluation.post('/evaluation/checkitem/upgrade?id='+selectRow.value.id, headers).then((res) => {
+  if(selectRow.value.pid === "0"){
+    ElMessage.warning("该考核项已经是最高等级.");
+    return;
+  }
+  if(selectRow.value.children !== null){
+    ElMessage.warning("该考核项有子节点,无法升级.");
+    return;
+  }
+  request.evaluation.post('/evaluation/checkitem/upgrade?id='+selectRow.value.id).then((res) => {
     if(res.code === 200){
       loadData();
       ElMessage.success('升级成功');
@@ -184,7 +206,7 @@ const upgradeLevel = () => {
 //删除
 const openDeleteDialog = () => {
   if(selectedRows.value.length === 0){
-    ElMessage.warning("未选择课程目标");
+    ElMessage.warning("未选择考核项");
     return;
   }
   deleteDialogVisible.value = true;
@@ -196,7 +218,7 @@ const deleteData = () => {
   for (const sel of selectedRows.value) {
     ids.push(sel.id);
   }
-  request.evaluation.post('/evaluation/checkitem/delete?ids='+ids.toString(), headers).then((res) => {
+  request.evaluation.post('/evaluation/checkitem/delete?ids='+ids.toString()).then((res) => {
     if(res.code === 200){
       loadData();
       ElMessage.success('删除成功');
@@ -209,16 +231,39 @@ const deleteData = () => {
 }
 
 const changeTask = (rowData) => {
-  request.evaluation.post('/evaluation/checkitem/changeTask?id=' + rowData.id + '&status=' + rowData.task, headers).then((res) => {
-    if(res.code === 200){
-      loadData();
-      ElMessage.success('修改成功');
-    }else{
-      ElMessage.error(res.msg);
-    }
-  }).catch((error) => {
-    ElMessage.error('修改失败' + error);
-  });
+  if(rowData.task){
+    request.evaluation.post('/evaluation/checkitem/setTaskTrue?id=' + rowData.id).then((res) => {
+      if(res.code === 200){
+        loadData();
+        ElMessage.success('勾选成功');
+      }else{
+        ElMessage.error(res.msg);
+      }
+    }).catch((error) => {
+      ElMessage.error('修改失败' + error);
+    });
+  }else{
+    const tempData = [rowData.id];
+    addChildId(tempData,rowData);
+    request.evaluation.post('/evaluation/checkitem/setTaskFalse?ids=' + tempData).then((res) => {
+      if(res.code === 200){
+        loadData();
+        ElMessage.success('取消勾选成功');
+      }else{
+        ElMessage.error(res.msg);
+      }
+    }).catch((error) => {
+      ElMessage.error('修改失败' + error);
+    });
+  }
+}
+const addChildId = (ids,pitem) => {
+  if(pitem.children){
+    pitem.children.forEach(item => {
+      ids.push(item.id);
+      addChildId(ids,item);
+    });
+  }
 }
 </script>
 <style scoped>
