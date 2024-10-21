@@ -116,6 +116,16 @@ const editEditNameRef = (row) => {
 }
 const saveEditNameRef = (row) => {
   editNameRef.value = -1;
+  request.evaluation.post('/evaluation/checkitem/changeName?id=' + row.id + '&name=' + row.itemName).then((res) => {
+    if(res.code === 200){
+      loadData();
+      ElMessage.success('修改成功');
+    }else{
+      ElMessage.error(res.msg);
+    }
+  }).catch((error) => {
+    ElMessage.error('修改失败' + error);
+  });
 }
 const editEditRemarkRef = (row) => {
   inputRemarkRef.value = row.remark;
@@ -126,6 +136,16 @@ const editEditRemarkRef = (row) => {
 }
 const saveEditRemarkRef = (row) => {
   editRemarkRef.value = -1;
+  request.evaluation.post('/evaluation/checkitem/changeRemark?id=' + row.id + '&remark=' + row.remark).then((res) => {
+    if(res.code === 200){
+      loadData();
+      ElMessage.success('修改成功');
+    }else{
+      ElMessage.error(res.msg);
+    }
+  }).catch((error) => {
+    ElMessage.error('修改失败' + error);
+  });
 }
 //复选框
 const handleSelectionChange = (selection) => {
@@ -188,7 +208,7 @@ const upgradeLevel = () => {
     ElMessage.warning("该考核项已经是最高等级.");
     return;
   }
-  if(selectRow.value.children !== null){
+  if(selectRow.value.children){
     ElMessage.warning("该考核项有子节点,无法升级.");
     return;
   }
