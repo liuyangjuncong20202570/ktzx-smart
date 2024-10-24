@@ -60,7 +60,6 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { findNodebyId } from '@/utils/findNodebyId.js';
 import { storeToRefs } from 'pinia';
 import useTeacherInClass from '@/stores/useTeacherInClass.js';
-import { testData, nameData } from '@/assets/js/testData.js';
 import { ref, reactive, computed, onMounted, h } from 'vue';
 import _ from 'lodash';
 

@@ -492,7 +492,8 @@ function submitUpload() {
 					importdialogViaible.value = false;
 					getPeopleList();
 				} else {
-					ElMessage.error(res.message || '上传失败！');
+					console.log('@@@2' + JSON.stringify(res))
+					ElMessage.error(res.msg || '上传失败！');
 				}
 			})
 			.catch(error => {

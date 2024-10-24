@@ -2,7 +2,8 @@ import {
   createRouter,
   createWebHistory,
   onBeforeRouteLeave,
-  createWebHashHistory
+  createWebHashHistory,
+  useRoute
 } from 'vue-router';
 
 const rolehome = [
@@ -30,6 +31,7 @@ const rolehome = [
 // coursemanagerhome 课程负责人首页
 
 const pathHeader = `/homes/:rolehome(${rolehome.join('|')})`;
+const route = useRoute();
 
 console.log('pathHeader', pathHeader);
 const routes = [
@@ -137,7 +139,7 @@ const routes = [
         component: () => import('../components/admin/Classmangt.vue')
       },
       {
-        path: 'coursemangt/coursemangt', // 课程管理
+        path: 'coursemangt/ccomponentsoursemangt', // 课程管理
         name: 'CourseManagement',
         component: () => import('../components/course/Coursemangt.vue')
       },
@@ -149,7 +151,8 @@ const routes = [
       {
         path: 'evaluation/ability', // 能力字典
         name: 'AbilityDictionary',
-        component: () => import('../components/course/AbilityDictionary.vue')
+        component: () => import('../components/course/AbilityDictionary.vue'),
+        props: route => ({ badge: route.params.rolehome })
       },
       {
         path: 'coursemangt/instructionalprogram', // 教学大纲
@@ -191,7 +194,7 @@ const routes = [
         //1004hhy修改
         path: 'evaluation/getability', // 形成性评价模型-能力
         name: 'Ability',
-        meta:1,
+        meta: 1,
         component: () => import('../components/evaluation/Ability.vue')
       },
       {
