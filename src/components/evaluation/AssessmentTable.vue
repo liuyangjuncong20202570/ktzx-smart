@@ -82,10 +82,11 @@
 				<vue-office-docx
 					v-if="fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'"
 					style="height: 82vh;" :src="blobData" />
-				<vue-office-pdf v-else-if="fileType === 'application/pdf'" style="height: 70vh;" :src="blobData" />
+				<vue-office-pdf v-else-if="fileType === 'application/pdf'" style="height: 82vh;" :src="blobData" />
 				<vue-office-excel
 					v-else-if="fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'"
 					style="height: 82vh;" :src="blobData" />
+				<div v-else>不支持的文件</div>
 			</div>
 		</el-dialog>
 		<!------------------------------------------------------------------------------------->
@@ -456,7 +457,6 @@ const getFileList = async () => {
 				file.blobData = new Blob([byteArray], { type: file.mimeType });
 			})
 			filesTableData.value = res.data.files;
-			console.log(filesTableData.value);
 			filesTableData.value.forEach((item) => {
 				item.createTime = item.createTime.replace('T', ' ');		// 格式化上传时间
 			})

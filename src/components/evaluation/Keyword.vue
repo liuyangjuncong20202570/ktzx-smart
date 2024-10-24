@@ -39,10 +39,9 @@
 		<el-main style="padding: 0;">
 
 			<!----------------------------------确认删除的弹框-------------------------------------->
-			<el-dialog v-model="deleteDialogVisible" :showClose="false" width="450" :close-on-click-modal="false"
-				destroy-on-close>
+			<el-dialog v-model="deleteDialogVisible" width="450" destroy-on-close>
 				<template #header="{ titleId, titleClass }">
-					<div style="text-align: left; margin-bottom: -15px;">
+					<div v-if="!relatedKWA.length" style="text-align: left; margin-bottom: -15px;">
 						<div :id="titleId" :class="titleClass" style="font-size: 15px;">
 							<el-button link type="warning">
 								<el-icon size="20" style="padding-bottom: 3px; box-sizing: border-box;">
@@ -53,20 +52,18 @@
 						</div>
 					</div>
 				</template>
-				<div v-if="relatedKWA.length > 0" style="max-height: 300px; overflow: auto; text-align: left;">
+				<div v-if="relatedKWA.length > 0" style="text-align: left;">
 					<div style="margin-bottom: 5px;">
 						<el-text type="danger" style="display: flex;">
-							<div>将删除的关键字与以下KWA有关，若删除则对应的KWA也会删除</div>
+							<div>将删除的关键字与以下KWA有关，请先删除相关的KWA</div>
 						</el-text>
 					</div>
-					<el-table :data="relatedKWA" style="width: 100%; height: 200px;" stripe border>
-						<el-table-column label="KWA名称">
-							<template v-slot="row">{{ relatedKWA[row.$index] }}</template>
-						</el-table-column>
+					<el-table :data="relatedKWA" style="width: 100%; height: 300px;" stripe border>
+						<el-table-column label="KWA名称" prop="name" />
 					</el-table>
 				</div>
 				<template #footer>
-					<div class="dialog-footer">
+					<div v-if="!relatedKWA.length" class="dialog-footer">
 						<el-button @click="deleteDialogVisible = false">取消</el-button>
 						<el-button type="primary" @click="deleteKeyword()">
 							确认
@@ -91,7 +88,8 @@
 				</el-table-column>
 				<el-table-column prop="datavalue" label="数值" width="100">
 					<template #default="tableRowData">
-						<div v-if="!editRef.get(tableRowData.row.id)['editDataValue']" style="width: 100%; height: 23px;"
+						<div v-if="!editRef.get(tableRowData.row.id)['editDataValue']"
+							style="width: 100%; height: 23px;"
 							@dblclick="editEditRef(tableRowData.row, 'editDataValue')">{{ tableRowData.row.datavalue
 							}}</div>
 						<el-input ref="inputTableRowDataRef" v-else v-model="tableRowData.row.datavalue"
@@ -101,7 +99,8 @@
 				</el-table-column>
 				<el-table-column prop="importantlevelid" label="重要程度" width="150">
 					<template #default="tableRowData">
-						<div v-if="!editRef.get(tableRowData.row.id)['editImportantlevelid']" style="width: 100%; height: 23px;"
+						<div v-if="!editRef.get(tableRowData.row.id)['editImportantlevelid']"
+							style="width: 100%; height: 23px;"
 							@dblclick="editEditRef(tableRowData.row, 'editImportantlevelid')">{{
 								tableRowData.row.importantlevelid
 							}}</div>
@@ -234,7 +233,7 @@ const openDeleteDialog = () => {
 	for (const sel of multipleSelection) {
 		ids.push(sel.id);
 	}
-	request.evaluation.post(`/evaluation/keywords/getKwaByKeywordsID?courseid=${courseid.value}`, ids).then((res) => {
+	request.evaluation.post(`/evaluation/keywords/getKwaByKeywordsId`, ids).then((res) => {
 		if (res.code === 200) {
 			relatedKWA.value = res.data;
 		}

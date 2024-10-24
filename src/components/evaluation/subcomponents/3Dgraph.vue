@@ -31,7 +31,7 @@ const courseid = ref("2c918af681fa6ea7018209a505c30672");
 
 const sectionChapterMap = new Map(); // 创建知识单元中各个小节和章的映射
 
-const kwasPositionMap = new Map(); // 以kwaid和其所在的章的id为主键创建kwa与其位置的映射
+const kwaUnitPositionMap = new Map(); // 以kwaid和其所在的章的id为主键创建kwa与其位置的映射
 
 const keywordPositionMap = new Map(); // 以keyword的id为键创建其位置的映射
 
@@ -53,7 +53,7 @@ const getData = async () => {
 	// 获取关键字数据
 	try {
 		const keywordsRes = await request.evaluation.get(
-			`/evaluation/keywords?courseid=${courseid.value}`
+			`/evaluation/keywords`
 		);
 		if (keywordsRes.code === 200) {
 			data.keywords = _.cloneDeep(keywordsRes.data);
@@ -65,7 +65,7 @@ const getData = async () => {
 	// 获取知识单元数据
 	try {
 		const unitsRes = await request.evaluation.get(
-			`/evaluation/knowledgeUnit/getKnowledgeUnitTree?courseid=${courseid.value}`
+			`/evaluation/knowledgeUnit/getKnowledgeUnitTree`
 		);
 		if (unitsRes.code === 200) {
 			data.units = _.cloneDeep(unitsRes.data);
@@ -77,10 +77,11 @@ const getData = async () => {
 	// 获取课程目标
 	try {
 		const targetsRes = await request.evaluation.get(
-			`/evaluation/coursetarget?courseid=${courseid.value}`
+			`/evaluation/coursetarget`
 		);
 		if (targetsRes.code === 200) {
 			data.targets = _.cloneDeep(targetsRes.data);
+			console.log(data.targets);
 		} else ElMessage.error(targetsRes.msg);
 	} catch (error) {
 		ElMessage.error("获取课程目标失败" + error);
@@ -176,14 +177,22 @@ onMounted(async () => {
 		const intersects = raycaster.intersectObjects(scene.children, true);
 
 		if (intersects.length > 0) {
-			// 获取第一个被点击的物体
-			const clickedObject = intersects[0].object;
+			// 存储合法的点的物体
+			let clickedObject = null;
+			for (let item of intersects) {		// 检查点击的地方有没有球型节点或者章平面
+				if(item.object.userData.type === "plane") break;		// 防止透过三层平面中的几面点击到本不该被点击的节点或章平面
+				if (item.object.userData.type === "node" || item.object.userData.type === "unit") {
+					clickedObject = item.object;
+					break;
+				}
+			}
+			if (!clickedObject) {		// 点击的地方没有球型节点或者章平面
+				showPopup.value = false;
+				return;
+			}
 
 			// 点击节点会显示名称
-			if (
-				clickedObject.userData.type === "node" ||
-				clickedObject.userData.type === "unit"
-			) {
+			if (clickedObject.userData.type === "node" || clickedObject.userData.type === "unit") {
 				popupContent.value = clickedObject.userData.name;
 				// 设置弹框位置
 				popupStyle.value.top = `${event.clientY}px`;
@@ -207,9 +216,21 @@ onMounted(async () => {
 
 		const intersects = raycaster.intersectObjects(scene.children, true);
 
-		if (intersects.length > 0) {
-			const clickedObject = intersects[0].object;
-			if (clickedObject.userData.type === "node") {
+		if (intersects.length) {
+			// 存储合法的光标悬浮的物体
+			let hoverObject = null;
+			for (let item of intersects) {		// 检查悬浮的地方有没有球型节点或者章平面
+				if(item.object.userData.type === "plane") break;		// 防止透过三层平面中的几面点击到本不该被点击的节点或章平面
+				if (item.object.userData.type === "node") {
+					hoverObject = item.object;
+					break;
+				}
+			}
+			if (!hoverObject) {		// 悬浮的地方没有球型节点或者章平面
+				container.style.cursor = "default";
+				return;
+			}
+			if (hoverObject.userData.type === "node") {
 				container.style.cursor = "pointer";
 			} else container.style.cursor = "default";
 		} else {
@@ -270,12 +291,13 @@ onMounted(async () => {
 	// 将每一章中的小节里的kwa合并到这一章中，以下在对重复的kwa进行处理
 	data.units.forEach((unit) => {
 		const kwaidStatusMap = new Map();		// 将kwa的id和status之间创建映射，用于确定一章里存在重复的kwa的status值
-		
+
 		let uniqueChildKwas = [];		// 存储去重后的所有小节中的kwa
 		sectionChapterMap.set(unit.id, unit.id);
 
 		unit.kwas.forEach((kwa) => {
 			kwaidStatusMap.set(kwa.kwaid, kwa.status);		// 首先记录每章自带的kwa
+			uniqueChildKwas.push(kwa);
 		})
 		unit.children.forEach((child) => {			// 再对每一章的所有小节进行kwa整合
 			sectionChapterMap.set(child.id, unit.id);
@@ -287,7 +309,7 @@ onMounted(async () => {
 				}
 				// 如果重复的kwa中存在status为0的，则显示的章中的kwa的status为0，重复的kwa的status字段是与的关系
 				else if (kwa.status === 0 && kwaidStatusMap.get(kwa.kwaid) === 1) {
-					kwaidStatusMap.set(kwa.id, kwa.status);			// 更新映射的值用于减少本分支的执行次数
+					kwaidStatusMap.set(kwa.kwaid, kwa.status);			// 更新映射的值用于减少本分支的执行次数
 					uniqueChildKwas.forEach((uniqueKwa) => {
 						if (uniqueKwa.kwaid === kwa.kwaid) {
 							uniqueKwa.status = kwa.status;
@@ -296,7 +318,7 @@ onMounted(async () => {
 				}
 			});
 		});
-		unit.kwas = unit.kwas.concat(uniqueChildKwas);
+		unit.kwas = _.cloneDeep(uniqueChildKwas);
 
 		if (!unitKwaAmount[unit.id]) unitKwaAmount[unit.id] = 0;
 		unitKwaAmount[unit.id] = unit.kwas.length;		// 记录记录每一章整合完其内所有小节后的kwa数量
@@ -557,6 +579,10 @@ onMounted(async () => {
 			abilityPositionMap.set(ability.id, ability.position);
 		});
 
+		let kwaIdPositionMap = {};		// 拥有同样id的kwa在不同章中的位置
+		kwadict.forEach(kwa => {
+			kwaIdPositionMap[kwa.id] = [];
+		})
 		// 生成知识单元平面
 		data.units.forEach((unit, index) => {
 			// 知识单元的材质
@@ -613,7 +639,6 @@ onMounted(async () => {
 					name: kwa.name,
 				};
 				sphere.receiveShadow = true;
-				console.log(kwa)
 				sphere.position.set(
 					unitPlaneGridPoints[kwa.unitid][index].x,
 					unitPlaneGridPoints[kwa.unitid][index].y,
@@ -624,29 +649,29 @@ onMounted(async () => {
 				// 将节点的位置信息存储在节点内
 				kwa.position = sphere.position;
 
-				kwasPositionMap.set(
+				kwaUnitPositionMap.set(
 					JSON.stringify([kwa.kwaid, sectionChapterMap.get(kwa.unitid)]),
 					kwa.position
 				);
 
 				const kwainfo = kwadict.find((item) => item.id === kwa.kwaid);
-				const startVertex = kwa.position;
+				const startPosition = kwa.position;
 				const lineMaterial = new THREE.LineBasicMaterial({ color: 0xf6e432 });
 
-				const abilityVertex = abilityPositionMap.get(kwainfo.abilityid);
+				const abilityPosition = abilityPositionMap.get(kwainfo.abilityid);
 				// 将局部坐标转换为全局坐标
-				const globalStartVertex = unitPlanes[kwa.unitid].localToWorld(
-					startVertex.clone()
+				const globalStartPosition = unitPlanes[kwa.unitid].localToWorld(
+					startPosition.clone()
 				);
-				const globalAbilityVertex = abilityPlane.localToWorld(
-					abilityVertex.clone()
+				const globalAbilityPosition = abilityPlane.localToWorld(
+					abilityPosition.clone()
 				);
-				const abilityVertices = [globalStartVertex, globalAbilityVertex];
+				const abilityVertices = [globalStartPosition, globalAbilityPosition];
 				const abilityLineGeometry = new THREE.BufferGeometry();
 				abilityLineGeometry.setFromPoints(abilityVertices);
 				// 创建连线
 				const abilityLine = new THREE.Line(abilityLineGeometry, lineMaterial);
-				// 将连线添加为平面的子对象
+				// 将连线添加为场景的子对象
 				scene.add(abilityLine);
 
 				const keywordVertex = keywordPositionMap.get(kwainfo.keywordid);
@@ -654,16 +679,17 @@ onMounted(async () => {
 				const globalKeywordVertex = keywordPlane.localToWorld(
 					keywordVertex.clone()
 				);
-				const keywordVertices = [globalStartVertex, globalKeywordVertex];
+				const keywordVertices = [globalStartPosition, globalKeywordVertex];
 				const keywordLineGeometry = new THREE.BufferGeometry();
 				keywordLineGeometry.setFromPoints(keywordVertices);
 				// 创建连线
 				const keywordLine = new THREE.Line(keywordLineGeometry, lineMaterial);
-				// 将连线添加为平面的子对象
+				// 将连线添加为场景的子对象
 				scene.add(keywordLine);
+
+				kwaIdPositionMap[kwa.kwaid].push(globalStartPosition);
 			});
 		});
-
 		// 创建课程目标节点
 		data.targets.forEach((target, index) => {
 			// 创建球形节点的材质
@@ -688,66 +714,50 @@ onMounted(async () => {
 
 			// 将节点的位置信息存储在节点内
 			target.position = sphere.position;
+			const startPosition = target.position;
+			// 将局部坐标转换为全局坐标
+			const globalStartPosition = planes[2].localToWorld(
+				startPosition.clone()
+			);
 
-			// // 创建文本几何体
-			// const textGeometry = new TextGeometry(fittingString(target.name, 80, 12), {
-			//     font,
-			//     size: 0.15,
-			//     depth: 0.02,
-			// });
-
-			// textGeometry.computeBoundingBox();
-
-			// const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
-			// const textHeight = textGeometry.boundingBox.max.y - textGeometry.boundingBox.min.y + 0.1;
-
-			// // 创建文本材质
-			// const textMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
-
-			// // 创建文本网格对象
-			// const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-			// textMesh.userData = {
-			//     type: 'text',
-			// };
-
-			// // 文本位置
-			// textMesh.position.set(-1 * (textWidth / 2), 0, -1 * textHeight);
-			// // textMesh1.rotation.y = Math.PI;
-			// textMesh.rotation.x = Math.PI * 1.5;
-
-			// sphere.add(textMesh);
+			const lineMaterial = new THREE.LineBasicMaterial({ color: 0xf6e432 });
+			target.kwas.forEach(kwa => {
+				kwaIdPositionMap[kwa.id].forEach(position => {
+					const keywordVertices = [globalStartPosition, position]; const keywordLineGeometry = new THREE.BufferGeometry();
+					keywordLineGeometry.setFromPoints(keywordVertices);
+					// 创建连线
+					const keywordLine = new THREE.Line(keywordLineGeometry, lineMaterial);
+					// 将连线添加为场景的子对象
+					scene.add(keywordLine);
+				})
+			})
 		});
 
 		// 创建知识单元间kwa的连线
 		data.kwaLines.forEach((line) => {
-			// console.log(kwasPositionMap.has(JSON.stringify([line.startkwaid, sectionChapterMap.get(line.startunitid)])));
-			// console.log(kwasPositionMap);
 			// 创建连线
 			const lineMaterial = new THREE.LineBasicMaterial({ color: 0xf6e432 });
 			const lineGeometry = new THREE.BufferGeometry();
 			// 获取球形节点的位置并创建连线的顶点
-			const startVertex = kwasPositionMap.get(
+			const startPosition = kwaUnitPositionMap.get(
 				JSON.stringify([
 					line.startkwaid,
 					sectionChapterMap.get(line.startunitid),
 				])
 			);
-			// console.log(JSON.stringify([line.startkwaid, sectionChapterMap.get(line.startunitid)]));
-			const endVertex = kwasPositionMap.get(
+			const endVertex = kwaUnitPositionMap.get(
 				JSON.stringify([line.endkwaid, sectionChapterMap.get(line.endunitid)])
 			);
-			// console.log(JSON.stringify([line.endkwaid, sectionChapterMap.get(line.endunitid)]))
-			// console.log(startVertex, endVertex);
 
 			// 将局部坐标转换为全局坐标，因为每章里的点的位置是相对于章平面而不是全局的
-			const globalStartVertex = unitPlanes[
+			const globalStartPosition = unitPlanes[
 				sectionChapterMap.get(line.startunitid)
-			].localToWorld(startVertex.clone());
+			].localToWorld(startPosition.clone());
 			const globalEndVertex = unitPlanes[
 				sectionChapterMap.get(line.endunitid)
 			].localToWorld(endVertex.clone());
 
-			const pointsVertices = [globalStartVertex, globalEndVertex];
+			const pointsVertices = [globalStartPosition, globalEndVertex];
 			lineGeometry.setFromPoints(pointsVertices);
 			// 创建连线
 			const kwaLine = new THREE.Line(lineGeometry, lineMaterial);
@@ -876,7 +886,7 @@ const findSecondPlaneGridSize = (array, len, maxUnitSizeR) => {
 	for (let i = 0; i < len; i++) {
 		// 找到最大的正方形对角线长
 		const res = Math.sqrt(Math.pow(Math.abs(array[i].x) + maxUnitSizeR, 2) + Math.pow(Math.abs(array[i].y) + maxUnitSizeR, 2)) * 2;
-		if(d < res) d = res;
+		if (d < res) d = res;
 	}
 	return (d - 0.15 * d) > 4 ? (d - 0.15 * d) : 4;		// 最小直径是4
 }
