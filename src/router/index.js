@@ -180,14 +180,17 @@ const routes = [
         name: 'StudentsList',
         component: () => import('../components/course/Classroommangt/StudentsList.vue')
       },
-      // {
-      //     path: 'coursemanagerhomepage',  // 课程负责人首页
-      //     name: 'CourseManagerHomePage',
-      //     component: () => import('../components/course/CourseManagerHomePage.vue')
-      // },
+      {
+        path: 'coursemangt/classroommangt', // 课程负责人首页
+        name: 'CourseManagerHomePage',
+        component: () => import('../components/course/CourseManagerHomePage.vue')
+      },
       {
         path: 'evasys/formative/keyword', // 形成性评价模型-关键字
         name: 'Keyword',
+        meta: {
+          keepAlive: true //添加这个作为标志符，表明该页面需要保留状态
+        },
         component: () => import('../components/evaluation/Keyword.vue')
       },
       {
