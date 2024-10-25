@@ -8,7 +8,7 @@
             <el-button type="warning" @click="">导出到Excel</el-button>
         </el-header>
         <el-main style="padding: 0;">
-            <el-table :data="courseTargetData" style="width: 100%; height: 100%;" v-model="tableSelected"
+            <el-table :data="courseTargetTargetData" style="width: 100%; height: 100%;" v-model="tableSelected"
                 @select="tableSelect" @select-all="tableSelectAll" stripe>
                 <el-table-column type="selection" width="55"></el-table-column>
                 <el-table-column label="代码" width="100">
@@ -36,7 +36,24 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="基本教学目标单元" min-width="200"></el-table-column>
+                <el-table-column label="关联KWA" min-width="200">
+                    <template #default="{ row }">
+                        <el-popover placement="bottom" width="800" trigger="click" @hide="saveEditKwa(row)">
+                            <el-checkbox-group v-model="row.kwaIds">
+                                <el-checkbox v-for="kwa in kwaData" :key="kwa.id" :label="kwa.name"
+                                    :value="kwa.id"></el-checkbox>
+                            </el-checkbox-group>
+                            <template #reference>
+                                <el-icon class='icon' color="dodgerblue">
+                                    <Edit />
+                                </el-icon>
+                            </template>
+                        </el-popover>
+                        <span>
+                            {{ ' ' + row.kwas.map(item => item.name).join(", ") }}
+                        </span>
+                    </template>
+                </el-table-column>
             </el-table>
         </el-main>
     </el-container>
@@ -48,11 +65,9 @@ import request from '../../utils/request';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import _ from 'lodash';
 
-const courseid = ref('2c918af681fa6ea7018209a505c30672');
+const courseTargetTargetData = ref([])
 
-const courseTargetData = ref([])
-
-const nullTargetNum = ref(0);
+const kwaData = ref([]);
 
 const tableSelected = ref([]);
 
@@ -61,57 +76,61 @@ const inputRefs = ref({});
 const tempRowData = ref({});
 
 onMounted(() => {
-    getData();
+    getTargetData();
     tableSelected.value = [];
 })
 
-const initialize = (data) => {
-    data.forEach((item) => {
+const initialize = () => {
+    courseTargetTargetData.value.forEach((item) => {
         item.editingName = false;
         item.editingRemark = false;
         item.editingTarget = false;
-
-        if (item.name.includes('未命名目标')) {
-            if (item.name.length > 5 && item.name[5] === '(') {
-                let num = '';
-                for (let i = 6; item.name[i] !== ')'; i++) {
-                    num += item.name[i];
-                }
-                if (nullTargetNum.value < Number(num)) nullTargetNum.value = Number(num);
-            }
-            else if (item.name.length === 5 && nullTargetNum.value === 0) nullTargetNum.value++;
-        }
+        // oldKwaIds存储kwaid的备份
+        item.oldKwaIds = item.kwaIds = item.kwas.map(kwa => kwa.id);
     });
-    // console.log(data);
 };
 
-const getData = () => {
-    request.evaluation.get(`/evaluation/coursetarget?courseid=${courseid.value}`).then((res) => {
+const getTargetData = async () => {
+    try {
+        const res = await request.evaluation.get(`/evaluation/coursetarget`);
         if (res.code === 200) {
-            courseTargetData.value = res.data;
-            initialize(courseTargetData.value);
+            courseTargetTargetData.value = res.data;
+            console.log(res.data);
+            getKwaData();
+            initialize();
         }
         else ElMessage.error(res.msg);
-    }).catch((error) => {
+    } catch (error) {
         ElMessage.error('获取课程目标失败' + error);
-    });
+    }
 };
 
+const getKwaData = async () => {
+    try {
+        const res = await request.evaluation.get(`/evaluation/kwadict`);
+        if (res.code === 200) {
+            kwaData.value = res.data;
+        } else {
+            ElMessage.error(res.msg);
+        }
+    } catch (error) {
+        ElMessage.error('获取kwa字典失败' + error);
+    }
+}
+
 const addTarget = () => {
-    nullTargetNum.value ++;
     const newTarget = {
         id: '',
         code: '',
-        name: nullTargetNum.value > 1 ? '未命名目标(' + nullTargetNum.value + ')' : '未命名目标',
+        name: '未命名目标',
         remark: '',
         unitid: '',
-        courseid: courseid.value,
     }
     // console.log(newTarget);
 
     request.evaluation.post('/evaluation/coursetarget/create', newTarget).then((res) => {
         if (res.code === 200) {
-            getData();
+            getTargetData();
             ElMessage.success('新增成功');
         }
         else ElMessage.error(res.msg);
@@ -143,14 +162,14 @@ const deleteTarget = () => {
         // console.log(deletedIds);
         request.evaluation.post('/evaluation/coursetarget/delete', deletedIds).then((res) => {
             if (res.code === 200) {
-                getData();
+                getTargetData();
                 ElMessage.success('删除成功');
             }
             else ElMessage.error(res.msg);
         }).catch((error) => {
             ElMessage.error('删除失败' + error);
         });
-    }).catch(() => {});
+    }).catch(() => { });
 };
 
 const tableSelect = (selection) => {
@@ -170,7 +189,7 @@ const setInputRef = (el, row) => {
 const handleClick = (row, field) => {
     nextTick(() => {
         tempRowData.value = _.cloneDeep(row);     // 存一份修改之前的数据用作比对
-        // console.log(courseTargetData.value);
+        // console.log(courseTargetTargetData.value);
         row[field] = true;
         setTimeout(() => {
             if (inputRefs.value[row.id] && inputRefs.value[row.id].$refs.input) {
@@ -192,7 +211,7 @@ const handleBlur = (row, field) => {
         // 当数据发生改变了再传数据给后端
         request.evaluation.post('/evaluation/coursetarget', row).then((res) => {
             if (res.code === 200) {
-                getData();
+                getTargetData();
                 ElMessage.success('修改成功');
             }
             else ElMessage.error(res.msg);
@@ -202,4 +221,56 @@ const handleBlur = (row, field) => {
     }
 };
 
+const saveEditKwa = async (row) => {
+    const newKwas = row.kwaIds.filter(id => !row.oldKwaIds.includes(id)).map(id => ({ id }));
+    const deleteKwas = row.oldKwaIds.filter(id => !row.kwaIds.includes(id)).map(id => ({ id }));
+    if (!newKwas.length && !deleteKwas.length) return;
+    // console.log(newKwas, deleteKwas);
+    let createFlag = true;
+    let deleteFlag = true;
+    if (newKwas.length) {
+        const postData = {
+            id: row.id,
+            kwas: newKwas
+        };
+        try {
+            const res = await request.evaluation.post(`/evaluation/coursetarget/createKwas`, postData);
+            if (res.code === 200) {
+                getTargetData();
+            } else {
+                createFlag = false;
+                ElMessage.error(res.msg);
+            }
+        } catch (error) {
+            ElMessage.error('新增kwa失败' + error);
+            createFlag = false;
+        }
+    }
+    if (deleteKwas.length) {
+        const postData = {
+            id: row.id,
+            kwas: deleteKwas
+        };
+        try {
+            const res = await request.evaluation.post(`/evaluation/coursetarget/deleteKwas`, postData);
+            if (res.code === 200) {
+                getTargetData();
+            } else {
+                deleteFlag = false;
+                ElMessage.error(res.msg);
+            }
+        } catch (error) {
+            ElMessage.error('删除kwa失败' + error); 
+            deleteFlag = false;
+        }
+    }
+    if(createFlag && deleteFlag) ElMessage.success('修改成功');
+}
+
 </script>
+
+<style scoped>
+.icon:hover {
+    cursor: pointer;
+}
+</style>

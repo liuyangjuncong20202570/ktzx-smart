@@ -1,39 +1,25 @@
 <template>
   <el-container style="height: 92vh">
-    <el-header
-      style="
+    <el-header style="
         height: auto;
         padding: 5px 0px;
         width: 100%;
         text-align: left;
         background-color: #deebf7;
-      "
-    >
+      ">
       <!-- <el-button type="success" style="margin-left: 0.8vw; cursor: not-allowed;">新增</el-button> -->
-      <el-button type="primary" style="margin-left: 0.8vw" @click="openDictionary"
-        >从能力字典选择</el-button
-      >
+      <el-button type="primary" style="margin-left: 0.8vw" @click="openDictionary">从能力字典选择</el-button>
       <el-button type="danger" @click="openDeleteDialog">删除</el-button>
       <el-button type="primary">保存</el-button>
-      <el-input
-        v-model="tableSearchData"
-        style="margin-left: 0.8vw; width: 250px"
-        placeholder="查找能力"
-      >
+      <el-input v-model="tableSearchData" style="margin-left: 0.8vw; width: 250px" placeholder="查找能力">
         <template #append><el-button :icon="Search" /></template>
       </el-input>
     </el-header>
     <el-main style="padding: 0">
       <!----------------------------------确认删除的弹框-------------------------------------->
-      <el-dialog
-        v-model="deleteDialogVisible"
-        :showClose="false"
-        width="450"
-        :close-on-click-modal="false"
-        destroy-on-close
-      >
+      <el-dialog v-model="deleteDialogVisible" width="450" destroy-on-close>
         <template #header="{ titleId, titleClass }">
-          <div style="text-align: left; margin-bottom: -15px">
+          <div v-if="!relatedKWA.length" style="text-align: left; margin-bottom: -15px">
             <div :id="titleId" :class="titleClass" style="font-size: 15px">
               <el-button link type="warning">
                 <el-icon size="20" style="padding-bottom: 3px; box-sizing: border-box">
@@ -44,23 +30,18 @@
             </div>
           </div>
         </template>
-        <div
-          v-if="relatedKWA.length > 0"
-          style="max-height: 300px; overflow: auto; text-align: left"
-        >
+        <div v-if="relatedKWA.length > 0" style="text-align: left">
           <div style="margin-bottom: 5px">
             <el-text type="danger" style="display: flex">
-              <div>将删除的能力与以下KWA有关，若删除则对应的KWA也会删除</div>
+              <div>将删除的能力与以下KWA有关，请先删除相关的KWA</div>
             </el-text>
           </div>
-          <el-table :data="relatedKWA" style="width: 100%; height: 200px" stripe border>
-            <el-table-column label="KWA名称">
-              <template v-slot="row">{{ relatedKWA[row.$index] }}</template>
-            </el-table-column>
+          <el-table :data="relatedKWA" style="width: 100%; height: 300px" stripe border>
+            <el-table-column label="KWA名称" prop="name" />
           </el-table>
         </div>
         <template #footer>
-          <div class="dialog-footer">
+          <div v-if="!relatedKWA.length" class="dialog-footer">
             <el-button @click="deleteDialogVisible = false">取消</el-button>
             <el-button type="primary" @click="deleteAbility()"> 确认 </el-button>
           </div>
@@ -68,18 +49,9 @@
       </el-dialog>
       <!-------------------------------------------------------------------------------------->
 
-      <el-table
-        :data="filterTableData"
-        style="height: 100%; width: 100%"
-        v-model="tableSelected"
-        size="large"
-        v-loading="tableLoading"
-        element-loading-text="Loading..."
-        element-loading-background="rgba(0, 0, 0, 0.7)"
-        @select="filterTableSelect"
-        @select-all="filterTableSelectAll"
-        stripe
-      >
+      <el-table :data="filterTableData" style="height: 100%; width: 100%" v-model="tableSelected" size="large"
+        v-loading="tableLoading" element-loading-text="Loading..." element-loading-background="rgba(0, 0, 0, 0.2)"
+        @select="filterTableSelect" @select-all="filterTableSelectAll" stripe>
         <el-table-column type="selection" width="55"></el-table-column>
         <!-- <el-table-column prop="id" label="序码" width="60"></el-table-column> -->
         <el-table-column width="50">
@@ -111,15 +83,8 @@
     </el-main>
   </el-container>
 
-  <el-dialog
-    v-model="abilityDictionaryVisible"
-    width="1000"
-    style="height: 360px; max-width: 1000px; overflow: auto"
-    :close-on-click-modal="false"
-    :show-close="false"
-    destroy-on-close
-    align-center
-  >
+  <el-dialog v-model="abilityDictionaryVisible" width="1000" style="height: 360px; max-width: 1000px; overflow: auto"
+    :close-on-click-modal="false" :show-close="false" destroy-on-close align-center>
     <template #header="{ titleId }">
       <el-header style="height: auto; padding: 5px 0px; width: 100%" :id="titleId">
         <div style="display: flex; justify-content: space-between">
@@ -133,12 +98,8 @@
           </el-button>
         </div>
       </el-header>
-      <el-cascader-panel
-        style="width: fit-content; margin-top: 20px"
-        :options="dictionaryData"
-        :props="props"
-        v-model="dictionarySelected"
-      />
+      <el-cascader-panel style="width: fit-content; margin-top: 20px" :options="dictionaryData" :props="props"
+        v-model="dictionarySelected" />
     </template>
   </el-dialog>
 </template>
@@ -198,11 +159,12 @@ const relatedKWA = ref([]);
 const getAbility = () => {
   request.evaluation
     // .get(`/evaluation/getability?courseid=${courseid.value}`)
-      //1004hhy修改将接口由 `/evaluation/getability?courseid=${courseid.value}` 改为`/evaluation/getability`
-      .get(`/evaluation/getability`)
-      .then(res => {
+    //1004hhy修改将接口由 `/evaluation/getability?courseid=${courseid.value}` 改为`/evaluation/getability`
+    .get(`/evaluation/getability`)
+    .then(res => {
       if (res.code === 200) {
         data.value = res.data;
+        console.log(res.data);
         tableData.value = [];
         initialize();
         tableLoading.value = false;
@@ -269,6 +231,20 @@ const filterTableSelectAll = selection => {
 };
 /*********************************************/
 
+const getRelatedKwas = async (deletedIds) => {
+  relatedKWA.value = [];
+  try {
+    const res = await request.evaluation.post(`/evaluation/getability/getKwaByGetabilityId`, deletedIds);
+    if (res.code === 200) {
+      relatedKWA.value = res.data;
+    } else if (res.code === 404) {
+      ElMessage.error(res.msg);
+    }
+  } catch (error) {
+    ElMessage.error('获取相关KWA失败' + error);
+  }
+};
+
 const openDeleteDialog = () => {
   if (tableSelected.value.length === 0) {
     ElMessage({
@@ -283,45 +259,32 @@ const openDeleteDialog = () => {
   tableSelected.value.forEach(item => {
     deletedIds.push(item.id);
   });
-  request.evaluation
-    .post(`/evaluation/getability/getKwaByGetability?courseid=${courseid.value}`, deletedIds)
-    .then(res => {
-      if (res.code === 200) {
-        relatedKWA.value = res.data;
-      } else if (res.code === 404) {
-        ElMessage.error(res.msg);
-      }
-    })
-    .catch(error => {
-      ElMessage.error('获取相关KWA失败' + error);
-    });
+
+  getRelatedKwas(deletedIds);
 
   deleteDialogVisible.value = true;
 };
 
-const deleteAbility = () => {
+const deleteAbility = async () => {
   // console.log(tableSelected.value);
   let deletedIds = [];
   tableSelected.value.forEach(item => {
     deletedIds.push(item.id);
   });
 
-  request.evaluation
-    .post(`/evaluation/getability/delete?courseid=${courseid.value}`, deletedIds)
-    .then(res => {
-      if (res.code === 200) {
-        tableLoading.value = true;
-        getAbility();
-        ElMessage.success('删除成功');
-        // console.log(tableSelected.value);
-      } else if (res.code === 404) {
-        ElMessage.error(res.msg);
-      }
-    })
-    .catch(error => {
-      ElMessage.error('删除失败' + error);
-    });
-  // console.log(deletedIds);
+  try {
+    const res = await request.evaluation.post(`/evaluation/getability/delete?courseid=${courseid.value}`, deletedIds);
+    if (res.code === 200) {
+      tableLoading.value = true;
+      getAbility();
+      ElMessage.success('删除成功');
+      // console.log(tableSelected.value);
+    } else if (res.code === 404) {
+      ElMessage.error(res.msg);
+    }
+  } catch (error) {
+    ElMessage.error('删除失败' + error);
+  }
 
   deleteDialogVisible.value = false;
 };
@@ -332,7 +295,7 @@ const openDictionary = () => {
   dictionarySelected_backup.value = dictionarySelected.value;
   // console.log(dictionarySelected.value);
   request.evaluation.get('/evaluation/getability/allability')
-      //1004hhy修改，此处为形成性评价模型-能力页面，调用获取能力接口，即'/evaluation/getability/allability'
+    //1004hhy修改，此处为形成性评价模型-能力页面，调用获取能力接口，即'/evaluation/getability/allability'
     // .get('/evaluation/ability?courseId=' + parseJWT(sessionStorage.getItem('token')).obsid)
     .then(res => {
       if (res.code === 200) {
@@ -356,13 +319,10 @@ const closeDictionary = () => {
   // console.log(dictionarySelected.value);
 };
 
-const changeAbilities = () => {
+const changeAbilities = async () => {
   // console.log(dictionarySelected.value);
 
-  if (_.isEqual(dictionarySelected.value, dictionarySelected_backup.value)) {
-    abilityDictionaryVisible.value = false;
-    return;
-  }
+  if (_.isEqual(dictionarySelected.value, dictionarySelected_backup.value)) return;
 
   let oldIds = []; // 存储未改变弹窗选择前的数据
   dictionarySelected_backup.value.forEach(item => {
@@ -382,48 +342,47 @@ const changeAbilities = () => {
   let addedIds = [...newSet].filter(item => !oldSet.has(item));
   let deletedIds = [...oldSet].filter(item => !newSet.has(item));
 
-  let promise = []; // Promise.all()接受一个promise对象的数组作为参数，用作所有请求都结束后再执行某些操作
-
   tableLoading.value = true;
 
   if (deletedIds.length) {
-    let deletePromise = request.evaluation
-      .post(`/evaluation/getability/delete?courseid=${courseid.value}`, deletedIds)
-      .then(res => {
-        if (res.code === 200) {
-        } else if (res.code === 404) {
-          ElMessage.error(res.msg);
-        }
-      })
-      .catch(error => {
-        ElMessage.error('删除失败' + error);
-        tableLoading.value = false;
-      });
+    await getRelatedKwas(deletedIds);
+    if (relatedKWA.value.length) {
+      deleteDialogVisible.value = true;
+      tableLoading.value = false;
+      abilityDictionaryVisible.value = false;
+      dictionarySelected.value = dictionarySelected_backup.value;
+      return;
+    }
 
-    promise.push(deletePromise);
+    try {
+      const res = await request.evaluation.post(`/evaluation/getability/delete?courseid=${courseid.value}`, deletedIds);
+      if (res.code === 200) {
+      } else if (res.code === 404) {
+        deleteFlag = false;
+        ElMessage.error(res.msg);
+      }
+    } catch (error) {
+      deleteFlag = false;
+      ElMessage.error('删除失败' + error);
+    }
   }
+
   if (addedIds.length) {
-    let addPromise = request.evaluation
-      .post(`/evaluation/getability/insert?courseid=${courseid.value}`, addedIds)
-      .then(res => {
-        if (res.code === 200) {
-        } else if (res.code === 404) {
-          ElMessage.error(res.msg);
-        }
-      })
-      .catch(error => {
-        ElMessage.error('新增失败' + error);
-        tableLoading.value = false;
-      });
-
-    promise.push(addPromise);
+    try {
+      const res = await request.evaluation.post(`/evaluation/getability/insert?courseid=${courseid.value}`, addedIds);
+      if (res.code === 200) {
+      } else if (res.code === 404) {
+        addFlag = false;
+        ElMessage.error(res.msg);
+      }
+    } catch (error) {
+      addFlag = false;
+      ElMessage.error('新增失败' + error);
+    }
   }
 
-  Promise.all(promise).then(() => {
-    // 所有请求都结束后再执行某些操作
-    getAbility();
-    dictionarySelected_backup.value = [];
-  });
+  getAbility();
+  dictionarySelected_backup.value = [];
   abilityDictionaryVisible.value = false;
 };
 /****************************************/

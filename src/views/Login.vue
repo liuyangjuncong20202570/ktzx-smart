@@ -279,7 +279,7 @@ const login = () => {
 
           ElMessage({
             type: 'error',
-            message: '登录失败'
+            message: `登录失败 ${error}`
           });
         });
     } else {

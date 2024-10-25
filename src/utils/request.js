@@ -13,6 +13,7 @@ import { ElMessage } from 'element-plus';
 //   term: createAPI('http://60.205.178.180:8084/term')
 // };
 
+
 const request = {
   admin: createAPI('http://157.0.19.2:8080/api'),
   course: createAPI('http://157.0.19.2:8082/api'),

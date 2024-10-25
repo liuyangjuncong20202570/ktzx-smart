@@ -1,6 +1,7 @@
 <template>
 	<div v-if="!nodes.length && !edges.length && !combos.length" style="display: flex; justify-content: center; 
-		align-items: center; height: 100%; background-color: white;" v-loading="loading">
+		align-items: center; height: 100%; background-color: white;" v-loading="loading"
+		element-loading-background="rgba(0, 0, 0, 0.2)">
 		<el-empty description="No Data" />
 	</div>
 	<div v-else class="container" id="container"
@@ -66,7 +67,7 @@ const getData = async () => {
 		const nodesCombosRes = await request.evaluation.get(`/evaluation/knowledgeUnit/getKnowledgeUnitTree?courseid=${courseid.value}`);
 		if (nodesCombosRes.code === 200) {
 			let data = nodesCombosRes.data;
-			// console.log(res.data);
+			console.log(data);
 			getNodesCombosProp(data);
 
 			return request.evaluation.get(`/evaluation/lines`).then((res) => {
@@ -179,7 +180,7 @@ onMounted(async () => {
 				graph.setItemState(item, 'status0', true);
 				postData.status = 0;
 			}
-			// console.log(postData);
+			console.log(postData);
 
 			request.evaluation.post('/evaluation/knowledgeUnit/updateKnowledgeUnitKwa', postData).then((res) => {
 				if (res.code === 200) {
@@ -193,9 +194,9 @@ onMounted(async () => {
 			})
 		},
 		// 需要加上父级容器的 padding-left 16 与自身偏移量 10
-		offsetX: -290,
+		offsetX: -240,
 		// 需要加上父级容器的 padding-top 24 、画布兄弟元素高度、与自身偏移量 10
-		offsetY: -50,
+		offsetY: -100,
 		// 在哪些类型的元素上响应
 		itemTypes: ['node'],
 	});
