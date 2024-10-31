@@ -1,7 +1,12 @@
 <template>
   <div style="height: 92vh; display: flex; flex-direction: column;">
     <el-header
-        style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; justify-content: flex-end;">
+        style="height: auto; 
+        padding: 5px 0px; 
+        width:100%; 
+        background-color:#deebf7; 
+        display: flex; 
+        justify-content: flex-end;">
       <el-upload
           ref="upload"
           :before-upload="beforeUpload"
@@ -126,15 +131,17 @@ const beforeUpload = (file) => {
 };
 
 const previewFile = async (file) => {
-  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/instructionalprogram/download/${encodeURIComponent(file.filename)}`;
+  let fileUrl = `${request.course.defaults.baseURL}/coursemangt/instructionalprogram/download/${encodeURIComponent(file.id)}`;
   console.log('Preview file URL:', fileUrl);  // 检查 URL 是否正确
   const isPDF = file.filename.toLowerCase().endsWith('.pdf');
   const isWord = file.filename.toLowerCase().endsWith('.docx');
 
   if (isPDF) {
     previewFileType.value = 'pdf';
+    fileUrl += ".pdf"
   } else if (isWord) {
     previewFileType.value = 'word';
+    fileUrl += ".docx"
   } else {
     ElMessage.error('无法预览此文件类型');
     return;
@@ -145,7 +152,9 @@ const previewFile = async (file) => {
 
 
 const downloadFile = (file) => {
-  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/instructionalprogram/download/${encodeURIComponent(file.filename)}`;
+  const dotIndex = file.filename.lastIndexOf('.');
+  let suffix = file.filename.substring(dotIndex + 1);
+  let fileUrl = `${request.course.defaults.baseURL}/coursemangt/instructionalprogram/download/${encodeURIComponent(file.id)}.${suffix}`;
   fetch(fileUrl)
       .then(response => {
         if (response.ok) {
@@ -177,7 +186,10 @@ const deleteFile = async (file) => {
       cancelButtonText: '取消',
       type: 'warning',
     });
-    await request.course.get(`/coursemangt/instructionalprogram/delete/${encodeURIComponent(file.filename)}`)
+    const dotIndex = file.filename.lastIndexOf('.');
+    let suffix = file.filename.substring(dotIndex + 1);
+    let fileUrl = `/coursemangt/instructionalprogram/delete/${encodeURIComponent(file.id)}.${suffix}`
+    await request.course.get(fileUrl)
         .then(res => {
           if (res.code === 200) {
             ElMessage.success('删除成功');
