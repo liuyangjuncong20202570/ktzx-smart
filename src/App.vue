@@ -22,7 +22,7 @@ onMounted(() => {
 
 <template>
   <div class="container">
-    <button @click="handleClick">点击跳转</button>
+    <!--<button @click="handleClick">点击跳转</button>-->
     <router-view />
   </div>
 </template>
