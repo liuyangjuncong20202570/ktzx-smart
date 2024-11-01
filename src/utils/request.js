@@ -3,25 +3,25 @@ import { ElMessage } from 'element-plus';
 //60.205.178.180
 //127.0.0.1
 
-// const request = {
-//   admin: createAPI('http://localhost:8080/api'),
-//   course: createAPI('http://localhost:8082/api'),
-//   evaluation: createAPI('http://localhost:8083/api'),
-//   page: createAPI('http://60.205.178.180:8084/page'),
-//   fork: createAPI('http://60.205.178.180:8084/fork'),
-//   common: createAPI('http://60.205.178.180:8084/common'),
-//   term: createAPI('http://60.205.178.180:8084/term')
-// };
-
 const request = {
-  admin: createAPI('http://157.0.19.2:10247/api'),
-  course: createAPI('http://157.0.19.2:10052/api'),
-  evaluation: createAPI('http://157.0.19.2:10209/api'),
-  page: createAPI('http://157.0.19.2:10231/page'),
-  fork: createAPI('http://157.0.19.2:10231/fork'),
-  common: createAPI('http://157.0.19.2:10231/common'),
-  term: createAPI('http://157.0.19.2:10231/term')
+  admin: createAPI('http://localhost:8080/api'),
+  course: createAPI('http://localhost:8082/api'),
+  evaluation: createAPI('http://localhost:8083/api'),
+  page: createAPI('http://60.205.178.180:8084/page'),
+  fork: createAPI('http://60.205.178.180:8084/fork'),
+  common: createAPI('http://60.205.178.180:8084/common'),
+  term: createAPI('http://60.205.178.180:8084/term')
 };
+
+// const request = {
+//   admin: createAPI('http://157.0.19.2:10247/api'),
+//   course: createAPI('http://157.0.19.2:10052/api'),
+//   evaluation: createAPI('http://157.0.19.2:10209/api'),
+//   page: createAPI('http://157.0.19.2:10231/page'),
+//   fork: createAPI('http://157.0.19.2:10231/fork'),
+//   common: createAPI('http://157.0.19.2:10231/common'),
+//   term: createAPI('http://157.0.19.2:10231/term')
+// };
 
 // 60.205.178.180
 function createAPI(url) {

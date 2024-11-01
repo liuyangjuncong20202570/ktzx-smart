@@ -155,28 +155,26 @@ const downloadFile = (file) => {
   const dotIndex = file.filename.lastIndexOf('.');
   let suffix = file.filename.substring(dotIndex + 1);
   let fileUrl = `${request.course.defaults.baseURL}/coursemangt/instructionalprogram/download/${encodeURIComponent(file.id)}.${suffix}`;
-  fetch(fileUrl)
-      .then(response => {
-        if (response.ok) {
-          return response.blob();
-        } else {
-          throw new Error('Network response was not ok');
-        }
-      })
-      .then(blob => {
-        const link = document.createElement('a');
-        const url = window.URL.createObjectURL(blob);
-        link.href = url;
-        link.download = file.filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      })
-      .catch(error => {
-        console.error('There was a problem with the fetch operation:', error);
-        ElMessage.error('文件下载失败');
-      });
+  request.course({
+    url: fileUrl,
+    method: 'GET',
+    responseType: 'blob', // 重要：设置响应类型为blob
+  })
+  .then(response => {
+      const blob = response;
+      const link = document.createElement('a');
+      const url = window.URL.createObjectURL(blob);
+      link.href = url;
+      link.download = file.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+  })
+  .catch(error => {
+    console.error('There was a problem with the fetch operation:', error);
+    ElMessage.error('文件下载失败');
+  });
 };
 
 const deleteFile = async (file) => {
