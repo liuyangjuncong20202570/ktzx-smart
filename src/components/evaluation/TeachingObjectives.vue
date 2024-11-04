@@ -432,10 +432,11 @@ const setKeyword = row => {
       // 数据变化了再传给后端
       const postData = {
         id: row.row.id,
-        keywordid: selectedKeyword.value.id
+        keywordid: selectedKeyword.value.id,
+        keywordname: selectedKeyword.value.name
       }
       request.evaluation
-          .post('/evaluation/kwadict', postData)
+          .post('/evaluation/kwadict/updateKwadict', postData)
           .then(res => {
             if (res.code === 200) {
               getKWAData();
@@ -516,10 +517,11 @@ const setAbility = row => {
       // 数据变化了再传给后端
       const postData = {
         id: row.row.id,
-        abilityid: selectedAbility.value.id
+        abilityid: selectedAbility.value.id,
+        abilityname: selectedAbility.value.name
       };
       request.evaluation
-          .post('/evaluation/kwadict', postData)
+          .post('/evaluation/kwadict/updateKwadict', postData)
           .then(res => {
             if (res.code === 200) {
               getKWAData();
