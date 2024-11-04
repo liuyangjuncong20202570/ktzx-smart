@@ -432,6 +432,7 @@ const setKeyword = row => {
       // 数据变化了再传给后端
       const postData = {
         id: row.row.id,
+        name: selectedKeyword.value.name + '-' + row.row.abilityname,
         keywordid: selectedKeyword.value.id,
         keywordname: selectedKeyword.value.name
       }
@@ -517,6 +518,7 @@ const setAbility = row => {
       // 数据变化了再传给后端
       const postData = {
         id: row.row.id,
+        name: row.row.keywordname + '-' + selectedAbility.value.name,
         abilityid: selectedAbility.value.id,
         abilityname: selectedAbility.value.name
       };
