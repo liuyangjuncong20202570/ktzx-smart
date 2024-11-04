@@ -391,7 +391,7 @@ const openKeywordDictionary = row => {
 	openedAbilityPop.value = null;
 
 	request.evaluation
-		.get(`/evaluation/kwadict/getKeyworddict?courseid=${courseid.value}`)
+		.get(`/evaluation/kwadict`)
 		.then(res => {
 			if (res.code === 200) {
 				keywordData.value = res.data;
