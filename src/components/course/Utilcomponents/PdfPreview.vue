@@ -9,9 +9,12 @@ import {ref, watch, onBeforeUnmount, defineExpose, onMounted} from 'vue';
 import * as pdfjsLib from 'pdfjs-dist';
 import 'pdfjs-dist/build/pdf.worker.entry.js';
 import InstructionalProgrammangt from "../InstructionalProgrammangt.vue"
+import request from '../../../utils/request';
 
 // 确保路径正确
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.js';
+
+
 
 const props = defineProps({
   fileUrl: {
@@ -37,8 +40,13 @@ const renderPDF = async (url) => {
   try {
     console.log('Starting to render PDF from URL:', url);
     cancelCurrentTasks();
-
-    loadingTask = pdfjsLib.getDocument(url);
+    const pdfData = await request.admin({
+      url,
+      method: 'GET',
+      responseType: 'arraybuffer'
+    })
+    
+    loadingTask = pdfjsLib.getDocument({data:pdfData});
     const pdf = await loadingTask.promise;
     console.log('PDF loaded:', pdf);
 

@@ -126,15 +126,17 @@ const beforeUpload = (file) => {
 };
 
 const previewFile = async (file) => {
-  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/courseresources/download/${encodeURIComponent(file.filename)}`;
+  let fileUrl = `${request.course.defaults.baseURL}/coursemangt/courseresources/download/${encodeURIComponent(file.id)}`;
   console.log('Preview file URL:', fileUrl);  // 检查 URL 是否正确
   const isPDF = file.filename.toLowerCase().endsWith('.pdf');
   const isWord = file.filename.toLowerCase().endsWith('.docx');
 
   if (isPDF) {
     previewFileType.value = 'pdf';
+    fileUrl += ".pdf"
   } else if (isWord) {
     previewFileType.value = 'word';
+    fileUrl += ".docx"
   } else {
     ElMessage.error('无法预览此文件类型');
     return;
@@ -145,29 +147,29 @@ const previewFile = async (file) => {
 
 
 const downloadFile = (file) => {
-  const fileUrl = `${request.course.defaults.baseURL}/coursemangt/courseresources/download/${encodeURIComponent(file.filename)}`;
-  fetch(fileUrl)
-      .then(response => {
-        if (response.ok) {
-          return response.blob();
-        } else {
-          throw new Error('Network response was not ok');
-        }
-      })
-      .then(blob => {
-        const link = document.createElement('a');
-        const url = window.URL.createObjectURL(blob);
-        link.href = url;
-        link.download = file.filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      })
-      .catch(error => {
-        console.error('There was a problem with the fetch operation:', error);
-        ElMessage.error('文件下载失败');
-      });
+  const dotIndex = file.filename.lastIndexOf('.');
+  let suffix = file.filename.substring(dotIndex + 1);
+  let fileUrl = `${request.course.defaults.baseURL}/coursemangt/courseresources/download/${encodeURIComponent(file.id)}.${suffix}`;
+  request.course({
+    url: fileUrl,
+    method: 'GET',
+    responseType: 'blob', // 重要：设置响应类型为blob
+  })
+  .then(response => {
+      const blob = response;
+      const link = document.createElement('a');
+      const url = window.URL.createObjectURL(blob);
+      link.href = url;
+      link.download = file.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+  })
+  .catch(error => {
+    console.error('There was a problem with the fetch operation:', error);
+    ElMessage.error('文件下载失败');
+  });
 };
 
 const deleteFile = async (file) => {
@@ -177,7 +179,10 @@ const deleteFile = async (file) => {
       cancelButtonText: '取消',
       type: 'warning',
     });
-    await request.course.get(`/coursemangt/courseresources/delete/${encodeURIComponent(file.filename)}`)
+    const dotIndex = file.filename.lastIndexOf('.');
+    let suffix = file.filename.substring(dotIndex + 1);
+    let fileUrl = `/coursemangt/courseresources/delete/${encodeURIComponent(file.id)}.${suffix}`
+    await request.course.get(fileUrl)
         .then(res => {
           console.log("res",res)
           if (res.code === 200) {

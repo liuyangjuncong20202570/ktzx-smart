@@ -5,6 +5,7 @@
 <script setup>
 import {ref, watch, onMounted, defineExpose} from 'vue';
 import mammoth from 'mammoth';
+import request from '../../../utils/request';
 
 const props = defineProps({
   fileUrl: {
@@ -18,10 +19,12 @@ const wordContent = ref('');
 const fetchWordFile = async (url) => {
   try {
     console.log('Fetching Word file from URL:', url);
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
+    const response = await request.course({
+    url: url,
+    method: 'GET',
+    responseType: 'blob', // 重要：设置响应类型为blob
+  })
+    console.log(response);
     const arrayBuffer = await response.arrayBuffer();
     const result = await mammoth.convertToHtml({arrayBuffer: arrayBuffer});
     console.log('Word file converted to HTML:', result.value);

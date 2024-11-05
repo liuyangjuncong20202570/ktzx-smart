@@ -63,7 +63,7 @@
           </div>
         </div>
       </el-header>
-      <el-container style="width: 100%;overflow-x: hidden;">
+      <el-container style="width: 100%; overflow-x: hidden">
         <el-aside width="200px" style="height: 100%">
           <div
             style="
@@ -157,11 +157,11 @@
                     v-if="hasChildren(menu)"
                     :index="menu.id"
                     :key="menu.id"
-                    style="border-top: 1px solid #efefef"
+                    style="border-top: 1px solid #efefef; position: relative"
                   >
                     <template #title>
                       <!--0822有更改-->
-                      <span @click="navigateTo(menu.url)">{{ menu.name }}</span>
+                      <div class="titleBox" @click="navigateTo(menu.url)">{{ menu.name }}</div>
                     </template>
                     <el-menu-item
                       v-for="child in getChildrenMenus(menu)"
@@ -170,7 +170,7 @@
                       style="border-top: 1px solid #efefef"
                       @click="navigateTo(child.url)"
                     >
-                      <span>{{ child.name }}</span>
+                      <div class="childtitleBox">{{ child.name }}</div>
                     </el-menu-item>
                   </el-sub-menu>
                   <el-menu-item
@@ -180,7 +180,7 @@
                     @click="navigateTo(menu.url)"
                     style="border-top: 1px solid #efefef"
                   >
-                    <span>{{ menu.name }}</span>
+                    <div class="titleBox">{{ menu.name }}</div>
                   </el-menu-item>
                 </template>
               </el-menu>
@@ -407,7 +407,6 @@ onMounted(() => {
     router.replace(basePath); // 重定向到基础路径
   }
 
-
   const storedUserInfo = sessionStorage.getItem('users');
   if (storedUserInfo) {
     const userInfo = JSON.parse(storedUserInfo);
@@ -448,7 +447,7 @@ onMounted(() => {
     .post(`/homes/teacherhome`)
     .then(res => {
       console.log(res);
-      console.log("defaultActive",defaultActive.value)
+      console.log('defaultActive', defaultActive.value);
       // 登录成功
 
       if (res.code === 200 && res.data.length > 0) {
@@ -465,7 +464,19 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style lang="less" scoped>
+.childtitleBox,
+.titleBox {
+  width: 177px;
+  height: 60px;
+  // margin: 0 auto;
+  position: absolute;
+  left: 0;
+}
+.childtitleBox {
+  left: 20px;
+}
+
 .layout-container-demo .el-header {
   position: relative;
   color: var(--el-text-color-primary);
