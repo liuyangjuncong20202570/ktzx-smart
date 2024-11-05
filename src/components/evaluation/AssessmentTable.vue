@@ -39,6 +39,7 @@
 			</el-table-column>
 		</el-table>
 
+		<!----------------------------------编辑弹窗-------------------------------------->
 		<el-dialog v-model="editDialogVisible" width="600" destroy-on-close>
 			<div style="padding: 0 25%; display: flex; justify-content: space-between; margin: -5px 0 15px 0">
 				<el-button @click="uploadDialogVisible = true">上传</el-button>
@@ -63,6 +64,8 @@
 				</el-table-column>
 			</el-table>
 		</el-dialog>
+
+		<!----------------------------------上传弹窗-------------------------------------->
 		<el-dialog v-model="uploadDialogVisible" width="400" destroy-on-close>
 			<el-text type="warning">仅支持.docx、.pdf、.xlsx文件类型<br>如有需要请将.doc和.xls文件转化为允许格式</el-text>
 			<el-upload ref="uploadRef" class="upload-demo"
@@ -77,7 +80,8 @@
 		</el-dialog>
 
 		<!----------------------------------预览文件的弹窗-------------------------------------->
-		<el-dialog v-model="previewDialogVisible" width="1000" style="height: 90vh; margin-top: 30px; margin-bottom: 30px;" destroy-on-close>
+		<el-dialog v-model="previewDialogVisible" width="1200"
+			style="height: 90vh; margin-top: 30px; margin-bottom: 30px;" destroy-on-close>
 			<div style="max-height: 82vh; overflow: auto;">
 				<vue-office-docx
 					v-if="fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'"

@@ -81,7 +81,6 @@ const getData = async () => {
 		);
 		if (targetsRes.code === 200) {
 			data.targets = _.cloneDeep(targetsRes.data);
-			console.log(data.targets);
 		} else ElMessage.error(targetsRes.msg);
 	} catch (error) {
 		ElMessage.error("获取课程目标失败" + error);
@@ -579,9 +578,9 @@ onMounted(async () => {
 			abilityPositionMap.set(ability.id, ability.position);
 		});
 
-		let kwaIdPositionMap = {};		// 拥有同样id的kwa在不同章中的位置
+		let kwaIdGlobalPositionMap = {};		// 拥有同样id的kwa在不同章中的全局位置
 		kwadict.forEach(kwa => {
-			kwaIdPositionMap[kwa.id] = [];
+			kwaIdGlobalPositionMap[kwa.id] = [];
 		})
 		// 生成知识单元平面
 		data.units.forEach((unit, index) => {
@@ -687,7 +686,8 @@ onMounted(async () => {
 				// 将连线添加为场景的子对象
 				scene.add(keywordLine);
 
-				kwaIdPositionMap[kwa.kwaid].push(globalStartPosition);
+				// 将每个kwa节点的全局位置存起来，用于和课程目标连线
+				kwaIdGlobalPositionMap[kwa.kwaid].push(globalStartPosition);
 			});
 		});
 		// 创建课程目标节点
@@ -697,7 +697,7 @@ onMounted(async () => {
 				color: "#00ff00",
 			});
 			// 创建球形节点的几何体
-			const sphereGeometry = new THREE.SphereGeometry(0.2, 64, 64); // 半径为0.2，水平和垂直分段数均为32
+			const sphereGeometry = new THREE.SphereGeometry(0.2, 64, 64); // 半径为0.2，水平和垂直分段数均为64
 
 			const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 			sphere.userData = {
@@ -722,8 +722,9 @@ onMounted(async () => {
 
 			const lineMaterial = new THREE.LineBasicMaterial({ color: 0xf6e432 });
 			target.kwas.forEach(kwa => {
-				kwaIdPositionMap[kwa.id].forEach(position => {
-					const keywordVertices = [globalStartPosition, position]; const keywordLineGeometry = new THREE.BufferGeometry();
+				kwaIdGlobalPositionMap[kwa.id].forEach(position => {
+					const keywordVertices = [globalStartPosition, position];
+					const keywordLineGeometry = new THREE.BufferGeometry();
 					keywordLineGeometry.setFromPoints(keywordVertices);
 					// 创建连线
 					const keywordLine = new THREE.Line(keywordLineGeometry, lineMaterial);

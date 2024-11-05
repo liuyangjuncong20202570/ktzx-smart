@@ -164,7 +164,7 @@ const getAbility = () => {
     .then(res => {
       if (res.code === 200) {
         data.value = res.data;
-        console.log(res.data);
+        // console.log(res.data);
         tableData.value = [];
         initialize();
         tableLoading.value = false;
@@ -234,7 +234,7 @@ const filterTableSelectAll = selection => {
 const getRelatedKwas = async (deletedIds) => {
   relatedKWA.value = [];
   try {
-    const res = await request.evaluation.post(`/evaluation/getability/getKwaByGetabilityId`, deletedIds);
+    const res = await request.evaluation.post(`/evaluation/getability/getCourseKwaByGetabilityId`, deletedIds);
     if (res.code === 200) {
       relatedKWA.value = res.data;
     } else if (res.code === 404) {
