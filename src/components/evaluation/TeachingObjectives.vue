@@ -430,12 +430,8 @@ const setKeyword = row => {
 			createNewKWA(row.row);
 		} else if (created && oldKeyword !== selectedKeyword.value.id) {
 			// 数据变化了再传给后端
-			const postData = {
-				id: row.row.id,
-				keywordid: selectedKeyword.value.id
-			}
 			request.evaluation
-				.post('/evaluation/kwadict', postData)
+				.post('/evaluation/kwadict', row.row)
 				.then(res => {
 					if (res.code === 200) {
 						getKWAData();
@@ -508,18 +504,14 @@ const setAbility = row => {
 	row.row.abilityname = selectedAbility.value.name;
 	const oldAbility = row.row.abilityid;
 	row.row.abilityid = selectedAbility.value.id;
-	// console.log(row.row);
+	console.log(row.row);
 	if (row.row.abilityid && row.row.keywordid) {
 		if (!created) {
 			createNewKWA(row.row);
 		} else if (created && oldAbility !== selectedAbility.value.id) {
 			// 数据变化了再传给后端
-			const postData = {
-				id: row.row.id,
-				abilityid: selectedAbility.value.id
-			};
 			request.evaluation
-				.post('/evaluation/kwadict', postData)
+				.post('/evaluation/kwadict', row.row)
 				.then(res => {
 					if (res.code === 200) {
 						getKWAData();

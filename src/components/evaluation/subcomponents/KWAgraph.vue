@@ -67,7 +67,7 @@ const getData = async () => {
 		const nodesCombosRes = await request.evaluation.get(`/evaluation/knowledgeUnit/getKnowledgeUnitTree?courseid=${courseid.value}`);
 		if (nodesCombosRes.code === 200) {
 			let data = nodesCombosRes.data;
-			console.log(data);
+			// console.log(data);
 			getNodesCombosProp(data);
 
 			return request.evaluation.get(`/evaluation/lines`).then((res) => {

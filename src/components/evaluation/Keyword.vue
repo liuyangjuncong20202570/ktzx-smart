@@ -133,8 +133,6 @@ import _ from 'lodash';
 
 const tableSearchData = ref('');    // 主界面搜索框数据
 
-const courseid = ref('2c918af681fa6ea7018209a505c30672');
-
 const deleteDialogVisible = ref(false);
 
 const relatedKWA = ref([]);

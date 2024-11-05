@@ -177,7 +177,7 @@ const loadKwaData = () => {
 	request.evaluation.get('/evaluation/kwadict').then((res) => {
 		if (res.code === 200) {
 			kwaData.value = res.data;
-			console.log(kwaData.value);
+			// console.log(kwaData.value);
 			kwaData.value.forEach(item => {
 				// ElMessage.success(item.name);
 			})
@@ -193,7 +193,7 @@ const loadData = () => {
 	request.evaluation.get('/evaluation/knowledgeUnit/getKnowledgeUnitTree?courseid=' + courseid).then((res) => {
 		if (res.code === 200) {
 			tableData.value = res.data;
-			console.log(res.data);
+			// console.log(res.data);
 			initialize();
 		} else {
 			ElMessage.error(res.msg);
