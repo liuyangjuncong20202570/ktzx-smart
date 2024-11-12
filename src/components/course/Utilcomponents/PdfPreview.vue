@@ -5,16 +5,14 @@
 </template>
 
 <script setup>
-import {ref, watch, onBeforeUnmount, defineExpose, onMounted} from 'vue';
+import { ref, watch, onBeforeUnmount, defineExpose, onMounted } from 'vue';
 import * as pdfjsLib from 'pdfjs-dist';
 import 'pdfjs-dist/build/pdf.worker.entry.js';
-import InstructionalProgrammangt from "../InstructionalProgrammangt.vue"
+import InstructionalProgrammangt from '../InstructionalProgrammangt.vue';
 import request from '../../../utils/request';
 
 // 确保路径正确
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.js';
-
-
 
 const props = defineProps({
   fileUrl: {
@@ -36,7 +34,7 @@ const cancelCurrentTasks = () => {
   }
 };
 
-const renderPDF = async (url) => {
+const renderPDF = async url => {
   try {
     console.log('Starting to render PDF from URL:', url);
     cancelCurrentTasks();
@@ -44,9 +42,9 @@ const renderPDF = async (url) => {
       url,
       method: 'GET',
       responseType: 'arraybuffer'
-    })
-    
-    loadingTask = pdfjsLib.getDocument({data:pdfData});
+    });
+
+    loadingTask = pdfjsLib.getDocument({ data: pdfData });
     const pdf = await loadingTask.promise;
     console.log('PDF loaded:', pdf);
 
@@ -60,7 +58,7 @@ const renderPDF = async (url) => {
 
       // 使用默认的 scale 参数
       const scale = 1.5;
-      const viewport = page.getViewport({scale});
+      const viewport = page.getViewport({ scale });
 
       // 创建新的 canvas 元素
       const canvas = document.createElement('canvas');
@@ -97,12 +95,15 @@ const renderPDF = async (url) => {
   }
 };
 
-watch(() => props.fileUrl, (newUrl) => {
-  console.log('New file URL:', newUrl);
-  if (pdfViewer.value) {
-    renderPDF(newUrl);
+watch(
+  () => props.fileUrl,
+  newUrl => {
+    console.log('New file URL:', newUrl);
+    if (pdfViewer.value) {
+      renderPDF(newUrl);
+    }
   }
-});
+);
 
 onMounted(() => {
   if (props.fileUrl) {
@@ -116,7 +117,7 @@ onBeforeUnmount(() => {
 });
 
 // 公开取消任务的方法，以便父组件调用
-defineExpose({cancelCurrentTasks});
+defineExpose({ cancelCurrentTasks });
 </script>
 
 <style scoped>

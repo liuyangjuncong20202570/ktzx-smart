@@ -229,7 +229,7 @@ const nullNodeNum = ref(0); // 未命名节点数
 const id = ref(1);
 
 const initialize = nodes => {
-  nodes.forEach(node => {
+  nodes?.forEach(node => {
     node.popVisible = false;
     node.editingName = false;
     node.editingDatavalue = false;

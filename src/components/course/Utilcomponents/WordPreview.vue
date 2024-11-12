@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import {ref, watch, onMounted, defineExpose} from 'vue';
+import { ref, watch, onMounted, defineExpose } from 'vue';
 import mammoth from 'mammoth';
 import request from '../../../utils/request';
 
@@ -16,17 +16,17 @@ const props = defineProps({
 
 const wordContent = ref('');
 
-const fetchWordFile = async (url) => {
+const fetchWordFile = async url => {
   try {
     console.log('Fetching Word file from URL:', url);
     const response = await request.course({
-    url: url,
-    method: 'GET',
-    responseType: 'blob', // 重要：设置响应类型为blob
-  })
+      url: url,
+      method: 'GET',
+      responseType: 'blob' // 重要：设置响应类型为blob
+    });
     console.log(response);
     const arrayBuffer = await response.arrayBuffer();
-    const result = await mammoth.convertToHtml({arrayBuffer: arrayBuffer});
+    const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
     console.log('Word file converted to HTML:', result.value);
     wordContent.value = result.value;
   } catch (error) {
@@ -34,11 +34,14 @@ const fetchWordFile = async (url) => {
   }
 };
 
-watch(() => props.fileUrl, (newUrl) => {
-  if (newUrl) {
-    fetchWordFile(newUrl);
+watch(
+  () => props.fileUrl,
+  newUrl => {
+    if (newUrl) {
+      fetchWordFile(newUrl);
+    }
   }
-});
+);
 
 const resetContent = () => {
   if (wordContent.value) {
@@ -52,7 +55,7 @@ onMounted(() => {
   }
 });
 
-defineExpose({resetContent});
+defineExpose({ resetContent });
 </script>
 
 <style scoped>
@@ -88,7 +91,12 @@ defineExpose({resetContent});
   text-decoration: underline; /* 下划线 */
 }
 
-.word-container h1, .word-container h2, .word-container h3, .word-container h4, .word-container h5, .word-container h6 {
+.word-container h1,
+.word-container h2,
+.word-container h3,
+.word-container h4,
+.word-container h5,
+.word-container h6 {
   margin-top: 20px; /* 标题上方添加间距 */
   margin-bottom: 10px; /* 标题下方添加间距 */
 }
