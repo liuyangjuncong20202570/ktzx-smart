@@ -17,6 +17,7 @@
         >全部展开/关闭</el-button
       >
       <el-button type="success" style="margin-left: 0.8vw">保存</el-button>
+      <el-button type="primary" @click="create1stNode" style="margin-left: 0.8vw;">新增一级节点</el-button>
     </el-header>
 
     <el-main style="padding: 0">
@@ -223,8 +224,6 @@ const expandedKeys = ref([]); // 默认展开的节点的key的数组
 
 const openedPopNode = ref({}); // 记录哪个节点的弹出框被打开了
 
-const nullNodeNum = ref(0); // 未命名节点数
-
 /*************预处理数据************/
 const id = ref(1);
 
@@ -236,16 +235,6 @@ const initialize = nodes => {
     node.editingRemark = false;
     // node.id = id.value ++;
 
-    if (node.name.includes('未命名节点')) {
-      if (node.name.length > 5 && node.name[5] === '(') {
-        let num = '';
-        for (let i = 6; node.name[i] !== ')'; i++) {
-          num += node.name[i];
-        }
-        if (nullNodeNum.value < Number(num)) nullNodeNum.value = Number(num);
-      } else if (node.name.length === 5 && nullNodeNum.value === 0) nullNodeNum.value++;
-    }
-
     if (node.children && node.children.length > 0) {
       initialize(node.children); // 递归子节点
     }
@@ -255,7 +244,6 @@ const initialize = nodes => {
 const getData = res => {
   if (res.code === 200) {
     treeData.value = res.data;
-    nullNodeNum.value = 0;
     initialize(treeData.value);
     // console.log(treeData.value);
   }
@@ -418,21 +406,43 @@ const handleClick = (node, field) => {
 /***********************************/
 
 /**************新增节点*************/
+const create1stNode = async () => {
+  const postData = {
+    id: '',
+    pid: '0',
+    abilitydeep: 0,
+    type: '1',
+    cmAbility: {
+      name: '未命名节点',
+      remark: ''
+    }
+  }
+
+  try{
+    const res = await request.evaluation.post('/evaluation/ability/create', postData);
+    if (res.code === 200 ) {
+      getTreeData();
+    } else {
+      ElMessage.error(res.msg);
+    }
+  } catch (error) {
+    ElMessage.error('新增失败' + error);
+  }
+}
+
 const addSiblingNode = node => {
   console.log(node);
-  nullNodeNum.value++;
   const newNode = {
     id: node.id,
     pid: node.pid,
     abilitydeep: node.abilitydeep,
     type: '1',
     cmAbility: {
-      name: nullNodeNum.value > 1 ? '未命名节点(' + nullNodeNum.value + ')' : '未命名节点',
+      name: '未命名节点',
       remark: '',
-      professionid: node.professionid
     }
   };
-  console.log(newNode);
+  // console.log(newNode);
   request.evaluation
     .post('/evaluation/ability/create', newNode)
     .then(res => {
@@ -442,23 +452,21 @@ const addSiblingNode = node => {
       }
     })
     .catch(error => {
-      ElMessage.error('新增失败失败' + error);
+      ElMessage.error('新增失败' + error);
     });
 
   node.popVisible = false;
 };
 
 const addChildNode = node => {
-  nullNodeNum.value++;
   const newNode = {
     id: node.id,
     pid: node.pid,
     abilitydeep: node.abilitydeep,
     type: '0',
     cmAbility: {
-      name: nullNodeNum.value > 1 ? '未命名节点(' + nullNodeNum.value + ')' : '未命名节点',
+      name: '未命名节点',
       remark: '',
-      professionid: node.professionid
     }
   };
   // console.log(newNode);
@@ -471,7 +479,7 @@ const addChildNode = node => {
       }
     })
     .catch(error => {
-      ElMessage.error('获取能力数据失败' + error);
+      ElMessage.error('新增失败' + error);
     });
 
   node.popVisible = false;

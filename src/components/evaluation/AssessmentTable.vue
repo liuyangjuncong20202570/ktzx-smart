@@ -84,106 +84,61 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog v-model="editDialogVisible" width="600" destroy-on-close>
-      <div
-        style="padding: 0 25%; display: flex; justify-content: space-between; margin: -5px 0 15px 0"
-      >
-        <el-button @click="uploadDialogVisible = true">上传</el-button>
-        <el-button @click="associate()">关联</el-button>
-      </div>
-      <div
-        style="
-          font-weight: bolder;
-          border: 1px solid #ebebeb;
-          height: 30px;
-          line-height: 30px;
-          color: #969696;
-          user-select: none;
-        "
-      >
-        考核项：{{ rightClickItem.title }}
-      </div>
-      <el-table
-        ref="multipleTableRef"
-        :data="filesTableData"
-        style="height: 350px"
-        v-loading="filesTableLoading"
-        element-loading-background="rgba(0, 0, 0, 0.2)"
-        @selection-change="handleSelectionChange"
-        border
-      >
-        <el-table-column align="center" type="selection" width="40"></el-table-column>
-        <el-table-column align="center" label="名称" prop="fileName"></el-table-column>
-        <el-table-column
-          align="center"
-          label="上传时间"
-          width="200"
-          prop="createTime"
-        ></el-table-column>
-        <el-table-column align="center" label="操作" width="150">
-          <template #default="{ row }">
-            <div style="display: flex; justify-content: space-between; padding: 0 10px">
-              <el-button type="primary" size="small" @click="openPreviewDialog(row)"
-                >预览</el-button
-              >
-              <el-button type="danger" size="small" @click="openDeleteDialog(row)">删除</el-button>
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-dialog>
-    <el-dialog v-model="uploadDialogVisible" width="400" destroy-on-close>
-      <el-text type="warning"
-        >仅支持.docx、.pdf、.xlsx文件类型<br />如有需要请将.doc和.xls文件转化为允许格式</el-text
-      >
-      <el-upload
-        ref="uploadRef"
-        class="upload-demo"
-        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-        :limit="1"
-        :on-exceed="handleExceed"
-        :auto-upload="false"
-        accept=".pdf,.docx,.xlsx"
-        :before-upload="file => storeFileInfo(file, rightClickItem)"
-      >
-        <template #trigger>
-          <el-button type="primary">选择文件</el-button>
-        </template>
-      </el-upload>
-      <el-button @click="uploadFile()">确定</el-button>
-    </el-dialog>
+		<!----------------------------------编辑弹窗-------------------------------------->
+		<el-dialog v-model="editDialogVisible" width="600" destroy-on-close>
+			<div style="padding: 0 25%; display: flex; justify-content: space-between; margin: -5px 0 15px 0">
+				<el-button @click="uploadDialogVisible = true">上传</el-button>
+				<el-button @click="associate()">关联</el-button>
+			</div>
+			<div style="font-weight: bolder; border: 1px solid #ebebeb; height: 30px; line-height: 30px;
+			color: #969696; user-select: none;">
+				考核项：{{ rightClickItem.title }}
+			</div>
+			<el-table ref="multipleTableRef" :data="filesTableData" style="height: 350px;" v-loading="filesTableLoading"
+				element-loading-background="rgba(0, 0, 0, 0.2)" @selection-change="handleSelectionChange" border>
+				<el-table-column align="center" type="selection" width="40"></el-table-column>
+				<el-table-column align="center" label="名称" prop="fileName"></el-table-column>
+				<el-table-column align="center" label="上传时间" width="200" prop="createTime"></el-table-column>
+				<el-table-column align="center" label="操作" width="150">
+					<template #default="{ row }">
+						<div style="display: flex; justify-content: space-between; padding: 0 10px;">
+							<el-button type="primary" size="small" @click="openPreviewDialog(row)">预览</el-button>
+							<el-button type="danger" size="small" @click="openDeleteDialog(row)">删除</el-button>
+						</div>
+					</template>
+				</el-table-column>
+			</el-table>
+		</el-dialog>
 
-    <!----------------------------------预览文件的弹窗-------------------------------------->
-    <el-dialog
-      v-model="previewDialogVisible"
-      width="1000"
-      style="height: 90vh; margin-top: 30px; margin-bottom: 30px"
-      destroy-on-close
-    >
-      <div style="max-height: 82vh; overflow: auto">
-        <vue-office-docx
-          v-if="
-            fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-          "
-          style="height: 82vh"
-          :src="blobData"
-        />
-        <vue-office-pdf
-          v-else-if="fileType === 'application/pdf'"
-          style="height: 82vh"
-          :src="blobData"
-        />
-        <vue-office-excel
-          v-else-if="
-            fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-          "
-          style="height: 82vh"
-          :src="blobData"
-        />
-        <div v-else>不支持的文件</div>
-      </div>
-    </el-dialog>
-    <!------------------------------------------------------------------------------------->
+		<!----------------------------------上传弹窗-------------------------------------->
+		<el-dialog v-model="uploadDialogVisible" width="400" destroy-on-close>
+			<el-text type="warning">仅支持.docx、.pdf、.xlsx文件类型<br>如有需要请将.doc和.xls文件转化为允许格式</el-text>
+			<el-upload ref="uploadRef" class="upload-demo"
+				action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" :limit="1"
+				:on-exceed="handleExceed" :auto-upload="false" accept=".pdf,.docx,.xlsx"
+				:before-upload="file => storeFileInfo(file, rightClickItem)">
+				<template #trigger>
+					<el-button type="primary">选择文件</el-button>
+				</template>
+			</el-upload>
+			<el-button @click="uploadFile()">确定</el-button>
+		</el-dialog>
+
+		<!----------------------------------预览文件的弹窗-------------------------------------->
+		<el-dialog v-model="previewDialogVisible" width="1200"
+			style="height: 90vh; margin-top: 30px; margin-bottom: 30px;" destroy-on-close>
+			<div style="max-height: 82vh; overflow: auto;">
+				<vue-office-docx
+					v-if="fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'"
+					style="height: 82vh;" :src="blobData" />
+				<vue-office-pdf v-else-if="fileType === 'application/pdf'" style="height: 82vh;" :src="blobData" />
+				<vue-office-excel
+					v-else-if="fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'"
+					style="height: 82vh;" :src="blobData" />
+				<div v-else>不支持的文件</div>
+			</div>
+		</el-dialog>
+		<!------------------------------------------------------------------------------------->
 
     <!----------------------------------确认删除的弹框-------------------------------------->
     <el-dialog v-model="deleteDialogVisible" width="350" destroy-on-close>
