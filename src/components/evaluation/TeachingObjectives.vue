@@ -420,37 +420,31 @@ const chooseKeyword = data => {
 };
 
 const setKeyword = row => {
-  let created = false; // 判断该行数据是否在数据库里
-  if (row.row.abilityid && row.row.keywordid) created = true; // 如果当前行的关键字和能力在选择前不为空则说明这条数据存在于数据库中
-  row.row.keywordname = selectedKeyword.value.name;
-  const oldKeyword = row.row.keywordid;
-  row.row.keywordid = selectedKeyword.value.id;
-  if (row.row.abilityid && row.row.keywordid) {
-    if (!created) {
-      createNewKWA(row.row);
-    } else if (created && oldKeyword !== selectedKeyword.value.id) {
-      // 数据变化了再传给后端
-      const postData = {
-        id: row.row.id,
-        name: selectedKeyword.value.name + '-' + row.row.abilityname,
-        keywordid: selectedKeyword.value.id,
-        keywordname: selectedKeyword.value.name
-      }
-      request.evaluation
-          .post('/evaluation/kwadict/updateKwadict', postData)
-          .then(res => {
-            if (res.code === 200) {
-              getKWAData();
-              ElMessage.success('修改成功');
-            } else {
-              ElMessage.error(res.msg);
-            }
-          })
-          .catch(error => {
-            ElMessage.error('保存失败' + error);
-          });
-    }
-  }
+	let created = false; // 判断该行数据是否在数据库里
+	if (row.row.abilityid && row.row.keywordid) created = true; // 如果当前行的关键字和能力在选择前不为空则说明这条数据存在于数据库中
+	row.row.keywordname = selectedKeyword.value.name;
+	const oldKeyword = row.row.keywordid;
+	row.row.keywordid = selectedKeyword.value.id;
+	if (row.row.abilityid && row.row.keywordid) {
+		if (!created) {
+			createNewKWA(row.row);
+		} else if (created && oldKeyword !== selectedKeyword.value.id) {
+			// 数据变化了再传给后端
+			request.evaluation
+				.post('/evaluation/kwadict', row.row)
+				.then(res => {
+					if (res.code === 200) {
+						getKWAData();
+						ElMessage.success('修改成功');
+					} else {
+						ElMessage.error(res.msg);
+					}
+				})
+				.catch(error => {
+					ElMessage.error('保存失败' + error);
+				});
+		}
+	}
 
   selectedKeyword.value = {};
   row.row.keywordPopVisible = false;
@@ -504,41 +498,35 @@ const chooseAbility = data => {
 };
 
 const setAbility = row => {
-  // 点击确定后将选择的能力赋值给KWA表数据
-  let created = false; // 判断该行数据是否在数据库里
-  if (row.row.abilityid && row.row.keywordid) created = true; // 如果当前行的关键字和能力在选择前不为空则说明这条数据存在于数据库中
-  row.row.abilityname = selectedAbility.value.name;
-  const oldAbility = row.row.abilityid;
-  row.row.abilityid = selectedAbility.value.id;
-  // console.log(row.row);
-  if (row.row.abilityid && row.row.keywordid) {
-    if (!created) {
-      createNewKWA(row.row);
-    } else if (created && oldAbility !== selectedAbility.value.id) {
-      // 数据变化了再传给后端
-      const postData = {
-        id: row.row.id,
-        name: row.row.keywordname + '-' + selectedAbility.value.name,
-        abilityid: selectedAbility.value.id,
-        abilityname: selectedAbility.value.name
-      };
-      request.evaluation
-          .post('/evaluation/kwadict/updateKwadict', postData)
-          .then(res => {
-            if (res.code === 200) {
-              getKWAData();
-              ElMessage.success('修改成功');
-            } else {
-              ElMessage.error(res.msg);
-            }
-          })
-          .catch(error => {
-            ElMessage.error('保存失败' + error);
-          });
-    }
-  }
-  selectedAbility.value = {};
-  row.row.abilityPopVisible = false;
+	// 点击确定后将选择的能力赋值给KWA表数据
+	let created = false; // 判断该行数据是否在数据库里
+	if (row.row.abilityid && row.row.keywordid) created = true; // 如果当前行的关键字和能力在选择前不为空则说明这条数据存在于数据库中
+	row.row.abilityname = selectedAbility.value.name;
+	const oldAbility = row.row.abilityid;
+	row.row.abilityid = selectedAbility.value.id;
+	console.log(row.row);
+	if (row.row.abilityid && row.row.keywordid) {
+		if (!created) {
+			createNewKWA(row.row);
+		} else if (created && oldAbility !== selectedAbility.value.id) {
+			// 数据变化了再传给后端
+			request.evaluation
+				.post('/evaluation/kwadict', row.row)
+				.then(res => {
+					if (res.code === 200) {
+						getKWAData();
+						ElMessage.success('修改成功');
+					} else {
+						ElMessage.error(res.msg);
+					}
+				})
+				.catch(error => {
+					ElMessage.error('保存失败' + error);
+				});
+		}
+	}
+	selectedAbility.value = {};
+	row.row.abilityPopVisible = false;
 };
 
 /*******************************************/

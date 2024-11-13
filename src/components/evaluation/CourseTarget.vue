@@ -95,7 +95,7 @@ const getTargetData = async () => {
         const res = await request.evaluation.get(`/evaluation/coursetarget`);
         if (res.code === 200) {
             courseTargetTargetData.value = res.data;
-            console.log(res.data);
+            // console.log(res.data);
             getKwaData();
             initialize();
         }

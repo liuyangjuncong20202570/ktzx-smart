@@ -139,12 +139,12 @@ const routes = [
         component: () => import('../components/admin/Classmangt.vue')
       },
       {
-        path: 'coursemangt/ccomponentsoursemangt', // 课程管理
+        path: 'coursemangt/coursemangt', // 课程管理
         name: 'CourseManagement',
         component: () => import('../components/course/Coursemangt.vue')
       },
       {
-        path: 'coursemangt/classroom', // 课程管理
+        path: 'coursemangt/classroom', // 课堂管理
         name: 'ClassRoomManagement',
         component: () => import('../components/course/Classroommangt.vue')
       },
