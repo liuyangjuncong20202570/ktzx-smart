@@ -11,15 +11,14 @@
             v-model="valueStrictly"
             :data="listData"
             :expand-on-click-node="true"
-            :check-on-click-node="false"
-            multiple
+            :check-on-click-node="true"
             :render-after-expand="false"
-            show-checkbox
             style="width: 250px"
             :render-content="renderContent"
             :placeholder="placeholderText"
             @node-click="nodeClick"
             @check-change="handleCheckChange"
+            @change="handleCheckChange"
           />
         </el-dropdown>
       </div>
@@ -70,6 +69,8 @@ const props = defineProps({
   }
 });
 
+
+
 const searchKeyword = ref('');
 
 const listData = ref([]);
@@ -88,6 +89,7 @@ const currentobsname = ref('');
 // TODO:在异步处理时，应将currentobsID获取以便找到对应班级的学生
 const nodeClick = (data, node, event) => {
   // console.log(data.id);
+  console.log(data);
 
   console.log(node);
   if (!node.childNodes || node.childNodes.length === 0) {
@@ -160,6 +162,10 @@ const handleSelectionChange = async data => {
   });
   console.log(nodes.value);
 };
+
+const handleCheckChange = (a,b) =>{
+  console.log(a,b);
+}
 
 // const handleCheckChange = async (node, nodeData) => {
 //   if (
