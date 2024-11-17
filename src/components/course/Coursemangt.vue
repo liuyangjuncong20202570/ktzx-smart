@@ -166,6 +166,7 @@ const getcourseList = async () => {
       // 登录成功
       if (res.code === 200) {
         courseList.value = res.data;
+        console.log('hhh', courseList.value);
         initialize();
       } else {
         ElMessage({

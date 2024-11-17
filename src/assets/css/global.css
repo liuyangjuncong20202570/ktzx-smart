@@ -1,13 +1,13 @@
 .flex-start {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-  }
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
 
 .flex-between {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .flex-end {
@@ -33,5 +33,5 @@
 }
 
 button {
-  outline: none !important;  /* 去除聚焦时的轮廓线 */
+  outline: none !important; /* 去除聚焦时的轮廓线 */
 }

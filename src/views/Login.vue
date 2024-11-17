@@ -167,8 +167,25 @@ import { ElMessage } from 'element-plus';
 import request from '../utils/request.js';
 import router from '../router/index.js';
 import { useProfileStore } from '../stores/profileStore.js';
+import useInstructor from '../stores/InstructorStore.js';
+import { storeToRefs } from 'pinia';
 
 const profileStore = useProfileStore();
+const instrutorStore = useInstructor();
+const { isDefaultTerm } = storeToRefs(instrutorStore);
+
+// 创建获取当前学期id函数
+const getCurrentTermId = () => {
+  request.course.get('/coursemangt/course/currenttermId').then(res => {
+    console.log(res.data);
+    if (res.data === null) {
+      // console.log('wsnd');
+      instrutorStore.changeDefaultTerm(true);
+    }
+    // sessionStorage.setItem('currentTermId', res.data);
+    // console.log(res);
+  });
+};
 
 //构造登录表单
 const loginForm = reactive({
@@ -361,6 +378,8 @@ const setprofile = data => {
 
 onMounted(() => {
   sessionStorage.removeItem('users');
+  sessionStorage.removeItem('currentTermId');
+  getCurrentTermId();
 });
 </script>
 

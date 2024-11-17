@@ -1,24 +1,4 @@
-<script setup>
-import { onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
-window.addEventListener('beforeunload', () => {
-  sessionStorage.setItem('savedPath', router.currentRoute.value.fullPath);
-  //   router.replace('/homes/superadminhome/sysmangt/schoolmangt');
-});
-const handleClick = () => {
-  router.replace('/homes/superadminhome/sysmangt/schoolmangt');
-};
-onMounted(() => {
-  const savedPath = sessionStorage.getItem('savedPath');
-  console.log(savedPath);
-  if (savedPath) {
-    router.replace(savedPath);
-    // sessionStorage.removeItem('savedPath'); // 恢复后删除存储的路径
-  }
-});
-</script>
+<script setup></script>
 
 <template>
   <div class="container">

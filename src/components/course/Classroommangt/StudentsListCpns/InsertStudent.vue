@@ -69,8 +69,6 @@ const props = defineProps({
   }
 });
 
-
-
 const searchKeyword = ref('');
 
 const listData = ref([]);
@@ -163,9 +161,9 @@ const handleSelectionChange = async data => {
   console.log(nodes.value);
 };
 
-const handleCheckChange = (a,b) =>{
-  console.log(a,b);
-}
+const handleCheckChange = (a, b) => {
+  console.log(a, b);
+};
 
 // const handleCheckChange = async (node, nodeData) => {
 //   if (

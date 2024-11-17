@@ -5,6 +5,8 @@ import {
   createWebHashHistory,
   useRoute
 } from 'vue-router';
+import useMain from '../stores/useMain';
+import { storeToRefs } from 'pinia';
 
 const rolehome = [
   'teacherhomne',
@@ -87,6 +89,7 @@ const routes = [
     path: '/homes/:rolehome(' + rolehome.join('|') + ')',
     name: 'Homepage',
     component: () => import('../views/teacherHomePage.vue'),
+    // component: () => import('../views/Test.vue'),
     children: [
       {
         path: 'sysmangt/rolemangt',
@@ -346,6 +349,16 @@ const router = createRouter({
 //
 //     next();
 // });
+
+router.beforeEach((to, from, next) => {
+  const MainStore = useMain();
+  const { selectedRoute } = storeToRefs(MainStore);
+  // 如果当前路由与选中的路由不一致，则根据 URL 跳转
+  if (to.path !== selectedRoute.value && selectedRoute.value !== '') {
+    next(selectedRoute.value);
+  }
+  next();
+});
 
 router.beforeEach((to, from, next) => {
   // 尝试从 sessionStorage 中获取用户信息

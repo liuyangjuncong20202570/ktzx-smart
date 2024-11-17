@@ -148,10 +148,11 @@
 
           <!--页面左侧导航栏-->
 
-          <div style="height: calc(92vh - 150px)">
+          <div style="height: calc(92vh - 150px); position: relative">
+            <div v-if="isSHow" class="instrutor"></div>
             <el-scrollbar style="border-right: 1px solid #dedede">
               <el-menu :default-active="defaultActive">
-                <template v-for="menu in filteredMenus">
+                <template v-for="(menu, index) in filteredMenus">
                   <!-- <div>{{ menu }}</div> -->
                   <el-sub-menu
                     v-if="hasChildren(menu)"
@@ -161,7 +162,10 @@
                   >
                     <template #title>
                       <!--0822有更改-->
-                      <div class="titleBox" @click="navigateTo(menu.url)">{{ menu.name }}</div>
+                      <div class="titleBox" @click="navigateTo(menu.url)">
+                        {{ menu.name }}
+                        <!-- {{ menu.name === '学期管理' }} -->
+                      </div>
                     </template>
                     <el-menu-item
                       v-for="child in getChildrenMenus(menu)"
@@ -180,7 +184,9 @@
                     @click="navigateTo(menu.url)"
                     style="border-top: 1px solid #efefef"
                   >
-                    <div class="titleBox">{{ menu.name }}</div>
+                    <div class="titleBox">
+                      {{ menu.name }}
+                    </div>
                   </el-menu-item>
                 </template>
               </el-menu>
@@ -198,13 +204,55 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed, onMounted, toRaw } from 'vue';
+import intro from '../utils/introConfigure';
+import { ref, reactive, computed, onMounted, toRaw, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import request from '../utils/request.js';
 import { ElMessage } from 'element-plus';
 import { Menu as IconMenu, Message, Setting, Plus, Platform, Right } from '@element-plus/icons-vue';
 import type { UploadProps } from 'element-plus';
 import { useProfileStore } from '../stores/profileStore.js';
+import introJs from 'intro.js';
+import useInstructor from '../stores/InstructorStore.js';
+import { storeToRefs } from 'pinia';
+import useMain from '../stores/useMain.js';
+
+// 判断是否已新建学期
+const InstructorStore = useInstructor();
+const { isDefaultTerm } = storeToRefs(InstructorStore);
+console.log(isDefaultTerm.value);
+const isSHow = ref(isDefaultTerm.value);
+
+// 路由置空
+const handleJumpTo = () => {};
+
+// 创建introJS实例
+/**************指引框逻辑********************/
+const guide = () => {
+  intro.setOptions({
+    showBullets: false,
+    tooltipPosition: 'right',
+    doneLabel: '立即前往',
+    // skipLabel: 'X',
+    steps: [
+      {
+        element: '.instrutor', // 定位到相应的元素位置，如果不设置element，则默认展示在屏幕中央
+        tooltipClass: 'customTooltip',
+        title: '欢迎来到智能教学平台', // 标题
+        intro: '在使用之前请先创建学期👋' // 内容
+      }
+    ]
+  });
+  nextTick(() => {
+    intro
+      .onexit(() => {
+        isSHow.value = false;
+        router.push('/homes/secretariatehome/sysmangt/termmangt');
+      })
+      .start();
+  });
+};
+/**************指引框逻辑********************/
 
 //获取Stroe
 const profileStore = useProfileStore();
@@ -251,6 +299,7 @@ function clearLoginInfo() {
 
 //登出的方法
 const handleLogout = () => {
+  MainStore.setSelectedRoute('');
   clearLoginInfo();
   router.push({ name: 'Login' }); // 假设您的登录路由的名字是 'Login'
 };
@@ -292,10 +341,12 @@ const getChildrenMenus = menu => {
   return menu.children;
 };
 //路由导航
+const MainStore = useMain();
 const navigateTo = url => {
   //前面拼一个/表示绝对路径
   if (!url) return;
   console.log(homeurl.value + url);
+  MainStore.setSelectedRoute(homeurl.value + url);
   router.push(homeurl.value + url);
 };
 
@@ -332,6 +383,8 @@ const getRolelist = () => {
 };
 
 const switchRole = role => {
+  // 保存路由进行置空
+  MainStore.setSelectedRoute('');
   console.log(`切换到角色: ${role.roleid}`);
   // 切换角色的逻辑
   loginuserFrom.value.id = role.id;
@@ -398,8 +451,15 @@ const handleVisibleChange = visible => {
 };
 
 //钩子函数用来刷新后重新获取数据
-
 onMounted(() => {
+  // guide();
+  nextTick(() => {
+    if (isDefaultTerm.value && route.fullPath === '/homes/secretariatehome') {
+      guide();
+    } else {
+      isSHow.value = false;
+    }
+  });
   defaultActive.value = 'not-selected';
   const role = route.params.rolehome; // 获取当前路由参数中的 rolehome 值
   const basePath = `/homes/${role}`;
@@ -465,6 +525,23 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
+.customTooltip * {
+  color: #4a4a4a;
+  font-size: 18px;
+}
+
+.customTooltip .introjs-tooltip-title {
+  color: #0a41c9;
+}
+.instrutor {
+  position: absolute;
+  z-index: 999;
+  width: 160px;
+  height: 55px;
+  padding: 0 20px;
+  text-align: center;
+  line-height: 55px;
+}
 .childtitleBox,
 .titleBox {
   width: 177px;
