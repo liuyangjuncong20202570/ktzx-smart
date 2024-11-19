@@ -1,15 +1,28 @@
 <template>
-  <div style="height: 92vh; display: flex; flex-direction: column;">
+  <div style="height: 92vh; display: flex; flex-direction: column">
     <el-header
-        style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; justify-content: flex-end;">
-      <el-upload
-          ref="upload"
-          :before-upload="beforeUpload"
-          :show-file-list="false">
-        <el-button type="primary" v-blur-on-click>上传</el-button>
+      style="
+        height: auto;
+        padding: 5px 0px;
+        width: 100%;
+        background-color: #deebf7;
+        display: flex;
+        justify-content: flex-end;
+      "
+    >
+      <el-upload ref="upload" :before-upload="beforeUpload" :show-file-list="false">
+        <el-button
+          v-if="
+            MainStore.selectedRoute !==
+            '/homes/coursemanagerhome/coursemangt/classroommangt/academiccalendar'
+          "
+          type="primary"
+          v-blur-on-click
+          >上传</el-button
+        >
       </el-upload>
     </el-header>
-    <div style="max-height: 100%; height: 100%; overflow:auto;">
+    <div style="max-height: 100%; height: 100%; overflow: auto">
       <el-table :data="formattedFilelist" style="width: 100%">
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="filename" label="名称"></el-table-column>
@@ -35,16 +48,21 @@
     </div>
 
     <!-- 预览模态框 -->
-    <el-dialog v-model="previewVisible" custom-class="preview-dialog" @close="handleClosePreview" :width="dialogWidth"
-               :height="dialogWidth">
+    <el-dialog
+      v-model="previewVisible"
+      custom-class="preview-dialog"
+      @close="handleClosePreview"
+      :width="dialogWidth"
+      :height="dialogWidth"
+    >
       <template #title>
         <span>预览文件</span>
       </template>
       <div v-if="previewFileType === 'pdf'" class="preview-container">
-        <PdfPreview ref="pdfPreviewRef" :fileUrl="previewFileUrl"/>
+        <PdfPreview ref="pdfPreviewRef" :fileUrl="previewFileUrl" />
       </div>
       <div v-if="previewFileType === 'word'" class="preview-container">
-        <WordPreview ref="wordPreviewRef" :fileUrl="previewFileUrl"/>
+        <WordPreview ref="wordPreviewRef" :fileUrl="previewFileUrl" />
       </div>
       <template #footer>
         <span class="dialog-footer">
@@ -56,12 +74,13 @@
 </template>
 
 <script setup>
-import {ref, onMounted, computed} from 'vue';
-import {ElMessage, ElMessageBox} from 'element-plus';
+import useMain from '../../../stores/useMain.js';
+import { ref, onMounted, computed } from 'vue';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import request from '../../../utils/request.js';
 import PdfPreview from '../Utilcomponents/PdfPreview.vue';
 import WordPreview from '../Utilcomponents/WordPreview.vue';
-import {uploadTeachingFile} from '../../../utils/uploadTeachingFile.js';
+import { uploadTeachingFile } from '../../../utils/uploadTeachingFile.js';
 
 const filelist = ref([]);
 const previewVisible = ref(false);
@@ -72,21 +91,24 @@ const dialogWidth = ref('65%');
 const pdfPreviewRef = ref(null);
 const wordPreviewRef = ref(null);
 
+const MainStore = useMain();
+
 const fetchCourseList = async () => {
-  await request.course.get('/coursemangt/classroommangt/academiccalendar')
-      .then(res => {
-        if (res.code === 200) {
-          filelist.value = res.data;
-        } else {
-          ElMessage.error('获取教学日历失败');
-        }
-      })
-      .catch(() => {
+  await request.course
+    .get('/coursemangt/classroommangt/academiccalendar')
+    .then(res => {
+      if (res.code === 200) {
+        filelist.value = res.data;
+      } else {
         ElMessage.error('获取教学日历失败');
-      });
+      }
+    })
+    .catch(() => {
+      ElMessage.error('获取教学日历失败');
+    });
 };
 
-const formatFileSize = (size) => {
+const formatFileSize = size => {
   if (size < 1024) {
     return size + ' B';
   } else if (size < 1024 * 1024) {
@@ -101,40 +123,43 @@ const formatFileSize = (size) => {
 const formattedFilelist = computed(() => {
   return filelist.value.map(file => ({
     ...file,
-    formattedSize: formatFileSize(file.size),
+    formattedSize: formatFileSize(file.size)
   }));
 });
 
-const beforeUpload = (file) => {
-
+const beforeUpload = file => {
   const uploadUrl = '/coursemangt/classroommangt/academiccalendar/upload';
-  uploadTeachingFile(file, uploadUrl,
-      (res) => {
-        // 成功回调
-        console.log('上传成功:', res);
-        // 处理成功后的逻辑
-        fetchCourseList();
-      },
-      (res) => {
-        // 失败回调
-        console.log('上传失败:', res);
-        // 处理失败后的逻辑
-      }
+  uploadTeachingFile(
+    file,
+    uploadUrl,
+    res => {
+      // 成功回调
+      console.log('上传成功:', res);
+      // 处理成功后的逻辑
+      fetchCourseList();
+    },
+    res => {
+      // 失败回调
+      console.log('上传失败:', res);
+      // 处理失败后的逻辑
+    }
   );
 };
 
-const previewFile = async (file) => {
-  let fileUrl = `${request.course.defaults.baseURL}/coursemangt/classroommangt/academiccalendar/download/${encodeURIComponent(file.id)}`;
-  console.log('Preview file URL:', fileUrl);  // 检查 URL 是否正确
+const previewFile = async file => {
+  let fileUrl = `${
+    request.course.defaults.baseURL
+  }/coursemangt/classroommangt/academiccalendar/download/${encodeURIComponent(file.id)}`;
+  console.log('Preview file URL:', fileUrl); // 检查 URL 是否正确
   const isPDF = file.filename.toLowerCase().endsWith('.pdf');
   const isWord = file.filename.toLowerCase().endsWith('.docx');
 
   if (isPDF) {
     previewFileType.value = 'pdf';
-    fileUrl += ".pdf"
+    fileUrl += '.pdf';
   } else if (isWord) {
     previewFileType.value = 'word';
-    fileUrl += ".docx"
+    fileUrl += '.docx';
   } else {
     ElMessage.error('无法预览此文件类型');
     return;
@@ -143,17 +168,19 @@ const previewFile = async (file) => {
   previewVisible.value = true;
 };
 
-
-const downloadFile = (file) => {
+const downloadFile = file => {
   const dotIndex = file.filename.lastIndexOf('.');
   let suffix = file.filename.substring(dotIndex + 1);
-  let fileUrl = `${request.course.defaults.baseURL}/coursemangt/classroommangt/academiccalendar/download/${encodeURIComponent(file.id)}.${suffix}`;
-  request.course({
-    url: fileUrl,
-    method: 'GET',
-    responseType: 'blob', // 重要：设置响应类型为blob
-  })
-  .then(response => {
+  let fileUrl = `${
+    request.course.defaults.baseURL
+  }/coursemangt/classroommangt/academiccalendar/download/${encodeURIComponent(file.id)}.${suffix}`;
+  request
+    .course({
+      url: fileUrl,
+      method: 'GET',
+      responseType: 'blob' // 重要：设置响应类型为blob
+    })
+    .then(response => {
       const blob = response;
       const link = document.createElement('a');
       const url = window.URL.createObjectURL(blob);
@@ -163,35 +190,38 @@ const downloadFile = (file) => {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-  })
-  .catch(error => {
-    console.error('There was a problem with the fetch operation:', error);
-    ElMessage.error('文件下载失败');
-  });
+    })
+    .catch(error => {
+      console.error('There was a problem with the fetch operation:', error);
+      ElMessage.error('文件下载失败');
+    });
 };
 
-const deleteFile = async (file) => {
+const deleteFile = async file => {
   try {
     await ElMessageBox.confirm('此操作将永久删除该内容, 是否继续?', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
-      type: 'warning',
+      type: 'warning'
     });
     const dotIndex = file.filename.lastIndexOf('.');
     let suffix = file.filename.substring(dotIndex + 1);
-    let fileUrl = `/coursemangt/classroommangt/academiccalendar/delete/${encodeURIComponent(file.id)}.${suffix}`
-    await request.course.get(fileUrl)
-        .then(res => {
-          if (res.code === 200) {
-            ElMessage.success('删除成功');
-            fetchCourseList();
-          } else {
-            ElMessage.error('删除失败');
-          }
-        })
-        .catch(() => {
+    let fileUrl = `/coursemangt/classroommangt/academiccalendar/delete/${encodeURIComponent(
+      file.id
+    )}.${suffix}`;
+    await request.course
+      .get(fileUrl)
+      .then(res => {
+        if (res.code === 200) {
+          ElMessage.success('删除成功');
+          fetchCourseList();
+        } else {
           ElMessage.error('删除失败');
-        });
+        }
+      })
+      .catch(() => {
+        ElMessage.error('删除失败');
+      });
   } catch (error) {
     ElMessage.info('删除失败');
   }
@@ -208,7 +238,6 @@ const handleClosePreview = () => {
     wordPreviewRef.value.resetContent();
   }
   previewFileUrl.value = ''; // 清空预览的URL
-
 };
 
 onMounted(() => {
@@ -222,12 +251,14 @@ onMounted(() => {
   height: 100%;
 }
 
-.pdf-container, .word-container {
+.pdf-container,
+.word-container {
   width: 100%;
   height: 80vh;
 }
 
-.pdf-frame, .word-frame {
+.pdf-frame,
+.word-frame {
   width: 100%;
   height: 100%;
 }
