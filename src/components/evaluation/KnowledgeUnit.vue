@@ -9,11 +9,12 @@
 			<el-button v-if="selParent" type="primary" @click="createChildrenData">新增小节</el-button>
 			<div class="flex-container" style="width: 100%;font-weight: bold; font-size: 25px;">课程名称</div>
 		</el-header>
-		<el-main style="padding: 0; overflow: auto; background-color: white;">
-			<el-table class="uniqueTable" ref="sortableInstance" :data="tableData"
-				style="width: 100%;margin-bottom: 20px;" row-key="id" highlight-current-row size="large"
-				:tree-props="{ children: 'children', hasChildren: 'hasChildren' }" :row-class-name="tableRowClassName"
-				@selection-change="handleSelectionChange" @current-change="changeSelRow">
+		<el-main style="padding: 0; background-color: white;">
+			<el-table class="uniqueTable" ref="sortableInstance" :data="tableData" v-loading="tableLoading"
+				element-loading-background="rgba(0, 0, 0, 0.2)" style="height: 100%; width: 100%;" row-key="id"
+				highlight-current-row size="large" :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+				:row-class-name="tableRowClassName" @selection-change="handleSelectionChange"
+				@current-change="changeSelRow">
 				<el-table-column type="selection" width="55"></el-table-column>
 				<el-table-column prop="type" label="类型" sortable width="180">
 					<!--          <template #default="tableRowData">-->
@@ -45,17 +46,29 @@
 				</el-table-column>
 				<el-table-column prop="kwas" label="基本教学目标">
 					<template #default="tableRowData">
-						<el-popover placement="bottom" :width="800" trigger="click"
-							@hide="saveEditKwa(tableRowData.row)">
-							<el-checkbox-group v-model="tableRowData.row.kwaIds">
-								<el-checkbox v-for="item in kwaData" :key="item.id" :label="item.name" :value="item.id"
-									size="large" :disabled="tableRowData.row.children_kwas.some(childKwa => childKwa.kwaid === item.id)">
-									{{ item.name }}
-								</el-checkbox>
-							</el-checkbox-group>
+						<el-popover placement="right-end" width="500" :visible="kwaPopoverVisible[tableRowData.row.id]">
+							<div style="text-align: right;">
+								<el-button style="font-size: 23px;" :type="'danger'" link
+									@click="kwaPopoverVisible[tableRowData.row.id] = isKwaPopoverShow = false;">×</el-button>
+							</div>
+							<el-table ref="kwaTableRef" :data="kwaData" height="400" @selection-change="handleKwaChange"
+								stripe>
+								<el-table-column align="center" type="selection"
+									:selectable="row => kwaTableSelectable(row, tableRowData.row)"
+									width="40"></el-table-column>
+								<el-table-column width="60">
+									<template v-slot="row">
+										{{ row.$index + 1 }}
+									</template>
+								</el-table-column>
+								<el-table-column prop="name" label="名称"></el-table-column>
+							</el-table>
+							<div style="margin-top: 10px; display: flex; justify-content: center;">
+								<el-button type="success" @click="saveEditKwa(tableRowData.row)">确定</el-button>
+							</div>
 							<template #reference>
 								<el-icon class='icon' color="dodgerblue">
-									<Edit />
+									<Edit @click="openKwaDict(tableRowData.row)" />
 								</el-icon>
 							</template>
 						</el-popover>
@@ -70,13 +83,14 @@
 	</el-container>
 </template>
 
-<script setup>
-import { onMounted, ref } from 'vue';
-import { ElMessage, ElMessageBox } from "element-plus";
+<script lang="ts" setup>
+import { computed, onMounted, ref, nextTick } from 'vue';
+import { ElMessage, ElMessageBox, rowContextKey } from "element-plus";
 import { Edit } from '@element-plus/icons-vue';
 import request from "../../utils/request";
 import Sortable from 'sortablejs';
 import _ from 'lodash';
+import { TableInstance } from 'element-plus';
 
 //-------------------------缓存数据变量
 //应该存储真正的课程ID
@@ -90,8 +104,10 @@ const inputDataValueRef = ref(null);
 const sortableInstance = ref(null);
 
 //-------------------------数据
-const tableData = ref([])
+const tableData = ref([]);
+const tableLoading = ref(true);
 const kwaData = ref([]);
+const kwaPopoverVisible = ref({});
 
 //-------------------------处理方法
 //children行class显示
@@ -104,9 +120,9 @@ const tableRowClassName = ({ row, rowIndex }) => {
 }
 
 //初始化
-onMounted(() => {
-	loadKwaData();
-	loadData();
+onMounted(async () => {
+	await loadKwaData();
+	await loadData();
 	const table = document.querySelector('.uniqueTable .el-table__body-wrapper tbody');
 	// const tbody = myTable.value.$el.querySelector('.el-table__body-wrapper tbody');
 
@@ -173,24 +189,23 @@ const getDataForPosition = (p) => {
 	return null;
 }
 
-const loadKwaData = () => {
-	request.evaluation.get('/evaluation/kwadict').then((res) => {
+const loadKwaData = async () => {
+	try {
+		const res = await request.evaluation.get('/evaluation/kwadict');
 		if (res.code === 200) {
 			kwaData.value = res.data;
-			// console.log(kwaData.value);
-			kwaData.value.forEach(item => {
-				// ElMessage.success(item.name);
-			})
 		} else {
 			ElMessage.error(res.msg);
 		}
-	}).catch((error) => {
+	} catch (error) {
 		ElMessage.error('获取失败' + error);
-	})
+	}
 }
 
-const loadData = () => {
-	request.evaluation.get('/evaluation/knowledgeUnit/getKnowledgeUnitTree?courseid=' + courseid).then((res) => {
+const loadData = async () => {
+	tableLoading.value = true;
+	try {
+		const res = await request.evaluation.get('/evaluation/knowledgeUnit/getKnowledgeUnitTree?courseid=' + courseid);
 		if (res.code === 200) {
 			tableData.value = res.data;
 			// console.log(res.data);
@@ -198,9 +213,10 @@ const loadData = () => {
 		} else {
 			ElMessage.error(res.msg);
 		}
-	}).catch((error) => {
+	} catch (error) {
 		ElMessage.error('获取失败' + error);
-	})
+	}
+	tableLoading.value = false;
 }
 
 const initialize = () => {
@@ -210,11 +226,13 @@ const initialize = () => {
 		const map = new Map();
 		[..._.cloneDeep(item.kwas), ..._.cloneDeep(item.children_kwas)].forEach(kwa => map.set(kwa.kwaid, kwa));
 		item.sumKwas = Array.from(map.values());
+		item.sumKwaIds = item.sumKwas.map(item => item.kwaid);
 
 		item.datavalue = Number(item.datavalue).toFixed(2);
 		item.position = p++;
 		item.pOrderNum = 0;
 		item.isChildren = false;
+		kwaPopoverVisible.value[item.id] = false;
 		editRef.value.set(item.id, { "editName": false, "editDataValue": false });
 		if (item.children) {
 			item.children.forEach((i) => {
@@ -222,6 +240,7 @@ const initialize = () => {
 				const childMap = new Map();
 				[..._.cloneDeep(i.kwas), ..._.cloneDeep(i.children_kwas)].forEach(kwa => childMap.set(kwa.kwaid, kwa));
 				i.sumKwas = Array.from(childMap.values());
+				i.sumKwaIds = i.sumKwas.map(item => item.kwaid);
 				i.datavalue = Number(i.datavalue).toFixed(2);
 				i.position = p++;
 				i.isChildren = true;
@@ -229,6 +248,7 @@ const initialize = () => {
 				i.pid = item.id;
 				i.pOrderNum = item.ordernum;
 				i.parentType = item.type;
+				kwaPopoverVisible.value[i.id] = false;
 				editRef.value.set(i.id, { "editName": false, "editDataValue": false });
 			});
 		}
@@ -308,6 +328,47 @@ const editEditRef = (row, field) => {
 	}, 0);
 };
 
+const kwaTableRef = ref<TableInstance>();
+const kwaSelection = ref([]);
+const isKwaPopoverShow = ref(false);
+const kwaTableSelectable = (kwaRow, tableRowData) => {
+	tableData.value.forEach(t => {
+		if(t.id === tableRowData.id){
+			console.log(t)
+			tableRowData = t;
+			return ;
+		}
+	});
+
+	return !tableRowData.children_kwas.map(t => t.kwaid).includes(kwaRow.id);
+}
+
+const toggleSelection = kwaIds => {
+	// 从filterKwaData.value中过滤出id和kwaIds每一个值相同的元素
+	const rows = kwaData.value.filter(kwa => kwaIds.includes(kwa.id));
+	if (rows.length > 0) {
+		nextTick(() => {
+			rows.forEach(row => {
+				kwaTableRef.value!.toggleRowSelection(row, undefined, true);
+			});
+		});
+	} else {
+		kwaTableRef.value!.clearSelection();
+	}
+};
+
+const handleKwaChange = selection => {
+	kwaSelection.value = selection;
+};
+
+const openKwaDict = (row) => {
+	if (isKwaPopoverShow.value) return;
+	kwaPopoverVisible.value[row.id] = true;
+	isKwaPopoverShow.value = true;
+	kwaTableRef.value!.clearSelection();
+	toggleSelection(row.sumKwaIds);
+}
+
 //保存章节、名称修改
 const saveEditRef = (row, field) => {
 	editRef.value.get(row.id)[field] = false;
@@ -326,14 +387,16 @@ const saveEditRef = (row, field) => {
 
 //保存kwa修改
 const saveEditKwa = async (row) => {
-	// console.log(row);
+	kwaPopoverVisible.value[row.id] = isKwaPopoverShow.value = false;
+	row.kwaIds = _.cloneDeep(kwaSelection.value).map(kwa => kwa.id);
+	kwaTableRef.value!.clearSelection();
 	var newKwaIds = row.kwaIds.filter(id => !row.oldKwaIds.includes(id));
 	var deleteKwaIds = row.oldKwaIds.filter(id => !row.kwaIds.includes(id));
 	if (deleteKwaIds.length !== 0) {
 		try {
 			const res = await request.evaluation.post(`/evaluation/knowledgeUnit/deleteKnowledgeUnitKwa?unitid=${row.id}`, deleteKwaIds);
 			if (res.code === 200) {
-				ElMessage.success('删除kwa成功');
+				// ElMessage.success('删除kwa成功');
 			} else {
 				ElMessage.error(res.msg);
 			}
@@ -350,7 +413,7 @@ const saveEditKwa = async (row) => {
 		try {
 			const res = await request.evaluation.post('/evaluation/knowledgeUnit/insertKnowledgeUnitKwa', postData);
 			if (res.code === 200) {
-				ElMessage.success('添加kwa成功');
+				// ElMessage.success('添加kwa成功');
 			} else {
 				ElMessage.error(res.msg);
 			}
@@ -358,7 +421,9 @@ const saveEditKwa = async (row) => {
 			ElMessage.error('添加kwa失败' + error);
 		}
 	});
-	loadData();
+	if (deleteKwaIds.length || newKwaIds.length) {
+		await loadData();
+	}
 };
 
 //删除章
