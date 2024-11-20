@@ -17,8 +17,6 @@
             :render-content="renderContent"
             :placeholder="placeholderText"
             @node-click="nodeClick"
-            @check-change="handleCheckChange"
-            @change="handleCheckChange"
           />
         </el-dropdown>
       </div>
@@ -86,12 +84,7 @@ const currentobsname = ref('');
 
 // TODO:在异步处理时，应将currentobsID获取以便找到对应班级的学生
 const nodeClick = (data, node, event) => {
-  // console.log(data.id);
-  console.log(data);
-
-  console.log(node);
   if (!node.childNodes || node.childNodes.length === 0) {
-    console.log('first');
     node.checked = !node.checked;
     currentobsId.value = data.id;
     getPeopleList();
@@ -142,28 +135,71 @@ const querySearch = () => {
     // console.log('搜索内容:', searchKeyword.value)
   }
 };
-
-// const nodeIds = ref([]);
 const nodes = ref([]);
+// const nodesMap = reactive(new Map());
+const selectedIds = ref(new Set());
 
 const handleSelectionChange = async data => {
+  // 创建一个新的选中 ID 集合
+  const newSelectedIds = new Set(data.map(row => row.id));
   data.forEach(item => {
-    nodes.value.push({
-      classRoomId: props.parseToken.obsid,
-      usersid: item.id,
-      obsid: item.obsid,
-      username: item.username,
-      obsname: item.obsname,
-      proname: currentobsname.value,
-      loginname: item.loginname
-    });
+    if (!selectedIds.value.has(item.id)) {
+      const newNode = {
+        classRoomId: props.parseToken.obsid,
+        usersid: item.id,
+        obsid: item.obsid,
+        username: item.username,
+        obsname: item.obsname,
+        proname: currentobsname.value,
+        loginname: item.loginname
+      };
+      nodes.value.push(newNode); // 添加到 nodes
+    }
   });
-  console.log(nodes.value);
+
+  // 处理取消选中的项
+  selectedIds.value.forEach(id => {
+    if (!newSelectedIds.has(id)) {
+      const index = nodes.value.findIndex(node => node.usersid === id);
+      if (index > -1) nodes.value.splice(index, 1); // 从 nodes 中移除
+    }
+  });
+
+  // 更新选中 ID 集合
+  selectedIds.value = newSelectedIds;
+  console.log(nodes.value); // 更新后的数组
 };
 
-const handleCheckChange = (a, b) => {
-  console.log(a, b);
-};
+// const handleSelectionChange = async data => {
+//   nodes.value.forEach(node => nodesMap.set(node.usersid, node));
+//   // console.log(data);
+//   data.forEach(item => {
+//     console.log(item);
+//     if (!nodesMap.has(item.id)) {
+//       const newNode = {
+//         classRoomId: props.parseToken.obsid,
+//         usersid: item.id,
+//         obsid: item.obsid,
+//         username: item.username,
+//         obsname: item.obsname,
+//         proname: currentobsname.value,
+//         loginname: item.loginname
+//       };
+//       nodesMap.set(item.id, newNode);
+//       nodes.value.push(newNode);
+//       // nodes.value.push({
+//       //   classRoomId: props.parseToken.obsid,
+//       //   usersid: item.id,
+//       //   obsid: item.obsid,
+//       //   username: item.username,
+//       //   obsname: item.obsname,
+//       //   proname: currentobsname.value,
+//       //   loginname: item.loginname
+//       // });
+//     }
+//   });
+//   console.log(nodes.value);
+// };
 
 // const handleCheckChange = async (node, nodeData) => {
 //   if (
@@ -206,14 +242,15 @@ const handleCheckChange = (a, b) => {
 
 // 批量导入学生
 const submitUpload = async () => {
-  const res = await TeacherInClassStore.importStudent(nodes.value);
+  // 再次去重
+  const uniqueNodes = _.uniqBy(nodes.value, 'usersid');
+  const res = await TeacherInClassStore.importStudent(uniqueNodes);
   if (res.code === 200) {
     ElMessage.success('学生选课成功');
     location.reload();
   } else {
     ElMessage.error('学生选课失败');
   }
-  console.log(res);
 };
 
 const emits = defineEmits(['closeTab']);

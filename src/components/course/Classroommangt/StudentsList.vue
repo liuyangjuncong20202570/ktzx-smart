@@ -292,6 +292,7 @@ const handleDelete = async () => {
       type: 'success',
       message: '删除成功'
     });
+    location.reload();
   } else {
     ElMessage({
       type: 'error',
@@ -309,6 +310,7 @@ const handleDelAll = async () => {
       type: 'success',
       message: '删除成功'
     });
+    location.reload();
   } else {
     ElMessage({
       type: 'error',
