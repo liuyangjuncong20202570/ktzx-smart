@@ -128,6 +128,7 @@ const formattedFilelist = computed(() => {
 });
 
 const beforeUpload = file => {
+  console.log(file);
   const uploadUrl = '/coursemangt/classroommangt/lessonplan/upload';
   uploadTeachingFile(
     file,
