@@ -1,14 +1,14 @@
 <template>
     <el-container style="height: 92vh;">
         <el-header
-            style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
+            style="height: auto; padding: 5px 0px; width: 100%; background-color:#deebf7; display: flex; align-items: center;">
             <el-button type="primary" style="margin-left: 0.8vw;" @click="addTarget">新增</el-button>
             <el-button type="danger" @click="deleteTarget">删除</el-button>
             <el-button type="success" @click="">保存</el-button>
             <el-button type="warning" @click="">导出到Excel</el-button>
         </el-header>
-        <el-main style="padding: 0;">
-            <el-table :data="courseTargetTargetData" style="width: 100%; height: 100%;" v-model="tableSelected"
+        <el-main style="padding: 0; background-color: white;">
+            <el-table :data="targetData" style="width: 100%; height: 100%;" v-model="tableSelected"
                 @select="tableSelect" @select-all="tableSelectAll" stripe>
                 <el-table-column type="selection" width="55"></el-table-column>
                 <el-table-column label="代码" width="100">
@@ -16,7 +16,7 @@
                         {{ row.row.code }}
                     </template>
                 </el-table-column>
-                <el-table-column label="课程目标" min-width="220">
+                <el-table-column label="课程目标" min-width="150">
                     <template v-slot="row">
                         <el-input v-if="row.row.editingName" style="width: 100%; height: 25px;" v-model="row.row.name"
                             :ref="el => setInputRef(el, row.row)" @blur="handleBlur(row.row, 'editingName')"></el-input>
@@ -25,7 +25,7 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="备注" min-width="400">
+                <el-table-column label="备注" min-width="300">
                     <template v-slot="row">
                         <el-input v-if="row.row.editingRemark" style="width: 100%; height: 25px;"
                             v-model="row.row.remark" :ref="el => setInputRef(el, row.row)"
@@ -36,16 +36,29 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="关联KWA" min-width="200">
+                <el-table-column label="关联KWA" min-width="400">
                     <template #default="{ row }">
-                        <el-popover placement="bottom" width="800" trigger="click" @hide="saveEditKwa(row)">
-                            <el-checkbox-group v-model="row.kwaIds">
-                                <el-checkbox v-for="kwa in kwaData" :key="kwa.id" :label="kwa.name"
-                                    :value="kwa.id"></el-checkbox>
-                            </el-checkbox-group>
+                        <el-popover placement="left-end" width="500" :visible="kwaPopoverVisible[row.id]">
+                            <div style="text-align: right;">
+                                <el-button style="font-size: 23px;" :type="'danger'" link
+                                    @click="kwaPopoverVisible[row.id] = isKwaPopoverShow = false;">×</el-button>
+                            </div>
+                            <el-table ref="kwaTableRef" :data="kwaData" height="400" @selection-change="handleKwaChange"
+                                stripe>
+                                <el-table-column align="center" type="selection" width="40"></el-table-column>
+                                <el-table-column width="60">
+                                    <template v-slot="row">
+                                        {{ row.$index + 1 }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column prop="name" label="名称"></el-table-column>
+                            </el-table>
+                            <div style="margin-top: 10px; display: flex; justify-content: center;">
+                                <el-button type="success" @click="saveEditKwa(row)">确定</el-button>
+                            </div>
                             <template #reference>
                                 <el-icon class='icon' color="dodgerblue">
-                                    <Edit />
+                                    <Edit @click="openKwaDict(row)" />
                                 </el-icon>
                             </template>
                         </el-popover>
@@ -59,13 +72,14 @@
     </el-container>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { nextTick, onMounted, ref } from 'vue';
 import request from '../../utils/request';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessage, ElMessageBox, TableInstance } from 'element-plus';
 import _ from 'lodash';
+import { Edit } from '@element-plus/icons-vue';
 
-const courseTargetTargetData = ref([])
+const targetData = ref([])
 
 const kwaData = ref([]);
 
@@ -81,10 +95,11 @@ onMounted(() => {
 })
 
 const initialize = () => {
-    courseTargetTargetData.value.forEach((item) => {
+    targetData.value.forEach((item) => {
         item.editingName = false;
         item.editingRemark = false;
         item.editingTarget = false;
+        kwaPopoverVisible.value[item.id] = false;
         // oldKwaIds存储kwaid的备份
         item.oldKwaIds = item.kwaIds = item.kwas.map(kwa => kwa.id);
     });
@@ -94,7 +109,7 @@ const getTargetData = async () => {
     try {
         const res = await request.evaluation.get(`/evaluation/coursetarget`);
         if (res.code === 200) {
-            courseTargetTargetData.value = res.data;
+            targetData.value = res.data;
             // console.log(res.data);
             getKwaData();
             initialize();
@@ -189,7 +204,7 @@ const setInputRef = (el, row) => {
 const handleClick = (row, field) => {
     nextTick(() => {
         tempRowData.value = _.cloneDeep(row);     // 存一份修改之前的数据用作比对
-        // console.log(courseTargetTargetData.value);
+        // console.log(targetData.value);
         row[field] = true;
         setTimeout(() => {
             if (inputRefs.value[row.id] && inputRefs.value[row.id].$refs.input) {
@@ -221,7 +236,40 @@ const handleBlur = (row, field) => {
     }
 };
 
+
+const kwaTableRef = ref<TableInstance>();
+const kwaSelection = ref([]);
+const kwaPopoverVisible = ref({});
+const isKwaPopoverShow = ref(false);
+
+const toggleSelection = kwaIds => {
+    // 从filterKwaData.value中过滤出id和kwaIds每一个值相同的元素
+    const rows = kwaData.value.filter(kwa => kwaIds.includes(kwa.id));
+    if (rows.length > 0) {
+        nextTick(() => {
+            rows.forEach(row => {
+                kwaTableRef.value!.toggleRowSelection(row, undefined, false);
+            });
+        });
+    } else {
+        kwaTableRef.value!.clearSelection();
+    }
+};
+
+const handleKwaChange = selection => {
+    kwaSelection.value = selection;
+};
+
+const openKwaDict = (row) => {
+    if (isKwaPopoverShow.value) return;
+    kwaPopoverVisible.value[row.id] = isKwaPopoverShow.value = true;
+    kwaTableRef.value!.clearSelection();
+    toggleSelection(row.kwaIds);
+}
+
 const saveEditKwa = async (row) => {
+    kwaPopoverVisible.value[row.id] = isKwaPopoverShow.value = false;
+    row.kwaIds = _.cloneDeep(kwaSelection.value.map(kwa => kwa.id));
     const newKwas = row.kwaIds.filter(id => !row.oldKwaIds.includes(id)).map(id => ({ id }));
     const deleteKwas = row.oldKwaIds.filter(id => !row.kwaIds.includes(id)).map(id => ({ id }));
     if (!newKwas.length && !deleteKwas.length) return;
@@ -236,7 +284,7 @@ const saveEditKwa = async (row) => {
         try {
             const res = await request.evaluation.post(`/evaluation/coursetarget/createKwas`, postData);
             if (res.code === 200) {
-                getTargetData();
+                // getTargetData();
             } else {
                 createFlag = false;
                 ElMessage.error(res.msg);
@@ -254,17 +302,20 @@ const saveEditKwa = async (row) => {
         try {
             const res = await request.evaluation.post(`/evaluation/coursetarget/deleteKwas`, postData);
             if (res.code === 200) {
-                getTargetData();
+                // getTargetData();
             } else {
                 deleteFlag = false;
                 ElMessage.error(res.msg);
             }
         } catch (error) {
-            ElMessage.error('删除kwa失败' + error); 
+            ElMessage.error('删除kwa失败' + error);
             deleteFlag = false;
         }
     }
-    if(createFlag && deleteFlag) ElMessage.success('修改成功');
+    if (createFlag && deleteFlag) {
+        ElMessage.success('修改成功');
+        await getTargetData();
+    }
 }
 
 </script>

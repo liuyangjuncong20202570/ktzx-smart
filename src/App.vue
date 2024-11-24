@@ -10,6 +10,6 @@
 <style lang="less" scoped>
 .container {
   background-color: #fff;
-  height: vh;
+  height: 100vh;
 }
 </style>
