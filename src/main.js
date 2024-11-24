@@ -18,6 +18,8 @@ import VxeUITable from 'vxe-table';
 import 'vxe-table/lib/style.css';
 // pinia持久化插件
 import piniaPersist from 'pinia-plugin-persist';
+// 进度条样式库
+import 'nprogress/nprogress.css';
 
 const pinia = createPinia();
 pinia.use(piniaPersist);

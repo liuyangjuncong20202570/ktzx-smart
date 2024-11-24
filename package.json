@@ -25,6 +25,7 @@
     "less": "^4.2.0",
     "lodash": "^4.17.21",
     "mammoth": "^1.8.0",
+    "nprogress": "^0.2.0",
     "pdfjs-dist": "^2.16.105",
     "pinia": "^2.1.7",
     "pinia-plugin-persist": "^1.0.0",

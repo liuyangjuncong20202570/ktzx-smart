@@ -81,6 +81,7 @@ import request from '../../../utils/request.js';
 import PdfPreview from '../Utilcomponents/PdfPreview.vue';
 import WordPreview from '../Utilcomponents/WordPreview.vue';
 import { uploadTeachingFile } from '../../../utils/uploadTeachingFile.js';
+import { download } from '@/utils/FileTech.js';
 
 const filelist = ref([]);
 const previewVisible = ref(false);
@@ -170,33 +171,37 @@ const previewFile = async file => {
 };
 
 const downloadFile = file => {
-  const dotIndex = file.filename.lastIndexOf('.');
-  let suffix = file.filename.substring(dotIndex + 1);
-  let fileUrl = `${
-    request.course.defaults.baseURL
-  }/coursemangt/classroommangt/lessonplan/download/${encodeURIComponent(file.id)}.${suffix}`;
-  request
-    .course({
-      url: fileUrl,
-      method: 'GET',
-      responseType: 'blob' // 重要：设置响应类型为blob
-    })
-    .then(response => {
-      const blob = response;
-      const link = document.createElement('a');
-      const url = window.URL.createObjectURL(blob);
-      link.href = url;
-      link.download = file.filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    })
-    .catch(error => {
-      console.error('There was a problem with the fetch operation:', error);
-      ElMessage.error('文件下载失败');
-    });
+  download(file, '/coursemangt/classroommangt/lessonplan/download/');
 };
+
+// const downloadFile = file => {
+//   const dotIndex = file.filename.lastIndexOf('.');
+//   let suffix = file.filename.substring(dotIndex + 1);
+//   let fileUrl = `${
+//     request.course.defaults.baseURL
+//   }/coursemangt/classroommangt/lessonplan/download/${encodeURIComponent(file.id)}.${suffix}`;
+//   request
+//     .course({
+//       url: fileUrl,
+//       method: 'GET',
+//       responseType: 'blob' // 重要：设置响应类型为blob
+//     })
+//     .then(response => {
+//       const blob = response;
+//       const link = document.createElement('a');
+//       const url = window.URL.createObjectURL(blob);
+//       link.href = url;
+//       link.download = file.filename;
+//       document.body.appendChild(link);
+//       link.click();
+//       document.body.removeChild(link);
+//       window.URL.revokeObjectURL(url);
+//     })
+//     .catch(error => {
+//       console.error('There was a problem with the fetch operation:', error);
+//       ElMessage.error('文件下载失败');
+//     });
+// };
 
 const deleteFile = async file => {
   try {

@@ -81,6 +81,8 @@ import request from '../../../utils/request.js';
 import PdfPreview from '../Utilcomponents/PdfPreview.vue';
 import WordPreview from '../Utilcomponents/WordPreview.vue';
 import { uploadTeachingFile } from '../../../utils/uploadTeachingFile.js';
+import { download } from '@/utils/FileTech.js';
+import NProgress from 'nprogress';
 
 const filelist = ref([]);
 const previewVisible = ref(false);
@@ -169,33 +171,67 @@ const previewFile = async file => {
 };
 
 const downloadFile = file => {
-  const dotIndex = file.filename.lastIndexOf('.');
-  let suffix = file.filename.substring(dotIndex + 1);
-  let fileUrl = `${
-    request.course.defaults.baseURL
-  }/coursemangt/classroommangt/academiccalendar/download/${encodeURIComponent(file.id)}.${suffix}`;
-  request
-    .course({
-      url: fileUrl,
-      method: 'GET',
-      responseType: 'blob' // 重要：设置响应类型为blob
-    })
-    .then(response => {
-      const blob = response;
-      const link = document.createElement('a');
-      const url = window.URL.createObjectURL(blob);
-      link.href = url;
-      link.download = file.filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    })
-    .catch(error => {
-      console.error('There was a problem with the fetch operation:', error);
-      ElMessage.error('文件下载失败');
-    });
+  download(file, '/coursemangt/classroommangt/academiccalendar/download/');
 };
+
+// const downloadFile = file => {
+//   const dotIndex = file.filename.lastIndexOf('.');
+//   let suffix = file.filename.substring(dotIndex + 1);
+//   let fileUrl = `${
+//     request.course.defaults.baseURL
+//   }/coursemangt/classroommangt/academiccalendar/download/${encodeURIComponent(file.id)}.${suffix}`;
+
+//   // 创建一个用于显示下载进度的元素（可以是进度条）
+//   NProgress.start();
+
+//   request
+//     .course({
+//       url: fileUrl,
+//       method: 'GET',
+//       responseType: 'blob', // 重要：设置响应类型为blob
+//       onDownloadProgress: progressEvent => {
+//         if (progressEvent.total) {
+//           const percentCompleted = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+//           console.log(percentCompleted);
+//           NProgress.set(percentCompleted / 100); // 更新进度条
+//         }
+//       }
+//     })
+//     .then(response => {
+//       console.log(response);
+//       const reader = new FileReader();
+//       reader.readAsDataURL(response);
+//       //  读取完的回调事件
+//       reader.onload = e => {
+//         let a = document.createElement('a');
+//         a.download = file.filename;
+//         a.style.display = 'none';
+//         let url = reader.result;
+//         a.href = url;
+//         document.body.appendChild(a);
+//         a.click();
+//         document.body.removeChild(a);
+//         // 移除进度条
+//         NProgress.done();
+//         ElMessage.success('下载成功');
+//       };
+//       // const blob = response;
+//       // const link = document.createElement('a');
+//       // const url = window.URL.createObjectURL(blob);
+//       // link.href = url;
+//       // link.download = file.filename;
+//       // document.body.appendChild(link);
+//       // link.click();
+//       // document.body.removeChild(link);
+//       // window.URL.revokeObjectURL(url);
+//     })
+//     .catch(error => {
+//       console.error('There was a problem with the fetch operation:', error);
+//       ElMessage.error('文件下载失败');
+//       // 移除进度条
+//       NProgress.done();
+//     });
+// };
 
 const deleteFile = async file => {
   try {
@@ -246,6 +282,13 @@ onMounted(() => {
 </script>
 
 <style scoped>
+#nprogress .bar {
+  top: auto; /* 禁用顶部对齐 */
+  bottom: 0; /* 设置为底部对齐 */
+}
+#nprogress .bar {
+  background: black; /* 进度条主颜色 */
+}
 .preview-container {
   width: 100%;
   height: 100%;
