@@ -5,6 +5,7 @@
 </template>
 
 <script setup>
+import LoadingSpinner from '../Utilcomponents/PdfPreview.vue';
 import { ref, watch, onBeforeUnmount, defineExpose, onMounted } from 'vue';
 import * as pdfjsLib from 'pdfjs-dist';
 import 'pdfjs-dist/build/pdf.worker.entry.js';
@@ -34,6 +35,7 @@ const cancelCurrentTasks = () => {
   }
 };
 
+const emit = defineEmits(['handleLoading']);
 const renderPDF = async url => {
   try {
     console.log('Starting to render PDF from URL:', url);
@@ -85,6 +87,7 @@ const renderPDF = async url => {
 
       // 将 canvas 添加到 pdfViewer 容器中
       pdfViewer.value.appendChild(canvas);
+      emit('handleLoading');
     }
   } catch (error) {
     if (error.name === 'RenderingCancelledException') {

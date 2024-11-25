@@ -59,7 +59,8 @@
         <span>预览文件</span>
       </template>
       <div v-if="previewFileType === 'pdf'" class="preview-container">
-        <PdfPreview ref="pdfPreviewRef" :fileUrl="previewFileUrl" />
+        <!-- <PdfPreview ref="pdfPreviewRef" :fileUrl="previewFileUrl" /> -->
+        <PdfLoadingPreview :fileUrl="previewFileUrl" />
       </div>
       <div v-if="previewFileType === 'word'" class="preview-container">
         <WordPreview ref="wordPreviewRef" :fileUrl="previewFileUrl" />
@@ -74,6 +75,7 @@
 </template>
 
 <script setup>
+import PdfLoadingPreview from '../Utilcomponents/PdfLoadingPreview.vue';
 import useMain from '../../../stores/useMain.js';
 import { ref, onMounted, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';

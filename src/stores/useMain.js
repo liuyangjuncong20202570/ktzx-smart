@@ -2,11 +2,15 @@ import { defineStore } from 'pinia';
 
 const useMain = defineStore('Main', {
   state: () => ({
-    selectedRoute: ''
+    selectedRoute: '',
+    isLoading: false
   }),
   actions: {
     setSelectedRoute(route) {
       this.selectedRoute = route;
+    },
+    setLoading(payload) {
+      this.isLoading = payload;
     }
   },
   persist: {
@@ -16,6 +20,11 @@ const useMain = defineStore('Main', {
         key: 'selectedRoute',
         storage: sessionStorage,
         paths: ['selectedRoute']
+      },
+      {
+        key: 'isLoading',
+        storage: sessionStorage,
+        paths: ['isLoading']
       }
     ]
   }

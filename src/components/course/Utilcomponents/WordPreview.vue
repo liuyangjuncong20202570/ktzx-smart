@@ -1,8 +1,12 @@
 <template>
-  <div class="word-container" v-html="wordContent"></div>
+  <!-- <div class="word-container" v-html="wordContent"></div> -->
+  <vue-office-docx v-if="wordContent" :src="wordContent" />
+  <LoadingSpinner v-else />
 </template>
 
 <script setup>
+import LoadingSpinner from '../Classroommangt/LoadingSpinner.vue';
+import VueOfficeDocx from '@vue-office/docx';
 import { ref, watch, onMounted, defineExpose } from 'vue';
 import mammoth from 'mammoth';
 import request from '../../../utils/request';
@@ -26,9 +30,10 @@ const fetchWordFile = async url => {
     });
     console.log(response);
     const arrayBuffer = await response.arrayBuffer();
+    wordContent.value = arrayBuffer;
     const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
     console.log('Word file converted to HTML:', result.value);
-    wordContent.value = result.value;
+    // wordContent.value = result.value;
   } catch (error) {
     console.error('Error fetching or converting Word file:', error);
   }

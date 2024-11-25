@@ -58,8 +58,17 @@
       <template #title>
         <span>预览文件</span>
       </template>
+      <!-- <LoadingSpinner /> -->
       <div v-if="previewFileType === 'pdf'" class="preview-container">
-        <PdfPreview ref="pdfPreviewRef" :fileUrl="previewFileUrl" />
+        <PdfLoadingPreview :fileUrl="previewFileUrl" />
+        <!-- <PdfPreview
+          @handleLoading="handleLoad"
+          v-show="!isLoading"
+          ref="pdfPreviewRef"
+          :fileUrl="previewFileUrl"
+        />
+        <LoadingSpinner v-show="isLoading" /> -->
+        <!-- <AsyncPdfViewer ref="pdfPreviewRef" :fileUrl="previewFileUrl" /> -->
       </div>
       <div v-if="previewFileType === 'word'" class="preview-container">
         <WordPreview ref="wordPreviewRef" :fileUrl="previewFileUrl" />
@@ -74,15 +83,16 @@
 </template>
 
 <script setup>
+import PdfLoadingPreview from '../Utilcomponents/PdfLoadingPreview.vue';
 import useMain from '../../../stores/useMain.js';
 import { ref, onMounted, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import request from '../../../utils/request.js';
 import PdfPreview from '../Utilcomponents/PdfPreview.vue';
+
 import WordPreview from '../Utilcomponents/WordPreview.vue';
 import { uploadTeachingFile } from '../../../utils/uploadTeachingFile.js';
 import { download } from '@/utils/FileTech.js';
-import NProgress from 'nprogress';
 
 const filelist = ref([]);
 const previewVisible = ref(false);
@@ -90,7 +100,7 @@ const previewFileType = ref('');
 const previewFileUrl = ref('');
 const dialogWidth = ref('65%');
 
-const pdfPreviewRef = ref(null);
+// const pdfPreviewRef = ref(null);
 const wordPreviewRef = ref(null);
 
 const MainStore = useMain();
@@ -267,9 +277,9 @@ const handleClosePreview = () => {
   previewVisible.value = false;
 
   // 取消 PDF 预览的渲染任务
-  if (pdfPreviewRef.value) {
-    pdfPreviewRef.value.cancelCurrentTasks();
-  }
+  // if (pdfPreviewRef.value) {
+  //   pdfPreviewRef.value.cancelCurrentTasks();
+  // }
   if (wordPreviewRef.value) {
     wordPreviewRef.value.resetContent();
   }
@@ -281,14 +291,7 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-#nprogress .bar {
-  top: auto; /* 禁用顶部对齐 */
-  bottom: 0; /* 设置为底部对齐 */
-}
-#nprogress .bar {
-  background: black; /* 进度条主颜色 */
-}
+<style lang="less" scoped>
 .preview-container {
   width: 100%;
   height: 100%;

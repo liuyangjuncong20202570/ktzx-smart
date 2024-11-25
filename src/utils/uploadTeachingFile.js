@@ -1,36 +1,10 @@
 // utils/uploadTeachingFile.js
+import NProgress from 'nprogress';
 import { ElMessage } from 'element-plus';
 import request from './request.js';
 
-// const uploadChunk = (chunk, uploadUrl, successCallback, errorCallback) => {
-//   const formData = new FormData();
-//   formData.append('file', chunk);
-
-//   return request.course
-//     .post(uploadUrl, formData, {
-//       headers: {
-//         'Content-Type': 'multipart/form-data'
-//       }
-//     })
-//     .then(res => {
-//       if (res.code === 200) {
-//         // ElMessage.success(`${file.name} 上传成功`);
-//         if (successCallback) successCallback(res);
-//       } else {
-//         flag = 1;
-//         ElMessage.error(`${file.name} 上传失败: ${res.msg}`);
-//         if (errorCallback) errorCallback(res);
-//       }
-//     })
-//     .catch(() => {
-//       flag = 1;
-//       ElMessage.error(`${file.name} 上传失败`);
-//       if (errorCallback) errorCallback();
-//     });
-// };
-
 export const uploadTeachingFile = async (file, uploadUrl, successCallback, errorCallback) => {
-  let flag = 0;
+  // let flag = 0;
   const isDoc = file.type === 'application/msword'; // 支持 .doc 文件
   const isDocx =
     file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -50,114 +24,91 @@ export const uploadTeachingFile = async (file, uploadUrl, successCallback, error
   //   }
 
   // 前端文件切片
-  const chunkSize = 2 * 1024 * 1024; // 2MB
-  const fileId = `${file.name}-${Date.now()}`; // 唯一标识文件
-  const promises = [];
-  const chunckSize = 2 * 1024 * 1024; //2mb
-  const totalChunks = Math.ceil(file.size / chunckSize);
-  //   for (let i = 0; i < totalChunks; i++) {
-  //     const start = i * chunckSize;
-  //     // 读取到文件末尾
-  //     const end = Math.min(start + chunckSize, file.size);
-  //     const chunk = file.slice(start, end);
-  //     // 发送异步请求
-  //     const formData = new FormData();
-  //     formData.append('file', chunk);
+  // const chunkSize = 2 * 1024 * 1024; // 2MB
+  // const fileId = `${file.name}-${Date.now()}`; // 唯一标识文件
+  // const promises = [];
+  // const chunckSize = 2 * 1024 * 1024; //2mb
+  // const totalChunks = Math.ceil(file.size / chunckSize);
 
-  //     return request.course
+  const formData = new FormData();
+  formData.append('file', file);
+  NProgress.start();
+  return request.course
+    .post(uploadUrl, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      onDownloadProgress: progressEvent => {
+        if (progressEvent.total) {
+          const percentCompleted = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+          console.log(percentCompleted);
+          NProgress.set(percentCompleted / 100);
+          // NProgress.set(percentCompleted / 100); // 更新进度条
+        }
+      }
+    })
+    .then(res => {
+      if (res.code === 200) {
+        ElMessage.success(`${file.name} 上传成功`);
+        if (successCallback) successCallback(res);
+        NProgress.done();
+      } else {
+        ElMessage.error(`${file.name} 上传失败: ${res.msg}`);
+        if (errorCallback) errorCallback(res);
+        NProgress.done();
+      }
+    })
+    .catch(() => {
+      ElMessage.error(`${file.name} 上传失败`);
+      if (errorCallback) errorCallback();
+      NProgress.done();
+    });
+
+  // for (let i = 0; i < totalChunks; i++) {
+  //   const start = i * chunkSize;
+  //   const end = Math.min(start + chunkSize, file.size);
+  //   const chunk = file.slice(start, end);
+
+  //   const formData = new FormData();
+  //   formData.append('file', chunk);
+  //   formData.append('chunkIndex', i);
+  //   formData.append('totalChunks', totalChunks);
+  //   formData.append('fileId', fileId); // 文件唯一标识
+
+  //   // 记录每个切片上传的 Promise
+  //   promises.push(
+  //     request.course
   //       .post(uploadUrl, formData, {
   //         headers: {
   //           'Content-Type': 'multipart/form-data'
   //         }
   //       })
-  //       .then(res => {
-  //         if (res.code === 200) {
-  //           //   ElMessage.success(`${file.name} 上传成功`);
-  //           if (successCallback) successCallback(res);
-  //         } else {
-  //           flag = 1;
-  //           ElMessage.error(`${file.name} 上传失败: ${res.msg}`);
-  //           if (errorCallback) errorCallback(res);
-  //         }
+  //       .catch(err => {
+  //         ElMessage.error(`第 ${i + 1} 块切片上传失败`);
+  //         throw err; // 如果某个切片失败，抛出错误
   //       })
-  //       .catch(() => {
-  //         flag = 1;
-  //         ElMessage.error(`${file.name} 上传失败`);
-  //         if (errorCallback) errorCallback();
-  //       });
-  //     // uploadChunk(chunk, uploadUrl, successCallback, errorCallback);
+  //   );
+  // }
+
+  // try {
+  //   // 并行上传所有切片
+  //   await Promise.all(promises);
+  //   ElMessage.success('所有切片上传成功，正在合并文件...');
+
+  //   // 通知后端合并文件
+  //   // const mergeResponse = await request.course.post(mergeUrl, { fileId, fileName: file.name });
+  //   const mergeResponse = {
+  //     code: 200
+  //   };
+  //   if (mergeResponse.code === 200) {
+  //     ElMessage.success(`${file.name} 上传完成`);
+  //     if (successCallback) successCallback(mergeResponse);
+  //   } else {
+  //     ElMessage.error(`文件合并失败: ${mergeResponse.msg}`);
+  //     if (errorCallback) errorCallback(mergeResponse);
   //   }
-  //   if (flag === 0) {
-  //     ElMessage.success(`${file.name} 上传成功`);
-  //   }
-
-  //   const formData = new FormData();
-  //   formData.append('file', file);
-
-  //   return request.course
-  //     .post(uploadUrl, formData, {
-  //       headers: {
-  //         'Content-Type': 'multipart/form-data'
-  //       }
-  //     })
-  //     .then(res => {
-  //       if (res.code === 200) {
-  //         ElMessage.success(`${file.name} 上传成功`);
-  //         if (successCallback) successCallback(res);
-  //       } else {
-  //         ElMessage.error(`${file.name} 上传失败: ${res.msg}`);
-  //         if (errorCallback) errorCallback(res);
-  //       }
-  //     })
-  //     .catch(() => {
-  //       ElMessage.error(`${file.name} 上传失败`);
-  //       if (errorCallback) errorCallback();
-  //     });
-  for (let i = 0; i < totalChunks; i++) {
-    const start = i * chunkSize;
-    const end = Math.min(start + chunkSize, file.size);
-    const chunk = file.slice(start, end);
-
-    const formData = new FormData();
-    formData.append('file', chunk);
-    formData.append('chunkIndex', i);
-    formData.append('totalChunks', totalChunks);
-    formData.append('fileId', fileId); // 文件唯一标识
-
-    // 记录每个切片上传的 Promise
-    promises.push(
-      request.course
-        .post(uploadUrl, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        })
-        .catch(err => {
-          ElMessage.error(`第 ${i + 1} 块切片上传失败`);
-          throw err; // 如果某个切片失败，抛出错误
-        })
-    );
-  }
-
-  try {
-    // 并行上传所有切片
-    await Promise.all(promises);
-    ElMessage.success('所有切片上传成功，正在合并文件...');
-
-    // 通知后端合并文件
-    // const mergeResponse = await request.course.post(mergeUrl, { fileId, fileName: file.name });
-    const mergeResponse = {
-      code: 200
-    };
-    if (mergeResponse.code === 200) {
-      ElMessage.success(`${file.name} 上传完成`);
-      if (successCallback) successCallback(mergeResponse);
-    } else {
-      ElMessage.error(`文件合并失败: ${mergeResponse.msg}`);
-      if (errorCallback) errorCallback(mergeResponse);
-    }
-  } catch (err) {
-    ElMessage.error('文件上传失败');
-    if (errorCallback) errorCallback(err);
-  }
+  // } catch (err) {
+  //   ElMessage.error('文件上传失败');
+  //   if (errorCallback) errorCallback(err);
+  // }
 };

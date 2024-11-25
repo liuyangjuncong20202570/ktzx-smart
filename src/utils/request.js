@@ -27,8 +27,8 @@ const request = {
 function createAPI(url) {
   // 构建不同端口的异步请求数据
   const axiosData = axios.create({
-    baseURL: url,
-    timeout: 70000
+    baseURL: url
+    // timeout: 70000
   });
 
   // request 拦截器

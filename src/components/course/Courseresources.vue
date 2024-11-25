@@ -11,7 +11,12 @@
       "
     >
       <el-upload ref="upload" :before-upload="beforeUpload" :show-file-list="false">
-        <el-button type="primary" v-blur-on-click>上传</el-button>
+        <el-button
+          v-if="MainStore.selectedRoute !== '/homes/courseteacherhome/coursemangt/courseresources'"
+          type="primary"
+          v-blur-on-click
+          >上传</el-button
+        >
       </el-upload>
     </el-header>
     <div style="max-height: 100%; height: 100%; overflow: auto">
@@ -51,7 +56,8 @@
         <span>预览文件</span>
       </template>
       <div v-if="previewFileType === 'pdf'" class="preview-container">
-        <PdfPreview ref="pdfPreviewRef" :fileUrl="previewFileUrl" />
+        <!-- <PdfPreview ref="pdfPreviewRef" :fileUrl="previewFileUrl" /> -->
+        <PdfLoadingPreview :fileUrl="previewFileUrl" />
       </div>
       <div v-if="previewFileType === 'word'" class="preview-container">
         <WordPreview ref="wordPreviewRef" :fileUrl="previewFileUrl" />
@@ -66,6 +72,7 @@
 </template>
 
 <script setup>
+import PdfLoadingPreview from './Utilcomponents/PdfLoadingPreview.vue';
 import { ref, onMounted, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import request from '../../utils/request.js';
@@ -73,6 +80,7 @@ import PdfPreview from './Utilcomponents/PdfPreview.vue';
 import WordPreview from './Utilcomponents/WordPreview.vue';
 import { uploadTeachingFile } from '../../utils/uploadTeachingFile.js';
 import { download } from '../../utils/FileTech.js';
+import useMain from '../../stores/useMain.js';
 
 const filelist = ref([]);
 const previewVisible = ref(false);
@@ -82,6 +90,8 @@ const dialogWidth = ref('65%');
 
 const pdfPreviewRef = ref(null);
 const wordPreviewRef = ref(null);
+
+const MainStore = useMain();
 
 const fetchCourseList = async () => {
   await request.course
