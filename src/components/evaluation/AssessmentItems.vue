@@ -164,6 +164,7 @@ onMounted(() => {
 const loadData = () => {
   request.evaluation.get('/evaluation/checkitem').then((res) => {
     if(res.code === 200){
+      selectRow.value = null;
       tableData.value = res.data;
     }else{
       ElMessage.error(res.msg);
@@ -173,8 +174,32 @@ const loadData = () => {
   })
 }
 const addChild = (type) => {
-  if(selectRow.value === null){
+  if(selectRow.value === null && type === 0){
     ElMessage.warning("未选择考核项");
+    return;
+  }
+  if(selectRow.value === undefined || selectRow.value === null){
+    const newData = {
+      id: 0,
+      pid: 0,
+      type: type,
+      checkitemdeep: 0,
+      cmCheckitem: {
+        itemName: '新增的考核项',
+        task: 'false',
+        remark: null
+      },
+    };
+    request.evaluation.post('/evaluation/checkitem/create',newData).then((res) => {
+      if(res.code === 200){
+        loadData();
+        ElMessage.success('新增成功');
+      }else{
+        ElMessage.error(res.msg);
+      }
+    }).catch((error) => {
+      ElMessage.error('新增失败' + error);
+    });
     return;
   }
   var data = {
