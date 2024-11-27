@@ -1,6 +1,8 @@
 <template>
   <!-- <div class="word-container" v-html="wordContent"></div> -->
-  <vue-office-docx v-if="wordContent" :src="wordContent" />
+  <div v-if="wordContent" class="word-wrapper">
+    <vue-office-docx :src="wordContent" />
+  </div>
   <LoadingSpinner v-else />
 </template>
 
@@ -64,6 +66,11 @@ defineExpose({ resetContent });
 </script>
 
 <style scoped>
+.word-wrapper {
+  overflow: auto;
+  height: 500px;
+  scrollbar-width: none;
+}
 .word-container {
   width: 100%;
   height: 80vh;

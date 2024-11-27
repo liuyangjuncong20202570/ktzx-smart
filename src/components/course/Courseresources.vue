@@ -51,6 +51,7 @@
       @close="handleClosePreview"
       :width="dialogWidth"
       :height="dialogWidth"
+      destroy-on-close
     >
       <template #title>
         <span>预览文件</span>
@@ -234,9 +235,12 @@ const handleClosePreview = () => {
   previewVisible.value = false;
 
   // 取消 PDF 预览的渲染任务
-  if (pdfPreviewRef.value) {
-    pdfPreviewRef.value.cancelCurrentTasks();
+  if (previewFileType === 'pdf') {
+    close.value = true;
   }
+  // if (pdfPreviewRef.value) {
+  //   pdfPreviewRef.value.cancelCurrentTasks();
+  // }
   if (wordPreviewRef.value) {
     wordPreviewRef.value.resetContent();
   }

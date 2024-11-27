@@ -53,6 +53,7 @@
       custom-class="preview-dialog"
       @close="handleClosePreview"
       :width="dialogWidth"
+      destroy-on-close
       :height="dialogWidth"
     >
       <template #title>
@@ -239,9 +240,12 @@ const handleClosePreview = () => {
   previewVisible.value = false;
 
   // 取消 PDF 预览的渲染任务
-  if (pdfPreviewRef.value) {
-    pdfPreviewRef.value.cancelCurrentTasks();
+  if (previewFileType === 'pdf') {
+    close.value = true;
   }
+  // if (pdfPreviewRef.value) {
+  //   pdfPreviewRef.value.cancelCurrentTasks();
+  // }
   if (wordPreviewRef.value) {
     wordPreviewRef.value.resetContent();
   }

@@ -54,13 +54,14 @@
       @close="handleClosePreview"
       :width="dialogWidth"
       :height="dialogWidth"
+      destroy-on-close
     >
       <template #title>
         <span>预览文件</span>
       </template>
       <!-- <LoadingSpinner /> -->
       <div v-if="previewFileType === 'pdf'" class="preview-container">
-        <PdfLoadingPreview :fileUrl="previewFileUrl" />
+        <PdfLoadingPreview :isClose="close" :fileUrl="previewFileUrl" />
         <!-- <PdfPreview
           @handleLoading="handleLoad"
           v-show="!isLoading"
@@ -99,6 +100,8 @@ const previewVisible = ref(false);
 const previewFileType = ref('');
 const previewFileUrl = ref('');
 const dialogWidth = ref('65%');
+
+const close = ref(false);
 
 // const pdfPreviewRef = ref(null);
 const wordPreviewRef = ref(null);
@@ -277,6 +280,9 @@ const handleClosePreview = () => {
   previewVisible.value = false;
 
   // 取消 PDF 预览的渲染任务
+  if (previewFileType === 'pdf') {
+    close.value = true;
+  }
   // if (pdfPreviewRef.value) {
   //   pdfPreviewRef.value.cancelCurrentTasks();
   // }
@@ -292,6 +298,12 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
+// :deep(.el-dialog) {
+//   // overflow: hidden;
+//   overflow: auto;
+//   height: 620px;
+//   scrollbar-width: none;
+// }
 .preview-container {
   width: 100%;
   height: 100%;

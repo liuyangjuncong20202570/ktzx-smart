@@ -109,6 +109,7 @@ watch(
 );
 
 onMounted(() => {
+  cancelCurrentTasks();
   if (props.fileUrl) {
     console.log('Mounted file URL:', props.fileUrl);
     renderPDF(props.fileUrl);
