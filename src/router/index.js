@@ -238,6 +238,11 @@ const routes = [
         name: 'AssessmentTable',
         component: () => import('../components/evaluation/AssessmentTable.vue')
       },
+      {
+        path: '/evaluation/coursemangt/dynamicEvaluation/studentReport', // 评估与画像-学生报告
+        name: 'StudentReport',
+        component: () => import('../components/dynamicEvaluation/StudentsReport/StudentsReport.vue')
+      },
       // 0822
       // 课程页
       {
@@ -350,15 +355,17 @@ const router = createRouter({
 //     next();
 // });
 
-router.beforeEach((to, from, next) => {
-  const MainStore = useMain();
-  const { selectedRoute } = storeToRefs(MainStore);
-  // 如果当前路由与选中的路由不一致，则根据 URL 跳转
-  if (to.path !== selectedRoute.value && selectedRoute.value !== '') {
-    next(selectedRoute.value);
-  }
-  next();
-});
+// router.beforeEach((to, from, next) => {
+//   const MainStore = useMain();
+//   const { selectedRoute } = storeToRefs(MainStore);
+//   // 如果当前路由与选中的路由不一致，则根据 URL 跳转
+//   console.log(to.path);
+//   if (to.path !== selectedRoute.value && selectedRoute.value !== '') {
+//     // MainStore.setSelectedRoute(to.path);
+//     next(selectedRoute.value);
+//   }
+//   next();
+// });
 
 router.beforeEach((to, from, next) => {
   // 尝试从 sessionStorage 中获取用户信息
@@ -366,12 +373,31 @@ router.beforeEach((to, from, next) => {
 
   // 检查目标路由是否需要认证（假设需要认证的路由有一个'meta'字段）
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const MainStore = useMain();
+  const { selectedRoute } = storeToRefs(MainStore);
+  // 如果当前路由与选中的路由不一致，则根据 URL 跳转
+  console.log(to);
+  if (!from.path.includes('exam')) {
+    if (to.path !== selectedRoute.value && selectedRoute.value !== '') {
+      const MainStore = useMain();
+      const { selectedRoute } = storeToRefs(MainStore);
+      // 如果当前路由与选中的路由不一致，则根据 URL 跳转
+      console.log(to.path);
+      if (to.path !== selectedRoute.value && selectedRoute.value !== '') {
+        // MainStore.setSelectedRoute(to.path);
+        next(selectedRoute.value);
+        return;
+      }
+    }
+  }
   if (requiresAuth && !storedUserInfo) {
     // 如果目标路由需要认证，但没有存储的用户信息，则重定向到登录页面
     next({ name: 'Login' });
+    return;
   } else {
     // 如果不需要认证，或者用户信息存在，则正常导航
     next();
   }
+  // next();
 });
 export default router;

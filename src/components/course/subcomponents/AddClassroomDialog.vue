@@ -1,10 +1,17 @@
 <template>
-  <div style="padding:0;margin:0;">
+  <div style="padding: 0; margin: 0">
     <el-dialog
-        :destroy-on-close="true" :show-close="false" :close-on-click-modal="false"
-        style="width:50vw;" v-model="AdddialogVisible" @close="closeDialog">
-      <el-container style="margin-left:0">
-        <el-header style="height: auto; padding: 2px 0px; width:100%; display: flex; align-items: center;">
+      :destroy-on-close="true"
+      :show-close="false"
+      :close-on-click-modal="false"
+      style="width: 50vw"
+      v-model="AdddialogVisible"
+      @close="closeDialog"
+    >
+      <el-container style="margin-left: 0">
+        <el-header
+          style="height: auto; padding: 2px 0px; width: 100%; display: flex; align-items: center"
+        >
         </el-header>
         <el-main>
           <el-form ref="formRef" :model="newform" :rules="rules" label-width="120px">
@@ -24,61 +31,63 @@
               <el-input v-model="newform.practiceTime" placeholder="请输入实践学时"></el-input>
             </el-form-item>
 
-            <el-form-item label="主讲教师" prop="">
+            <el-form-item label="主讲教师" prop="mainTeacher">
               <el-cascader
-                  ref="mainteacherref"
-                  v-model="mainteacherid"
-                  :options="teacherlist"
-                  placeholder="请选择主讲教师"
-                  :props="{ value: 'id', label: 'label', children: 'children', emitPath: false }"
-                  filterable
-                  clearable
-                  :show-all-levels="false"
-                  @focus="fetchData"
-                  change-on-select
-                  @change="(value) => handleCascaderChange('mainteacher', value)"
-                  style="width: 100%;"
+                ref="mainteacherref"
+                v-model="mainteacherid"
+                :options="teacherlist"
+                placeholder="请选择主讲教师"
+                :props="{ value: 'id', label: 'label', children: 'children', emitPath: false }"
+                filterable
+                clearable
+                :show-all-levels="false"
+                @focus="fetchData"
+                change-on-select
+                @change="value => handleCascaderChange('mainteacher', value)"
+                style="width: 100%"
               >
               </el-cascader>
             </el-form-item>
-            <el-form-item label="实验教师" prop="">
+            <el-form-item label="实验教师" prop="elementTeacher">
               <el-cascader
-                  ref="labteacherref"
-                  v-model="labteacherid"
-                  :options="teacherlist"
-                  placeholder="请选择实验教师"
-                  :props="{ value: 'id', label: 'label', children: 'children', emitPath: false }"
-                  filterable
-                  clearable
-                  :show-all-levels="false"
-                  @focus="fetchData"
-                  change-on-select
-                  @change="(value) => handleCascaderChange('labteacher', value)"
-                  style="width: 100%;"
+                ref="labteacherref"
+                v-model="labteacherid"
+                :options="teacherlist"
+                placeholder="请选择实验教师"
+                :props="{ value: 'id', label: 'label', children: 'children', emitPath: false }"
+                filterable
+                clearable
+                :show-all-levels="false"
+                @focus="fetchData"
+                change-on-select
+                @change="value => handleCascaderChange('labteacher', value)"
+                style="width: 100%"
               >
               </el-cascader>
             </el-form-item>
-            <el-form-item label="实践教师" prop="">
+            <el-form-item label="实践教师" prop="practiceTeacher">
               <el-cascader
-                  ref="practiceteacherref"
-                  v-model="practiceteacherid"
-                  :options="teacherlist"
-                  placeholder="请选择实践教师"
-                  :props="{ value: 'id', label: 'label', children: 'children', emitPath: false }"
-                  filterable
-                  clearable
-                  :show-all-levels="false"
-                  @focus="fetchData"
-                  change-on-select
-                  @change="(value) => handleCascaderChange('practiceteacher', value)"
-                  style="width: 100%;"
+                ref="practiceteacherref"
+                v-model="practiceteacherid"
+                :options="teacherlist"
+                placeholder="请选择实践教师"
+                :props="{ value: 'id', label: 'label', children: 'children', emitPath: false }"
+                filterable
+                clearable
+                :show-all-levels="false"
+                @focus="fetchData"
+                change-on-select
+                @change="value => handleCascaderChange('practiceteacher', value)"
+                style="width: 100%"
               >
               </el-cascader>
             </el-form-item>
 
-            <el-form-item style="display: flex; justify-content: center; gap: 20px;">
-              <el-button type="info" large style="width: 40%;" @click="closeDialog">取消</el-button>
-              <el-button type="success" large style="width: 40%;" @click="submitForm">新增</el-button>
+            <el-form-item style="display: flex; justify-content: center; gap: 20px">
+              <el-button type="info" large style="width: 40%" @click="closeDialog">取消</el-button>
+              <el-button type="success" large style="width: 40%" @click="submitForm"
+                >新增</el-button
+              >
             </el-form-item>
           </el-form>
         </el-main>
@@ -88,12 +97,12 @@
 </template>
 
 <script setup>
-import {defineExpose, onMounted, reactive, ref} from 'vue';
-import {ElMessage, ElMessageBox} from 'element-plus';
-import request from "../../../utils/request.js";
-import {useProfileStore} from "../../../stores/profileStore.js";
+import { defineExpose, onMounted, reactive, ref } from 'vue';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import request from '../../../utils/request.js';
+import { useProfileStore } from '../../../stores/profileStore.js';
 
-const username = ref('')
+const username = ref('');
 const profileStore = useProfileStore();
 username.value = profileStore.profilename;
 
@@ -118,7 +127,7 @@ const newform = reactive({
   practiceTime: '',
   teacherId: '',
   labTeacherId: '',
-  practiceTeacherId: '',
+  practiceTeacherId: ''
 });
 
 const resetForm = () => {
@@ -133,15 +142,17 @@ const resetForm = () => {
   practiceteacherid.value = '';
 };
 
-
 const emit = defineEmits(['formSubmitted']);
-defineExpose({init});
+defineExpose({ init });
 
 const rules = reactive({
-  classroomName: [{required: true, message: '请输入课堂名称', trigger: 'blur'}],
-  teachTime: [{required: true, message: '请输入讲授时长', trigger: 'blur'}],
-  labTime: [{required: true, message: '请输入实验时长', trigger: 'blur'}],
-  practiceTime: [{required: true, message: '请输入实践时长', trigger: 'blur'}],
+  classroomName: [{ required: true, message: '请输入课堂名称', trigger: 'blur' }],
+  teachTime: [{ required: true, message: '请输入讲授时长', trigger: 'blur' }],
+  labTime: [{ required: true, message: '请输入实验时长', trigger: 'blur' }],
+  practiceTime: [{ required: true, message: '请输入实践时长', trigger: 'blur' }],
+  mainTeacher: [{ required: true, message: '请输入主讲教师', trigger: 'blur' }],
+  elementTeacher: [{ required: true, message: '请输入实验教师', trigger: 'blur' }],
+  practiceTeacher: [{ required: true, message: '请输入实践教师', trigger: 'blur' }]
 });
 
 function init(courseinfo) {
@@ -150,44 +161,45 @@ function init(courseinfo) {
   AdddialogVisible.value = true;
   newform.courseid = courseinfo.courseid;
   newform.courseChineseName = courseinfo.coursename;
-
-
 }
 
 const fetchData = () => {
-  request.course.post('/coursemangt/course/courseRP')
-      .then(res => {
-        if (res.code === 200) {
-          teacherlist.value = formatDataForCascader(res.data, alreadyteacheridlist.value);
-          console.log('Formatted teacher list:', teacherlist.value); // 打印格式化后的数据
-        }
-      })
-      .catch(error => {
-        ElMessage({
-          type: 'error',
-          message: '获取列表失败',
-        });
+  request.course
+    .post('/coursemangt/course/courseRP')
+    .then(res => {
+      if (res.code === 200) {
+        teacherlist.value = formatDataForCascader(res.data, alreadyteacheridlist.value);
+        console.log('Formatted teacher list:', teacherlist.value); // 打印格式化后的数据
+      }
+    })
+    .catch(error => {
+      ElMessage({
+        type: 'error',
+        message: '获取列表失败'
       });
+    });
 };
 
 const formatDataForCascader = (nodes, selectedTeacherIds) => {
-  const formatNode = (node) => {
+  const formatNode = node => {
     const formattedNode = {
       ...node,
-      label: node.obsname,
+      label: node.obsname
     };
     if (node.children && node.children.length > 0) {
       formattedNode.children = node.children.map(formatNode).filter(child => child !== null);
     }
     if (node.responsiblePerson && node.responsiblePerson.length > 0) {
-      const filteredTeachers = node.responsiblePerson.filter(teacher => !selectedTeacherIds.includes(teacher.id));
+      const filteredTeachers = node.responsiblePerson.filter(
+        teacher => !selectedTeacherIds.includes(teacher.id)
+      );
       if (filteredTeachers.length > 0) {
         formattedNode.children = (formattedNode.children || []).concat(
-            filteredTeachers.map(teacher => ({
-              id: teacher.id,
-              label: teacher.username,
-              isLeaf: true,
-            }))
+          filteredTeachers.map(teacher => ({
+            id: teacher.id,
+            label: teacher.username,
+            isLeaf: true
+          }))
         );
       }
     }
@@ -248,15 +260,11 @@ const closeDialog = () => {
 async function submitForm() {
   try {
     // 显示确认对话框
-    await ElMessageBox.confirm(
-        '是否确认新增',
-        '提示',
-        {
-          confirmButtonText: '确认',
-          cancelButtonText: '取消',
-          type: 'info',
-        }
-    );
+    await ElMessageBox.confirm('是否确认新增', '提示', {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'info'
+    });
 
     // 用户确认后执行以下代码
     const newClassroomform = ref({
@@ -271,12 +279,15 @@ async function submitForm() {
       practiceTeacher: practiceteachername.value,
       teachTime: newform.teachTime,
       labTime: newform.labTime,
-      practiceTime: newform.practiceTime,
+      practiceTime: newform.practiceTime
     });
 
-    console.log(newClassroomform.value)
+    console.log(newClassroomform.value);
     // 接下来可以加入发送请求的代码
-    const courseResponse = await request.course.post('/coursemangt/classroom/create', newClassroomform.value);
+    const courseResponse = await request.course.post(
+      '/coursemangt/classroom/create',
+      newClassroomform.value
+    );
     if (courseResponse.code === 200) {
       // 处理响应
       ElMessage({
@@ -286,7 +297,6 @@ async function submitForm() {
 
       emit('formSubmitted');
       closeDialog();
-
     } else {
       throw new Error('新增课程失败');
     }
@@ -295,7 +305,8 @@ async function submitForm() {
       // 如果用户取消，则不显示错误消息
       ElMessage({
         type: 'error',
-        message: error.message || '操作取消'
+        // message: error.message || '操作取消'
+        message: '插入失败'
       });
     }
   }
@@ -305,7 +316,6 @@ onMounted(() => {
   // 可以选择在挂载时预先加载数据
   fetchData();
 });
-
 </script>
 
 <style scoped>

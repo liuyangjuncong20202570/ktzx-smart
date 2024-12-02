@@ -153,7 +153,7 @@
             <el-scrollbar style="border-right: 1px solid #dedede">
               <el-menu :default-active="defaultActive">
                 <template v-for="(menu, index) in filteredMenus">
-                  <!-- <div>{{ menu }}</div> -->
+                  <!-- <diSv>{{ menu }}</diSv> -->
                   <el-sub-menu
                     v-if="hasChildren(menu)"
                     :index="menu.id"
