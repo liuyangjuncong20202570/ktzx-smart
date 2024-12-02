@@ -377,27 +377,22 @@ router.beforeEach((to, from, next) => {
   const { selectedRoute } = storeToRefs(MainStore);
   // 如果当前路由与选中的路由不一致，则根据 URL 跳转
   console.log(to);
-  if (!from.path.includes('exam')) {
-    if (to.path !== selectedRoute.value && selectedRoute.value !== '') {
-      const MainStore = useMain();
-      const { selectedRoute } = storeToRefs(MainStore);
-      // 如果当前路由与选中的路由不一致，则根据 URL 跳转
-      console.log(to.path);
-      if (to.path !== selectedRoute.value && selectedRoute.value !== '') {
-        // MainStore.setSelectedRoute(to.path);
-        next(selectedRoute.value);
-        return;
-      }
-    }
+  if (
+    !from.path.includes('exam') &&
+    to.path !== selectedRoute.value &&
+    selectedRoute.value !== ''
+  ) {
+    // 如果当前路由与选中的路由不一致，则根据 URL 跳转
+    console.log(to.path);
+    // MainStore.setSelectedRoute(to.path);
+    next(selectedRoute.value);
+    return;
   }
   if (requiresAuth && !storedUserInfo) {
     // 如果目标路由需要认证，但没有存储的用户信息，则重定向到登录页面
     next({ name: 'Login' });
     return;
-  } else {
-    // 如果不需要认证，或者用户信息存在，则正常导航
-    next();
   }
-  // next();
+  next();
 });
 export default router;
