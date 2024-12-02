@@ -239,9 +239,19 @@ const routes = [
         component: () => import('../components/evaluation/AssessmentTable.vue')
       },
       {
-        path: '/evaluation/coursemangt/dynamicEvaluation/studentReport', // 评估与画像-学生报告
+        path: 'evaluation/dynamicEvaluation/studentReport', // 评估与画像-学生报告
         name: 'StudentReport',
         component: () => import('../components/dynamicEvaluation/StudentsReport/StudentsReport.vue')
+      },
+      {
+        path: 'evaluation/dynamicEvaluation/studentGraph', // 评估与画像-学生画像
+        name: 'StudentGraph',
+        component: () => import('../components/dynamicEvaluation/StudentsGraph/StudentsGraph.vue')
+      },
+      {
+        path: 'evaluation/dynamicEvaluation/classroomGraph', // 评估与画像-课堂画像
+        name: 'ClassroomGraph',
+        component: () => import('../components/dynamicEvaluation/ClassroomGraph/ClassroomGraph.vue')
       },
       // 0822
       // 课程页
@@ -363,6 +373,37 @@ const router = createRouter({
 //   if (to.path !== selectedRoute.value && selectedRoute.value !== '') {
 //     // MainStore.setSelectedRoute(to.path);
 //     next(selectedRoute.value);
+//   }
+//   next();
+// });
+
+// router.beforeEach((to, from, next) => {
+//   // 尝试从 sessionStorage 中获取用户信息
+//   const storedUserInfo = sessionStorage.getItem('users');
+
+//   // 检查目标路由是否需要认证（假设需要认证的路由有一个'meta'字段）
+//   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+//   const MainStore = useMain();
+//   const { selectedRoute } = storeToRefs(MainStore);
+//   // 如果当前路由与选中的路由不一致，则根据 URL 跳转
+//   console.log(to);
+//   if (
+//     Object.keys(to.query).length === 0 &&
+//     to.path !== selectedRoute.value &&
+//     selectedRoute.value !== ''
+//   ) {
+//     // 如果当前路由与选中的路由不一致，则根据 URL 跳转
+//     console.log(to.path);
+//     // MainStore.setSelectedRoute(to.path);
+//     next(selectedRoute.value);
+//     return;
+//   }
+//   if (requiresAuth && !storedUserInfo) {
+//     // 是否要将当前路由保存到MainStore中
+//     MainStore.setSelectedRoute(to.path);
+//     // 如果目标路由需要认证，但没有存储的用户信息，则重定向到登录页面
+//     next({ name: 'Login' });
+//     return;
 //   }
 //   next();
 // });

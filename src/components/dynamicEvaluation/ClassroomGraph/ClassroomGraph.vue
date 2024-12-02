@@ -1,5 +1,5 @@
 <template>
-  <div>学生报告</div>
+  <div>课堂画像</div>
 </template>
 
 <script setup></script>
