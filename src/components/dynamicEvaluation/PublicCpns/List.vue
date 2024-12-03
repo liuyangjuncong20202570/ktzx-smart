@@ -4,11 +4,11 @@
       :data="props.listData"
       :border="true"
       style="width: 100%"
+      highlight-current-row
       :header-cell-style="{ textAlign: 'center' }"
       :cell-style="props.addCellStyle"
       @cell-click="props.handleCellClick"
     >
-      <el-table-column type="selection" />
       <el-table-column label="序号" width="100%">
         <template #default="scope">{{
           props.listData.findIndex(item => item.id === scope.row.id) + 1
@@ -43,10 +43,6 @@ import { ref, reactive, computed, onMounted } from 'vue';
 
 /* ********************变量定义******************** */
 const props = defineProps({
-  keyword: {
-    type: String,
-    default: '默认搜索内容'
-  },
   titleList: {
     type: Array,
     default: () => [

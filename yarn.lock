@@ -1622,7 +1622,7 @@
   dependencies:
     "@vue/shared" "3.5.8"
 
-"@vue/runtime-core@3.5.8":
+"@vue/runtime-core@^3.0.0", "@vue/runtime-core@3.5.8":
   version "3.5.8"
   resolved "https://registry.npmmirror.com/@vue/runtime-core/-/runtime-core-3.5.8.tgz"
   integrity sha512-fJuPelh64agZ8vKkZgp5iCkPaEqFJsYzxLk9vSC0X3G8ppknclNDr61gDc45yBGTaN5Xqc1qZWU3/NoaBMHcjQ==
@@ -2400,6 +2400,19 @@ duck@^0.1.12:
   integrity sha512-wkctla1O6VfP89gQ+J/yDesM0S7B7XLXjKGzXxMDVFg7uEn706niAtyYovKbyq1oT9YwDcly721/iUWoc8MVRg==
   dependencies:
     underscore "^1.13.1"
+
+echarts-wordcloud@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.npmmirror.com/echarts-wordcloud/-/echarts-wordcloud-2.1.0.tgz"
+  integrity sha512-Kt1JmbcROgb+3IMI48KZECK2AP5lG6bSsOEs+AsuwaWJxQom31RTNd6NFYI01E/YaI1PFZeueaupjlmzSQasjQ==
+
+echarts@^5.0.1, echarts@^5.5.1:
+  version "5.5.1"
+  resolved "https://registry.npmmirror.com/echarts/-/echarts-5.5.1.tgz"
+  integrity sha512-Fce8upazaAXUVUVsjgV6mBnGuqgO+JNDlcgF79Dksy4+wgGpQB2lmYoO4TSweFg/mZITdpGHomw/cNBJZj1icA==
+  dependencies:
+    tslib "2.3.0"
+    zrender "5.6.0"
 
 electron-to-chromium@^1.5.28:
   version "1.5.28"
@@ -4188,6 +4201,11 @@ tslib@^2.0.0, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.3.0, tslib@^2.3.1, tslib@^2.5
   resolved "https://registry.npmmirror.com/tslib/-/tslib-2.7.0.tgz"
   integrity sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==
 
+tslib@2.3.0:
+  version "2.3.0"
+  resolved "https://registry.npmmirror.com/tslib/-/tslib-2.3.0.tgz"
+  integrity sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==
+
 type@^2.7.2:
   version "2.7.3"
   resolved "https://registry.npmmirror.com/type/-/type-2.7.3.tgz"
@@ -4392,6 +4410,18 @@ vue-demi@^0.12.1:
   resolved "https://registry.npmmirror.com/vue-demi/-/vue-demi-0.12.5.tgz"
   integrity sha512-BREuTgTYlUr0zw0EZn3hnhC3I6gPWv+Kwh4MCih6QcAeaTlaIX0DwOVN0wHej7hSvDPecz4jygy/idsgKfW58Q==
 
+vue-demi@^0.13.11:
+  version "0.13.11"
+  resolved "https://registry.npmmirror.com/vue-demi/-/vue-demi-0.13.11.tgz"
+  integrity sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==
+
+vue-echarts@^7.0.3:
+  version "7.0.3"
+  resolved "https://registry.npmmirror.com/vue-echarts/-/vue-echarts-7.0.3.tgz"
+  integrity sha512-/jSxNwOsw5+dYAUcwSfkLwKPuzTQ0Cepz1LxCOpj2QcHrrmUa/Ql0eQqMmc1rTPQVrh2JQ29n2dhq75ZcHvRDw==
+  dependencies:
+    vue-demi "^0.13.11"
+
 vue-resize-text@^0.1.1:
   version "0.1.1"
   resolved "https://registry.npmmirror.com/vue-resize-text/-/vue-resize-text-0.1.1.tgz"
@@ -4411,7 +4441,7 @@ vue-types@^3.0.0:
   dependencies:
     is-plain-object "3.0.1"
 
-"vue@^2.0.0 || >=3.0.0", "vue@^2.6.14 || ^3.3.0", vue@^3.0.0, "vue@^3.0.0-0 || ^2.6.0", vue@^3.0.1, vue@^3.0.11, vue@^3.0.5, vue@^3.2.0, vue@^3.2.25, vue@^3.3.11, vue@>=3.0.3, vue@>=3.2.0, vue@3.5.8, vue@3.x:
+"vue@^2.0.0 || >=3.0.0", "vue@^2.6.14 || ^3.3.0", "vue@^2.7.0 || ^3.1.1", vue@^3.0.0, "vue@^3.0.0-0 || ^2.6.0", vue@^3.0.1, vue@^3.0.11, vue@^3.0.5, vue@^3.2.0, vue@^3.2.25, vue@^3.3.11, vue@>=3.0.3, vue@>=3.2.0, vue@3.5.8, vue@3.x:
   version "3.5.8"
   resolved "https://registry.npmmirror.com/vue/-/vue-3.5.8.tgz"
   integrity sha512-hvuvuCy51nP/1fSRvrrIqTLSvrSyz2Pq+KQ8S8SXCxTWVE0nMaOnSDnSOxV1eYmGfvK7mqiwvd1C59CEEz7dAQ==
@@ -4560,3 +4590,10 @@ yallist@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmmirror.com/yallist/-/yallist-4.0.0.tgz"
   integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
+
+zrender@5.6.0:
+  version "5.6.0"
+  resolved "https://registry.npmmirror.com/zrender/-/zrender-5.6.0.tgz"
+  integrity sha512-uzgraf4njmmHAbEUxMJ8Oxg+P3fT04O+9p7gY+wJRVxo8Ge+KmYv0WJev945EH4wFuc4OY2NLXz46FZrWS9xJg==
+  dependencies:
+    tslib "2.3.0"
