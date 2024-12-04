@@ -1038,3 +1038,23 @@ export const data = {
     }
   ]
 };
+
+export const radarData = {
+  indicator: [
+    { name: '代码解析能力', max: 100 },
+    { name: '问题分析能力', max: 100 },
+    { name: '诠释理解能力', max: 100 },
+    { name: '试图绘图能力', max: 100 },
+    { name: '系统联合能力', max: 100 },
+    { name: '系统仿真能力', max: 100 },
+    { name: '程序设计与编写能力', max: 100 },
+    { name: '硬件设计能力', max: 100 },
+    { name: '现代工具使用能力', max: 100 },
+    { name: '沟通交流能力', max: 100 },
+    { name: '概念识别能力', max: 100 },
+    { name: '实验设计与分析能力', max: 100 },
+    { name: '团队合作能力', max: 100 },
+    { name: '器件选择能力', max: 100 }
+  ],
+  sliceData: [{}, {}, {}, {}, {}]
+};

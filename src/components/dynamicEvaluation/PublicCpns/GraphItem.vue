@@ -5,21 +5,14 @@
       {{ props.title }}
     </div>
     <div class="split"></div>
-    <div class="chart">
+    <div class="chart" style="z-index: 9999">
       <v-chart
+        @timeline-changed="props.onTimelineChanged"
+        ref="chartRef"
         autoresize
-        :theme="'shine'"
         :option="props.chartOption"
         :style="{ height: props.chartHeight + 'vh', width: props.chartWidth + '%' }"
       ></v-chart>
-    </div>
-    <div class="timeLine">
-      <el-slider
-        v-model="slideValue"
-        :max="max"
-        :format-tooltip="formatTooltip"
-        @input="inputSlider"
-      />
     </div>
   </div>
 </template>
@@ -46,20 +39,40 @@ const props = defineProps({
   chartOption: {
     type: Object,
     default: () => defaultPreset
+  },
+  onTimelineChanged: {
+    type: Function,
+    defaul: event => ({})
   }
 });
 // 普通变量
+const chartRef = ref(null);
 const slideValue = ref();
 const max = ref();
+const isDataView = ref(false);
+
+defineExpose({
+  getChartInstance: () => {
+    return chartRef.value; // 返回 echarts 实例
+  },
+  // 你还可以暴露其他方法，例如：
+  refreshChart: () => {
+    chartRef.value?.echartsInstance().resize(); // 重新调整图表大小
+  }
+});
 
 // pinia状态管理
 
 /* ********************方法定义******************** */
+
 const inputSlider = () => {};
+
+onMounted(() => {});
 </script>
 
 <style lang="less" scoped>
 .container {
+  position: relative;
   width: 90%;
   margin: 0 auto;
   display: flex;
@@ -73,6 +86,18 @@ const inputSlider = () => {};
     color: #6ca5de;
     height: 50px;
     font-size: 20px;
+  }
+  .operation {
+    z-index: 999;
+    width: 100px;
+    height: auto;
+    position: absolute;
+    top: 8vh;
+    right: 0;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    justify-content: space-around;
   }
   .split {
     // padding-top: 10px;

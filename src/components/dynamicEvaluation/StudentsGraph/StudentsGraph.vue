@@ -10,6 +10,7 @@
   <!-- 课堂列表结束 -->
   <!-- 学生列表浮窗 -->
   <DynamicStudentList
+    :store="studentGraphStore"
     :handleCellClick="stuListCellClick"
     :addCellStyle="stuListCellStyle"
     :studentList="studentLists"
@@ -19,10 +20,27 @@
   </DynamicStudentList>
   <!-- 学生列表浮窗结束 -->
   <!-- 图标列表 -->
-  <GraphChart>
+  <!-- 在GraphChart组件的具名插槽中可以插入GraphItem，可自定义图表 -->
+  <GraphChart :store="studentGraphStore">
     <template #title
       >学生课程画像：{{ stuInfo.courseName }} - {{ stuInfo.stuname }}({{ stuInfo.stuNo }})</template
     >
+    <template #GraphItem>
+      <GraphItem
+        title="能力画像"
+        :onTimelineChanged="onAbilityTimelineChanged"
+        chartHeight="65"
+        :chartOption="radarOption"
+      />
+      <GraphItem
+        title="关键字画像"
+        :onTimelineChanged="onKWATimelineChanged"
+        :chartOption="currentWordOption"
+        ref="wordmapCmp"
+      />
+      <GraphItem title="KWA画像" />
+      <GraphItem title="知识单元画像" :chartOption="treeOption" />
+    </template>
   </GraphChart>
   <!-- 图标列表结束 -->
 </template>
@@ -30,17 +48,30 @@
 <script setup>
 import { storeToRefs } from 'pinia';
 import GraphChart from '../PublicCpns/GraphChart.vue';
+import GraphItem from '../PublicCpns/GraphItem.vue';
+import {
+  response,
+  wordMapPreset
+} from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Wordmap.js';
+import { radarOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Radar';
+import { treeOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Treemap';
+import { wordOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/wordmap';
 import useStudentGraph from '../../../stores/dynamicEvaluation/studentGraphStore';
 import DynamicStudentList from '../PublicCpns/DynamicStudentList.vue';
 import GraphTemplate from '../PublicCpns/GraphTemplate.vue';
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, nextTick } from 'vue';
 
 /* ********************变量定义******************** */
 // props
 // 普通变量
+const currentWordOption = ref({ ...wordOption });
+
+const wordmapCmp = ref(null);
+
 const stuInfo = reactive({
   stuId: 0, //学生id
   curriculumId: 0, //课程id
+  courseId: 0, //课堂id
   courseName: '',
   stuname: '',
   stuNo: ''
@@ -102,6 +133,33 @@ const studentLists = [
 /* ********************方法定义******************** */
 
 /* ************课程单元格样式定义*********** */
+const onAbilityTimelineChanged = event => {
+  // TODO此处将会把timeline点击索引获取，保存到store中，作为图解
+};
+
+const onKWATimelineChanged = event => {
+  // 更新词云中的内容
+  const currentId = event.currentIndex;
+  // TODO:获取关键字数据进行渲染,将在store中发送异步请求并进行重新赋值
+  try {
+    const chartInstance = wordmapCmp.value?.getChartInstance();
+    // currentWordOption.value =
+    console.log(chartInstance);
+    chartInstance.setOption(
+      {
+        series: [
+          {
+            ...wordMapPreset,
+            data: response.wordCloudData[currentId]
+          }
+        ]
+      },
+      { replaceMerge: 'series' }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
 // 单元格样式定义
 const addCellStyle = ({ row, column, rowIndex, columnIndex }) => {
   if (column.property === 'courseName') {
@@ -123,9 +181,9 @@ const handleCellClick = (row, column, cell) => {
   if (column.property === 'courseName') {
     // 记录学生课堂信息
     stuInfo.courseName = row.courseName;
-    stuInfo.curriculumId = row.id;
+    stuInfo.courseId = row.id;
     // 控制学生列表是否可见
-    studentGraphStore.setStuListVisible(true);
+    studentGraphStore.setListVisible(true);
     console.log(row.id);
     //TODO 此处将打开学生列表，发送请求将id传过去
   }

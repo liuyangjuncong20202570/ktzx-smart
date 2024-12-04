@@ -35,3 +35,7 @@
 button {
   outline: none !important; /* 去除聚焦时的轮廓线 */
 }
+
+.echarts-tooltip {
+  z-index: 9999 !important; /* 提高 tooltip 的层级 */
+}

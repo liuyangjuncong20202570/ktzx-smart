@@ -2,7 +2,10 @@ import { data } from './testdata';
 export const treeOption = {
   tooltip: {
     trigger: 'item',
-    triggerOn: 'mousemove'
+    triggerOn: 'mousemove',
+    // textStyle: {
+    //   color: '#FFF' // 设置提示框中文字的颜色（例如，番茄红）
+    // }
   },
   series: [
     {

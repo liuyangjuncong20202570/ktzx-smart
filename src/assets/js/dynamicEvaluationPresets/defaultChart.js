@@ -11,5 +11,10 @@ export const defaultPreset = {
       data: [150, 230, 224, 218, 135, 147, 260],
       type: 'line'
     }
-  ]
+  ],
+  toolbox: {
+    feature: {
+      dataView: { show: false } // 这里的按钮不显示，使用自定义按钮触发
+    }
+  }
 };

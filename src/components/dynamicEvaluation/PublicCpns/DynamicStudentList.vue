@@ -4,7 +4,7 @@
     :show-close="true"
     :close-on-click-modal="true"
     style="width: 50vw; padding-top: 0; height: 78vh"
-    v-model="stuListVisible"
+    v-model="props.store.listVisible"
   >
     <h2 style="margin-top: 0">
       <slot name="title">默认学生列表</slot>
@@ -35,6 +35,10 @@ import { ref, reactive, computed, onMounted } from 'vue';
 /* ********************变量定义******************** */
 // props定义
 const props = defineProps({
+  store: {
+    type: Object,
+    default: () => ({ listVisible: false })
+  },
   studentList: {
     type: Array,
     default: () => []
