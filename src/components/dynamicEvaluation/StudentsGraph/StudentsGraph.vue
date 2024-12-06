@@ -30,16 +30,16 @@
         title="能力画像"
         :onTimelineChanged="onAbilityTimelineChanged"
         chartHeight="65"
-        :chartOption="radarOption"
+        :chartOption="currentRadarOption"
       />
       <GraphItem
         title="关键字画像"
-        :onTimelineChanged="onKWATimelineChanged"
+        :onTimelineChanged="onKWTimelineChanged"
         :chartOption="currentWordOption"
         ref="wordmapCmp"
       />
       <GraphItem title="KWA画像" />
-      <GraphItem title="知识单元画像" :chartOption="treeOption" />
+      <GraphItem title="知识单元画像" :chartOption="currentTreeOption" />
     </template>
   </GraphChart>
   <!-- 图标列表结束 -->
@@ -49,22 +49,21 @@
 import { storeToRefs } from 'pinia';
 import GraphChart from '../PublicCpns/GraphChart.vue';
 import GraphItem from '../PublicCpns/GraphItem.vue';
-import {
-  response,
-  wordMapPreset
-} from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Wordmap.js';
+import { wordMapPreset } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Wordmap.js';
 import { radarOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Radar';
 import { treeOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Treemap';
 import { wordOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/wordmap';
 import useStudentGraph from '../../../stores/dynamicEvaluation/studentGraphStore';
 import DynamicStudentList from '../PublicCpns/DynamicStudentList.vue';
 import GraphTemplate from '../PublicCpns/GraphTemplate.vue';
-import { onMounted, reactive, ref, nextTick } from 'vue';
+import { onMounted, reactive, ref, nextTick, provide } from 'vue';
 
 /* ********************变量定义******************** */
 // props
 // 普通变量
-const currentWordOption = ref({ ...wordOption });
+const currentTreeOption = ref({});
+const currentRadarOption = ref({});
+const currentWordOption = ref({});
 
 const wordmapCmp = ref(null);
 
@@ -83,9 +82,9 @@ const { stuListVisible, chartVisible } = storeToRefs(studentGraphStore);
 
 /* ********************课程数据定义******************** */
 const titles = [
-  { prop: 'courseName', label: '课堂名称' }, //大
+  { prop: 'courseName', label: '课堂名称' }, //小
   { prop: 'term', label: '学期' },
-  { prop: 'curriculum', label: '课程' }, //小
+  { prop: 'curriculum', label: '课程' }, //大
   { prop: 'profession', label: '专业' },
   { prop: 'mainTeacher', label: '主讲教师' },
   { prop: 'experimentTeacher', label: '实验教师' },
@@ -137,7 +136,7 @@ const onAbilityTimelineChanged = event => {
   // TODO此处将会把timeline点击索引获取，保存到store中，作为图解
 };
 
-const onKWATimelineChanged = event => {
+const onKWTimelineChanged = event => {
   // 更新词云中的内容
   const currentId = event.currentIndex;
   // TODO:获取关键字数据进行渲染,将在store中发送异步请求并进行重新赋值
@@ -150,7 +149,7 @@ const onKWATimelineChanged = event => {
         series: [
           {
             ...wordMapPreset,
-            data: response.wordCloudData[currentId]
+            data: studentGraphStore.charts[1].response.wordCloudData[currentId]
           }
         ]
       },
@@ -218,8 +217,30 @@ const stuListCellClick = (row, column, cell) => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   // TODO 此处获取课堂名单
+  // 渲染图表
+  studentGraphStore.updateCharts();
+  currentRadarOption.value = {
+    ...radarOption(
+      studentGraphStore.charts[0].timelineData,
+      studentGraphStore.charts[0].options,
+      studentGraphStore.charts[0].indicators
+    )
+  };
+  currentWordOption.value = {
+    ...wordOption(
+      studentGraphStore.charts[1].timelineData,
+      studentGraphStore.charts[1].response.wordCloudData[0]
+    )
+  };
+  currentTreeOption.value = {
+    ...treeOption(
+      studentGraphStore.charts[2].timelineData,
+      studentGraphStore.charts[2].options,
+      studentGraphStore.charts[2].response
+    )
+  };
 });
 </script>
 

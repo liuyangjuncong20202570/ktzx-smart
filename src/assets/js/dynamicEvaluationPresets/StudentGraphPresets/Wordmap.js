@@ -1,9 +1,14 @@
 import { color } from 'echarts';
-const timelineData = [];
-export const options = [];
+import {
+  toolbox,
+  graphicLegend,
+  timeline,
+  tooltip,
+  graphicTitle
+} from '@/assets/js/dynamicEvaluationPresets/PublicPresets.js';
 
 export const wordMapPreset = {
-  name: '词云',
+  name: '关键字',
   type: 'wordCloud',
   shape: 'square',
   left: 'center',
@@ -45,129 +50,256 @@ export const wordMapPreset = {
   }
 };
 
-export const response = {
-  timeline: ['2024-09-01', '2024-09-09', '2024-09-17', '2024-09-25', '2024-09-25'],
-  wordCloudData: [
-    [
-      { name: '模块1.1', value: 100 },
-      { name: '模块1.2', value: 80 },
-      { name: '模块1.3', value: 75 },
-      { name: '模块1.4', value: 60 },
-      { name: '模块1.5', value: 40 },
-      { name: '模块1.6', value: 0 }
-    ],
-    [
-      { name: '模块2.1', value: 90 },
-      { name: '模块2.2', value: 70 },
-      { name: '模块2.3', value: 50 },
-      { name: '模块2.4', value: 30 }
-    ],
-    [
-      { name: '模块3.1', value: 100 },
-      { name: '模块3.2', value: 80 },
-      { name: '模块3.3', value: 60 },
-      { name: '模块3.4', value: 40 }
-    ],
-    [
-      { name: '模块4.1', value: 90 },
-      { name: '模块4.2', value: 70 },
-      { name: '模块4.3', value: 60 },
-      { name: '模块4.4', value: 50 }
-    ],
-    [
-      { name: '模块5.1', value: 90 },
-      { name: '模块5.2', value: 70 },
-      { name: '模块5.3', value: 60 },
-      { name: '模块5.4', value: 50 }
-    ]
-  ]
-};
+// export const response = {
+//   timeline: ['2024-09-01', '2024-09-09', '2024-09-17', '2024-09-25', '2024-09-25'],
+//   wordCloudData: [
+//     [
+//       { name: '模块1.1', value: 100 },
+//       { name: '模块1.2', value: 80 },
+//       { name: '模块1.3', value: 75 },
+//       { name: '模块1.4', value: 60 },
+//       { name: '模块1.5', value: 40 },
+//       { name: '模块1.6', value: 0 }
+//     ],
+//     [
+//       { name: '模块2.1', value: 90 },
+//       { name: '模块2.2', value: 70 },
+//       { name: '模块2.3', value: 50 },
+//       { name: '模块2.4', value: 30 }
+//     ],
+//     [
+//       { name: '模块3.1', value: 100 },
+//       { name: '模块3.2', value: 80 },
+//       { name: '模块3.3', value: 60 },
+//       { name: '模块3.4', value: 40 }
+//     ],
+//     [
+//       { name: '模块4.1', value: 90 },
+//       { name: '模块4.2', value: 70 },
+//       { name: '模块4.3', value: 60 },
+//       { name: '模块4.4', value: 50 }
+//     ],
+//     [
+//       { name: '模块5.1', value: 90 },
+//       { name: '模块5.2', value: 70 },
+//       { name: '模块5.3', value: 60 },
+//       { name: '模块5.4', value: 50 }
+//     ]
+//   ]
+// };
 
-response.timeline.map((item, index) => {
-  timelineData.push({
-    value: 1 + index,
-    tooltip: {
-      // 让鼠标悬浮到此项时能够显示 `tooltip`。
-      formatter: function (params) {
-        return '第' + params.name + '次作业';
-      }
+// response.timeline.map((item, index) => {
+//   timelineData.push({
+//     value: 1 + index,
+//     tooltip: {
+//       // 让鼠标悬浮到此项时能够显示 `tooltip`。
+//       formatter: function (params) {
+//         return '第' + params.name + '次作业';
+//       }
+//     }
+//     // symbol: 'diamond', // 此项的图形的特别设置。
+//     // symbolSize: 16 // 此项的图形大小的特别设置。
+//   });
+// });
+
+export const wordOption = (timelineData, initialData) => ({
+  toolbox,
+  graphic: [
+    {
+      ...graphicLegend
+    },
+    {
+      ...graphicTitle,
+      top: 35
     }
-    // symbol: 'diamond', // 此项的图形的特别设置。
-    // symbolSize: 16 // 此项的图形大小的特别设置。
-  });
-});
+  ],
+  // toolbox: {
+  //   show: true,
+  //   feature: {
+  //     dataView: {
+  //       readOnly: false,
+  //       title: '数据视图', // 修改按钮的文字为中文
+  //       lang: ['数据视图', '关闭', '刷新'] // 定义数据视图窗口的文字
+  //     },
 
-response.wordCloudData.map((item, index) => {
-  options.push({
-    ...wordMapPreset,
-    data: item
-  });
-});
-
-export const wordOption = {
-  toolbox: {
-    show: true,
-    feature: {
-      dataView: {
-        readOnly: false,
-        title: '数据视图', // 修改按钮的文字为中文
-        lang: ['数据视图', '关闭', '刷新'] // 定义数据视图窗口的文字
-      },
-
-      restore: {
-        title: '还原'
-      },
-      saveAsImage: {
-        title: '保存为图片'
-      }
-    }
-  },
-  // 图例
-
-  // legend: {
-  //   data: ['优', '良', '中', '差'], // 图例中显示的项
-  //   orient: 'horizontal',
-  //   left: 'left'
+  //     restore: {
+  //       title: '还原'
+  //     },
+  //     saveAsImage: {
+  //       title: '保存为图片'
+  //     }
+  //   }
   // },
+  // 文本框（假图例）
+  // graphic: {
+  //   type: 'group', // 使用分组容器
+  //   // left: '5%', // 整体分组距离左侧的距离
+  //   top: '2%', // 整体分组距离顶部的距离
+  //   children: [
+  //     // 优
+  //     {
+  //       type: 'circle',
+  //       left: '0', // 第一个圆形的水平位置
+  //       top: '0', // 圆形的垂直位置
+  //       shape: {
+  //         cx: 5, // 圆心 X 坐标
+  //         cy: 8, // 圆心 Y 坐标
+  //         r: 5 // 半径
+  //       },
+  //       style: {
+  //         fill: '#90ee90' // 圆形颜色（绿色）
+  //       }
+  //     },
+  //     {
+  //       type: 'text',
+  //       left: '15', // 第一个文本在最左侧
+  //       top: '0',
+  //       style: {
+  //         text: '优',
+  //         fill: '#90ee90', // 绿色
+  //         font: 'bold 16px sans-serif'
+  //       }
+  //     },
+  //     // 良
+  //     {
+  //       type: 'circle',
+  //       left: '50', // 第一个圆形的水平位置
+  //       top: '0', // 圆形的垂直位置
+  //       shape: {
+  //         cx: 5, // 圆心 X 坐标
+  //         cy: 8, // 圆心 Y 坐标
+  //         r: 5 // 半径
+  //       },
+  //       style: {
+  //         fill: '#4876ff' // 圆形颜色（绿色）
+  //       }
+  //     },
+  //     {
+  //       type: 'text',
+  //       left: '65', // 与前一个文本的水平间距
+  //       top: '0',
+  //       style: {
+  //         text: '良',
+  //         fill: '#4876ff', // 蓝色
+  //         font: 'bold 16px sans-serif'
+  //       }
+  //     },
+  //     // 中
+  //     {
+  //       type: 'circle',
+  //       left: '100', // 第一个圆形的水平位置
+  //       top: '0', // 圆形的垂直位置
+  //       shape: {
+  //         cx: 5, // 圆心 X 坐标
+  //         cy: 8, // 圆心 Y 坐标
+  //         r: 5 // 半径
+  //       },
+  //       style: {
+  //         fill: '#ffff00' // 圆形颜色（绿色）
+  //       }
+  //     },
+  //     {
+  //       type: 'text',
+  //       left: '115', // 与前一个文本的水平间距
+  //       top: '0',
+  //       style: {
+  //         text: '中',
+  //         fill: '#ffff00', // 黄色
+  //         font: 'bold 16px sans-serif'
+  //       }
+  //     },
+  //     // 差
+  //     {
+  //       type: 'circle',
+  //       left: '150', // 第一个圆形的水平位置
+  //       top: '0', // 圆形的垂直位置
+  //       shape: {
+  //         cx: 5, // 圆心 X 坐标
+  //         cy: 8, // 圆心 Y 坐标
+  //         r: 5 // 半径
+  //       },
+  //       style: {
+  //         fill: '#fb9e94' // 圆形颜色（绿色）
+  //       }
+  //     },
+  //     {
+  //       type: 'text',
+  //       left: '165', // 与前一个文本的水平间距
+  //       top: '0',
+  //       style: {
+  //         text: '差',
+  //         fill: '#fb9e94', // 红色
+  //         font: 'bold 16px sans-serif'
+  //       }
+  //     },
+  //     // 无
+  //     {
+  //       type: 'circle',
+  //       left: '200', // 第一个圆形的水平位置
+  //       top: '0', // 圆形的垂直位置
+  //       shape: {
+  //         cx: 5, // 圆心 X 坐标
+  //         cy: 8, // 圆心 Y 坐标
+  //         r: 5 // 半径
+  //       },
+  //       style: {
+  //         fill: '#cfcfcf' // 圆形颜色（绿色）
+  //       }
+  //     },
+  //     {
+  //       type: 'text',
+  //       left: '215', // 与前一个文本的水平间距
+  //       top: '0',
+  //       style: {
+  //         text: '无',
+  //         fill: '#cfcfcf', // 灰色
+  //         font: 'bold 16px sans-serif'
+  //       }
+  //     }
+  //   ]
+  // },
+
   // 时间轴
-  timeline: {
-    axisType: 'category', // 时间轴类型为分类
-    autoPlay: false, // 自动播放
-    playInterval: 2000, // 自动播放间隔，单位：毫秒
-    data: timelineData, // 时间节点
-    controlStyle: {
-      showPlayBtn: false, // 隐藏播放按钮
-      showPrevBtn: true, // 显示上一页按钮
-      showNextBtn: true // 显示下一页按钮
-    },
-    tooltip: {
-      trigger: 'item',
-      formatter: function (value, index) {
-        return '第' + value + '次作业';
-      }
-    },
-    checkpointStyle: {
-      symbol: 'diamond', // 设置时间节点符号样式
-      symbolSize: 16, // 设置时间节点符号大小
-      color: '#b7feb7' // 时间节点颜色
-    },
-    // 样式设定
-    bottom: '-4%'
-  },
+  timeline: timeline(timelineData),
+  tooltip,
+  // timeline: {
+  //   axisType: 'category', // 时间轴类型为分类
+  //   autoPlay: false, // 自动播放
+  //   playInterval: 2000, // 自动播放间隔，单位：毫秒
+  //   data: timelineData, // 时间节点
+  //   controlStyle: {
+  //     showPlayBtn: false, // 隐藏播放按钮
+  //     showPrevBtn: true, // 显示上一页按钮
+  //     showNextBtn: true // 显示下一页按钮
+  //   },
+  //   tooltip: {
+  //     trigger: 'item',
+  //     formatter: function (value, index) {
+  //       return '第' + value + '次作业';
+  //     }
+  //   },
+  //   checkpointStyle: {
+  //     symbol: 'diamond', // 设置时间节点符号样式
+  //     symbolSize: 16, // 设置时间节点符号大小
+  //     color: '#b7feb7' // 时间节点颜色
+  //   },
+  //   // 样式设定
+  //   bottom: '-4%'
+  // },
 
   // 提示框
-  tooltip: {
-    trigger: 'item'
-    // appendToBody: true,
-    // extraCssText: 'z-index: 9999 !important;'
-  },
+  // tooltip: {
+  //   trigger: 'item'
+  //   // appendToBody: true,
+  //   // extraCssText: 'z-index: 9999 !important;'
+  // },
   series: [
     {
       ...wordMapPreset,
-      data: response.wordCloudData[0]
+      data: initialData
     }
   ]
-};
+});
 
 // export const wordOption = {
 //   tooltip: {
