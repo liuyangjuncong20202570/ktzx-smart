@@ -31,6 +31,7 @@
         :onTimelineChanged="onAbilityTimelineChanged"
         chartHeight="65"
         :chartOption="currentRadarOption"
+        ref="radarCmp"
       />
       <GraphItem
         title="关键字画像"
@@ -39,7 +40,7 @@
         ref="wordmapCmp"
       />
       <GraphItem title="KWA画像" />
-      <GraphItem title="知识单元画像" :chartOption="currentTreeOption" />
+      <GraphItem ref="treeCmp" title="知识单元画像" :chartOption="currentTreeOption" />
     </template>
   </GraphChart>
   <!-- 图标列表结束 -->
@@ -56,7 +57,7 @@ import { wordOption } from '../../../assets/js/dynamicEvaluationPresets/StudentG
 import useStudentGraph from '../../../stores/dynamicEvaluation/studentGraphStore';
 import DynamicStudentList from '../PublicCpns/DynamicStudentList.vue';
 import GraphTemplate from '../PublicCpns/GraphTemplate.vue';
-import { onMounted, reactive, ref, nextTick, provide } from 'vue';
+import { onMounted, reactive, ref, nextTick, onBeforeUnmount } from 'vue';
 
 /* ********************变量定义******************** */
 // props
@@ -65,7 +66,13 @@ const currentTreeOption = ref({});
 const currentRadarOption = ref({});
 const currentWordOption = ref({});
 
+// echarts实例
+const radarCmp = ref(null);
 const wordmapCmp = ref(null);
+const treeCmp = ref(null);
+const radarInstance = radarCmp.value?.getChartInstance();
+const wordInstance = wordmapCmp.value?.getChartInstance();
+const treeInstance = treeCmp.value?.getChartInstance();
 
 const stuInfo = reactive({
   stuId: 0, //学生id
@@ -217,8 +224,12 @@ const stuListCellClick = (row, column, cell) => {
   }
 };
 
-onMounted(async () => {
+const initChart = () => {
   // TODO 此处获取课堂名单
+  // 加载数据前清空图表
+  radarInstance?.clear();
+  wordInstance?.clear();
+  treeInstance?.clear();
   // 渲染图表
   studentGraphStore.updateCharts();
   currentRadarOption.value = {
@@ -241,6 +252,26 @@ onMounted(async () => {
       studentGraphStore.charts[2].response
     )
   };
+};
+
+onMounted(async () => {
+  // 此为异步操作，应为await，此处为模拟
+  initChart();
+});
+
+onBeforeUnmount(() => {
+  if (radarInstance || wordInstance || treeInstance) {
+    radarInstance.dispose();
+    radarInstance = null;
+    wordInstance.dispose();
+    wordInstance = null;
+    treeInstance.dispose();
+    treeInstance = null;
+  }
+  // 初始化pinia数据
+  studentGraphStore.setChart(0);
+  studentGraphStore.setChart(1);
+  studentGraphStore.setChart(2);
 });
 </script>
 

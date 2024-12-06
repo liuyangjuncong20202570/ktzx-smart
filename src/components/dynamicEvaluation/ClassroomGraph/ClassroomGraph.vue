@@ -19,6 +19,7 @@
         :onTimelineChanged="onAbilityTimelineChanged"
         chartHeight="65"
         :chartOption="currentRadarOption"
+        ref="radarCmp"
       />
       <GraphItem
         title="关键字画像"
@@ -27,7 +28,7 @@
         ref="wordmapCmp"
       />
       <GraphItem title="KWA画像" />
-      <GraphItem title="知识单元画像" :chartOption="currentTreeOption" />
+      <GraphItem ref="treeCmp" title="知识单元画像" :chartOption="currentTreeOption" />
     </template>
   </GraphChart>
   <!-- 课堂画像图表结束 -->
@@ -35,7 +36,7 @@
 
 <script setup>
 import { storeToRefs } from 'pinia';
-import { reactive, ref, onMounted } from 'vue';
+import { reactive, ref, onMounted, onBeforeUnmount } from 'vue';
 import GraphItem from '../PublicCpns/GraphItem.vue';
 import GraphChart from '../PublicCpns/GraphChart.vue';
 import GraphTemplate from '../PublicCpns/GraphTemplate.vue';
@@ -47,7 +48,12 @@ import { wordMapPreset } from '../../../assets/js/dynamicEvaluationPresets/Stude
 /* ********************变量定义******************** */
 // props定义
 // 普通变量
+const radarCmp = ref(null);
 const wordmapCmp = ref(null);
+const treeCmp = ref(null);
+const radarInstance = radarCmp.value?.getChartInstance();
+const wordInstance = wordmapCmp.value?.getChartInstance();
+const treeInstance = treeCmp.value?.getChartInstance();
 
 const courseInfo = reactive({
   courseName: '',
@@ -153,9 +159,12 @@ const handleCellClick = (row, column, cell) => {
   }
 };
 
-onMounted(async () => {
-  // TODO 此处获取课堂名单
+const initChart = () => {
   // 渲染图表
+  // 加载数据前清空图表
+  radarInstance?.clear();
+  wordInstance?.clear();
+  treeInstance?.clear();
   classroomGraphStore.updateCharts();
   currentRadarOption.value = {
     ...radarOption(
@@ -177,7 +186,27 @@ onMounted(async () => {
       classroomGraphStore.charts[2].response
     )
   };
+
   // provide('indicators');
+};
+
+onMounted(async () => {
+  initChart();
+});
+
+onBeforeUnmount(() => {
+  if (radarInstance || wordInstance || treeInstance) {
+    radarInstance.dispose();
+    radarInstance = null;
+    wordInstance.dispose();
+    wordInstance = null;
+    treeInstance.dispose();
+    treeInstance = null;
+  }
+  // 初始化pinia数据
+  classroomGraphStore.setChart(0);
+  classroomGraphStore.setChart(1);
+  classroomGraphStore.setChart(2);
 });
 </script>
 

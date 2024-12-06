@@ -1,6 +1,5 @@
 import {
   toolbox,
-  graphicLegend,
   timeline,
   tooltip,
   graphicTitle

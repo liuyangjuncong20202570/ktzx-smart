@@ -21,44 +21,43 @@
   <!-- 课堂画像图表 -->
   <GraphChart :store="studentReportStore">
     <template #title>评价学生列表</template>
-    <!-- TODO：此处需要对每个图表的公共部分进行封装，同时每个组件的私有部分需要单独写，否则会共享同一个配置项 -->
-    <!-- TODO：使用store进行存储每一个配置项私有部分 -->
     <template #GraphItem>
       <GraphItem
         title="关键词评价"
         :onTimelineChanged="onAbilityTimelineChanged"
         :chartOption="currentBarFOption"
+        ref="barFCmp"
       />
       <GraphItem
         title="能力评价"
         :onTimelineChanged="onKWTimelineChanged"
         :chartOption="currentRadarOption"
-        ref="wordmapCmp"
+        ref="radarCmp"
       />
-      <GraphItem title="KWA评价" :chartOption="currentBarSOption" />
+      <GraphItem ref="barSCmp" title="KWA评价" :chartOption="currentBarSOption" />
     </template>
   </GraphChart>
   <!-- 课堂画像图表结束 -->
 </template>
 
 <script setup>
-import { storeToRefs } from 'pinia';
-import { reactive, ref, onMounted } from 'vue';
+import { reactive, ref, onMounted, onBeforeUnmount } from 'vue';
 import GraphItem from '../PublicCpns/GraphItem.vue';
 import GraphChart from '../PublicCpns/GraphChart.vue';
 import GraphTemplate from '../PublicCpns/GraphTemplate.vue';
 import DynamicStudentList from '../PublicCpns/DynamicStudentList.vue';
-import useClassroomGraph from '../../../stores/dynamicEvaluation/classroomStore';
 import { barOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Bar.js';
 import { radarOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Radar';
-import { treeOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Treemap';
-import { wordOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/wordmap';
-import { wordMapPreset } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Wordmap.js';
 import useStudentReport from '../../../stores/dynamicEvaluation/studentReportStore.js';
 /* ********************变量定义******************** */
 // props定义
 // 普通变量
-const wordmapCmp = ref(null);
+const barFCmp = ref(null);
+const radarCmp = ref(null);
+const barSCmp = ref(null);
+const barFInstance = barFCmp.value?.getChartInstance();
+const radarInstance = radarCmp.value?.getChartInstance();
+const barSInstance = barSCmp.value?.getChartInstance();
 
 const stuInfo = reactive({
   stuId: 0, //学生id
@@ -126,25 +125,6 @@ const studentLists = [
 const onKWTimelineChanged = event => {
   // 更新词云中的内容
   const currentId = event.currentIndex;
-  // TODO:获取关键字数据进行渲染,将在store中发送异步请求并进行重新赋值
-  try {
-    const chartInstance = wordmapCmp.value?.getChartInstance();
-    // currentWordOption.value =
-    // console.log(chartInstance);
-    chartInstance.setOption(
-      {
-        series: [
-          {
-            ...wordMapPreset,
-            data: classroomGraphStore.charts[1].response.wordCloudData[currentId]
-          }
-        ]
-      },
-      { replaceMerge: 'series' }
-    );
-  } catch (error) {
-    console.log(error);
-  }
 };
 // 单元格样式定义
 const addCellStyle = ({ row, column, rowIndex, columnIndex }) => {
@@ -204,8 +184,12 @@ const stuListCellClick = (row, column, cell) => {
   }
 };
 
-onMounted(async () => {
+const initChart = () => {
   // TODO 此处获取课堂名单
+  // 加载数据前清空图表
+  radarInstance?.clear();
+  barFInstance?.clear();
+  barSInstance?.clear();
   // 渲染图表
   studentReportStore.updateCharts();
   currentBarFOption.value = {
@@ -226,6 +210,25 @@ onMounted(async () => {
   currentBarSOption.value = {
     ...barOption(studentReportStore.charts[2].xData, studentReportStore.charts[2].values)
   };
+};
+
+onMounted(async () => {
+  initChart();
+});
+
+onBeforeUnmount(() => {
+  if (radarInstance || barFInstance || barSInstance) {
+    radarInstance.dispose();
+    radarInstance = null;
+    barFInstance.dispose();
+    barFInstance = null;
+    barSInstance.dispose();
+    barSInstance = null;
+  }
+  // 初始化pinia数据
+  studentReportStore.setChart(0);
+  studentReportStore.setChart(1);
+  studentReportStore.setChart(2);
 });
 </script>
 
