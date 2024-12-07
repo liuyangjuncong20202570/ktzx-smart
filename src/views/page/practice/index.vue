@@ -109,8 +109,8 @@ const lookStudent = (row:any)=>{
 const getPracticePage = async () => {
   const data = await practicePage({ pageIndex: pagination.pageIndex, pageSize: pagination.pageSize});
   if (data.code==200) {
-    tableData.value = data.data.data
-    pagination.total = data.data.recordSize
+    tableData.value = data?.data?.data || []
+    pagination.total = data?.data?.recordSize || 0
   }
 };
 // 编辑数据

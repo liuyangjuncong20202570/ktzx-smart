@@ -50,7 +50,7 @@
 import { ref, reactive, onMounted } from "vue";
 import { VideoPlayer } from '@videojs-player/vue'
 import 'video.js/dist/video-js.css'
-import { host } from "@/api/host.js";
+import { host } from "@/utils/request.js";
 import { UploadFilled } from "@element-plus/icons-vue";
 import { ElMessage, UploadFile, UploadFiles, UploadRawFile, UploadUserFile } from "element-plus";
 const props = defineProps({

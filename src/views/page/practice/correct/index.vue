@@ -78,7 +78,7 @@
 import { ref, computed, onMounted, nextTick, toRaw } from "vue";
 import { useRouter } from 'vue-router'
 import { studentCorrect, studentSave } from '@/api/practice/index.ts'
-import { host } from '@/api/host.js'
+import { host } from "@/utils/request.js";
 import { getFileExtensionFromUrl, isImageURL, downloadFile } from '@/utils/index.js'
 import { ElMessage, ElMessageBox } from "element-plus";
 import Header from '@/views/page/components/header/index.vue'

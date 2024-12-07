@@ -6,7 +6,7 @@
       <el-input placeholder="题目title，请填写" style="margin-bottom: 10px;" v-model="item.title">
       </el-input>
 
-      <Wangeditor ref="wangeditor" :data="item.content" @change="handleRichEditorChange" />
+      <Wangeditor style="z-index: 999;" ref="wangeditor" :data="item.content" @change="handleRichEditorChange" />
 
       <el-button 
         v-if="headline === '填空题'" 
@@ -33,10 +33,10 @@
             {{ option.name }}: <el-input v-model="option.itemContent" placeholder="请输入选项" />
           </div>
           <div class="option-right flex-between cursor-pointer">
-            <el-icon @click="plus">
+            <el-icon :class="headline === '判断题' ? 'no-click' : ''" @click="plus">
               <Plus />
             </el-icon>
-            <el-icon @click="del(index)">
+            <el-icon :class="headline === '判断题' ? 'no-click' : ''" @click="del(index)">
               <Minus />
             </el-icon>
             <ImageUpload :item="option" />

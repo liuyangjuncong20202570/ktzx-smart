@@ -89,7 +89,7 @@
   import { onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import Header from '@/views/page/components/header/index.vue'
-  import { host } from '@/api/host.js'
+  import { host } from "@/utils/request.js";
   import { getFileExtensionFromUrl, isImageURL, downloadFile } from '@/utils/index.js'
   import { practiceStuDetail } from "@/api/practice/index.ts";
   const routes = useRouter()

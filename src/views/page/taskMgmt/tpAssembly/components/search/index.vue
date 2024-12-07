@@ -181,7 +181,10 @@ const kwaEvent = (val) => {
     console.log('???', abilityIds, abilityIds)
     ruleForm.value.abilityIds = abilityIds
     ruleForm.value.keyIds = keyIds
-    console.log(val)
+    ruleForm.value.libType = 1
+    selectedTableData.value = []
+    tableData.value = []
+    getCourseLibTypeList()
 }
 
 const submitForm = () => {

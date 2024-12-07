@@ -14,29 +14,29 @@ export default defineConfig({
     port: 8081,
     proxy: {
       '/api': {
-        // target: 'http://60.205.178.180:8080',
-        target: 'http://127.0.0.1:8082',
+        target: 'http://120.46.201.4:9000',
+        // target: 'http://127.0.0.1:8082',
         changeOrigin: true,
         rewrite: path => path.replace(/^\//, '')
       },
 
       '/page': {
-        target: 'http://60.205.178.180:8084',
+        target: 'http://120.46.201.4:10203',
         changeOrigin: true,
         rewrite: path => path.replace(/^\//, '')
       },
       '/fork': {
-        target: 'http://60.205.178.180:8084',
+        target: 'http://120.46.201.4:10203',
         changeOrigin: true,
         rewrite: path => path.replace(/^\//, '')
       },
       '/common': {
-        target: 'http://60.205.178.180:8084',
+        target: 'http://120.46.201.4:10203',
         changeOrigin: true,
         rewrite: path => path.replace(/^\//, '')
       },
       '/term': {
-        target: 'http://60.205.178.180:8084',
+        target: 'http://120.46.201.4:10203',
         changeOrigin: true,
         rewrite: path => path.replace(/^\//, '')
       }

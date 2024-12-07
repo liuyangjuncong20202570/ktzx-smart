@@ -83,7 +83,7 @@
   import { ElMessage, ElMessageBox } from 'element-plus'
   import Header from '@/views/page/components/header/index.vue'
   import { stuDetail, practiceSave, practiceSubmit } from '@/api/stuPractice.js'
-  import { host } from '@/api/host.js'
+  import { host } from "@/utils/request.js";
   import { getFileExtensionFromUrl, isImageURL, downloadFile } from '@/utils/index.js'
   const routes = useRouter()
   const { currentRoute } = routes
