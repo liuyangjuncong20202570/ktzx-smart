@@ -1,46 +1,74 @@
 <template>
   <el-dialog
     :destroy-on-close="true"
-    :show-close="false"
-    :close-on-click-modal="false"
-    style="width: 20vw; padding-top: 0"
-    v-model="importdialogViaible"
+    :show-close="true"
+    :close-on-click-modal="true"
+    style="width: 50vw; padding-top: 0; height: 78vh"
+    v-model="props.store.listVisible"
   >
-    <h2 style="margin-top: 0">导入Excel文件</h2>
-    <el-upload
-      class="upload-demo"
-      ref="uploadRef"
-      auto-upload="false"
-      show-file-list="false"
-      :before-upload="beforeUpload"
-      style="margin-bottom: 20px"
-    >
-      <!-- 使用输入框作为上传的触发器 -->
-      <el-input
-        slot="trigger"
-        v-model="fileName"
-        placeholder="未选择文件"
-        readonly
-        style="cursor: pointer; text-align: center"
-      ></el-input>
-    </el-upload>
+    <h2 style="margin-top: 0">
+      <slot name="title">默认学生列表</slot>
+    </h2>
 
-    <div style="text-align: center; margin-bottom: 20px">
-      <!-- 添加内联样式 -->
-      <!-- 下载链接 -->
-      <a href="/file/任课教师-导入学生名单模板.xlsx" download>点击下载模板文件</a>
+    <!-- 学生列表开始 -->
+    <div class="stuList-container">
+      <el-scrollbar>
+        <List
+          :titleList="props.studentListTitle"
+          :listData="props.studentList"
+          :handleCellClick="props.handleCellClick"
+          :addCellStyle="props.addCellStyle"
+        />
+      </el-scrollbar>
     </div>
 
-    <div>
-      <!-- 添加内联样式 -->
-      <!-- 上传按钮 -->
-      <el-button style="margin-right: 10px" @click="closeimportdialogViable">关闭</el-button>
-      <!-- 添加内联样式 -->
-      <el-button type="success" @click="submitUpload">上传</el-button>
-    </div>
+    <!-- 学生列表开始结束 -->
   </el-dialog>
 </template>
 
-<script setup></script>
+<script setup>
+import { storeToRefs } from 'pinia';
+import useStudentGraph from '../../../stores/dynamicEvaluation/studentGraphStore';
+import List from './List.vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 
-<style lang="less" scoped></style>
+/* ********************变量定义******************** */
+// props定义
+const props = defineProps({
+  store: {
+    type: Object,
+    default: () => ({ listVisible: false })
+  },
+  studentList: {
+    type: Array,
+    default: () => []
+  },
+  studentListTitle: {
+    type: Array,
+    default: () => []
+  },
+  addCellStyle: {
+    type: Function,
+    default: ({ row, column, rowIndex, columnIndex }) => ({ textAlign: 'center' })
+  },
+  handleCellClick: {
+    type: Function,
+    default: () => ({})
+  }
+});
+
+// 普通变量
+
+// pinia状态管理
+const studentGraphStore = useStudentGraph();
+const { stuListVisible } = storeToRefs(studentGraphStore);
+
+/* ********************方法定义******************** */
+</script>
+
+<style lang="less" scoped>
+.stuList-container {
+  overflow: auto;
+  height: 67vh;
+}
+</style>

@@ -15,36 +15,18 @@
       </div>
     </el-header>
     <!-- 列表开始 -->
-    <div class="list">
-      <List
-        :titleList="titles"
-        :listData="lists"
-        :handleCellClick="handleCellClick"
-        :addCellStyle="addCellStyle"
-      />
-      <!-- 分页器 -->
-      <el-footer
-        style="display: flex; justify-content: center; align-items: center; padding-bottom: 15px"
-      >
-        <el-pagination
-          style="margin-top: 20px; text-align: center"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="currentPage"
-          :page-sizes="[10, 20, 30, 40]"
-          :page-size="pageSize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total"
-        >
-        </el-pagination>
-      </el-footer>
-      <!-- 分页器结束 -->
-    </div>
-    <!-- 列表结束 -->
+    <List
+      :titleList="props.titleList"
+      :listData="props.graphList"
+      :handleCellClick="props.handleCellClick"
+      :addCellStyle="props.addCellStyle"
+    />
   </div>
+  <!-- 列表结束 -->
 </template>
 
 <script setup>
+import DynamicStudentList from './DynamicStudentList.vue';
 import List from './List.vue';
 import { searchInTable } from '@/utils/searchInTable.js';
 import { storeToRefs } from 'pinia';
@@ -53,47 +35,29 @@ import { ref, reactive, computed, onMounted } from 'vue';
 import _ from 'lodash';
 
 /* ********************变量定义******************** */
+// props定义
 const props = defineProps({
   keyword: {
     type: String,
     default: '默认搜索内容'
+  },
+  graphList: {
+    type: Array,
+    default: () => []
+  },
+  titleList: {
+    type: Array,
+    default: () => []
+  },
+  addCellStyle: {
+    type: Function,
+    default: ({ row, column, rowIndex, columnIndex }) => ({ textAlign: 'center' })
+  },
+  handleCellClick: {
+    type: Function,
+    default: () => ({})
   }
 });
-
-const titles = [
-  { prop: 'courseName', label: '课堂名称' },
-  { prop: 'term', label: '学期' },
-  { prop: 'curriculum', label: '课程' },
-  { prop: 'profession', label: '专业' },
-  { prop: 'mainTeacher', label: '主讲教师' },
-  { prop: 'experimentTeacher', label: '实验教师' },
-  { prop: 'practiceTeacher', label: '实践教师' },
-  { prop: 'creator', label: '创建人' }
-];
-const lists = [
-  {
-    id: 0,
-    courseName: '单片机原理及应用-2023春-自实验21',
-    term: '2023春季学期',
-    curriculum: '单片机原理及应用I',
-    profession: '自动化专业',
-    mainTeacher: '赵仁涛',
-    experimentTeacher: '',
-    practiceTeacher: '',
-    creator: '自动化专业负责人'
-  },
-  {
-    id: 1,
-    courseName: '单片机原理及应用-2024春-自实验22',
-    term: '2024春季学期',
-    curriculum: '单片机原理及应用I',
-    profession: '自动化专业',
-    mainTeacher: '赵仁涛',
-    experimentTeacher: '',
-    practiceTeacher: '',
-    creator: '李志军'
-  }
-];
 
 const searchKeyword = ref('');
 const pageSize = ref();
@@ -101,22 +65,8 @@ const currentPage = ref();
 const filteredData = ref();
 
 /* ********************方法定义******************** */
-// 单元格样式定义
-const addCellStyle = ({ row, column, rowIndex, columnIndex }) => {
-  if (columnIndex === 2) {
-    return {
-      color: '#86BFA8',
-      textAlign: 'center',
-      textDecoration: 'underline',
-      cursor: 'pointer'
-    };
-  }
-  return {
-    textAlign: 'center'
-  };
-};
-
 // 搜索框
+// TODO:待封装
 const querySearch = () => {
   // 处理搜索逻辑
   if (searchKeyword.value.length >= 1 || searchKeyword.value.length === 0) {
@@ -128,14 +78,6 @@ const debouncedQuerySearch = _.debounce(() => {
   querySearch();
 }, 500);
 
-// 单元格点击事件
-const handleCellClick = (row, column, cell) => {
-  // 限定只有courseName单元格才能点击
-  if (column.property === 'courseName') {
-    console.log(row.id);
-    //TODO 此处将打开学生列表，发送请求将id传过去
-  }
-};
 /* ********************分页器******************** */
 // 处理每页显示条目数改变
 const handleSizeChange = newSize => {

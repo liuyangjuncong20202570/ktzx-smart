@@ -1,4 +1,4 @@
-import { createApp } from 'vue';
+import { createApp, provide } from 'vue';
 import './style.css';
 import App from './App.vue';
 import router from './router';
@@ -24,11 +24,34 @@ import ExcelJS from 'exceljs'
 import piniaPersist from 'pinia-plugin-persist';
 // 进度条样式库
 import 'nprogress/nprogress.css';
+// 注册cue-echarts
+import Echarts from 'vue-echarts';
+import * as echarts from 'echarts';
+import { use } from 'echarts/core';
+import 'echarts-wordcloud';
+import 'echarts/theme/shine.js';
+
+// 引入Echarts模块
+// canvas渲染器，必传
+import { CanvasRenderer } from 'echarts/renderers';
+// echarts基本组件
+import {
+  TooltipComponent,
+  GridComponent,
+  LegendComponent,
+  TitleComponent
+} from 'echarts/components';
+// 引入所需组件
+import { RadarChart } from 'echarts/charts';
+
+use([CanvasRenderer, TooltipComponent, GridComponent, LegendComponent, TitleComponent, RadarChart]);
 
 const pinia = createPinia();
 pinia.use(piniaPersist);
 const app = createApp(App);
 
+app.component('v-chart', Echarts);
+app.config.globalProperties.$echarts = echarts;
 // 注册每个图标组件
 Object.keys(Icons).forEach(key => {
   app.component(key, Icons[key]);
