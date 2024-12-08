@@ -1,42 +1,24 @@
 <!-- 使用vxe-table组件开发 -->
 <template>
   <div>
-    <el-header
-      style="
+    <el-header style="
         height: 40px;
         padding: 5px 0px;
         width: 100%;
         text-align: left;
         background-color: #deebf7;
-      "
-    >
+      ">
       <el-button type="success" @click="save()" style="margin-left: 0.8vw">保存</el-button>
     </el-header>
     <div id="container" style="height: calc(92vh - 130px); width: 100%">
-      <vxe-grid
-        v-bind="gridOptions"
-        v-on="gridEvents"
-        :edit-config="gridOptions.editConfig"
-        class="scroll-container"
-        @edit-closed="handleEditClosed"
-      ></vxe-grid>
+      <vxe-grid v-bind="gridOptions" v-on="gridEvents" :edit-config="gridOptions.editConfig" class="scroll-container"
+        @edit-closed="handleEditClosed"></vxe-grid>
     </div>
 
-    <el-table
-      v-if="info"
-      :data="footer1Data"
-      :show-header="false"
-      :row-class-name="tableRowClassName"
-      border
-    >
+    <el-table v-if="info" :data="footer1Data" :show-header="false" :row-class-name="tableRowClassName" border>
       <el-table-column prop="name" width="240" align="center"></el-table-column>
-      <el-table-column
-        :prop="item.id"
-        v-for="(item, index) in info.head"
-        :key="index"
-        show-overflow-tooltip
-        align="center"
-      >
+      <el-table-column :prop="item.id" v-for="(item, index) in info.head" :key="index" show-overflow-tooltip
+        align="center">
         <template v-slot="scope">
           <div v-if="scope.row[item.id] !== 100" style="color: red; height: 28px">
             合计需为100（当前为：{{ scope.row[item.id] }}）
@@ -46,37 +28,17 @@
       </el-table-column>
     </el-table>
 
-    <el-table
-      v-if="info"
-      :data="footer2Data"
-      :show-header="false"
-      :row-class-name="tableRowClassName"
-      border
-    >
+    <el-table v-if="info" :data="footer2Data" :show-header="false" :row-class-name="tableRowClassName" border>
       <el-table-column prop="name" width="240" align="center"></el-table-column>
-      <el-table-column
-        v-for="(item, index) in info.head"
-        :key="index"
-        show-overflow-tooltip
-        align="center"
-      >
+      <el-table-column v-for="(item, index) in info.head" :key="index" show-overflow-tooltip align="center">
         <template v-slot="scope">
-          <el-input
-            v-if="scope.row.edit[item.id]"
-            style="height: 28px"
-            :ref="el => setInputRef(el, item.id)"
-            @blur="handleBlur(scope.row, item.id)"
-            v-model="scope.row[item.id]"
-          ></el-input>
-          <div
-            v-else
-            @dblclick="handleClick(scope.row, item.id)"
-            :style="{
-              color: calcFooter2Data() !== 100 ? 'red' : 'black',
-              width: '100%',
-              height: '28px'
-            }"
-          >
+          <el-input v-if="scope.row.edit[item.id]" style="height: 28px" :ref="el => setInputRef(el, item.id)"
+            @blur="handleBlur(scope.row, item.id)" v-model="scope.row[item.id]"></el-input>
+          <div v-else @dblclick="handleClick(scope.row, item.id)" :style="{
+            color: calcFooter2Data() !== 100 ? 'red' : 'black',
+            width: '100%',
+            height: '28px'
+          }">
             {{ scope.row[item.id] }}
             <span v-if="calcFooter2Data() !== 100" style="color: red"> （总评合计不为100）</span>
           </div>
@@ -84,61 +46,58 @@
       </el-table-column>
     </el-table>
 
-		<!----------------------------------编辑弹窗-------------------------------------->
-		<el-dialog v-model="editDialogVisible" width="600" destroy-on-close>
-			<div style="padding: 0 25%; display: flex; justify-content: space-between; margin: -5px 0 15px 0">
-				<el-button @click="uploadDialogVisible = true">上传</el-button>
-				<el-button @click="associate()">关联</el-button>
-			</div>
-			<div style="font-weight: bolder; border: 1px solid #ebebeb; height: 30px; line-height: 30px;
+    <!----------------------------------编辑弹窗-------------------------------------->
+    <el-dialog v-model="editDialogVisible" width="600" destroy-on-close>
+      <div style="padding: 0 25%; display: flex; justify-content: space-between; margin: -5px 0 15px 0">
+        <el-button @click="uploadDialogVisible = true">上传</el-button>
+        <el-button @click="associate()">关联</el-button>
+      </div>
+      <div style="font-weight: bolder; border: 1px solid #ebebeb; height: 30px; line-height: 30px;
 			color: #969696; user-select: none;">
-				考核项：{{ rightClickItem.title }}
-			</div>
-			<el-table ref="multipleTableRef" :data="filesTableData" style="height: 350px;" v-loading="filesTableLoading"
-				element-loading-background="rgba(0, 0, 0, 0.2)" @selection-change="handleSelectionChange" border>
-				<el-table-column align="center" type="selection" width="40"></el-table-column>
-				<el-table-column align="center" label="名称" prop="fileName"></el-table-column>
-				<el-table-column align="center" label="上传时间" width="200" prop="createTime"></el-table-column>
-				<el-table-column align="center" label="操作" width="150">
-					<template #default="{ row }">
-						<div style="display: flex; justify-content: space-between; padding: 0 10px;">
-							<el-button type="primary" size="small" @click="openPreviewDialog(row)">预览</el-button>
-							<el-button type="danger" size="small" @click="openDeleteDialog(row)">删除</el-button>
-						</div>
-					</template>
-				</el-table-column>
-			</el-table>
-		</el-dialog>
+        考核项：{{ rightClickItem.title }}
+      </div>
+      <el-table ref="multipleTableRef" :data="filesTableData" style="height: 350px;" v-loading="filesTableLoading"
+        element-loading-background="rgba(0, 0, 0, 0.2)" @selection-change="handleSelectionChange" border>
+        <el-table-column align="center" type="selection" width="40"></el-table-column>
+        <el-table-column align="center" label="名称" prop="fileName"></el-table-column>
+        <el-table-column align="center" label="上传时间" width="200" prop="createTime"></el-table-column>
+        <el-table-column align="center" label="操作" width="150">
+          <template #default="{ row }">
+            <div style="display: flex; justify-content: space-between; padding: 0 10px;">
+              <el-button type="primary" size="small" @click="openPreviewDialog(row)">预览</el-button>
+              <el-button type="danger" size="small" @click="openDeleteDialog(row)">删除</el-button>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
 
-		<!----------------------------------上传弹窗-------------------------------------->
-		<el-dialog v-model="uploadDialogVisible" width="400" destroy-on-close>
-			<el-text type="warning">仅支持.docx、.pdf、.xlsx文件类型<br>如有需要请将.doc和.xls文件转化为允许格式</el-text>
-			<el-upload ref="uploadRef" class="upload-demo"
-				action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" :limit="1"
-				:on-exceed="handleExceed" :auto-upload="false" accept=".pdf,.docx,.xlsx"
-				:before-upload="file => storeFileInfo(file, rightClickItem)">
-				<template #trigger>
-					<el-button type="primary">选择文件</el-button>
-				</template>
-			</el-upload>
-			<el-button @click="uploadFile()">确定</el-button>
-		</el-dialog>
+    <!----------------------------------上传弹窗-------------------------------------->
+    <el-dialog v-model="uploadDialogVisible" width="400" destroy-on-close>
+      <el-text type="warning">仅支持.docx、.pdf、.xlsx文件类型<br>如有需要请将.doc和.xls文件转化为允许格式</el-text>
+      <el-upload ref="uploadRef" class="upload-demo"
+        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" :limit="1" :on-exceed="handleExceed"
+        :auto-upload="false" accept=".pdf,.docx,.xlsx" :before-upload="file => storeFileInfo(file, rightClickItem)">
+        <template #trigger>
+          <el-button type="primary">选择文件</el-button>
+        </template>
+      </el-upload>
+      <el-button @click="uploadFile()">确定</el-button>
+    </el-dialog>
 
-		<!----------------------------------预览文件的弹窗-------------------------------------->
-		<el-dialog v-model="previewDialogVisible" width="1200"
-			style="height: 90vh; margin-top: 30px; margin-bottom: 30px;" destroy-on-close>
-			<div style="max-height: 82vh; overflow: auto;">
-				<vue-office-docx
-					v-if="fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'"
-					style="height: 82vh;" :src="blobData" />
-				<vue-office-pdf v-else-if="fileType === 'application/pdf'" style="height: 82vh;" :src="blobData" />
-				<vue-office-excel
-					v-else-if="fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'"
-					style="height: 82vh;" :src="blobData" />
-				<div v-else>不支持的文件</div>
-			</div>
-		</el-dialog>
-		<!------------------------------------------------------------------------------------->
+    <!----------------------------------预览文件的弹窗-------------------------------------->
+    <el-dialog v-model="previewDialogVisible" width="1200" style="height: 90vh; margin-top: 30px; margin-bottom: 30px;"
+      destroy-on-close>
+      <div style="max-height: 82vh; overflow: auto;">
+        <vue-office-docx v-if="fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'"
+          style="height: 82vh;" :src="blobData" />
+        <vue-office-pdf v-else-if="fileType === 'application/pdf'" style="height: 82vh;" :src="blobData" />
+        <vue-office-excel v-else-if="fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'"
+          style="height: 82vh;" :src="blobData" />
+        <div v-else>不支持的文件</div>
+      </div>
+    </el-dialog>
+    <!------------------------------------------------------------------------------------->
 
     <!----------------------------------确认删除的弹框-------------------------------------->
     <el-dialog v-model="deleteDialogVisible" width="350" destroy-on-close>
@@ -154,16 +113,13 @@
           </div>
         </div>
       </template>
-      <div
-        v-if="associateFiles.length"
-        style="
+      <div v-if="associateFiles.length" style="
           max-height: 300px;
           overflow: auto;
           display: flex;
           flex-direction: column;
           align-items: center;
-        "
-      >
+        ">
         <div style="margin-bottom: 5px">
           <el-text type="danger" style="display: flex">
             <div>将删除的文件与以下考核项关联，请先取消关联</div>
@@ -203,9 +159,6 @@ const container = ref();
 
 const info = ref(null); // 存储后端传来的的数据
 
-const usualLeafIds = ref(); // 存储平时项
-const finalLeafIds = ref();
-
 const leafIds = ref({}); // 以id为键存储其所有叶节点的id
 
 const footer1Data = ref([{ name: '分数合计' }]);
@@ -225,7 +178,7 @@ const gridOptions = ref({
   height: 500, // 表格默认高度，在钩子函数中会修改
   align: 'center',
   showOverflow: true,
-  showHeaderOverflow: false,
+  showHeaderOverflow: true,
   editConfig: {
     trigger: 'dblclick',
     mode: 'cell',
@@ -285,8 +238,6 @@ const getData = async () => {
 };
 
 const initialize = info => {
-  usualLeafIds.value = getLeafIds(info.head[0]); // 获取平时项的所有考核项id
-  finalLeafIds.value = getLeafIds(info.head[1]); // 获取期末项的所有考核项id
 
   info.head.forEach(item => {
     leafIds.value[item.id] = getLeafIds(item);
