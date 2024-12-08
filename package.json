@@ -15,6 +15,7 @@
     "@vue-office/docx": "^1.6.2",
     "@vue-office/excel": "^1.7.11",
     "@vue-office/pdf": "^2.0.2",
+    "@vxe-ui/plugin-export-xlsx": "^4.0.7",
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "^5.1.12",
     "ant-design-vue": "^3.2.20",
@@ -22,6 +23,8 @@
     "echarts": "^5.5.1",
     "echarts-wordcloud": "^2.1.0",
     "element-plus": "^2.5.1",
+    "exceljs": "^4.4.0",
+    "html2pdf.js": "^0.10.2",
     "intro.js": "^7.2.0",
     "jszip": "^3.10.1",
     "less": "^4.2.0",
@@ -45,7 +48,8 @@
     "vue-router": "^4.2.5",
     "vuedraggable": "^4.1.0",
     "vuex": "^4.0.2",
-    "vxe-table": "^4.7.82"
+    "vxe-pc-ui": "^4.3.11",
+    "vxe-table": "^4.9.11"
   },
   "devDependencies": {
     "@vitejs/plugin-legacy": "^5.3.0",

@@ -10,12 +10,16 @@ import { clickOutside } from './directives/clickOutside.js';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import './assets/css/global.css';
 import * as Icons from '@element-plus/icons-vue';
+//-------------vxeTable
 // 完整导入 UI 组件库
 import VxeUI from 'vxe-pc-ui';
 import 'vxe-pc-ui/lib/style.css';
 // 完整导入 表格库
 import VxeUITable from 'vxe-table';
 import 'vxe-table/lib/style.css';
+import VxeUIPluginExportXLSX from '@vxe-ui/plugin-export-xlsx'
+import ExcelJS from 'exceljs'
+//---------------------
 // pinia持久化插件
 import piniaPersist from 'pinia-plugin-persist';
 // 进度条样式库
@@ -52,6 +56,10 @@ app.config.globalProperties.$echarts = echarts;
 Object.keys(Icons).forEach(key => {
   app.component(key, Icons[key]);
 });
+
+VxeUI.use(VxeUIPluginExportXLSX, {
+  ExcelJS
+})
 
 app
   .use(router)
