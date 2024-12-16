@@ -1,11 +1,11 @@
 <template>
-  <div class="container">
+  <div v-loading="mainStore.dynamicSearchloading" class="container">
     <el-header
       style="height: auto; padding: 5px 0px; width: 100%; background-color: #deebf7; display: flex"
     >
       <div class="searchInput">
         <el-input
-          v-model.lazy="searchKeyword"
+          v-model.lazy="search"
           @input="debouncedQuerySearch"
           :placeholder="props.keyword"
           class="input-with-select"
@@ -26,21 +26,25 @@
 </template>
 
 <script setup>
-import DynamicStudentList from './DynamicStudentList.vue';
+import parseJWT from '../../../utils/parseJWT.js';
 import List from './List.vue';
-import { searchInTable } from '@/utils/searchInTable.js';
-import { storeToRefs } from 'pinia';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { ref, reactive, computed, onMounted } from 'vue';
 import _ from 'lodash';
+import useMain from '../../../stores/useMain.js';
 
 /* ********************变量定义******************** */
 // props定义
 const props = defineProps({
+  store: {
+    type: Object,
+    default: () => ({ listVisible: false })
+  },
   keyword: {
     type: String,
     default: '默认搜索内容'
   },
+
   graphList: {
     type: Array,
     default: () => []
@@ -59,24 +63,31 @@ const props = defineProps({
   }
 });
 
-const searchKeyword = ref('');
+const search = ref('');
 const pageSize = ref();
 const currentPage = ref();
 const filteredData = ref();
+const emits = defineEmits('flushList');
+const mainStore = useMain();
 
 /* ********************方法定义******************** */
 // 搜索框
 // TODO:待封装
-const querySearch = () => {
-  // 处理搜索逻辑
-  if (searchKeyword.value.length >= 1 || searchKeyword.value.length === 0) {
-    filteredData.value = searchInTable(filteredData.value, searchKeyword.value, 'username'); // 假设我们按 'username' 列搜索
-    // console.log('搜索内容:', searchKeyword.value)
-  }
-};
+// 搜索框逻辑
 const debouncedQuerySearch = _.debounce(() => {
   querySearch();
 }, 500);
+
+const querySearch = async () => {
+  if (search.value.length >= 1 || search.value.length === 0) {
+    mainStore.setDynamicSearchloading(true);
+    const { code, msg } = await props.store.fetchSearchList(
+      parseJWT(sessionStorage.getItem('token')).obsid,
+      search.value
+    );
+    emits('flushList');
+  }
+};
 
 /* ********************分页器******************** */
 // 处理每页显示条目数改变

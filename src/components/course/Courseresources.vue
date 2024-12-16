@@ -11,12 +11,7 @@
       "
     >
       <el-upload ref="upload" :before-upload="beforeUpload" :show-file-list="false">
-        <el-button
-          v-if="MainStore.selectedRoute !== '/homes/courseteacherhome/coursemangt/courseresources'"
-          type="primary"
-          v-blur-on-click
-          >上传</el-button
-        >
+        <el-button v-if="roleName !== '任课教师'" type="primary" v-blur-on-click>上传</el-button>
       </el-upload>
     </el-header>
     <div style="max-height: 100%; height: 100%; overflow: auto">
@@ -93,6 +88,7 @@ const pdfPreviewRef = ref(null);
 const wordPreviewRef = ref(null);
 
 const MainStore = useMain();
+const roleName = JSON.parse(sessionStorage.getItem('users')).rolename;
 
 const fetchCourseList = async () => {
   await request.course
