@@ -1,44 +1,33 @@
 <template>
   <div style="height: 100vh">
     <el-container class="layout-container-demo" style="height: 100%">
-      <el-header
-        style="
+      <el-header style="
           position: relative;
           text-align: right;
           background-color: #0064b1;
           font-size: 15px;
           height: 8vh;
-        "
-      >
+        ">
         <!--右侧按钮-->
-        <div
-          style="
+        <div style="
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 0;
-          "
-        >
+          ">
           <div class="left-div" style="flex-grow: 1; display: flex; align-items: center">
             <img src="../assets/images/logo.png" style="height: 5.5vh" />
-            <el-text style="font-size: calc(1vw + 6px); color: white; margin-left: 10px"
-              >智能教学平台</el-text
-            >
+            <el-text style="font-size: calc(1vw + 6px); color: white; margin-left: 10px">智能教学平台</el-text>
           </div>
 
           <div style="flex-grow: 2; text-align: center">
             <el-text style="font-size: calc(1.5vw + 6px); color: white">{{ currentterm }}</el-text>
           </div>
 
-          <div
-            class="right-div"
-            style="flex-grow: 1; display: flex; align-items: center; justify-content: flex-end"
-          >
+          <div class="right-div" style="flex-grow: 1; display: flex; align-items: center; justify-content: flex-end">
             <el-dropdown @visible-change="handleVisibleChange">
-              <el-avatar
-                src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-              />
+              <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
               <template #dropdown>
                 <el-dropdown-menu>
                   <template v-if="!showRoles">
@@ -46,11 +35,7 @@
                     <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
                   </template>
                   <template v-else>
-                    <el-dropdown-item
-                      v-for="role in roleList"
-                      :key="role.roleid"
-                      @click="switchRole(role)"
-                    >
+                    <el-dropdown-item v-for="role in roleList" :key="role.roleid" @click="switchRole(role)">
                       {{ role.rolename }}
                     </el-dropdown-item>
                   </template>
@@ -65,8 +50,7 @@
       </el-header>
       <el-container style="width: 100%; overflow-x: hidden">
         <el-aside width="200px" style="height: 100%">
-          <div
-            style="
+          <div style="
               width: 100%;
               height: 150px;
               padding: 10px 0;
@@ -74,42 +58,28 @@
               display: flex;
               align-items: center;
               box-sizing: border-box;
-            "
-          >
+            ">
             <!--头像-->
-            <div
-              style="
+            <div style="
                 width: 76px;
                 height: 105px;
                 margin-left: 10px;
                 overflow: hidden;
                 object-fit: cover;
-              "
-            >
-              <el-upload
-                style="width: 100%; height: 100%; display: flex"
-                class="avatar-uploader"
-                action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-                :show-file-list="false"
-                :on-success="handleAvatarSuccess"
-                :before-upload="beforeAvatarUpload"
-              >
+              ">
+              <el-upload style="width: 100%; height: 100%; display: flex" class="avatar-uploader"
+                action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" :show-file-list="false"
+                :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
                 <!-- action属性指定了文件上传的目标服务器地址 -->
                 <!-- show-file-list属性设置为false，表示不显示已选择的文件列表 -->
                 <!-- on-success属性是一个事件回调函数，当文件上传成功时，该函数将被调用 -->
                 <!-- before-upload属性是一个事件回调函数，当文件准备上传时，该函数将被调用 -->
                 <!-- 如果imageUrl有值，则显示这个图片，否则不显示 -->
-                <img
-                  v-if="imageUrl"
-                  :src="imageUrl"
-                  class="avatar"
-                  style="width: 100%; height: 120%; object-fit: cover"
-                />
+                <img v-if="imageUrl" :src="imageUrl" class="avatar"
+                  style="width: 100%; height: 120%; object-fit: cover" />
                 <!-- 如果imageUrl没有值，则显示提示文本-->
 
-                <el-text v-else size="small" style="width: 72px; color: white"
-                  >点击上传头像</el-text
-                >
+                <el-text v-else size="small" style="width: 72px; color: white">点击上传头像</el-text>
               </el-upload>
             </div>
             <div style="width: 88px; margin: 0 15px 0 15px">
@@ -117,9 +87,7 @@
                 <p style="font-size: 14px; line-height: 15px">{{ loginInfo.username }}</p>
               </el-row>
               <el-row :gutter="0">
-                <p
-                  style="font-size: 14px; margin-left: 2px; color: cornflowerblue; line-height: 0.2"
-                >
+                <p style="font-size: 14px; margin-left: 2px; color: cornflowerblue; line-height: 0.2">
                   {{ loginInfo.rolename }}
                 </p>
               </el-row>
@@ -153,37 +121,42 @@
             <el-scrollbar style="border-right: 1px solid #dedede">
               <el-menu :default-active="defaultActive">
                 <template v-for="(menu, index) in filteredMenus">
-                  <!-- <div>{{ menu }}</div> -->
-                  <el-sub-menu
-                    v-if="hasChildren(menu)"
-                    :index="menu.id"
-                    :key="menu.id"
-                    style="border-top: 1px solid #efefef; position: relative"
-                  >
+                  <!-- 二级菜单 -->
+                  <el-sub-menu v-if="hasChildren(menu)" :index="menu.id" :key="menu.id"
+                    style="border-top: 1px solid #efefef; position: relative">
                     <template #title>
                       <!--0822有更改-->
                       <div class="titleBox" @click="navigateTo(menu.url)">
                         {{ menu.name }}
-                        <!-- {{ menu.name === '学期管理' }} -->
                       </div>
                     </template>
-                    <el-menu-item
-                      v-for="child in getChildrenMenus(menu)"
-                      :index="child.url"
-                      :key="child.id"
-                      style="border-top: 1px solid #efefef"
-                      @click="navigateTo(child.url)"
-                    >
-                      <div class="childtitleBox">{{ child.name }}</div>
-                    </el-menu-item>
+                    <template v-for="child in getChildrenMenus(menu)">
+                      <!-- 三级菜单 -->
+                      <el-sub-menu v-if="hasChildren(child)" :index="child.id" :key="child.id"
+                        style="border-top: 1px solid #efefef; position: relative">
+                        <template #title>
+                          <div class="childtitleBox" @click="navigateTo(child.url)"> {{ child.name }} </div>
+                        </template>
+                        <el-menu-item v-for="grandchild in getChildrenMenus(child)" :index="grandchild.url"
+                          :key="grandchild.id" style="border-top: 1px solid #efefef"
+                          @click="navigateTo(grandchild.url)">
+                          <template #title>
+                            <div class="childtitleBox"> {{ grandchild.name }} </div>
+                          </template>
+                        </el-menu-item>
+                      </el-sub-menu>
+                      <!-- 无三级菜单 -->
+                      <el-menu-item v-else :index="child.url" :key="child.id" style="border-top: 1px solid #efefef"
+                        @click="navigateTo(child.url)">
+                        <template #title>
+                          <div class="childtitleBox">{{ child.name }}</div>
+                        </template>
+                      </el-menu-item>
+                    </template>
                   </el-sub-menu>
-                  <el-menu-item
-                    v-else
-                    :index="menu.url"
-                    :key="menu.id"
-                    @click="navigateTo(menu.url)"
-                    style="border-top: 1px solid #efefef"
-                  >
+                  <!-- 无二级菜单 -->
+                  <el-menu-item v-else :index="menu.url" :key="menu.id" @click="navigateTo(menu.url)"
+                    style="border-top: 1px solid #efefef">
                     <div class="titleBox">
                       {{ menu.name }}
                     </div>
@@ -224,7 +197,7 @@ console.log(isDefaultTerm.value);
 const isSHow = ref(isDefaultTerm.value);
 
 // 路由置空
-const handleJumpTo = () => {};
+const handleJumpTo = () => { };
 
 // 创建introJS实例
 /**************指引框逻辑********************/
@@ -533,6 +506,7 @@ onMounted(() => {
 .customTooltip .introjs-tooltip-title {
   color: #0a41c9;
 }
+
 .instrutor {
   position: absolute;
   z-index: 999;
@@ -542,17 +516,19 @@ onMounted(() => {
   text-align: center;
   line-height: 55px;
 }
-.childtitleBox,
-.titleBox {
-  width: 177px;
-  height: 60px;
-  // margin: 0 auto;
-  position: absolute;
-  left: 0;
-}
-.childtitleBox {
-  left: 20px;
-}
+
+// .childtitleBox,
+// .titleBox {
+//   width: 177px;
+//   height: 60px;
+//   // margin: 0 auto;
+//   position: absolute;
+//   left: 0;
+// }
+
+// .childtitleBox {
+//   left: 20px;
+// }
 
 .layout-container-demo .el-header {
   position: relative;
