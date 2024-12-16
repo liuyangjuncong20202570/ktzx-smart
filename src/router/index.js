@@ -259,7 +259,7 @@ const routes = [
         component: () => import('../components/evaluation/AcademicTranscript.vue')
       },
       {
-        path: 'evaluation/dynamicEvaluation/classroomReport', // 达成性评价-评价名单
+        path: 'evaluation/dynamicEvaluation/classroomReport', // 达成性评价-生成报告
         name: 'ClassroomReport',
         component: () => import('../components/evaluation/ClassroomReport.vue')
       },

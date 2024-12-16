@@ -135,6 +135,7 @@
             </div>
           </template>
         </el-table-column>
+        <el-table-column prop="importantlevelid" label="重要程度"></el-table-column>
       </el-table>
     </el-main>
   </el-container>
@@ -252,7 +253,7 @@ const getKWAData = async () => {
       tableData.value = res.data;
       initialize();
       filterTableLoading.value = false;
-      // console.log(tableData.value);
+      console.log(tableData.value);
     } else {
       ElMessage.error(res.msg);
       filterTableLoading.value = false;

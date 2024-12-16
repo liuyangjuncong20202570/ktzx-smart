@@ -1,18 +1,20 @@
 <template>
-    <el-container v-if="loading" v-loading="loading" element-loading-background="rgba(0, 0, 0, 0.2)"
+    <el-container v-if="renderLoading" v-loading="renderLoading" element-loading-background="rgba(0, 0, 0, 0.2)"
         style="height: 92vh;"></el-container>
     <choose-classroom v-else-if="isCourseManager && !hasChooseClassroom"
         @classroom-chosen="handleClassroomChosen"></choose-classroom>
     <el-container v-else-if="!isCourseManager || (isCourseManager && hasChooseClassroom)" style="height: 92vh;">
         <el-header style="height: auto; padding: 5px 0px; width: 100%; text-align: left; background-color: #deebf7;">
             <!-- <el-button type="success" style="margin-left: 0.8vw; cursor: not-allowed;">新增</el-button> -->
-            <el-button type="primary" style="margin-left: 0.8vw" @click="getData">刷新报告数据</el-button>
+            <el-button type="primary" v-if="!isCourseManager" style="margin-left: 0.8vw"
+                @click="calc()">刷新报告数据</el-button>
             <el-button type="success" style="margin-left: 0.8vw;" @click="printReport">打印报告</el-button>
             <el-button type="success" style="margin-left: 0.8vw;" @click="generatePDF">下载报告</el-button>
             <el-button type="primary" v-if="isCourseManager" style="margin-left: 0.8vw;"
                 @click="hasChooseClassroom = false">切换课堂</el-button>
         </el-header>
-        <div class="main-block" style="text-align: left; padding: 10mm 0; overflow: auto;">
+        <div v-loading="pageLoading" element-loading-background="rgba(0, 0, 0, 0.2)" class="main-block"
+            style="text-align: left; padding: 10mm 0; overflow: auto;">
             <div id="report-container"
                 style="width: 190mm; color: #0f0f0f; margin: 0 auto; font-size: 16px; font-weight: bolder; font-family: 'SimSun';">
                 <div style="margin-bottom: 30px; text-align: center;">{{ headerData.classroomName }}<br>课堂评价报告</div>
@@ -20,36 +22,38 @@
                     <div>一、课堂基本信息</div>
                     <table>
                         <tr>
-                            <td>课程名称</td>
+                            <td colspan="3"> 课程名称</td>
                             <td colspan="3">{{ headerData.courseName }}</td>
                             <td>开课学期</td>
                             <td>{{ headerData.termName }}</td>
                         </tr>
                         <tr>
-                            <td>任课教师</td>
+                            <td colspan="3">任课教师</td>
                             <td colspan="3">{{ headerData.teacherName }}</td>
                             <td>学时/学分</td>
                             <td>{{ headerData.time }} / {{ headerData.score ? headerData.score : 0 }}</td>
                         </tr>
                         <tr>
-                            <td>课堂名称/周次</td>
+                            <td colspan="3">课堂名称/周次</td>
                             <td colspan="3">{{ headerData.classroomName }}</td>
                             <td>课堂人数</td>
                             <td>{{ studentList.length }}</td>
                         </tr>
                         <tr>
-                            <td colspan="6">学生成绩总评结果</td>
+                            <td colspan="8">学生成绩总评结果</td>
                         </tr>
                         <tr>
                             <td>最高分</td>
-                            <td>96</td>
+                            <td>{{ headerData.topScore }}</td>
+                            <td>最低分</td>
+                            <td>{{ headerData.lowestScore }}</td>
                             <td>平均分</td>
-                            <td>81.26</td>
+                            <td>{{ headerData.averScore }}</td>
                             <td>不及格人数</td>
-                            <td>1</td>
+                            <td>{{ headerData.failNum }}</td>
                         </tr>
                         <tr>
-                            <td colspan="6">
+                            <td colspan="8">
                                 <div id="grade-div" style="height: 280px; margin-top: 10px; display: flex; flex-direction: column; justify-content: center;
                                 align-items: center"></div>
                             </td>
@@ -73,7 +77,7 @@
                 <div style="padding-left: 32px;">
                     <div style="text-align: left; margin-top: 10px;">
                         1、课程目标个体评价</div>
-                    <div v-for="(ctd, i) in courseTargetData" :key="ctd.id">
+                    <div v-for="(ctd, i) of courseTargetData" :key="ctd.id">
                         <div :id="ctd.id" style="height: 63.25mm;"></div>
                         <div v-if="targetAchievementPersonalDegreeScatterList[i]"
                             style="padding-left: 32px; margin: -25px 0 20px 0;">
@@ -81,7 +85,7 @@
                             <span v-if="targetAchievementPersonalDegreeScatterList[i].data[1].length">其中
                                 {{ targetAchievementPersonalDegreeScatterList[i].data[1].join(',') }}
                                 号同学本课程目标达成度低于0.6，目标没有达成</span>
-                            <span v-else>本目标全员达成</span>
+                            <span v-else-if="targetAchievementData">本目标全员达成</span>
                         </div>
                     </div>
                 </div>
@@ -93,18 +97,13 @@
                             <td style="width: 50px;">序号</td>
                             <td style="width: 120px;">学号</td>
                             <td style="width: 80px;">姓名</td>
-                            <td>课程目标1</td>
-                            <td>课程目标2</td>
-                            <td>课程目标3</td>
-                            <td>课程目标4</td>
-                            <td>课程目标5</td>
-                            <td>课程目标6</td>
+                            <td v-for="t of courseTargetData" :key="t.id">{{ t.name }}</td>
                         </tr>
-                        <tr v-for="e in targetAchievementData" :key="e.stuno">
-                            <td>{{ e.rowNo }}</td>
-                            <td style="width: 120px;">{{ e.stuno }}</td>
-                            <td style="width: 80px;">{{ e.userName }}</td>
-                            <td v-for="t in courseTargetData" :key="t.id">{{ Number(e[t.id]) >= 0.6 ? '√' : '' }}</td>
+                        <tr v-for="s of studentList" :key="s.stuno">
+                            <td>{{ s.rowNo }}</td>
+                            <td style="width: 120px;">{{ s.stuno }}</td>
+                            <td style="width: 80px;">{{ s.username }}</td>
+                            <td v-for="t in courseTargetData" :key="t.id">{{ Number(s[t.id]) >= 0.6 ? '√' : '' }}</td>
                         </tr>
                     </table>
                 </div>
@@ -116,19 +115,14 @@
                         <td style="width: 120px;">学号</td>
                         <td style="width: 80px;">姓名</td>
                         <td style="width: 120px;">班级</td>
-                        <td>课程目标1</td>
-                        <td>课程目标2</td>
-                        <td>课程目标3</td>
-                        <td>课程目标4</td>
-                        <td>课程目标5</td>
-                        <td>课程目标6</td>
+                        <td v-for="t of courseTargetData" :key="t.id">{{ t.name }}</td>
                     </tr>
-                    <tr v-for="e in targetAchievementData" :key="e.stuno">
-                        <td style="width: 50px;">{{ e.rowNo }}</td>
-                        <td style="width: 120px;">{{ e.stuno }}</td>
-                        <td style="width: 80px;">{{ e.userName }}</td>
-                        <td style="width: 120px;">{{ e.obsName }}</td>
-                        <td v-for="t in courseTargetData" :key="t.id">{{ e[t.id].toFixed(2) }}</td>
+                    <tr v-for="s of studentList" :key="s.stuno">
+                        <td style="width: 50px;">{{ s.rowNo }}</td>
+                        <td style="width: 120px;">{{ s.stuno }}</td>
+                        <td style="width: 80px;">{{ s.username }}</td>
+                        <td style="width: 120px;">{{ s.className }}</td>
+                        <td v-for="t in courseTargetData" :key="t.id">{{ s[t.id] }}</td>
                     </tr>
                 </table>
             </div>
@@ -143,115 +137,22 @@ import html2pdf from 'html2pdf.js';
 import request from '../../utils/request';
 import { ElMessage } from 'element-plus';
 import ChooseClassroom from './subcomponents/ChooseClassroom.vue';
-import { he } from 'element-plus/es/locale/index.mjs';
 
 const isCourseManager = ref(null);
 const hasChooseClassroom = ref(false);
-const loading = ref(true);
+const renderLoading = ref(true);
+const pageLoading = ref(true);
 const headerData = ref({});
-const studentList = ref([])
+const stuTotalScoreMap = ref(null);
+const stuTargetAchievementMap = ref(null);
+const studentList = ref([]);
+const classroomId = ref(null);
 
-const courseTargetData = ref([      // 课程目标数据
-    {
-        id: '1',
-        name: '课程目标1'
-    },
-    {
-        id: '2',
-        name: '课程目标2'
-    },
-    {
-        id: '3',
-        name: '课程目标3'
-    },
-    {
-        id: '4',
-        name: '课程目标4'
-    },
-    {
-        id: '5',
-        name: '课程目标5'
-    },
-    {
-        id: '6',
-        name: '课程目标6'
-    },
-])
+const totalScore = ref(null);
 
-const targetAchievementData = ref([     // 计算好的各个学生的课程目标达成度
-    {
-        rowNo: 1,
-        stuno: '22101130110',
-        userName: '张心玮',
-        obsName: '计实验22',
-        1: 0.76,
-        2: 0.58,
-        3: 0.81,
-        4: 0.92,
-        5: 0.71,
-        6: 0.86
-    },
-    {
-        rowNo: 2,
-        stuno: '22101130105',
-        userName: '张顺心',
-        obsName: '计实验22',
-        1: 0.92,
-        2: 0.88,
-        3: 0.89,
-        4: 0.96,
-        5: 0.90,
-        6: 0.92
-    },
-    {
-        rowNo: 3,
-        stuno: '22101130111',
-        userName: '张心瑞',
-        obsName: '计22-3',
-        1: 0.76,
-        2: 0.56,
-        3: 0.59,
-        4: 0.83,
-        5: 0.84,
-        6: 0.92
-    },
-    {
-        rowNo: 4,
-        stuno: '22101130120',
-        userName: '马子晨',
-        obsName: '计实验22',
-        1: 0.96,
-        2: 0.88,
-        3: 0.89,
-        4: 0.92,
-        5: 0.81,
-        6: 0.86
-    },
-    {
-        rowNo: 5,
-        stuno: '22101130115',
-        userName: '任腾旭',
-        obsName: '计22-2',
-        1: 0.57,
-        2: 0.81,
-        3: 0.88,
-        4: 0.90,
-        5: 0.56,
-        6: 0.71
-    },
-    {
-        rowNo: 6,
-        stuno: '66666666666',
-        userName: '金桂乌龙',
-        obsName: '计实验66',
-        1: 1.00,
-        2: 1.00,
-        3: 1.00,
-        4: 1.00,
-        5: 1.00,
-        6: 1.00
-    },
-]);      // 存放计算好的所有学生的课程目标达成度数据
+const courseTargetData = ref()
+
+const targetAchievementData = ref(null);      // 存放计算好的所有学生的课程目标达成度数据
 
 const targetSumAchievementDegree = ref({});     // 存储每个课程目标达成度的平均达成度
 
@@ -286,13 +187,13 @@ const checkRole = async () => {     // 查询是否是课程负责人，课程�
                 isCourseManager.value = false;
                 getClassroomInfoByClassroomId();
             }
-            loading.value = false;
         } else {
             ElMessage.error(res.msg);
         }
     } catch (error) {
         ElMessage.error('查询角色类型失败' + error);
     }
+    renderLoading.value = false;
     return isCourseManager.value;
 }
 
@@ -307,17 +208,118 @@ const getObsidFromToken = (token) => {
     return decodedPayload.obsid;
 }
 
+const calc = async () => {
+    pageLoading.value = true;
+    try {
+        const res = await request.evaluation.get(`/evaluation/attainment/calc`);
+        if (res.code === 200) {
+            await getData(classroomId.value);
+        } else {
+            ElMessage.error(res.msg);
+        }
+    } catch (error) {
+        ElMessage.error('计算失败' + error);
+    };
+    pageLoading.value = false;
+}
+
 onMounted(async () => {
-    loading.value = true;
+    renderLoading.value = true;
     await checkRole();
     if (!isCourseManager.value) {
         const token = sessionStorage.getItem('token');
-        const obsid = getObsidFromToken(token);
-        await getData(obsid);
+        classroomId.value = getObsidFromToken(token);
+        await getData(classroomId.value);
     }
 })
 
+const getData = async (classroomId) => {
+    pageLoading.value = true;
+    try {
+        const res = await request.evaluation.get(`/evaluation/attainment/getClassroomStuList?classroomId=${classroomId}`);
+        if (res.code === 200) {
+            studentList.value = res.data;
+        } else ElMessage.error(res.msg);
+    } catch (error) {
+        ElMessage.error('获取学生列表失败' + error);
+    }
+
+    try {
+        const res = await request.evaluation.get(`/evaluation/coursetarget`);
+        if (res.code === 200) {
+            courseTargetData.value = res.data;
+        }
+        else ElMessage.error(res.msg);
+    } catch (error) {
+        ElMessage.error('获取课程目标失败' + error);
+    }
+
+    try {
+        const res = await request.evaluation.get(`/evaluation/attainment/getTotalScore?classroomId=${classroomId}`);
+        if (res.code === 200) {
+            totalScore.value = res.data;
+        } else {
+            ElMessage.error(res.msg);
+        }
+    } catch (error) {
+        ElMessage.error('获取成绩失败' + error);
+    }
+
+    try {
+        const res = await request.evaluation.get(`/evaluation/attainment/getTargetAchievement?classroomId=${classroomId}`);
+        if (res.code === 200) {
+            targetAchievementData.value = res.data;
+        } else {
+            ElMessage.error(res.msg);
+        }
+    } catch (error) {
+        ElMessage.error('获取课程目标达成失败' + error);
+    }
+
+    setTimeout(() => {
+        initialize();
+        pageLoading.value = false;
+    }, 100)
+}
+
 const initialize = () => {
+    stuTotalScoreMap.value = new Map();
+    totalScore.value.forEach(score => {
+        const { stuId, checkitemId, checkitemScore, ratio } = score;
+        if (!stuTotalScoreMap.value.get(stuId)) stuTotalScoreMap.value.set(stuId, 0);
+        let totalScore = stuTotalScoreMap.value.get(stuId);
+        stuTotalScoreMap.value.set(stuId, totalScore + checkitemScore * ratio);
+    });
+
+    stuTargetAchievementMap.value = new Map();
+    for (let t of targetAchievementData.value) {
+        const { id, stuId, classroomId, targetId, degree } = t;
+        if (!stuTargetAchievementMap.value.get(stuId)) stuTargetAchievementMap.value.set(stuId, {});
+        stuTargetAchievementMap.value.get(stuId)[targetId] = Number(degree.toFixed(2));
+    }
+
+    Object.assign(headerData.value, {
+        averScore: 0,
+        topScore: 0,
+        lowestScore: 100,
+        failNum: 0
+    });
+    for (let stu of studentList.value) {
+        let score = stuTotalScoreMap.value.get(stu.id);
+        if (!score) continue;
+        stu.totalScore = Number(score.toFixed(0));
+        headerData.value.averScore += score;
+        if (score > headerData.value.topScore) headerData.value.topScore = Number(score.toFixed(0));
+        if (score < headerData.value.lowestScore) headerData.value.lowestScore = Number(score.toFixed(0));
+        if (score < 60) headerData.value.failNum++;
+
+        const targetAchievement = stuTargetAchievementMap.value.get(stu.id);
+        Object.assign(stu, targetAchievement);
+    };
+    headerData.value.averScore = Number((headerData.value.averScore / studentList.value.length).toFixed(2));
+    console.log(studentList.value);
+
+    const gradeDivData = generateGradeDivData();
     gradeDivBar.value = echarts.init(document.getElementById('grade-div'), null, { renderer: 'svg' });
     gradeDivBar.value.setOption({
         title: {
@@ -338,32 +340,7 @@ const initialize = () => {
         yAxis: {},
         series: [{
             type: "bar",
-            data: [
-                {
-                    value: 1,
-                    itemStyle: {
-                        color: '#d00'
-                    }
-                },
-                {
-                    value: 12,
-                    itemStyle: {
-                        color: 'dodgerblue'
-                    }
-                },
-                {
-                    value: 19,
-                    itemStyle: {
-                        color: 'dodgerblue'
-                    }
-                },
-                {
-                    value: 3,
-                    itemStyle: {
-                        color: 'dodgerblue'
-                    }
-                }
-            ],
+            data: gradeDivData,
             label: {
                 show: true,
                 position: 'top',
@@ -479,7 +456,7 @@ const initialize = () => {
             xAxis: {
                 type: "category",
                 // 这里type为'category'，echarts会自动把data的数据转换为String类型的
-                data: targetAchievementData.value.map(t => t.rowNo)
+                data: studentList.value.map(t => t.rowNo)
             },
             yAxis: {
                 type: "value",
@@ -493,10 +470,10 @@ const initialize = () => {
                     // console.log(params);
                     const info = params.data.extraInfo;
                     return '序号：' + info.rowNo + '<br>' +
-                        '姓名：' + info.userName + '<br>' +
+                        '姓名：' + info.username + '<br>' +
                         '学号：' + info.stuno + '<br>' +
-                        '班级：' + info.obsName + '<br>' +
-                        '达成度: ' + params.value[1].toFixed(2) + '<br>' +
+                        '班级：' + info.className + '<br>' +
+                        '达成度: ' + params.value[1] + '<br>' +
                         '课程目标: ' + courseTargetData.value[i].name;
                 }
             },
@@ -532,18 +509,6 @@ const initialize = () => {
     }
 }
 
-const getData = async (obsid) => {
-    try {
-        const res = await request.course.get(`/coursemangt/classroommangt/student/list?obsid=${obsid}`);
-        if (res.code === 200) {
-            studentList.value = res.data;
-            initialize();
-        } else ElMessage.error(res.msg);
-    } catch (error) {
-        ElMessage.error('获取学生列表失败' + error);
-    }
-}
-
 const getClassroomInfoByClassroomId = async () => {
     try {
         const res = await request.evaluation.get('/evaluation/attainment/getClassroomByClassroomId');
@@ -557,23 +522,37 @@ const getClassroomInfoByClassroomId = async () => {
     }
 }
 
-const handleClassroomChosen = async (classroomId, classroomInfo) => {
+const handleClassroomChosen = async (classroomId_, classroomInfo) => {
     headerData.value = classroomInfo;
     hasChooseClassroom.value = true;
-    await getData(classroomId);
+    classroomId.value = classroomId_;
+    await getData(classroomId.value);
+}
+
+const generateGradeDivData = () => {
+    let res = [];
+    for (let i = 0; i < 4; i++) res[i] = { value: 0, itemStyle: { color: i === 0 ? '#d00' : 'dodgerblue' } };
+    stuTotalScoreMap.value.forEach((score, stuId) => {
+        if (score < 60) res[0].value++;
+        else if (score >= 60 && score < 75) res[1].value++;
+        else if (score >= 75 && score < 84) res[2].value++;
+        else res[3].value++;
+    })
+    return res;
 }
 
 const calcTargetSumAchievementDegree = () => {      // 计算课程目标的整体达成度（均值）
     courseTargetData.value.forEach((ct) => {
         targetSumAchievementDegree.value[ct.id] = 0;
-        targetAchievementData.value.forEach((t) => {
-            targetSumAchievementDegree.value[ct.id] += t[ct.id];
+        studentList.value.forEach(stu => {
+            targetSumAchievementDegree.value[ct.id] += stu[ct.id];
         })
-        targetSumAchievementDegree.value[ct.id] = (targetSumAchievementDegree.value[ct.id] / targetAchievementData.value.length).toFixed(2);
+        let sum = targetSumAchievementDegree.value[ct.id];
+        targetSumAchievementDegree.value[ct.id] = Number((sum / studentList.value.length).toFixed(2));
     })
 }
 
-const generateSumGraphData = () => {        // 生成有关显示整体课程目标达成度的图表数据
+const generateSumGraphData = () => {        // 生成有关显示课程目标整体达成度的图表数据
     let res = [];
     courseTargetData.value.forEach((ct => {
         res.push({
@@ -586,23 +565,23 @@ const generateSumGraphData = () => {        // 生成有关显示整体课程目
     return res;
 }
 
-const generatePersonalGraphData = (courseTargetId) => {     // 生成有关显示个体课程目标达成度的图表数据
+const generatePersonalGraphData = (courseTargetId) => {     // 生成有关显示课程目标个体达成度的图表数据
     let res = [];
     let unAchieved = [];
-    targetAchievementData.value.forEach((t => {
+    studentList.value.forEach((s => {
         res.push({
-            value: [String(t.rowNo), t[courseTargetId]],
+            value: [String(s.rowNo), s[courseTargetId]],
             itemStyle: {
-                color: t[courseTargetId] >= 0.6 ? 'dodgerblue' : '#d00'
+                color: s[courseTargetId] >= 0.6 ? 'dodgerblue' : '#d00'
             },
             extraInfo: {
-                rowNo: t.rowNo,
-                userName: t.userName,
-                stuno: t.stuno,
-                obsName: t.obsName,
+                rowNo: s.rowNo,
+                username: s.username,
+                stuno: s.stuno,
+                className: s.className,
             }
         });
-        if (t[courseTargetId] < 0.6) unAchieved.push(t.rowNo);
+        if (s[courseTargetId] < 0.6) unAchieved.push(s.rowNo);
     }))
     return [res, unAchieved];
 }
