@@ -12,7 +12,7 @@ export const radarOption = (
   options,
   indicator,
   showTimeline = true,
-  expected = [90, 80, 85, 80, 95, 85, 88, 87, 90, 92]
+  expected = []
 ) => ({
   baseOption: {
     toolbox,

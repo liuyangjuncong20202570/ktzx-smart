@@ -3,7 +3,8 @@ import { defineStore } from 'pinia';
 const useMain = defineStore('Main', {
   state: () => ({
     selectedRoute: '',
-    isLoading: false
+    isLoading: false,
+    dynamicSearchloading: false
   }),
   actions: {
     setSelectedRoute(route) {
@@ -11,6 +12,9 @@ const useMain = defineStore('Main', {
     },
     setLoading(payload) {
       this.isLoading = payload;
+    },
+    setDynamicSearchloading(payload) {
+      this.dynamicSearchloading = payload;
     }
   },
   persist: {
