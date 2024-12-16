@@ -64,16 +64,12 @@
             {{ row.row.name }}
           </template>
         </el-table-column>
-        <el-table-column prop="datavalue" label="数值" width="100">
+        <!-- <el-table-column prop="datavalue" label="数值" width="100">
           <template v-slot="row">
             {{ Number(row.row.datavalue).toFixed(2) }}
           </template>
-        </el-table-column>
-        <!-- <el-table-column prop="courseid" label="重要程度" width="150">
-                    <template v-slot="row">
-                        {{ row.row.importantlevelid }}
-                    </template>
-                </el-table-column> -->
+        </el-table-column> -->
+        <el-table-column prop="importantlevel" label="重要程度" width="150"></el-table-column>
         <el-table-column prop="remark" label="备注" min-width="113">
           <template v-slot="row">
             {{ row.row.remark }}
@@ -164,7 +160,7 @@ const getAbility = () => {
     .then(res => {
       if (res.code === 200) {
         data.value = res.data;
-        // console.log(res.data);
+        console.log(res.data);
         tableData.value = [];
         initialize();
         tableLoading.value = false;
@@ -190,7 +186,7 @@ const splicedId = (node, namePath = [], idPath = []) => {
       id: node.id,
       name: currentNamePath.join('/'),
       datavalue: node.datavalue,
-      importantlevelid: node.importantlevelid,
+      importantlevel: node.importantlevel,
       remark: node.remark
     });
     return [currentIdPath];
