@@ -10,7 +10,7 @@
       <el-button type="success" style="margin-left: 0.8vw" @click="addKWA()">新增</el-button>
       <el-button type="danger" @click="deleteKWA">删除</el-button>
       <el-button type="primary">保存</el-button>
-      <el-button type="warning">导出Excel</el-button>
+      <el-button type="warning" @click="exportExcel">导出Excel</el-button>
       <el-input v-model="tableSearchData" style="margin-left: 0.8vw; width: 250px" placeholder="查找KWA">
         <template #append><el-button :icon="Search" /></template>
       </el-input>
@@ -135,6 +135,7 @@
             </div>
           </template>
         </el-table-column>
+        <el-table-column prop="importantlevelid" label="重要程度"></el-table-column>
       </el-table>
     </el-main>
   </el-container>
@@ -146,6 +147,7 @@ import { Edit, Search } from '@element-plus/icons-vue';
 import _ from 'lodash';
 import { ElMessage, ElMessageBox, ElTable } from 'element-plus';
 import request from '../../utils/request';
+import ExcelJS from "exceljs";
 
 const courseid = ref('2c918af681fa6ea7018209a505c30672');
 
@@ -208,6 +210,35 @@ const openedKeywordPop = ref(null); // 记录哪行的关键字表被打开了
 
 const openedAbilityPop = ref(null); // 记录哪行的能力表被打开了
 
+/*************导出excel*************/
+const exportExcel = async () => {
+  ElMessage.success("1");
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("Sheet1");
+
+  // 添加列标题
+  ElMessage.success("2");
+  worksheet.columns = [
+    { header: "名称", key: "name", width: 40 },
+    { header: "关键字", key: "keywordname", width: 20 },
+    { header: "能力", key: "abilityname", width: 20 },
+    { header: "权值", key: "datavalue", width: 10 }
+  ];
+  filterTableData.value.forEach(item => worksheet.addRow(item));
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: "application/octet-stream" });
+
+  // 使用原生浏览器 API 下载文件
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "基本教学目标.xlsx";
+  link.click();
+
+  // 释放资源
+  URL.revokeObjectURL(link.href);
+}
+
 /*************数据初始化**************/
 
 onMounted(async () => {
@@ -222,7 +253,7 @@ const getKWAData = async () => {
       tableData.value = res.data;
       initialize();
       filterTableLoading.value = false;
-      // console.log(tableData.value);
+      console.log(tableData.value);
     } else {
       ElMessage.error(res.msg);
       filterTableLoading.value = false;

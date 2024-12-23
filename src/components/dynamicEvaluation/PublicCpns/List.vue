@@ -11,7 +11,12 @@
     >
       <el-table-column label="序号" width="100%">
         <template #default="scope">{{
-          props.listData.findIndex(item => item.id === scope.row.id) + 1
+          props.listData.findIndex(
+            item =>
+              item.userId === scope.row.userId &&
+              item.classroomId === scope.row.classroomId &&
+              item.testId === scope.row.testId
+          ) + 1
         }}</template>
       </el-table-column>
       <template v-for="(item, index) in props.titleList" :key="index">

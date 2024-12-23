@@ -4,6 +4,7 @@ import {
   formatStudentReportGraphchartS,
   formatStudentReportGraphchartT
 } from '../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Format';
+import { getStuRepCourseList, getstuRepSearch, getStuRepStudentList } from '../../api/dynamic';
 
 const useStudentReport = defineStore('StudentReport', {
   state: () => ({
@@ -17,7 +18,9 @@ const useStudentReport = defineStore('StudentReport', {
       { timelineData: [], options: [], response: [] || {}, indicators: [], xData: [], values: [] },
       { timelineData: [], options: [], response: [] || {}, indicators: [], expected: [] },
       { timelineData: [], options: [], response: [] || {}, indicators: [], xData: [], values: [] }
-    ]
+    ],
+    courseList: [],
+    studentlist: []
   }),
   // 此处用于定义异步请求函数与state状态管理
   actions: {
@@ -93,6 +96,24 @@ const useStudentReport = defineStore('StudentReport', {
       //   this.charts[2].indicators
       // );
       // this.setChart(2, timelineDataT, optionsT, null, responseT);
+    },
+    // 获取课堂列表
+    async fetchStuRepCourseList(courseId) {
+      const { code, msg, data } = await getStuRepCourseList(courseId);
+      this.courseList = data;
+      return { code, msg };
+    },
+    // 获取学生列表
+    async fetchStuRepStudnetList(testId) {
+      const { code, msg, data } = await getStuRepStudentList(testId);
+      this.studentlist = data;
+      return { code, msg };
+    },
+    // 模糊搜索
+    async fetchSearchList(courseId, search) {
+      const { code, msg, data } = await getstuRepSearch(courseId, search);
+      this.courseList = data;
+      return { code, msg };
     }
   }
 });

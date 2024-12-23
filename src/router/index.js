@@ -253,6 +253,16 @@ const routes = [
         name: 'ClassroomGraph',
         component: () => import('../components/dynamicEvaluation/ClassroomGraph/ClassroomGraph.vue')
       },
+      {
+        path: 'evaluation/dynamicEvaluation/academicTranscript', // 达成性评价-评价名单
+        name: 'AcademicTranscript',
+        component: () => import('../components/evaluation/AcademicTranscript.vue')
+      },
+      {
+        path: 'evaluation/dynamicEvaluation/classroomReport', // 达成性评价-生成报告
+        name: 'ClassroomReport',
+        component: () => import('../components/evaluation/ClassroomReport.vue')
+      },
       // 0822
       // 课程页
       {

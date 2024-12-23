@@ -4,6 +4,7 @@ import {
   formatStudentGraphchartS,
   formatStudentGraphchartF
 } from '../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Format';
+import { getStuGraCourseList, getstuGraSearch, getStuGraStudentList } from '../../api/dynamic';
 
 const useStudentGraph = defineStore('StudentGraph', {
   state: () => ({
@@ -17,7 +18,12 @@ const useStudentGraph = defineStore('StudentGraph', {
       { timelineData: [], options: [], response: [] || {}, indicators: [], expected: [] },
       { timelineData: [], options: [], response: [] || {}, indicators: [] },
       { timelineData: [], options: [], response: [] || {}, indicators: [] }
-    ]
+    ],
+
+    // 课堂列表
+    courseList: [],
+    // 学生列表
+    studentList: []
   }),
   // 此处用于定义异步请求函数与state状态管理
   actions: {
@@ -67,6 +73,24 @@ const useStudentGraph = defineStore('StudentGraph', {
         this.charts[2].indicators
       );
       this.setChart(2, timelineDataT, optionsT, null, responseT);
+    },
+    // 获取课程列表
+    async fetchStuGraCourseList(courseId) {
+      const { code, msg, data } = await getStuGraCourseList(courseId);
+      this.courseList = data;
+      return { code, msg };
+    },
+    // 获取学生名单
+    async fetchStuGraStudentlist(classroomId) {
+      const { code, msg, data } = await getStuGraStudentList(classroomId);
+      this.studentList = data;
+      return { code, msg };
+    },
+    // 搜索功能
+    async fetchSearchList(courseId, search) {
+      const { code, msg, data } = await getstuGraSearch(courseId, search);
+      this.courseList = data;
+      return { code, msg };
     }
   }
 });

@@ -41,7 +41,7 @@
 
       <el-table
           :data="tableData"
-          style="width: 100%"
+          style="width: 100%; height: 100%;"
           row-key="id"
           :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
           border
@@ -57,9 +57,9 @@
         <!-- 任务名称列 -->
         <el-table-column prop="itemName" label="任务名称">
           <template #default="tableRowData">
-            <span v-if="editNameRef !== tableRowData.row.id"
+            <span v-if="editNameRef !== tableRowData.row.id" style="display: inline-block; height: 22px; min-width: 200px;"
                   @dblclick="editEditNameRef(tableRowData.row)">{{ tableRowData.row.itemName }}</span>
-            <el-input ref="inputNameRef" v-else v-model="tableRowData.row.itemName"
+            <el-input ref="inputNameRef" v-else v-model="tableRowData.row.itemName" style="width: 200px;"
                       @blur="saveEditNameRef(tableRowData.row)"
                       @keyup.enter="saveEditNameRef(tableRowData.row)"></el-input>
           </template>

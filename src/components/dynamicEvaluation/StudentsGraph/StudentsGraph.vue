@@ -1,10 +1,12 @@
 <template>
   <!-- 课堂列表 -->
   <GraphTemplate
+    :store="studentGraphStore"
     :handleCellClick="handleCellClick"
     :addCellStyle="addCellStyle"
     :graphList="lists"
     :titleList="titles"
+    @flushList="handleFlushList"
     keyword="请输入课堂名称关键字检索"
   />
   <!-- 课堂列表结束 -->
@@ -50,6 +52,7 @@
 import { storeToRefs } from 'pinia';
 import GraphChart from '../PublicCpns/GraphChart.vue';
 import GraphItem from '../PublicCpns/GraphItem.vue';
+import parseJWT from '../../../utils/parseJWT.js';
 import { wordMapPreset } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Wordmap.js';
 import { radarOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Radar';
 import { treeOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Treemap';
@@ -58,6 +61,7 @@ import useStudentGraph from '../../../stores/dynamicEvaluation/studentGraphStore
 import DynamicStudentList from '../PublicCpns/DynamicStudentList.vue';
 import GraphTemplate from '../PublicCpns/GraphTemplate.vue';
 import { onMounted, reactive, ref, nextTick, onBeforeUnmount } from 'vue';
+import useMain from '../../../stores/useMain.js';
 
 /* ********************变量定义******************** */
 // props
@@ -76,8 +80,8 @@ const treeInstance = treeCmp.value?.getChartInstance();
 
 const stuInfo = reactive({
   stuId: 0, //学生id
-  curriculumId: 0, //课程id
-  courseId: 0, //课堂id
+  courseName: '', //课程名称
+  classroomId: 0, //课堂id
   courseName: '',
   stuname: '',
   stuNo: ''
@@ -85,56 +89,31 @@ const stuInfo = reactive({
 
 // pinia状态
 const studentGraphStore = useStudentGraph();
+const mainStore = useMain();
 const { stuListVisible, chartVisible } = storeToRefs(studentGraphStore);
 
 /* ********************课程数据定义******************** */
 const titles = [
-  { prop: 'courseName', label: '课堂名称' }, //小
-  { prop: 'term', label: '学期' },
-  { prop: 'curriculum', label: '课程' }, //大
+  { prop: 'classroomName', label: '课堂名称' }, //小
+  { prop: 'termName', label: '学期' },
+  { prop: 'courseName', label: '课程' }, //大
   { prop: 'profession', label: '专业' },
-  { prop: 'mainTeacher', label: '主讲教师' },
-  { prop: 'experimentTeacher', label: '实验教师' },
+  { prop: 'teacherName', label: '主讲教师' },
+  { prop: 'labTeacher', label: '实验教师' },
   { prop: 'practiceTeacher', label: '实践教师' },
   { prop: 'creator', label: '创建人' }
 ];
 
-const lists = [
-  {
-    id: 0,
-    courseName: '单片机原理及应用I-2023春-自实验21',
-    term: '2023春季学期',
-    curriculum: '单片机原理及应用I',
-    profession: '自动化专业',
-    mainTeacher: '赵仁涛',
-    experimentTeacher: '',
-    practiceTeacher: '',
-    creator: '自动化专业负责人'
-  },
-  {
-    id: 3,
-    courseName: '单片机原理及应用I-2024春-自实验22',
-    term: '2024春季学期',
-    curriculum: '单片机原理及应用I',
-    profession: '自动化专业',
-    mainTeacher: '赵仁涛',
-    experimentTeacher: '',
-    practiceTeacher: '',
-    creator: '李志军'
-  }
-];
+const lists = ref([]);
 
 /* ********************学生数据数据定义******************** */
 const studentTitles = [
-  { prop: 'name', label: '姓名' },
+  { prop: 'userName', label: '姓名' },
   { prop: 'stuno', label: '学号' },
-  { prop: 'classname', label: '班级' }
+  { prop: 'obsName', label: '班级' }
 ];
 
-const studentLists = [
-  { id: 0, name: '古子阳', stuno: '18101150110', classname: '自实验21' },
-  { id: 1, name: '杨金立', stuno: '21101150107', classname: '自实验21' }
-];
+const studentLists = ref([]);
 
 /* ********************方法定义******************** */
 
@@ -168,7 +147,7 @@ const onKWTimelineChanged = event => {
 };
 // 单元格样式定义
 const addCellStyle = ({ row, column, rowIndex, columnIndex }) => {
-  if (column.property === 'courseName') {
+  if (column.property === 'classroomName') {
     return {
       color: '#86BFA8',
       textAlign: 'center',
@@ -184,20 +163,20 @@ const addCellStyle = ({ row, column, rowIndex, columnIndex }) => {
 // 单元格点击事件
 const handleCellClick = (row, column, cell) => {
   // 限定只有courseName单元格才能点击
-  if (column.property === 'courseName') {
+  if (column.property === 'classroomName') {
     // 记录学生课堂信息
     stuInfo.courseName = row.courseName;
-    stuInfo.courseId = row.id;
+    stuInfo.classroomId = row.classroomId;
     // 控制学生列表是否可见
     studentGraphStore.setListVisible(true);
-    console.log(row.id);
-    //TODO 此处将打开学生列表，发送请求将id传过去
+    // 获取学生列表
+    initStuList(row.classroomId);
   }
 };
 
 /* ************学生列表单元格样式定义*********** */
 const stuListCellStyle = ({ row, column, rowIndex, columnIndex }) => {
-  if (column.property === 'name' || column.property === 'stuno') {
+  if (column.property === 'userName' || column.property === 'stuno') {
     return {
       color: '#86BFA8',
       textAlign: 'center',
@@ -213,14 +192,14 @@ const stuListCellStyle = ({ row, column, rowIndex, columnIndex }) => {
 // 单元格点击事件
 const stuListCellClick = (row, column, cell) => {
   // 限定只有courseName单元格才能点击
-  if (column.property === 'name' || column.property === 'stuno') {
+  if (column.property === 'userName' || column.property === 'stuno') {
     // 将被点击的学生记录
-    stuInfo.stuId = row.id;
-    stuInfo.stuname = row.name;
+    stuInfo.stuId = row.stuId;
+    stuInfo.stuname = row.userName;
     stuInfo.stuNo = row.stuno;
     studentGraphStore.setChartVisible(true);
     console.log(row.id);
-    //TODO 此处将打开学生列表，发送请求将id传过去
+    //TODO 此处将打开具体学生评价画像，需要在此调用initChart方法
   }
 };
 
@@ -254,7 +233,39 @@ const initChart = () => {
   };
 };
 
+const initStuList = async classroomId => {
+  const { code, msg } = await studentGraphStore.fetchStuGraStudentlist(classroomId);
+  if (!(code === 200 && msg === 'success')) {
+    ElMessage({
+      type: 'error',
+      message: msg
+    });
+    return;
+  }
+  studentLists.value = studentGraphStore.studentList;
+};
+
+const initList = async () => {
+  const { code, msg } = await studentGraphStore.fetchStuGraCourseList(
+    parseJWT(sessionStorage.getItem('token')).obsid
+  );
+  if (!(code === 200 && msg === 'success')) {
+    ElMessage({
+      type: 'error',
+      message: msg
+    });
+    return;
+  }
+  lists.value = studentGraphStore.courseList;
+};
+const handleFlushList = () => {
+  lists.value = studentGraphStore.courseList;
+  mainStore.setDynamicSearchloading(false);
+};
+
 onMounted(async () => {
+  // 获取课程列表
+  initList();
   // 此为异步操作，应为await，此处为模拟
   initChart();
 });
