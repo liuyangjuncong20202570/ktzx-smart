@@ -13,6 +13,8 @@
             <el-form-item label="题库" prop="libType">
                 <el-radio-group @change="(() => {
                     ruleForm.queTypeIds = ''
+                    selectedTableData = []
+                    tableData = []
                     getCourseLibTypeList()
                 })" v-model="ruleForm.libType">
                     <el-radio :label="1">课程题库</el-radio>
@@ -181,10 +183,8 @@ const kwaEvent = (val) => {
     console.log('???', abilityIds, abilityIds)
     ruleForm.value.abilityIds = abilityIds
     ruleForm.value.keyIds = keyIds
-    ruleForm.value.libType = 1
     selectedTableData.value = []
     tableData.value = []
-    getCourseLibTypeList()
 }
 
 const submitForm = () => {
