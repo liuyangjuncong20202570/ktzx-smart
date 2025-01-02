@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, onBeforeUnmount } from 'vue';
 import { defaultPreset } from '../../../assets/js/dynamicEvaluationPresets/defaultChart';
 /* ********************变量定义******************** */
 // props定义
@@ -68,6 +68,10 @@ defineExpose({
 const inputSlider = () => {};
 
 onMounted(() => {});
+onBeforeUnmount(() => {
+  chartRef.value.dispose();
+  chartRef.value = null;
+});
 </script>
 
 <style lang="less" scoped>

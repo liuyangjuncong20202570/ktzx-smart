@@ -44,6 +44,8 @@
 
 <script setup>
 import _ from 'lodash';
+import { getCourseId } from '@/utils/searchCourseId.js';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import parseJWT from '../../../utils/parseJWT.js';
 import GraphItem from '../PublicCpns/GraphItem.vue';
 import GraphChart from '../PublicCpns/GraphChart.vue';
@@ -207,8 +209,19 @@ const initStudent = async testId => {
 };
 
 const initList = async () => {
+  const role = JSON.parse(sessionStorage.getItem('users'));
+  let courseId = ref('');
+  if (role.rolename === '任课教师') {
+    const { code, msg, data } = await getCourseId(parseJWT(sessionStorage.getItem('token')).obsid);
+    if (code === 200 && msg === 'success') {
+      courseId.value = data;
+    }
+  } else {
+    courseId.value = parseJWT(sessionStorage.getItem('token')).obsid;
+  }
   const { code, msg } = await studentReportStore.fetchStuRepCourseList(
-    parseJWT(sessionStorage.getItem('token')).obsid
+    // parseJWT(sessionStorage.getItem('token')).obsid
+    courseId.value
   );
   if (!(code === 200 && msg === 'success')) {
     ElMessage({

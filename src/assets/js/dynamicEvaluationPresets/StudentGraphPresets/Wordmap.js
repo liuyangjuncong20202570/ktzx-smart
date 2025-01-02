@@ -16,9 +16,9 @@ export const wordMapPreset = {
   height: '80%',
   right: null,
   bottom: null,
-  sizeRange: [12, 60],
+  sizeRange: [25, 60],
   gridSize: 20,
-  shrinkToFit: false,
+  shrinkToFit: true,
   layoutAnimation: true,
   textStyle: {
     fontFamily: 'sans-serif',
@@ -26,13 +26,13 @@ export const wordMapPreset = {
     // Color can be a callback function or a color string
     color: function (params) {
       const value = params.value;
-      if (value >= 90) {
+      if (value >= 0.9) {
         return 'rgb(144, 238, 144)';
-      } else if (value >= 80) {
+      } else if (value >= 0.8) {
         return 'rgb(72, 118, 255)';
-      } else if (value >= 70) {
+      } else if (value >= 0.7) {
         return 'rgb(255, 255, 0)';
-      } else if (value < 70 && value > 0) {
+      } else if (value < 0.7 && value > 0) {
         return 'rgb(251, 158, 148)';
       } else if (value === 0) {
         return 'rgb(207, 207, 207)';
@@ -49,7 +49,7 @@ export const wordMapPreset = {
   }
 };
 
-export const wordOption = (timelineData, initialData) => ({
+export const wordOption = (timelineData, { series }) => ({
   toolbox,
   graphic: [
     {
@@ -61,15 +61,17 @@ export const wordOption = (timelineData, initialData) => ({
     }
   ],
 
-  timeline: timeline(timelineData),
+  timeline: { ...timeline(timelineData), currentIndex: timelineData.length - 1 },
   tooltip,
+  series
+  // options
 
-  series: [
-    {
-      ...wordMapPreset,
-      data: initialData
-    }
-  ]
+  // series: [
+  //   {
+  //     ...wordMapPreset,
+  //     data: initialData
+  //   }
+  // ]
 });
 
 // export const wordOption = {

@@ -4,7 +4,13 @@ import {
   formatStudentGraphchartS,
   formatStudentGraphchartF
 } from '../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Format';
-import { getStuGraCourseList, getstuGraSearch, getStuGraStudentList } from '../../api/dynamic';
+import {
+  getStuGraCourseList,
+  getstuGraSearch,
+  getStuGraStudentList,
+  getEvaluationTimes,
+  getGraphEvaluation
+} from '../../api/dynamic';
 
 const useStudentGraph = defineStore('StudentGraph', {
   state: () => ({
@@ -23,7 +29,9 @@ const useStudentGraph = defineStore('StudentGraph', {
     // 课堂列表
     courseList: [],
     // 学生列表
-    studentList: []
+    studentList: [],
+    // 总评价次数
+    totalTimes: 0
   }),
   // 此处用于定义异步请求函数与state状态管理
   actions: {
@@ -40,27 +48,31 @@ const useStudentGraph = defineStore('StudentGraph', {
       this.charts[index].options = options;
       this.charts[index].indicators = indicators;
     }, // 定义获取图表数据异步函数
-    updateCharts() {
+    updateCharts(num, isInit = true) {
       // 获取数据后进行数据标准化
       const {
         timelineData: timelineDataF,
         options: optionsF,
         indicators: indicatorsF
       } = formatStudentGraphchartF(
-        null,
+        this.charts[0].response,
         this.charts[0].timelineData,
         this.charts[0].options,
-        this.charts[0].indicators
+        this.charts[0].indicators,
+        num,
+        isInit
       );
-      this.setChart(0, timelineDataF, optionsF, indicatorsF);
+      this.charts[0].timelineData = timelineDataF;
 
       const { response: responseS, timelineData: timelineDataS } = formatStudentGraphchartS(
         this.charts[1].response,
         this.charts[1].timelineData,
         this.charts[1].options,
-        this.charts[1].indicators
+        this.charts[1].indicators,
+        num,
+        isInit
       );
-      this.setChart(1, timelineDataS, null, null, responseS);
+      this.charts[1].timelineData = timelineDataS;
 
       const {
         timelineData: timelineDataT,
@@ -90,6 +102,21 @@ const useStudentGraph = defineStore('StudentGraph', {
     async fetchSearchList(courseId, search) {
       const { code, msg, data } = await getstuGraSearch(courseId, search);
       this.courseList = data;
+      return { code, msg };
+    },
+    // 获取总评价次数
+    async fetchEvaluationTimes(courseId, classroomId) {
+      const { code, msg, data } = await getEvaluationTimes(courseId, classroomId);
+      this.totalTimes = data;
+      return { code, msg };
+    },
+    // 获取评价
+    async fetchGraphEvaluation(classroomId, stuId, courseId, num) {
+      const { code, msg, data } = await getGraphEvaluation(classroomId, stuId, courseId, num);
+      if (code === 200 && msg === 'success') {
+        this.charts[0].response = data.ability;
+        (this.charts[1].response = data.keyword), (this.charts[2].response = data.unitTree);
+      }
       return { code, msg };
     }
   }

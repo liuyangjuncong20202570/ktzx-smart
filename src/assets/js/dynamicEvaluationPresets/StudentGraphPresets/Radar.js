@@ -22,7 +22,11 @@ export const radarOption = (
       left: 'center' // 图例水平居中
     },
     // 时间轴
-    timeline: { show: showTimeline, ...timeline(timelineData) },
+    timeline: {
+      show: showTimeline,
+      ...timeline(timelineData),
+      currentIndex: timelineData.length - 1
+    },
     graphic: {
       ...graphicTitle
     },
