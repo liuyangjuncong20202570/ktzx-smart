@@ -46,11 +46,7 @@ const useClassroomGraph = defineStore('ClassroomGraph', {
     updateCharts(num, isInit = true, which = 0) {
       // 获取数据后进行数据标准化
       if (which === 1) {
-        const {
-          timelineData: timelineDataF,
-          options: optionsF,
-          indicators: indicatorsF
-        } = formatClassroomGraphchartF(
+        formatClassroomGraphchartF(
           this.charts[0].response,
           this.charts[0].timelineData,
           this.charts[0].options,
@@ -58,11 +54,8 @@ const useClassroomGraph = defineStore('ClassroomGraph', {
           num,
           isInit
         );
-        // console.log(indicatorsF);
-        // this.charts[0].timelineData = timelineDataF;
-        // this.setChart(0, timelineDataF, null, null);
       } else if (which === 2) {
-        const { response: responseS, timelineData: timelineDataS } = formatClassroomGraphchartS(
+        formatClassroomGraphchartS(
           this.charts[1].response,
           this.charts[1].timelineData,
           this.charts[1].options,
@@ -70,8 +63,6 @@ const useClassroomGraph = defineStore('ClassroomGraph', {
           num,
           isInit
         );
-        // this.setChart(1, timelineDataS, null, null, responseS);
-        // this.charts[1].timelineData = timelineDataS;
       } else if (which === 3) {
         formatClassroomGraphchartT(
           this.charts[2].response,
@@ -81,13 +72,8 @@ const useClassroomGraph = defineStore('ClassroomGraph', {
           num,
           isInit
         );
-        // this.setChart(2, timelineDataT, optionsT, null, responseT);
       } else {
-        const {
-          timelineData: timelineDataF,
-          options: optionsF,
-          indicators: indicatorsF
-        } = formatClassroomGraphchartF(
+        formatClassroomGraphchartF(
           this.charts[0].response,
           this.charts[0].timelineData,
           this.charts[0].options,
@@ -95,11 +81,8 @@ const useClassroomGraph = defineStore('ClassroomGraph', {
           num,
           isInit
         );
-        // console.log(indicatorsF);
-        // this.charts[0].timelineData = timelineDataF;
-        // this.setChart(0, timelineDataF, null, null);
 
-        const { response: responseS, timelineData: timelineDataS } = formatClassroomGraphchartS(
+        formatClassroomGraphchartS(
           this.charts[1].response,
           this.charts[1].timelineData,
           this.charts[1].options,
@@ -107,8 +90,6 @@ const useClassroomGraph = defineStore('ClassroomGraph', {
           num,
           isInit
         );
-        // this.setChart(1, timelineDataS, null, null, responseS);
-        // this.charts[1].timelineData = timelineDataS;
 
         formatClassroomGraphchartT(
           this.charts[2].response,
@@ -118,7 +99,6 @@ const useClassroomGraph = defineStore('ClassroomGraph', {
           num,
           isInit
         );
-        // this.setChart(2, timelineDataT, optionsT, null, responseT);
       }
     },
     // 获取课堂列表

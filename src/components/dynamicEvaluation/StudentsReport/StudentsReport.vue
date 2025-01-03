@@ -22,7 +22,11 @@
   <!-- 学生列表浮窗结束 -->
   <!-- 课堂画像图表 -->
   <GraphChart :store="studentReportStore">
-    <template #title>评价学生列表</template>
+    <template #title
+      >学生作业评价报告：{{ stuInfo.paperName }} - {{ stuInfo.stuname }}({{
+        stuInfo.stuNo
+      }})</template
+    >
     <template #GraphItem>
       <GraphItem
         title="关键词评价"
@@ -53,12 +57,13 @@ import GraphTemplate from '../PublicCpns/GraphTemplate.vue';
 import { reactive, ref, onMounted, onBeforeUnmount } from 'vue';
 import DynamicStudentList from '../PublicCpns/DynamicStudentList.vue';
 import { barOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Bar.js';
-import { radarOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Radar';
+import { radarOption } from '@/assets/js/dynamicEvaluationPresets/StudentReportPresets/Radar.js';
 import useStudentReport from '../../../stores/dynamicEvaluation/studentReportStore.js';
 import useMain from '../../../stores/useMain.js';
 /* ********************变量定义******************** */
 // props定义
 // 普通变量
+const courseId = ref('');
 const barFCmp = ref(null);
 const radarCmp = ref(null);
 const barSCmp = ref(null);
@@ -68,9 +73,10 @@ const barSInstance = barSCmp.value?.getChartInstance();
 
 const stuInfo = reactive({
   stuId: 0, //学生id
-  curriculumId: 0, //课程id
+  classroomId: 0, //课程id
   courseId: 0, //课堂id
-  courseName: '',
+  paperId: 0,
+  paperName: '',
   stuname: '',
   stuNo: ''
 });
@@ -127,11 +133,14 @@ const addCellStyle = ({ row, column, rowIndex, columnIndex }) => {
 
 // 单元格点击事件
 const handleCellClick = (row, column, cell) => {
+  console.log(row);
   // 限定只有courseName单元格才能点击
   if (column.property === 'testName') {
     // 记录学生课堂信息
-    stuInfo.courseName = row.courseName;
-    stuInfo.courseId = row.id;
+    stuInfo.paperId = row.paperId;
+    stuInfo.classroomId = row.classroomId;
+    stuInfo.courseId = courseId.value;
+    stuInfo.paperName = row.paperName;
     // 控制学生列表是否可见
     studentReportStore.setListVisible(true);
     console.log(row.id);
@@ -155,16 +164,32 @@ const stuListCellStyle = ({ row, column, rowIndex, columnIndex }) => {
 };
 
 // 单元格点击事件
-const stuListCellClick = (row, column, cell) => {
+const stuListCellClick = async (row, column, cell) => {
+  console.log(row);
   // 限定只有courseName单元格才能点击
   if (column.property === 'userName' || column.property === 'stuNo') {
     // 将被点击的学生记录
-    stuInfo.stuId = row.id;
-    stuInfo.stuname = row.name;
-    stuInfo.stuNo = row.stuno;
+    stuInfo.stuId = row.userId;
+    stuInfo.stuname = row.userName;
+    stuInfo.stuNo = row.stuNo;
+    //先将原先数据进行清除
+    studentReportStore.setChart(0, [], [], [], [], [], [], []);
+    studentReportStore.setChart(1, [], [], [], [], [], [], []);
+    studentReportStore.setChart(2, [], [], [], [], [], [], []);
+    const { code, msg } = await studentReportStore.fetchReportEvaluation(
+      stuInfo.classroomId,
+      stuInfo.stuId,
+      stuInfo.courseId,
+      stuInfo.paperId
+    );
+    if (!(code === 200 && msg === 'success')) {
+      ElMessage({
+        type: 'error',
+        message: msg
+      });
+    }
     studentReportStore.setChartVisible(true);
-    console.log(row.id);
-    //TODO 此处将打开学生报告评价，须在此处调用initChart方法
+    initChart();
   }
 };
 
@@ -175,22 +200,24 @@ const initChart = () => {
   barFInstance?.clear();
   barSInstance?.clear();
   // 渲染图表
+
   studentReportStore.updateCharts();
   currentBarFOption.value = {
     ...barOption(studentReportStore.charts[0].xData, studentReportStore.charts[0].values)
   };
+
   const options = radarOption(
-    null,
     studentReportStore.charts[1].options,
     studentReportStore.charts[1].indicators,
-    false
+    studentReportStore.charts[1].expectdValue
   );
   // 更改配置项
-  options.baseOption.legend.show = false;
-  options.baseOption.graphic.invisible = true;
+  options.legend.show = false;
+  options.graphic.invisible = true;
   currentRadarOption.value = {
     ...options
   };
+
   currentBarSOption.value = {
     ...barOption(studentReportStore.charts[2].xData, studentReportStore.charts[2].values)
   };
@@ -210,7 +237,6 @@ const initStudent = async testId => {
 
 const initList = async () => {
   const role = JSON.parse(sessionStorage.getItem('users'));
-  let courseId = ref('');
   if (role.rolename === '任课教师') {
     const { code, msg, data } = await getCourseId(parseJWT(sessionStorage.getItem('token')).obsid);
     if (code === 200 && msg === 'success') {
@@ -241,7 +267,6 @@ const handleFlushList = () => {
 
 onMounted(async () => {
   initList();
-  initChart();
 });
 
 onBeforeUnmount(() => {

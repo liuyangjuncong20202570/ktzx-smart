@@ -25,6 +25,13 @@ export const getGraphEvaluation = (classroomId, stuId, courseId, num) => {
   );
 };
 
+//    获取评价次数
+export const getGraphAttendList = (classroomId, stuId, courseId) => {
+  return request.evaluation.get(
+    `/dynamic/portrait/getStudentEvalNums?classroomId=${classroomId}&stuId=${stuId}&courseId=${courseId}`
+  );
+};
+
 // 学生报告
 //    课堂列表
 export const getStuRepCourseList = courseId => {
@@ -40,6 +47,13 @@ export const getStuRepStudentList = testId => {
 export const getstuRepSearch = (courseId, search) => {
   return request.evaluation.get(
     `/dynamic/portrait/testPaperInfo?courseId=${courseId}&search=${search}`
+  );
+};
+
+//    获取评价
+export const getReportEvaluation = (classroomId, stuId, courseId, paperId) => {
+  return request.evaluation.get(
+    `/dynamic/portrait/studentPaper?classroomId=${classroomId}&stuId=${stuId}&courseId=${courseId}&paperId=${paperId}`
   );
 };
 

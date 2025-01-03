@@ -9,7 +9,8 @@ import {
   getstuGraSearch,
   getStuGraStudentList,
   getEvaluationTimes,
-  getGraphEvaluation
+  getGraphEvaluation,
+  getGraphAttendList
 } from '../../api/dynamic';
 
 const useStudentGraph = defineStore('StudentGraph', {
@@ -31,7 +32,9 @@ const useStudentGraph = defineStore('StudentGraph', {
     // 学生列表
     studentList: [],
     // 总评价次数
-    totalTimes: 0
+    totalTimes: 0,
+    // 参与评价数组
+    attendEvalList: []
   }),
   // 此处用于定义异步请求函数与state状态管理
   actions: {
@@ -48,43 +51,75 @@ const useStudentGraph = defineStore('StudentGraph', {
       this.charts[index].options = options;
       this.charts[index].indicators = indicators;
     }, // 定义获取图表数据异步函数
-    updateCharts(num, isInit = true) {
+    updateCharts(num, isInit = true, times, which = 0) {
       // 获取数据后进行数据标准化
-      const {
-        timelineData: timelineDataF,
-        options: optionsF,
-        indicators: indicatorsF
-      } = formatStudentGraphchartF(
-        this.charts[0].response,
-        this.charts[0].timelineData,
-        this.charts[0].options,
-        this.charts[0].indicators,
-        num,
-        isInit
-      );
-      this.charts[0].timelineData = timelineDataF;
+      if (which === 1) {
+        formatStudentGraphchartF(
+          this.charts[0].response,
+          this.charts[0].timelineData,
+          this.charts[0].options,
+          this.charts[0].indicators,
+          num,
+          isInit,
+          this.attendEvalList,
+          times
+        );
+      } else if (which === 2) {
+        formatStudentGraphchartS(
+          this.charts[1].response,
+          this.charts[1].timelineData,
+          this.charts[1].options,
+          this.charts[1].indicators,
+          num,
+          isInit,
+          this.attendEvalList,
+          times
+        );
+      } else if (which === 3) {
+        formatStudentGraphchartT(
+          this.charts[2].response,
+          this.charts[2].timelineData,
+          this.charts[2].options,
+          this.charts[2].indicators,
+          num,
+          isInit,
+          this.attendEvalList,
+          times
+        );
+      } else {
+        formatStudentGraphchartF(
+          this.charts[0].response,
+          this.charts[0].timelineData,
+          this.charts[0].options,
+          this.charts[0].indicators,
+          num,
+          isInit,
+          this.attendEvalList,
+          times
+        );
 
-      const { response: responseS, timelineData: timelineDataS } = formatStudentGraphchartS(
-        this.charts[1].response,
-        this.charts[1].timelineData,
-        this.charts[1].options,
-        this.charts[1].indicators,
-        num,
-        isInit
-      );
-      this.charts[1].timelineData = timelineDataS;
+        formatStudentGraphchartS(
+          this.charts[1].response,
+          this.charts[1].timelineData,
+          this.charts[1].options,
+          this.charts[1].indicators,
+          num,
+          isInit,
+          this.attendEvalList,
+          times
+        );
 
-      const {
-        timelineData: timelineDataT,
-        options: optionsT,
-        response: responseT
-      } = formatStudentGraphchartT(
-        this.charts[2].response,
-        this.charts[2].timelineData,
-        this.charts[2].options,
-        this.charts[2].indicators
-      );
-      this.setChart(2, timelineDataT, optionsT, null, responseT);
+        formatStudentGraphchartT(
+          this.charts[2].response,
+          this.charts[2].timelineData,
+          this.charts[2].options,
+          this.charts[2].indicators,
+          num,
+          isInit,
+          this.attendEvalList,
+          times
+        );
+      }
     },
     // 获取课程列表
     async fetchStuGraCourseList(courseId) {
@@ -116,6 +151,14 @@ const useStudentGraph = defineStore('StudentGraph', {
       if (code === 200 && msg === 'success') {
         this.charts[0].response = data.ability;
         (this.charts[1].response = data.keyword), (this.charts[2].response = data.unitTree);
+      }
+      return { code, msg };
+    },
+    // 获取评价次数数组
+    async fetchAttenfEvalList(classroomId, stuId, courseId) {
+      const { code, msg, data } = await getGraphAttendList(classroomId, stuId, courseId);
+      if (code === 200 && msg === 'success') {
+        this.attendEvalList = data;
       }
       return { code, msg };
     }

@@ -50,9 +50,9 @@ import GraphChart from '../PublicCpns/GraphChart.vue';
 import GraphTemplate from '../PublicCpns/GraphTemplate.vue';
 import { reactive, ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import useClassroomGraph from '../../../stores/dynamicEvaluation/classroomStore';
-import { radarOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Radar';
-import { treeOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Treemap';
-import { wordOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/wordmap';
+import { radarOption } from '../../../assets/js/dynamicEvaluationPresets/ClassRoomGraphPresets/Radar';
+import { treeOption } from '../../../assets/js/dynamicEvaluationPresets/ClassRoomGraphPresets/Treemap';
+import { wordOption } from '../../../assets/js/dynamicEvaluationPresets/ClassRoomGraphPresets/wordmap';
 import { wordMapPreset } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Wordmap.js';
 import { graphicLegend, graphicTitle } from '@/assets/js/dynamicEvaluationPresets/PublicPresets.js';
 /* ********************变量定义******************** */
@@ -126,6 +126,7 @@ const onAbilityTimelineChanged = async params => {
   };
   currentRadarOption.value.baseOption.graphic = {
     ...currentRadarOption.value.baseOption.graphic,
+    top: 5,
     style: {
       text: `当前展示第${params.currentIndex + 1}次评价，已评价${classroomGraphStore.totalTimes}次`
     }
