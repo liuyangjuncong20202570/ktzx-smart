@@ -6,7 +6,7 @@
     </div>
 
     <div v-for="(item, i) in items" :key="item.id">
-      <template v-if="item.beDefault === 0">
+      <template v-if="item.beDefault === 0 && item.beValid">
         <div class="item-title">{{ item.itemName }}</div>
         <div class="practice-item flex-between">
           <div class="item-left">
