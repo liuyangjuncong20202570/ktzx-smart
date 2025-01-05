@@ -1,5 +1,10 @@
 import { defineStore } from 'pinia';
-import { getCourseEvaluation, getCourseList, getCourseSearch } from '../../api/dynamic';
+import {
+  getCourseEvaluation,
+  getCourseList,
+  getCourseSearch,
+  getEvaluationTimes
+} from '../../api/dynamic';
 import {
   formatClassroomGraphchartT,
   formatClassroomGraphchartS,
@@ -19,7 +24,9 @@ const useClassroomGraph = defineStore('ClassroomGraph', {
       { timelineData: [], options: [], response: [] || {}, indicators: [] }
     ],
     // 课堂列表
-    courseList: []
+    courseList: [],
+    // 评价总次数
+    totalTimes: 0
   }),
   // 此处用于定义异步请求函数与state状态管理
   actions: {
@@ -36,41 +43,63 @@ const useClassroomGraph = defineStore('ClassroomGraph', {
       this.charts[index].options = options;
       this.charts[index].indicators = indicators;
     }, // 定义获取图表数据异步函数
-    updateCharts(week) {
+    updateCharts(num, isInit = true, which = 0) {
       // 获取数据后进行数据标准化
-      const {
-        timelineData: timelineDataF,
-        options: optionsF,
-        indicators: indicatorsF
-      } = formatClassroomGraphchartF(
-        this.charts[0].response,
-        this.charts[0].timelineData,
-        this.charts[0].options,
-        this.charts[0].indicators,
-        week
-      );
-      // console.log(indicatorsF);
-      this.setChart(0, timelineDataF, optionsF, indicatorsF);
+      if (which === 1) {
+        formatClassroomGraphchartF(
+          this.charts[0].response,
+          this.charts[0].timelineData,
+          this.charts[0].options,
+          this.charts[0].indicators,
+          num,
+          isInit
+        );
+      } else if (which === 2) {
+        formatClassroomGraphchartS(
+          this.charts[1].response,
+          this.charts[1].timelineData,
+          this.charts[1].options,
+          this.charts[1].indicators,
+          num,
+          isInit
+        );
+      } else if (which === 3) {
+        formatClassroomGraphchartT(
+          this.charts[2].response,
+          this.charts[2].timelineData,
+          this.charts[2].options,
+          this.charts[2].indicators,
+          num,
+          isInit
+        );
+      } else {
+        formatClassroomGraphchartF(
+          this.charts[0].response,
+          this.charts[0].timelineData,
+          this.charts[0].options,
+          this.charts[0].indicators,
+          num,
+          isInit
+        );
 
-      const { response: responseS, timelineData: timelineDataS } = formatClassroomGraphchartS(
-        this.charts[1].response,
-        this.charts[1].timelineData,
-        this.charts[1].options,
-        this.charts[1].indicators
-      );
-      this.setChart(1, timelineDataS, null, null, responseS);
+        formatClassroomGraphchartS(
+          this.charts[1].response,
+          this.charts[1].timelineData,
+          this.charts[1].options,
+          this.charts[1].indicators,
+          num,
+          isInit
+        );
 
-      const {
-        timelineData: timelineDataT,
-        options: optionsT,
-        response: responseT
-      } = formatClassroomGraphchartT(
-        this.charts[2].response,
-        this.charts[2].timelineData,
-        this.charts[2].options,
-        this.charts[2].indicators
-      );
-      this.setChart(2, timelineDataT, optionsT, null, responseT);
+        formatClassroomGraphchartT(
+          this.charts[2].response,
+          this.charts[2].timelineData,
+          this.charts[2].options,
+          this.charts[2].indicators,
+          num,
+          isInit
+        );
+      }
     },
     // 获取课堂列表
     async fetchCourseList(payload) {
@@ -81,11 +110,11 @@ const useClassroomGraph = defineStore('ClassroomGraph', {
       return { code, msg };
     },
     // 获取课堂评价
-    async fetchCourseEvaluation(classroomId, courseId, week, now) {
-      const { code, msg, data } = await getCourseEvaluation(classroomId, courseId, week, now);
+    async fetchCourseEvaluation(classroomId, courseId, num) {
+      const { code, msg, data } = await getCourseEvaluation(classroomId, courseId, num);
       if (code === 200 && msg === 'success') {
         this.charts[0].response = data.ability;
-        (this.charts[1].response = data.keyword), (this.charts[2].response = data.unit);
+        (this.charts[1].response = data.keyword), (this.charts[2].response = data.unitTree);
       }
       return { code, msg };
     },
@@ -93,6 +122,12 @@ const useClassroomGraph = defineStore('ClassroomGraph', {
     async fetchSearchList(courseId, search) {
       const { code, msg, data } = await getCourseSearch(courseId, search);
       this.courseList = data;
+      return { code, msg };
+    },
+    // 获取总体评价次数
+    async fetchEvaluationTimes(courseId, classroomId) {
+      const { code, msg, data } = await getEvaluationTimes(courseId, classroomId);
+      this.totalTimes = data;
       return { code, msg };
     }
   }

@@ -122,22 +122,26 @@ function transformToTreeData(wordCloudData) {
 //   });
 // });
 
-export const treeOption = (timelineData, options, response) => ({
+export const treeOption = (timelineData, options, times) => ({
   baseOption: {
     // 文本框（假图例）
     graphic: [{ ...graphicLegend }, { ...graphicTitle, top: 35 }],
     // 时间轴
-    timeline: timeline(timelineData),
+    timeline: {
+      ...timeline(timelineData),
+      currentIndex: times - 1,
+      progress: {
+        lineStyle: {
+          color: '#a4b1d7'
+        },
+        itemStyle: {
+          color: '#a4b1d7'
+        }
+      }
+    },
 
     // 提示框
-    tooltip,
-    // 树图配置初始数据
-    series: [
-      {
-        type: 'tree',
-        data: [transformToTreeData(response.treeValues[0])] // 使用第一个时间点的数据
-      }
-    ]
+    tooltip
   },
   options
 });
