@@ -2,11 +2,13 @@
 	<el-container style="height: 92vh;">
 		<!--两个按钮，靠最左-->
 		<el-header
-			style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
-			<el-button type="primary" style="margin-left: 0.8vw;" @click="createParentData">新增章节</el-button>
-			<el-button type="danger" @click="deleteSel">删除</el-button>
-			<el-button type="success" @click="">保存</el-button>
-			<el-button v-if="selParent" type="primary" @click="createChildrenData">新增小节</el-button>
+			style="height: 7vh; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex; align-items: center;">
+			<template v-if="isCourseManager">
+				<el-button type="primary" style="margin-left: 0.8vw;" @click="createParentData">新增章节</el-button>
+				<el-button type="danger" @click="deleteSel">删除</el-button>
+				<el-button type="success" @click="">保存</el-button>
+				<el-button v-if="selParent" type="primary" @click="createChildrenData">新增小节</el-button>
+			</template>
 			<div class="flex-container" style="width: 100%;font-weight: bold; font-size: 25px;">课程名称</div>
 		</el-header>
 		<el-main style="padding: 0; background-color: white;">
@@ -28,7 +30,7 @@
 					<template #default="tableRowData">
 						<span v-if="!editRef.get(tableRowData.row.id)['editName']"
 							@dblclick="editEditRef(tableRowData.row, 'editName')">{{ tableRowData.row.name }}</span>
-						<el-input ref="inputNameRef" v-else v-model="tableRowData.row.name"
+						<el-input ref="inputNameRef" v-else-if="isCourseManager" v-model="tableRowData.row.name"
 							@blur="saveEditRef(tableRowData.row, 'editName')"
 							@keyup.enter="saveEditRef(tableRowData.row, 'editName')"></el-input>
 					</template>
@@ -39,14 +41,15 @@
 							@dblclick="editEditRef(tableRowData.row, 'editDataValue')">
 							{{ tableRowData.row.datavalue }}
 						</span>
-						<el-input ref="inputDataValueRef" v-else v-model="tableRowData.row.datavalue"
-							@blur="saveEditRef(tableRowData.row, 'editDataValue')"
+						<el-input ref="inputDataValueRef" v-else-if="isCourseManager"
+							v-model="tableRowData.row.datavalue" @blur="saveEditRef(tableRowData.row, 'editDataValue')"
 							@keyup.enter="saveEditRef(tableRowData.row, 'editDataValue')"></el-input>
 					</template>
 				</el-table-column>
 				<el-table-column prop="kwas" label="基本教学目标">
 					<template #default="tableRowData">
-						<el-popover placement="right-end" width="500" :visible="kwaPopoverVisible[tableRowData.row.id]">
+						<el-popover v-if="isCourseManager" placement="right-end" width="500"
+							:visible="kwaPopoverVisible[tableRowData.row.id]">
 							<div style="text-align: right;">
 								<el-button style="font-size: 23px;" :type="'danger'" link
 									@click="kwaPopoverVisible[tableRowData.row.id] = isKwaPopoverShow = false;">×</el-button>
@@ -95,6 +98,7 @@ import { TableInstance } from 'element-plus';
 //-------------------------缓存数据变量
 //应该存储真正的课程ID
 const courseid = "2c918af681fa6ea7018209a505c30672";
+const isCourseManager = ref(false);
 var multipleSelection = [];
 var selParent = ref(null);
 const editRef = ref(new Map());
@@ -119,58 +123,80 @@ const tableRowClassName = ({ row, rowIndex }) => {
 	return ''
 }
 
+const checkRole = async () => {     // 查询是否是课程负责人，课程负责人要先选择课堂
+	try {
+		const res = await request.evaluation.get('/evaluation/attainment');
+		if (res.code === 200) {
+			if (res.data.isCourseManager) {
+				isCourseManager.value = true;
+			}
+			else {
+				isCourseManager.value = false;
+			}
+		} else {
+			ElMessage.error(res.msg);
+		}
+	} catch (error) {
+		ElMessage.error('查询角色类型失败' + error);
+	}
+	return isCourseManager.value;
+}
+
 //初始化
 onMounted(async () => {
+	await checkRole();
 	await loadKwaData();
 	await loadData();
 	const table = document.querySelector('.uniqueTable .el-table__body-wrapper tbody');
 	// const tbody = myTable.value.$el.querySelector('.el-table__body-wrapper tbody');
 
-	// 创建 Sortable 实例
-	sortableInstance.value = Sortable.create(table, {
-		animation: 150,
-		onEnd: (evt) => {
-			const list = tableData;
-			const oldIndex = evt.oldIndex;
-			const newIndex = evt.newIndex;
-			// 使用 Vue 的响应式方法来更新数组
-			if (oldIndex !== newIndex) {
-				var selData = getDataForPosition(oldIndex);
-				var toData = getDataForPosition(newIndex);
-				if (selData.pOrderNum === toData.pOrderNum) {
-					var data = {
-						id: selData.id,
-						pid: selData.pid,
-						courseid: courseid,
-						ordernum: selData.ordernum,
+	if (isCourseManager.value) {
+		// 创建 Sortable 实例
+		sortableInstance.value = Sortable.create(table, {
+			animation: 150,
+			onEnd: (evt) => {
+				const list = tableData;
+				const oldIndex = evt.oldIndex;
+				const newIndex = evt.newIndex;
+				// 使用 Vue 的响应式方法来更新数组
+				if (oldIndex !== newIndex) {
+					var selData = getDataForPosition(oldIndex);
+					var toData = getDataForPosition(newIndex);
+					if (selData.pOrderNum === toData.pOrderNum) {
+						var data = {
+							id: selData.id,
+							pid: selData.pid,
+							courseid: courseid,
+							ordernum: selData.ordernum,
+						}
+						request.evaluation.post(`/evaluation/knowledgeUnit/updateKnowledgeUnitOrdernum?preOrdernum=${toData.ordernum - 1}`, data)
+							.then((res) => {
+								if (res.code === 200) {
+									ElMessage.success('移动成功');
+									loadData();
+								} else {
+									loadData();
+									ElMessage.error(res.msg);
+								}
+							}).catch((error) => {
+								ElMessage.error('移动失败' + error);
+								setTimeout(() => {
+									ElMessage.success("重新加载数据");
+									loadData();
+								}, 1);
+							});
 					}
-					request.evaluation.post(`/evaluation/knowledgeUnit/updateKnowledgeUnitOrdernum?preOrdernum=${toData.ordernum - 1}`, data)
-						.then((res) => {
-							if (res.code === 200) {
-								ElMessage.success('移动成功');
-								loadData();
-							} else {
-								loadData();
-								ElMessage.error(res.msg);
-							}
-						}).catch((error) => {
-							ElMessage.error('移动失败' + error);
-							setTimeout(() => {
-								ElMessage.success("重新加载数据");
-								loadData();
-							}, 1);
-						});
 				}
-			}
-			const tagName = evt.item.tagName;
-			const items = evt.from.getElementsByTagName(tagName);
-			if (evt.oldIndex > evt.newIndex) {
-				evt.from.insertBefore(evt.item, items[evt.oldIndex + 1]);
-			} else {
-				evt.from.insertBefore(evt.item, items[evt.oldIndex]);
-			}
-		},
-	});
+				const tagName = evt.item.tagName;
+				const items = evt.from.getElementsByTagName(tagName);
+				if (evt.oldIndex > evt.newIndex) {
+					evt.from.insertBefore(evt.item, items[evt.oldIndex + 1]);
+				} else {
+					evt.from.insertBefore(evt.item, items[evt.oldIndex]);
+				}
+			},
+		});
+	}
 });
 
 const getDataForPosition = (p) => {
@@ -333,10 +359,10 @@ const kwaSelection = ref([]);
 const isKwaPopoverShow = ref(false);
 const kwaTableSelectable = (kwaRow, tableRowData) => {
 	tableData.value.forEach(t => {
-		if(t.id === tableRowData.id){
+		if (t.id === tableRowData.id) {
 			console.log(t)
 			tableRowData = t;
-			return ;
+			return;
 		}
 	});
 

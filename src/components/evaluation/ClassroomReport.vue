@@ -13,118 +13,120 @@
             <el-button type="primary" v-if="isCourseManager" style="margin-left: 0.8vw;"
                 @click="hasChooseClassroom = false">切换课堂</el-button>
         </el-header>
-        <div v-loading="pageLoading" element-loading-background="rgba(0, 0, 0, 0.2)" class="main-block"
-            style="text-align: left; padding: 10mm 0; overflow: auto;">
-            <div id="report-container"
-                style="width: 190mm; color: #0f0f0f; margin: 0 auto; font-size: 16px; font-weight: bolder; font-family: 'SimSun';">
-                <div style="margin-bottom: 30px; text-align: center;">{{ headerData.classroomName }}<br>课堂评价报告</div>
-                <div class="class-block">
-                    <div>一、课堂基本信息</div>
-                    <table>
-                        <tr>
-                            <td colspan="3"> 课程名称</td>
-                            <td colspan="3">{{ headerData.courseName }}</td>
-                            <td>开课学期</td>
-                            <td>{{ headerData.termName }}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">任课教师</td>
-                            <td colspan="3">{{ headerData.teacherName }}</td>
-                            <td>学时/学分</td>
-                            <td>{{ headerData.time }} / {{ headerData.score ? headerData.score : 0 }}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">课堂名称/周次</td>
-                            <td colspan="3">{{ headerData.classroomName }}</td>
-                            <td>课堂人数</td>
-                            <td>{{ studentList.length }}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="8">学生成绩总评结果</td>
-                        </tr>
-                        <tr>
-                            <td>最高分</td>
-                            <td>{{ headerData.topScore }}</td>
-                            <td>最低分</td>
-                            <td>{{ headerData.lowestScore }}</td>
-                            <td>平均分</td>
-                            <td>{{ headerData.averScore }}</td>
-                            <td>不及格人数</td>
-                            <td>{{ headerData.failNum }}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="8">
-                                <div id="grade-div" style="height: 280px; margin-top: 10px; display: flex; flex-direction: column; justify-content: center;
+        <div class="main-block" style="text-align: left; overflow: auto;">
+            <div v-loading="pageLoading" element-loading-background="rgba(0, 0, 0, 0.2)" style="width: 100%; padding: 10mm 0;">
+                <div id="report-container"
+                    style="width: 190mm; color: #0f0f0f; margin: 0 auto; font-size: 16px; font-weight: bolder; font-family: 'SimSun';">
+                    <div style="margin-bottom: 30px; text-align: center;">{{ headerData.classroomName }}<br>课堂评价报告</div>
+                    <div class="class-block">
+                        <div>一、课堂基本信息</div>
+                        <table>
+                            <tr>
+                                <td colspan="3"> 课程名称</td>
+                                <td colspan="3">{{ headerData.courseName }}</td>
+                                <td>开课学期</td>
+                                <td>{{ headerData.termName }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">任课教师</td>
+                                <td colspan="3">{{ headerData.teacherName }}</td>
+                                <td>学时/学分</td>
+                                <td>{{ headerData.time }} / {{ headerData.score ? headerData.score : 0 }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">课堂名称/周次</td>
+                                <td colspan="3">{{ headerData.classroomName }}</td>
+                                <td>课堂人数</td>
+                                <td>{{ studentList.length }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="8">学生成绩总评结果</td>
+                            </tr>
+                            <tr>
+                                <td>最高分</td>
+                                <td>{{ headerData.topScore }}</td>
+                                <td>最低分</td>
+                                <td>{{ headerData.lowestScore }}</td>
+                                <td>平均分</td>
+                                <td>{{ headerData.averScore }}</td>
+                                <td>不及格人数</td>
+                                <td>{{ headerData.failNum }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="8">
+                                    <div id="grade-div" style="height: 280px; margin-top: 10px; display: flex; flex-direction: column; justify-content: center;
                                 align-items: center"></div>
-                            </td>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="class-block">二、课程目标达成情况总体评价</div>
+                    <div id="target-achievement-degree-bar" style="height: 260px;"></div>
+                    <div id="target-achievement-degree-category" style="height: 260px; margin-top: -60px;"></div>
+                    <table style="margin-top: 10px;">
+                        <tr>
+                            <td v-for="t in courseTargetData" :key="t.id">{{ t.name }}</td>
+                        </tr>
+                        <tr>
+                            <td v-for="t in courseTargetData" :key="t.id">{{ targetSumAchievementDegree[t.id] }}</td>
                         </tr>
                     </table>
-                </div>
 
-                <div class="class-block">二、课程目标达成情况总体评价</div>
-                <div id="target-achievement-degree-bar" style="height: 260px;"></div>
-                <div id="target-achievement-degree-category" style="height: 260px; margin-top: -60px;"></div>
-                <table style="margin-top: 10px;">
-                    <tr>
-                        <td v-for="t in courseTargetData" :key="t.id">{{ t.name }}</td>
-                    </tr>
-                    <tr>
-                        <td v-for="t in courseTargetData" :key="t.id">{{ targetSumAchievementDegree[t.id] }}</td>
-                    </tr>
-                </table>
-
-                <div class="class-block">三、课程目标达成情况的个体评价</div>
-                <div style="padding-left: 32px;">
-                    <div style="text-align: left; margin-top: 10px;">
-                        1、课程目标个体评价</div>
-                    <div v-for="(ctd, i) of courseTargetData" :key="ctd.id">
-                        <div :id="ctd.id" style="height: 63.25mm;"></div>
-                        <div v-if="targetAchievementPersonalDegreeScatterList[i]"
-                            style="padding-left: 32px; margin: -25px 0 20px 0;">
-                            <span style="color: dodgerblue;">{{ ctd.name }}</span>:
-                            <span v-if="targetAchievementPersonalDegreeScatterList[i].data[1].length">其中
-                                {{ targetAchievementPersonalDegreeScatterList[i].data[1].join(',') }}
-                                号同学本课程目标达成度低于0.6，目标没有达成</span>
-                            <span v-else-if="targetAchievementData">本目标全员达成</span>
+                    <div class="class-block">三、课程目标达成情况的个体评价</div>
+                    <div style="padding-left: 32px;">
+                        <div style="text-align: left; margin-top: 10px;">
+                            1、课程目标个体评价</div>
+                        <div v-for="(ctd, i) of courseTargetData" :key="ctd.id">
+                            <div :id="ctd.id" style="height: 63.25mm;"></div>
+                            <div v-if="targetAchievementPersonalDegreeScatterList[i]"
+                                style="padding-left: 32px; margin: -25px 0 20px 0;">
+                                <span style="color: dodgerblue;">{{ ctd.name }}</span>:
+                                <span v-if="targetAchievementPersonalDegreeScatterList[i].data[1].length">其中
+                                    {{ targetAchievementPersonalDegreeScatterList[i].data[1].join(',') }}
+                                    号同学本课程目标达成度低于0.6，目标没有达成</span>
+                                <span v-else-if="targetAchievementData">本目标全员达成</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div style="padding-left: 32px;">
-                    <div style="text-align: left; margin-top: 10px;">2、课程目标未达成的学生个体清单</div>
-                    <div style="margin-top: 10px;">根据每位同学课程达成情况，可以汇总出本学期每个课程目标没有达成的学生个体清单，从中可以快速查阅每位学生的短板。</div>
+                    <div style="padding-left: 32px;">
+                        <div style="text-align: left; margin-top: 10px;">2、课程目标未达成的学生个体清单</div>
+                        <div style="margin-top: 10px;">根据每位同学课程达成情况，可以汇总出本学期每个课程目标没有达成的学生个体清单，从中可以快速查阅每位学生的短板。</div>
+                        <table>
+                            <tr>
+                                <td style="width: 50px;">序号</td>
+                                <td style="width: 120px;">学号</td>
+                                <td style="width: 80px;">姓名</td>
+                                <td v-for="t of courseTargetData" :key="t.id">{{ t.name }}</td>
+                            </tr>
+                            <tr v-for="s of studentList" :key="s.stuno">
+                                <td>{{ s.rowNo }}</td>
+                                <td style="width: 120px;">{{ s.stuno }}</td>
+                                <td style="width: 80px;">{{ s.username }}</td>
+                                <td v-for="t in courseTargetData" :key="t.id">{{ Number(s[t.id]) >= 0.6 ? '√' : '' }}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="class-block">四、课程目标达成情况明细表</div>
                     <table>
                         <tr>
                             <td style="width: 50px;">序号</td>
                             <td style="width: 120px;">学号</td>
                             <td style="width: 80px;">姓名</td>
+                            <td style="width: 120px;">班级</td>
                             <td v-for="t of courseTargetData" :key="t.id">{{ t.name }}</td>
                         </tr>
                         <tr v-for="s of studentList" :key="s.stuno">
-                            <td>{{ s.rowNo }}</td>
+                            <td style="width: 50px;">{{ s.rowNo }}</td>
                             <td style="width: 120px;">{{ s.stuno }}</td>
                             <td style="width: 80px;">{{ s.username }}</td>
-                            <td v-for="t in courseTargetData" :key="t.id">{{ Number(s[t.id]) >= 0.6 ? '√' : '' }}</td>
+                            <td style="width: 120px;">{{ s.className }}</td>
+                            <td v-for="t in courseTargetData" :key="t.id">{{ s[t.id] }}</td>
                         </tr>
                     </table>
                 </div>
-
-                <div class="class-block">四、课程目标达成情况明细表</div>
-                <table>
-                    <tr>
-                        <td style="width: 50px;">序号</td>
-                        <td style="width: 120px;">学号</td>
-                        <td style="width: 80px;">姓名</td>
-                        <td style="width: 120px;">班级</td>
-                        <td v-for="t of courseTargetData" :key="t.id">{{ t.name }}</td>
-                    </tr>
-                    <tr v-for="s of studentList" :key="s.stuno">
-                        <td style="width: 50px;">{{ s.rowNo }}</td>
-                        <td style="width: 120px;">{{ s.stuno }}</td>
-                        <td style="width: 80px;">{{ s.username }}</td>
-                        <td style="width: 120px;">{{ s.className }}</td>
-                        <td v-for="t in courseTargetData" :key="t.id">{{ s[t.id] }}</td>
-                    </tr>
-                </table>
             </div>
         </div>
     </el-container>
@@ -137,6 +139,7 @@ import html2pdf from 'html2pdf.js';
 import request from '../../utils/request';
 import { ElMessage } from 'element-plus';
 import ChooseClassroom from './subcomponents/ChooseClassroom.vue';
+import { Loading } from '@element-plus/icons-vue';
 
 const isCourseManager = ref(null);
 const hasChooseClassroom = ref(false);
@@ -209,6 +212,11 @@ const getObsidFromToken = (token) => {
 }
 
 const calc = async () => {
+    const loadingMessage = ElMessage({
+        message: `正在计算中，请稍候...`,
+        type: 'info',
+        duration: 0
+    });
     pageLoading.value = true;
     try {
         const res = await request.evaluation.get(`/evaluation/attainment/calc`);
@@ -219,8 +227,10 @@ const calc = async () => {
         }
     } catch (error) {
         ElMessage.error('计算失败' + error);
-    };
-    pageLoading.value = false;
+    } finally {
+        ElMessage.closeAll();
+        pageLoading.value = false;
+    }
 }
 
 onMounted(async () => {
@@ -586,12 +596,24 @@ const generatePersonalGraphData = (courseTargetId) => {     // 生成有关显�
     return [res, unAchieved];
 }
 
-const generatePDF = () => {     // 将报告转为pdf
+const generatePDF = async () => {     // 将报告转为pdf
+    pageLoading.value = true;
+    const info = ElMessage({
+        message: '导出中...',
+        duration: 0
+    });
     const report = document.getElementById('report-container');
-    html2pdf(report, options.value);
+    await html2pdf(report, options.value);
+    pageLoading.value = false;
+    ElMessage.closeAll();
 }
 
 const printReport = () => {     // 触发浏览器的打印窗口
+    pageLoading.value = true;
+    const info = ElMessage({
+        message: '请稍后...',
+        duration: 0
+    });
     const report = document.getElementById('report-container');
     html2pdf().from(report).set(options.value).toPdf().get('pdf').then(function (pdf) {
         // 生成完PDF后自动打开打印对话框
@@ -606,6 +628,8 @@ const printReport = () => {     // 触发浏览器的打印窗口
             // 触发打印
             iframe.contentWindow.print();
         };
+        pageLoading.value = false;
+        ElMessage.closeAll();
     });
 }
 </script>
