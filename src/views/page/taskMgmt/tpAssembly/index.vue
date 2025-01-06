@@ -36,14 +36,14 @@
               <span class="topic-title">{{ element.lib.title }}({{ TOPICTYPE[element.lib.questionTypeId] }})</span>
             </span>
             <div class="topic-contents">
-              <div v-html="element.lib.content"></div>
+              <div v-show="element.lib.content !== '<p><br></p>'" v-html="element.lib.content"></div>
               <div v-for="(answer, answerIdx) in element.lib.answers" :key="answerIdx" class="topic-answer-item">
                 {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}
                 <span v-if="answer.isAnswer">标准答案</span>
               </div>
               <div class="flex-start task-grade">
                 <span>分数：</span> 
-                <el-input v-model="element.score" @input="handleScore" style="width: 60px;" oninput="value=value.replace(/^0|[^0-9]/g,'')"></el-input>
+                <el-input v-model="element.score" @input="(value) => handleScore(value, index)" style="width: 60px;" oninput="value=value.replace(/^0|[^0-9]/g,'')"></el-input>
               </div>
             </div>
           </div>
@@ -133,9 +133,10 @@ const handleSelectAll = (val) => {
   })
 }
 
-const handleScore = () => {
+const handleScore = (value, index) => {
   let num = 0
-  taskList.value.forEach((item) => {
+  taskList.value.forEach((item, i) => {
+    if (index === i && value >= 1000)  item.score = 1000
     if (item.score) {
       num += Number(item.score)
     }

@@ -68,7 +68,7 @@ import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
 import { studentList, studentDownload } from '@/api/taskMgmt.js'
 import Header from '@/views/page/components/header/index.vue'
 import { downloadFile } from '@/utils/index'
-import { host } from '@/api/host.js'
+import { host } from "@/utils/request.js";
 const routes = useRouter()
 const { currentRoute } = routes
 const route = currentRoute.value

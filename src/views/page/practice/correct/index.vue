@@ -6,7 +6,7 @@
     </div>
 
     <div v-for="(item, i) in items" :key="item.id">
-      <template v-if="item.beDefault === 0">
+      <template v-if="item.beDefault === 0 && item.beValid">
         <div class="item-title">{{ item.itemName }}</div>
         <div class="practice-item flex-between">
           <div class="item-left">
@@ -78,7 +78,7 @@
 import { ref, computed, onMounted, nextTick, toRaw } from "vue";
 import { useRouter } from 'vue-router'
 import { studentCorrect, studentSave } from '@/api/practice/index.ts'
-import { host } from '@/api/host.js'
+import { host } from "@/utils/request.js";
 import { getFileExtensionFromUrl, isImageURL, downloadFile } from '@/utils/index.js'
 import { ElMessage, ElMessageBox } from "element-plus";
 import Header from '@/views/page/components/header/index.vue'

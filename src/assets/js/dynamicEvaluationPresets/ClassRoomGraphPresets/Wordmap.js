@@ -49,7 +49,7 @@ export const wordMapPreset = {
   }
 };
 
-export const wordOption = (timelineData, { series }, times) => ({
+export const wordOption = (timelineData, { series }) => ({
   toolbox,
   graphic: [
     {
@@ -61,18 +61,7 @@ export const wordOption = (timelineData, { series }, times) => ({
     }
   ],
 
-  timeline: {
-    ...timeline(timelineData),
-    currentIndex: times - 1,
-    progress: {
-      lineStyle: {
-        color: '#a4b1d7'
-      },
-      itemStyle: {
-        color: '#a4b1d7'
-      }
-    }
-  },
+  timeline: { ...timeline(timelineData), currentIndex: timelineData.length - 1 },
   tooltip,
   series
   // options

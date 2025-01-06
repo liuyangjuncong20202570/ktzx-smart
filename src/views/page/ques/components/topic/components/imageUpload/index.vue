@@ -29,7 +29,7 @@
 import { ref, defineComponent } from 'vue'
 import { Picture, Close } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { host } from '@/api/host.js'
+import { host } from "@/utils/request.js";
 export default defineComponent({
 components: {
     Close,

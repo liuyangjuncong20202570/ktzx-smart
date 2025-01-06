@@ -59,7 +59,7 @@
         />
         
         <div class="topic-item">
-          <div class="flex-start" v-html="course.content"></div>
+          <div v-show="course.content !== '<p><br></p>'" class="flex-start" v-html="course.content"></div>
           <div v-if="['单选题', '多选题', '判断题'].includes(TOPICTYPE[course.questionTypeId])" class="topic-answer-item" v-for="(answer, answerIdx) in course.answers" :key="answerIdx">
             {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}
             <span v-if="answer.isAnswer">正确答案</span>

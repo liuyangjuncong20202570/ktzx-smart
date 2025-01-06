@@ -277,4 +277,7 @@ defineExpose({
 .bgd-kwa .el-form-item {
   margin-bottom: 1px !important;
 }
+.bgd-kwa .el-form-item__content {
+  text-align: left;
+}
 </style>

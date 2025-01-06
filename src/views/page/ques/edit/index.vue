@@ -54,7 +54,7 @@
               <span class="topic-title">{{ index+1 }}、{{ element.title }}({{ TOPICTYPE[element.typeId] }})</span>
             </span>
            <div class="topic-contents">
-            <span v-html="element.content"></span>
+            <span v-show="element.content !== '<p><br></p>'" v-html="element.content"></span>
               <div 
                 v-if="['单选题', '多选题', '判断题'].includes(TOPICTYPE[element.typeId])" 
                 class="topic-answer-item" 

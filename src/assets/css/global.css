@@ -39,3 +39,9 @@ button {
 .echarts-tooltip {
   z-index: 9999 !important; /* 提高 tooltip 的层级 */
 }
+
+
+.no-click {
+  color: rgb(145, 145, 145);
+  pointer-events: none;
+}

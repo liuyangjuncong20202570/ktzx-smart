@@ -3,6 +3,9 @@ import { ElMessage } from 'element-plus';
 //60.205.178.180
 //127.0.0.1
 
+// 图片上传用到的域名
+export const host = 'http://120.46.201.4:10203';
+
 const request = {
   admin: createAPI('http://localhost:8080/api'),
   course: createAPI('http://localhost:8082/api'),

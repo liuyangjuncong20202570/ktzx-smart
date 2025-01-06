@@ -56,7 +56,7 @@
           }" 
         />
         <div class="topic-item">
-          <div class="flex-start" v-html="course.content"></div>
+          <div v-show="course.content !== '<p><br></p>'" class="flex-start" v-html="course.content"></div>
           <div>
             <div class="topic-answer-item" v-for="(answer, answerIdx) in course.answers" :key="answerIdx">
               {{ String.fromCharCode('A'.charCodeAt() + answerIdx) }}: {{ answer.itemContent }}

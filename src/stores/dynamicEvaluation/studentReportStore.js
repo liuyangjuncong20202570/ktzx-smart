@@ -4,7 +4,12 @@ import {
   formatStudentReportGraphchartS,
   formatStudentReportGraphchartT
 } from '../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Format';
-import { getStuRepCourseList, getstuRepSearch, getStuRepStudentList } from '../../api/dynamic';
+import {
+  getReportEvaluation,
+  getStuRepCourseList,
+  getstuRepSearch,
+  getStuRepStudentList
+} from '../../api/dynamic';
 
 const useStudentReport = defineStore('StudentReport', {
   state: () => ({
@@ -16,7 +21,14 @@ const useStudentReport = defineStore('StudentReport', {
     //  该模块下所有组件数据
     charts: [
       { timelineData: [], options: [], response: [] || {}, indicators: [], xData: [], values: [] },
-      { timelineData: [], options: [], response: [] || {}, indicators: [], expected: [] },
+      {
+        timelineData: [],
+        options: [],
+        response: [] || {},
+        indicators: [],
+        expected: [],
+        expectdValue: []
+      },
       { timelineData: [], options: [], response: [] || {}, indicators: [], xData: [], values: [] }
     ],
     courseList: [],
@@ -45,57 +57,37 @@ const useStudentReport = defineStore('StudentReport', {
       this.charts[index].options = options;
       this.charts[index].indicators = indicators;
       this.charts[index].xData = xData;
+      (this.charts[index].expected = xData), (this.charts[index].expectdValue = values);
       this.charts[index].values = values;
     }, // 定义获取图表数据异步函数
     updateCharts() {
       // 获取数据后进行数据标准化
-      const { xData: xDataF, values: valuesF } = formatStudentReportGraphchartF(
-        null,
+      formatStudentReportGraphchartF(
+        this.charts[0].response,
         null,
         null,
         null,
         this.charts[0].xData,
         this.charts[0].values
       );
-      this.setChart(0, null, null, null, null, xDataF, valuesF);
 
-      const { options: optionsS, indicators: indicatorsS } = formatStudentReportGraphchartS(
+      formatStudentReportGraphchartS(
         null,
-        null,
+        this.charts[1].response,
         this.charts[1].options,
-        this.charts[1].indicators
+        this.charts[1].indicators,
+        this.charts[1].expected,
+        this.charts[1].expectdValue
       );
-      this.setChart(1, null, optionsS, indicatorsS);
 
-      const { xData: xDataT, values: valuesT } = formatStudentReportGraphchartT(
+      formatStudentReportGraphchartT(
+        this.charts[2].response,
         null,
         null,
         null,
-        null,
-        this.charts[0].xData,
-        this.charts[0].values
+        this.charts[2].xData,
+        this.charts[2].values
       );
-      this.setChart(2, null, null, null, null, xDataT, valuesT);
-
-      // const { response: responseS, timelineData: timelineDataS } = formatStudentGraphchartS(
-      //   this.charts[1].response,
-      //   this.charts[1].timelineData,
-      //   this.charts[1].options,
-      //   this.charts[1].indicators
-      // );
-      // this.setChart(1, timelineDataS, null, null, responseS);
-
-      // const {
-      //   timelineData: timelineDataT,
-      //   options: optionsT,
-      //   response: responseT
-      // } = formatStudentGraphchartT(
-      //   this.charts[2].response,
-      //   this.charts[2].timelineData,
-      //   this.charts[2].options,
-      //   this.charts[2].indicators
-      // );
-      // this.setChart(2, timelineDataT, optionsT, null, responseT);
     },
     // 获取课堂列表
     async fetchStuRepCourseList(courseId) {
@@ -113,6 +105,17 @@ const useStudentReport = defineStore('StudentReport', {
     async fetchSearchList(courseId, search) {
       const { code, msg, data } = await getstuRepSearch(courseId, search);
       this.courseList = data;
+      return { code, msg };
+    },
+    // 获取评价
+    async fetchReportEvaluation(classroomId, stuId, courseId, paperId) {
+      const { code, msg, data } = await getReportEvaluation(classroomId, stuId, courseId, paperId);
+      if (code === 200 && msg === 'success') {
+        this.charts[0].response = data.keyword;
+        this.charts[1].response = data.ability;
+        this.charts[1].expected = data.classAbility;
+        this.charts[2].response = data.kwa;
+      }
       return { code, msg };
     }
   }

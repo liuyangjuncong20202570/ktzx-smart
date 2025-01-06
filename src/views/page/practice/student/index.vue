@@ -59,7 +59,7 @@ import { onMounted, reactive, ref } from "vue";
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Download ,Opportunity} from "@element-plus/icons-vue";
-import { host } from '@/api/host.js'
+import { host } from "@/utils/request.js";
 import { studentList, practiceDownload } from "@/api/practice/index.ts";
 import { ResVO ,StudentPracticePageVO} from "@/api/practice/type.ts";
 import { downloadFile } from '@/utils/index'

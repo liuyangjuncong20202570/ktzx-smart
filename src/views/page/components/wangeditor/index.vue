@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { host } from '@/api/host.js'
+import { host } from "@/utils/request.js";
 import '@wangeditor/editor/dist/css/style.css'
 import { ref, watch, onMounted, defineProps } from 'vue'
 //   import { appDomain, cdnStorageDomain } from '@/assets/js/config'

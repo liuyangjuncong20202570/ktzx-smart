@@ -13,8 +13,6 @@
   <!-- 课堂画像图表 -->
   <GraphChart :store="classroomGraphStore">
     <template #title>课堂画像：{{ courseInfo.courseName }}</template>
-    <!-- TODO：此处需要对每个图表的公共部分进行封装，同时每个组件的私有部分需要单独写，否则会共享同一个配置项 -->
-    <!-- TODO：使用store进行存储每一个配置项私有部分 -->
     <template #GraphItem>
       <GraphItem
         title="能力画像"
@@ -30,7 +28,12 @@
         ref="wordmapCmp"
       />
       <GraphItem title="KWA画像" />
-      <GraphItem ref="treeCmp" title="知识单元画像" :chartOption="currentTreeOption" />
+      <GraphItem
+        ref="treeCmp"
+        title="知识单元画像"
+        :onTimelineChanged="onTreeTimelineChanged"
+        :chartOption="currentTreeOption"
+      />
     </template>
   </GraphChart>
   <!-- 课堂画像图表结束 -->
@@ -38,22 +41,25 @@
 
 <script setup>
 import { storeToRefs } from 'pinia';
-import { reactive, ref, onMounted, onBeforeUnmount } from 'vue';
+import { ElMessage } from 'element-plus';
+import { getCourseId } from '@/utils/searchCourseId.js';
+import useMain from '../../../stores/useMain.js';
+import parseJWT from '../../../utils/parseJWT.js';
 import GraphItem from '../PublicCpns/GraphItem.vue';
 import GraphChart from '../PublicCpns/GraphChart.vue';
 import GraphTemplate from '../PublicCpns/GraphTemplate.vue';
+import { reactive, ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import useClassroomGraph from '../../../stores/dynamicEvaluation/classroomStore';
-import { radarOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Radar';
-import { treeOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Treemap';
-import { wordOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/wordmap';
+import { radarOption } from '../../../assets/js/dynamicEvaluationPresets/ClassRoomGraphPresets/Radar';
+import { treeOption } from '../../../assets/js/dynamicEvaluationPresets/ClassRoomGraphPresets/Treemap';
+import { wordOption } from '../../../assets/js/dynamicEvaluationPresets/ClassRoomGraphPresets/wordmap';
 import { wordMapPreset } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Wordmap.js';
-import parseJWT from '../../../utils/parseJWT.js';
-import { ElMessage } from 'element-plus';
-import useMain from '../../../stores/useMain.js';
-
+import { graphicLegend, graphicTitle } from '@/assets/js/dynamicEvaluationPresets/PublicPresets.js';
 /* ********************变量定义******************** */
 // props定义
 // 普通变量
+const currentWordIndex = ref(0);
+const courseId = ref('');
 const radarCmp = ref(null);
 const wordmapCmp = ref(null);
 const treeCmp = ref(null);
@@ -63,7 +69,7 @@ const treeInstance = treeCmp.value?.getChartInstance();
 
 const courseInfo = reactive({
   courseName: '',
-  curriculumId: 0, //课程id
+  classroomId: 0, //课程id
   courseId: 0 //课堂id
 });
 
@@ -81,7 +87,7 @@ const titles = [
   { prop: 'classroomName', label: '课堂名称' }, //大
   { prop: 'termName', label: '学期' },
   { prop: 'courseName', label: '课程' }, //小
-  { prop: 'profession', label: '专业' },
+  { prop: 'proName', label: '专业' },
   { prop: 'teacherName', label: '主讲教师' },
   { prop: 'labTeacher', label: '实验教师' },
   { prop: 'practiceTeacher', label: '实践教师' },
@@ -91,32 +97,105 @@ const titles = [
 const lists = ref([]);
 
 /* ********************方法定义******************** */
-const onAbilityTimelineChanged = () => {
+const onAbilityTimelineChanged = async params => {
   // TODO:之后根据timeline的点击节点监听什么时候获取节点数据
   // TODO：1：将新的数据{插入}options中，更新
-};
-const onKWTimelineChanged = event => {
-  // 更新词云中的内容
-  const currentId = event.currentIndex;
-  // TODO:获取关键字数据进行渲染,将在store中发送异步请求并进行重新赋值
-  try {
-    const chartInstance = wordmapCmp.value?.getChartInstance();
-    // currentWordOption.value =
-    // console.log(chartInstance);
-    chartInstance.setOption(
-      {
-        series: [
-          {
-            ...wordMapPreset,
-            data: classroomGraphStore.charts[1].response.wordCloudData[currentId]
-          }
-        ]
-      },
-      { replaceMerge: 'series' }
+  // classroomGraphStore.setChart(0, classroomGraphStore.charts[0].timelineData, [], [], []);
+  if (currentRadarOption.value.options[params.currentIndex].series[0].data[0].value.length === 0) {
+    const { code, msg } = await classroomGraphStore.fetchCourseEvaluation(
+      courseInfo.classroomId,
+      // '292104772-9c9f88f0-7af9-438c-a117-e2efc2020b7b',
+      courseId.value,
+      // '1508003654-abbeeeba-9e13-4d5e-b0c2-254bdda7c4c9',
+      params.currentIndex + 1
     );
-  } catch (error) {
-    console.log(error);
+    if (!(code === 200 && msg === 'success')) {
+      ElMessage({
+        type: 'error',
+        message: msg
+      });
+    }
+    // 渲染数据
+    initChart(params.currentIndex + 1, false, 'RADAR');
   }
+
+  // 注意深浅拷贝问题
+  currentRadarOption.value.baseOption.timeline = {
+    ...currentRadarOption.value.baseOption.timeline,
+    currentIndex: params.currentIndex
+  };
+  currentRadarOption.value.baseOption.graphic = {
+    ...currentRadarOption.value.baseOption.graphic,
+    top: 5,
+    style: {
+      text: `当前展示第${params.currentIndex + 1}次评价，已评价${classroomGraphStore.totalTimes}次`
+    }
+  };
+};
+
+const onKWTimelineChanged = async params => {
+  currentWordIndex.value = params.currentIndex;
+  const chartInstance = wordmapCmp.value?.getChartInstance();
+  // 更新前先把原数据清空
+  chartInstance.setOption({ series: { ...wordMapPreset, data: [] } }, { replaceMerge: 'series' });
+  // 更新词云中的内容
+  if (classroomGraphStore.charts[1].options[currentWordIndex.value].series[0].data.length === 0) {
+    classroomGraphStore
+      .fetchCourseEvaluation(
+        courseInfo.classroomId,
+        // '292104772-9c9f88f0-7af9-438c-a117-e2efc2020b7b',
+        courseId.value,
+        // '1508003654-abbeeeba-9e13-4d5e-b0c2-254bdda7c4c9',
+        params.currentIndex + 1
+      )
+      .then(({ code, msg }) => {
+        if (!(code === 200 && msg === 'success')) {
+          ElMessage({
+            type: 'error',
+            message: msg
+          });
+          return;
+        }
+        initChart(currentWordIndex.value + 1, false, 'WORD');
+      });
+  } else {
+    initChart(params.currentIndex + 1, false, 'WORD');
+  }
+};
+
+const onTreeTimelineChanged = async params => {
+  const chartInstance = treeCmp.value?.getChartInstance();
+  // 更新前先把原数据清空
+  chartInstance.setOption({ series: { type: 'tree', data: [] } }, { replaceMerge: 'series' });
+  if (currentTreeOption.value.options[params.currentIndex].series[0].data.length === 0) {
+    const { code, msg } = await classroomGraphStore.fetchCourseEvaluation(
+      courseInfo.classroomId,
+      // '292104772-9c9f88f0-7af9-438c-a117-e2efc2020b7b',
+      courseId.value,
+      // '1508003654-abbeeeba-9e13-4d5e-b0c2-254bdda7c4c9',
+      params.currentIndex + 1
+    );
+    if (!(code === 200 && msg === 'success')) {
+      ElMessage({
+        type: 'error',
+        message: msg
+      });
+    }
+    // 渲染数据
+    initChart(params.currentIndex + 1, false, 'TREE');
+  }
+
+  // 注意深浅拷贝问题
+  currentTreeOption.value.baseOption.timeline = {
+    ...currentTreeOption.value.baseOption.timeline,
+    currentIndex: params.currentIndex
+  };
+  currentTreeOption.value.baseOption.graphic[1] = {
+    ...currentTreeOption.value.baseOption.graphic[1],
+    style: {
+      text: `当前展示第${params.currentIndex + 1}次评价，已评价${classroomGraphStore.totalTimes}次`
+    }
+  };
 };
 // 单元格样式定义
 const addCellStyle = ({ row, column, rowIndex, columnIndex }) => {
@@ -140,22 +219,31 @@ const handleCellClick = async (row, column, cell) => {
     // 记录学生课堂信息
     courseInfo.courseName = row.courseName;
     courseInfo.courseId = row.id;
+    courseInfo.classroomId = row.classroomId;
     // 控制学生列表是否可见
-    classroomGraphStore.setChartVisible(true);
+
     console.log(row.classroomId);
     //TODO 此处将打开学生列表，发送请求将classroomId,courseId(token中的obsid)传过去
-    // await classroomGraphStore.fetchCourseEvaluation(
-    //   row.classroomId,
-    //   parseJWT(sessionStorage.getItem('token')).obsid,
-    //   week,
-    //   new Date().toISOString().split('T')[0]
-    // );
+    // 获取总评价次数
+    const { code: timeCode, msg: timeMsg } = await classroomGraphStore.fetchEvaluationTimes(
+      courseId.value,
+      courseInfo.classroomId
+      // '292104772-9c9f88f0-7af9-438c-a117-e2efc2020b7b'
+    );
+    if (!(timeCode === 200 && timeMsg === 'success')) {
+      ElMessage({
+        type: 'error',
+        message: timeMsg + '或暂无相关评价'
+      });
+      return;
+    }
+    classroomGraphStore.setChartVisible(true);
     const { code, msg } = await classroomGraphStore.fetchCourseEvaluation(
-      1,
-      '1508003654-abbeeeba-9e13-4d5e-b0c2-254bdda7c4c9',
-      14,
-      // new Date().toISOString().split('T')[0]
-      '2024-11-26'
+      row.classroomId,
+      // '292104772-9c9f88f0-7af9-438c-a117-e2efc2020b7b',
+      courseId.value,
+      // '1508003654-abbeeeba-9e13-4d5e-b0c2-254bdda7c4c9',
+      classroomGraphStore.totalTimes
     );
     if (!(code === 200 && msg === 'success')) {
       ElMessage({
@@ -164,45 +252,127 @@ const handleCellClick = async (row, column, cell) => {
       });
       return;
     }
-    console.log(classroomGraphStore.ability, classroomGraphStore.keyword, classroomGraphStore.unit);
-    initChart(14);
+
+    initChart(classroomGraphStore.totalTimes);
+    console.log(classroomGraphStore.charts[1].options[classroomGraphStore.totalTimes - 1]);
+    currentRadarOption.value.baseOption.graphic.style.text = `当前展示第${classroomGraphStore.totalTimes}次评价，已评价${classroomGraphStore.totalTimes}次`;
+    currentWordOption.value.graphic[1] = {
+      ...currentWordOption.value.graphic[1],
+      style: {
+        text: `当前展示第${classroomGraphStore.totalTimes}次评价，已评价${classroomGraphStore.totalTimes}次`
+      }
+    };
+    currentTreeOption.value.baseOption.graphic[1] = {
+      ...currentTreeOption.value.baseOption.graphic[1],
+      style: {
+        text: `当前展示第${classroomGraphStore.totalTimes}次评价，已评价${classroomGraphStore.totalTimes}次`
+      }
+    };
   }
 };
 
-// 需要传递第几周作业，默认第一周
-const initChart = (week = 1) => {
+// 需要传递第几次作业，默认最新一次评价
+const initChart = (num = classroomGraphStore.totalTimes, isInit, which = 'all') => {
   // 渲染图表
   // 加载数据前清空图表
   radarInstance?.clear();
   wordInstance?.clear();
   treeInstance?.clear();
-  classroomGraphStore.updateCharts(week);
-  currentRadarOption.value = {
-    ...radarOption(
-      classroomGraphStore.charts[0].timelineData,
-      classroomGraphStore.charts[0].options,
-      classroomGraphStore.charts[0].indicators
-    )
-  };
-  currentWordOption.value = {
-    ...wordOption(
-      classroomGraphStore.charts[1].timelineData,
-      classroomGraphStore.charts[1].response.wordCloudData[0]
-    )
-  };
-  currentTreeOption.value = {
-    ...treeOption(
-      classroomGraphStore.charts[2].timelineData,
-      classroomGraphStore.charts[2].options,
-      classroomGraphStore.charts[2].response
-    )
-  };
+
+  // 第一个图表在点击的时候会将所有数据进行初始化，节省性能
+
+  if (which === 'RADAR') {
+    classroomGraphStore.updateCharts(num, isInit, 1);
+    currentRadarOption.value = {
+      ...radarOption(
+        classroomGraphStore.charts[0].timelineData,
+        classroomGraphStore.charts[0].options,
+        classroomGraphStore.charts[0].indicators
+      )
+    };
+  } else if (which === 'WORD') {
+    classroomGraphStore.updateCharts(num, isInit, 2);
+    try {
+      const chartInstance = wordmapCmp.value?.getChartInstance();
+      chartInstance.setOption(classroomGraphStore.charts[1].options[currentWordIndex.value], {
+        replaceMerge: 'series'
+      });
+      chartInstance.setOption(
+        {
+          graphic: [
+            {
+              ...graphicLegend
+            },
+            {
+              ...graphicTitle,
+              top: 35,
+              style: {
+                text: `当前展示第${currentWordIndex.value + 1}次评价，已评价${
+                  classroomGraphStore.totalTimes
+                }次`
+              }
+            }
+          ]
+        },
+        {
+          replaceMerge: 'graphic'
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  } else if (which === 'TREE') {
+    classroomGraphStore.updateCharts(num, isInit, 3);
+    currentTreeOption.value = {
+      ...treeOption(
+        classroomGraphStore.charts[2].timelineData,
+        classroomGraphStore.charts[2].options,
+        classroomGraphStore.charts[2].response
+      )
+    };
+  } else {
+    classroomGraphStore.updateCharts(num, isInit);
+    currentRadarOption.value = {
+      ...radarOption(
+        classroomGraphStore.charts[0].timelineData,
+        classroomGraphStore.charts[0].options,
+        classroomGraphStore.charts[0].indicators
+      )
+    };
+
+    currentWordOption.value = {
+      ...wordOption(
+        classroomGraphStore.charts[1].timelineData,
+        classroomGraphStore.charts[1].options[classroomGraphStore.totalTimes - 1]
+      )
+    };
+
+    currentTreeOption.value = {
+      ...treeOption(
+        classroomGraphStore.charts[2].timelineData,
+        classroomGraphStore.charts[2].options
+        // classroomGraphStore.charts[2].options[classroomGraphStore.totalTimes - 1]
+        // classroomGraphStore.charts[2].options
+      )
+    };
+    console.log(classroomGraphStore.charts[2].options[classroomGraphStore.totalTimes - 1]);
+  }
 };
 
 // 获取课堂列表
 const initList = async () => {
+  const role = JSON.parse(sessionStorage.getItem('users'));
+  if (role.rolename === '任课教师') {
+    const { code, msg, data } = await getCourseId(parseJWT(sessionStorage.getItem('token')).obsid);
+    if (code === 200 && msg === 'success') {
+      courseId.value = data;
+    }
+  } else {
+    courseId.value = parseJWT(sessionStorage.getItem('token')).obsid;
+  }
   const { code, msg } = await classroomGraphStore.fetchCourseList(
-    parseJWT(sessionStorage.getItem('token')).obsid
+    // parseJWT(sessionStorage.getItem('token')).obsid
+    courseId.value
   );
   if (!(code === 200 && msg === 'success')) {
     ElMessage({
@@ -223,6 +393,7 @@ const handleFlushList = () => {
 
 onMounted(async () => {
   initList();
+  // 获取总评价次数
 });
 
 onBeforeUnmount(() => {
