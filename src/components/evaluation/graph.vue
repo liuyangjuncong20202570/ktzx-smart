@@ -9,7 +9,7 @@
         </div>
 
         <KWAgraph style="height: 93%;" v-if="showPage === 0"></KWAgraph>
-        <threeDgraph style="height: 93;" v-if="showPage === 1"></threeDgraph>
+        <threeDgraph style="height: 93;" v-else-if="showPage === 1"></threeDgraph>
     </div>
 </template>
 

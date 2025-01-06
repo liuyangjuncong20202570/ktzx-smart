@@ -41,7 +41,7 @@ const getData = async () => {
 	// 获取能力数据据
 	try {
 		const abilitiesRes = await request.evaluation.get(
-			`/evaluation/getability?courseid=${courseid.value}`
+			`/evaluation/getability?courseid`
 		);
 		if (abilitiesRes.code === 200) {
 			// console.log(abilitiesRes.data);
@@ -278,11 +278,10 @@ onMounted(async () => {
 
 	// 第一层平面的大小(最下层)
 	let firstPlaneSize =
-		data.keywords.length && data.abilities.length
-			? keywordPlaneSize +
-			abilityPlaneSize +
-			Math.max(keywordPlaneSize, abilityPlaneSize) / 1.5
-			: 5;
+		data.keywords.length || data.abilities.length
+			? 
+			Math.max(keywordPlaneSize, abilityPlaneSize) * 2.5
+			: 6;
 
 	// 计算每个知识单元上的节点数量，以其中的最大值确定知识单元的大小
 	let unitKwaAmount = {};
@@ -345,12 +344,12 @@ onMounted(async () => {
 		? findSecondPlaneGridSize(
 			secondPlaneGridPoints,
 			data.units.length,
-			maxUnitSize / 2
+			maxUnitSize / 5
 		)
 		: 4;
 
-	// 课程目标层平面大小
-	let thirdPlaneSize = 3;
+	// 第三层平面大小
+	let thirdPlaneSize = 2;
 	let targetPlaneGridCount = 1;
 	const targetPlanePadding = 0.8;
 	while (targetPlaneGridCount * targetPlaneGridCount <= data.targets.length) {
@@ -889,7 +888,7 @@ const findSecondPlaneGridSize = (array, len, maxUnitSizeR) => {
 		const res = Math.sqrt(Math.pow(Math.abs(array[i].x) + maxUnitSizeR, 2) + Math.pow(Math.abs(array[i].y) + maxUnitSizeR, 2)) * 2;
 		if (d < res) d = res;
 	}
-	return (d - 0.15 * d) > 4 ? (d - 0.15 * d) : 4;		// 最小直径是4
+	return d > 4 ? d : 4;		// 最小直径是4
 }
 </script>
 

@@ -1,3 +1,4 @@
+<!-- antv-g6 4.x开发 -->
 <template>
 	<div v-if="!nodes.length && !edges.length && !combos.length" style="display: flex; justify-content: center; 
 		align-items: center; height: 100%; background-color: white;" v-loading="loading"
@@ -14,7 +15,7 @@ import { onMounted, ref } from 'vue';
 import request from '../../../utils/request';
 import _ from 'lodash';
 
-const courseid = ref('2c918af681fa6ea7018209a505c30672');
+const isCourseManager = ref(true);
 
 const loading = ref(true);
 
@@ -62,9 +63,28 @@ const open1 = () => {
 	})
 }
 
+const checkRole = async () => {     // 查询是否是课程负责人
+	try {
+		const res = await request.evaluation.get('/evaluation/attainment');
+		if (res.code === 200) {
+			if (res.data.isCourseManager) {
+				isCourseManager.value = true;
+			}
+			else {
+				isCourseManager.value = false;
+			}
+		} else {
+			ElMessage.error(res.msg);
+		}
+	} catch (error) {
+		ElMessage.error('查询角色类型失败' + error);
+	}
+	return isCourseManager.value;
+}
+
 const getData = async () => {
 	try {
-		const nodesCombosRes = await request.evaluation.get(`/evaluation/knowledgeUnit/getKnowledgeUnitTree?courseid=${courseid.value}`);
+		const nodesCombosRes = await request.evaluation.get(`/evaluation/knowledgeUnit/getKnowledgeUnitTree`);
 		if (nodesCombosRes.code === 200) {
 			let data = nodesCombosRes.data;
 			// console.log(data);
@@ -114,7 +134,7 @@ const getNodesCombosProp = (data, parent = null) => {
 		combos.value.push({
 			id: 'combo' + combosId++,
 			comboid: item.id,
-			label: item.name,
+			label: fittingString(item.name, 80, 12),
 		});
 		combosMap.set(item.id, combos.value[combos.value.length - 1].id);
 		if (parent) combos.value[combos.value.length - 1].parentId = parent.id;
@@ -139,7 +159,7 @@ const getNodesCombosProp = (data, parent = null) => {
 }
 
 onMounted(async () => {
-
+	await checkRole();
 	await getData();
 
 	loading.value = false;
@@ -184,7 +204,7 @@ onMounted(async () => {
 
 			request.evaluation.post('/evaluation/knowledgeUnit/updateKnowledgeUnitKwa', postData).then((res) => {
 				if (res.code === 200) {
-
+					ElMessage.success('更新成功');
 				}
 				else {
 					ElMessage.error(res.msg);
@@ -234,15 +254,18 @@ onMounted(async () => {
 		width,
 		height,
 		animate: true,
-		minZoom: 0.2,
+		minZoom: 0.13,
 		// maxZoom: 1.3,
 		fitView: true,	// 自适应画布
-		fitViewPadding: 60,		// 自适应画布后内四周的内边距
+		fitViewPadding: 50,		// 自适应画布后内四周的内边距
 		linkCenter: true,	// 让箭头居中
-		plugins: [contextMenu],
+		plugins: isCourseManager.value ? [contextMenu] : null,
 		layout: {
 			type: 'comboCombined',
-			spacing: 100,
+			spacing: 70,
+			outerLayout: new G6.Layout['forceAtlas2']({
+				kr: 10
+			})
 		},
 		defaultNode: {
 			size: 17,
@@ -292,14 +315,15 @@ onMounted(async () => {
 		defaultCombo: {
 			type: "rect",
 			padding: 40,
-			size: [60, 60],
+			size: [100, 60],
 			labelCfg: {
 				style: {
 					fontSize: 20,
 				}
 			},
 			style: {
-				fill: 'lightcyan'
+				fill: '#f3f6fe',
+				stroke: 'dodgerblue'
 				// fill: 'lightskyblue'
 			}
 		},
@@ -315,8 +339,8 @@ onMounted(async () => {
 			},
 		},
 		modes: {
-			default: ['drag-combo', 'drag-canvas', 'zoom-canvas', 'collapse-expand-combo',
-				{
+			default: ['drag-canvas', 'zoom-canvas', 'collapse-expand-combo', 'drag-combo',
+				isCourseManager.value ? {
 					type: 'create-edge',
 					key: 'shift', // undefined by default, options: 'shift', 'control', 'ctrl', 'meta', 'alt'
 					shouldBegin: e => {
@@ -329,7 +353,7 @@ onMounted(async () => {
 						if (e.item.getType() === 'node') return true;
 						return false;
 					},
-				},
+				} : '',
 			],
 		},
 	});
@@ -379,7 +403,6 @@ onMounted(async () => {
 				endkwaid: e.edge._cfg.targetNode._cfg.model.kwaid,
 				endunitid: e.edge._cfg.targetNode._cfg.model.unitid,
 				remark: '',
-				courseid: courseid.value,
 			};
 			// console.log('source:',e.edge._cfg.source._cfg.model.kwaid,e.edge._cfg.source._cfg.model.label);
 			// console.log('target', e.edge._cfg.target._cfg.model.kwaid, e.edge._cfg.target._cfg.model.label)
@@ -435,7 +458,7 @@ onMounted(async () => {
 		// 获取被点击的边
 		// console.log(evt)
 		// console.log(evt.item._cfg.model.edgeid);
-		if (evt.originalEvent.ctrlKey) {
+		if (isCourseManager.value && evt.originalEvent.ctrlKey) {
 			ElMessageBox.confirm(
 				'是否删除该边？',
 				'警告',
@@ -464,7 +487,7 @@ onMounted(async () => {
 		}
 	});
 
-	open1();
+	if (isCourseManager.value) open1();
 
 	/*******************************************/
 });
