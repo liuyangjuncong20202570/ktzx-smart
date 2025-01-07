@@ -19,7 +19,7 @@
       </el-scrollbar>
     </div>
 
-    <!-- 图表结束 -->=
+    <!-- 图表结束 -->
   </el-dialog>
 </template>
 

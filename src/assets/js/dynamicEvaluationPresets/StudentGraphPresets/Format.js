@@ -250,7 +250,10 @@ export const formatStudentGraphchartT = (
             series: [
               {
                 type: 'tree',
-                data: []
+                data: [],
+                // 控制默认层级节点
+                expandAndCollapse: true,
+                initialTreeDepth: 1
               }
             ]
           });
@@ -271,7 +274,10 @@ export const formatStudentGraphchartT = (
             series: [
               {
                 type: 'tree',
-                data: []
+                data: [],
+                // 控制默认层级节点
+                expandAndCollapse: true,
+                initialTreeDepth: 1
               }
             ]
           });
@@ -444,7 +450,10 @@ export const formatClassroomGraphchartT = (
         series: [
           {
             type: 'tree',
-            data: []
+            data: [],
+            // 控制默认层级节点
+            expandAndCollapse: true,
+            initialTreeDepth: 1
           }
         ]
       });

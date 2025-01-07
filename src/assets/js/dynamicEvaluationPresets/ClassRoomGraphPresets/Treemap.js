@@ -60,6 +60,7 @@ function transformToTreeData(wordCloudData) {
         }
       },
       expandAndCollapse: true,
+      initialTreeDepth: 1,
       animationDuration: 550,
       animationDurationUpdate: 750
     }))
