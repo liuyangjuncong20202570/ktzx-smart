@@ -41,7 +41,9 @@
         :chartOption="currentWordOption"
         ref="wordmapCmp"
       />
-      <GraphItem title="KWA画像" />
+      <GraphItem title="KWA画像">
+        <KWAgraph />
+      </GraphItem>
       <GraphItem
         ref="treeCmp"
         title="知识单元画像"
@@ -69,6 +71,7 @@ import DynamicStudentList from '../PublicCpns/DynamicStudentList.vue';
 import GraphTemplate from '../PublicCpns/GraphTemplate.vue';
 import { onMounted, reactive, ref, nextTick, onBeforeUnmount } from 'vue';
 import useMain from '../../../stores/useMain.js';
+import KWAgraph from './StudentsGraphCpns/KWAgraph.vue';
 
 /* ********************变量定义******************** */
 // props

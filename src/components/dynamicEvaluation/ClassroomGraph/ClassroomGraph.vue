@@ -27,7 +27,9 @@
         :chartOption="currentWordOption"
         ref="wordmapCmp"
       />
-      <GraphItem title="KWA画像" />
+      <GraphItem title="KWA画像">
+        <KWAgraph />
+      </GraphItem>
       <GraphItem
         ref="treeCmp"
         title="知识单元画像"
@@ -42,6 +44,7 @@
 <script setup>
 import { storeToRefs } from 'pinia';
 import { ElMessage } from 'element-plus';
+import KWAgraph from './ClassroomGraphCpns/KWAgraph.vue';
 import { getCourseId } from '@/utils/searchCourseId.js';
 import useMain from '../../../stores/useMain.js';
 import parseJWT from '../../../utils/parseJWT.js';

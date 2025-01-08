@@ -1,32 +1,87 @@
 <!-- antv-g6 4.x开发 -->
 <template>
-  <div
-    v-if="!nodes.length && !edges.length && !combos.length"
-    style="
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      background-color: white;
-    "
-    v-loading="loading"
-    element-loading-background="rgba(0, 0, 0, 0.2)"
-  >
-    <el-empty description="No Data" />
+  <div class="wrapper">
+    <v-chart
+      ref="chartRef"
+      autoresize
+      :option="chartOption"
+      :style="{ height: '4vh', width: '100%' }"
+    >
+    </v-chart>
+    <div class="text">
+      当前展示第{{ currentTimes }}次评价，已评价{{ studentGraphStore.attendEvalList.length }}次
+    </div>
+    <div
+      v-if="!nodes.length && !edges.length && !combos.length"
+      style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        background-color: white;
+      "
+      v-loading="loading"
+      element-loading-background="rgba(0, 0, 0, 0.2)"
+    >
+      <el-empty description="No Data" />
+    </div>
+    <div
+      v-else
+      class="container"
+      id="container"
+      style="height: 100%; width: 100%; background-color: #fdfdfd; position: relative"
+    ></div>
+    <v-chart
+      @timeline-changed="onTimelineChanged"
+      ref="timeLineRef"
+      autoresize
+      :option="timeLineOption"
+      :style="{ height: '4vh', width: '100%' }"
+    >
+    </v-chart>
   </div>
-  <div
-    v-else
-    class="container"
-    id="container"
-    style="height: 100%; width: 100%; background-color: #fdfdfd; position: relative"
-  ></div>
 </template>
 
 <script lang="ts" setup>
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
-import { onMounted, ref } from 'vue';
+import { onBeforeMount, onMounted, ref } from 'vue';
 import request from '@/utils/request.js';
 import _ from 'lodash';
+import { graphicLegend, timeline } from '@/assets/js/dynamicEvaluationPresets/PublicPresets.js';
+import useStudentGraph from '../../../../stores/dynamicEvaluation/studentGraphStore';
+
+const onTimelineChanged = params => {
+  if (!studentGraphStore.attendEvalList.includes(params.currentIndex + 1)) {
+    timeLineOption.value.baseOption.timeline = {
+      ...timeLineOption.value.baseOption.timeline,
+      currentIndex: currentTimes.value - 1
+    };
+    ElMessage({
+      type: 'error',
+      message: '暂无此次评价信息！'
+    });
+
+    return;
+  }
+
+  currentTimes.value = params.currentIndex + 1;
+};
+
+const studentGraphStore = useStudentGraph();
+
+const chartOption = {
+  graphic: [{ ...graphicLegend }]
+};
+
+const currentTimes = ref(
+  studentGraphStore.attendEvalList[studentGraphStore.attendEvalList.length - 1]
+);
+
+const timeLineOption = ref();
+
+const chartRef = ref(null);
+
+const timeLineRef = ref(null);
 
 const isCourseManager = ref(true);
 
@@ -179,6 +234,41 @@ const getNodesCombosProp = (data, parent = null) => {
 onMounted(async () => {
   await checkRole();
   await getData();
+  timeLineOption.value = {
+    baseOption: {
+      timeline: {
+        axisType: 'category',
+        // realtime: false,
+        // loop: false,
+        autoPlay: false,
+        // currentIndex: 2,
+        playInterval: 1000,
+        controlStyle: {
+          showPlayBtn: false, // 隐藏播放按钮
+          showPrevBtn: true, // 显示上一页按钮
+          showNextBtn: true // 显示下一页按钮
+        },
+        data: studentGraphStore.charts[0].timelineData,
+        currentIndex:
+          studentGraphStore.attendEvalList[studentGraphStore.attendEvalList.length - 1] - 1,
+        checkpointStyle: {
+          symbol: 'diamond', // 设置时间节点符号样式
+          symbolSize: 16, // 设置时间节点符号大小
+          color: '#b7feb7' // 时间节点颜色
+        },
+        progress: {
+          lineStyle: {
+            color: '#a4b1d7'
+          },
+          itemStyle: {
+            color: '#a4b1d7'
+          }
+        }
+      },
+      tooltip: {},
+      calculable: true
+    }
+  };
 
   loading.value = false;
   if (!nodes.value.length && !edges.value.length && !combos.value.length) return;
@@ -274,7 +364,7 @@ onMounted(async () => {
     width,
     height,
     animate: true,
-    minZoom: 0.13,
+    minZoom: 0.3,
     // maxZoom: 1.3,
     fitView: true, // 自适应画布
     fitViewPadding: 50, // 自适应画布后内四周的内边距
@@ -362,8 +452,8 @@ onMounted(async () => {
       default: [
         'drag-canvas',
         'zoom-canvas',
-        'collapse-expand-combo',
-        'drag-combo',
+        // 'collapse-expand-combo',
+        // 'drag-combo',
         isCourseManager.value
           ? {
               type: 'create-edge',
@@ -386,138 +476,153 @@ onMounted(async () => {
   graph.data(data);
   graph.render();
 
+  onBeforeMount(() => {
+    (nodes.value = []), (edges.value = []);
+    combos.value = [];
+  });
+
   /*****************节点的函数*****************/
 
   /*******************************************/
 
   /*****************combo的函数****************/
-  graph.on('combo:mouseenter', evt => {
-    const { item } = evt;
-    graph.setItemState(item, 'active', true);
-  });
+  // graph.on('combo:mouseenter', evt => {
+  //   const { item } = evt;
+  //   graph.setItemState(item, 'active', true);
+  // });
 
-  graph.on('combo:mouseleave', evt => {
-    const { item } = evt;
-    graph.setItemState(item, 'active', false);
-  });
+  // graph.on('combo:mouseleave', evt => {
+  //   const { item } = evt;
+  //   graph.setItemState(item, 'active', false);
+  // });
 
-  graph.on('combo:dragenter', e => {
-    graph.setItemState(e.item, 'dragenter', true);
-  });
+  // graph.on('combo:dragenter', e => {
+  //   graph.setItemState(e.item, 'dragenter', true);
+  // });
 
-  graph.on('combo:dragleave', e => {
-    graph.setItemState(e.item, 'dragenter', false);
-  });
+  // graph.on('combo:dragleave', e => {
+  //   graph.setItemState(e.item, 'dragenter', false);
+  // });
 
-  graph.on('combo:dragend', e => {
-    graph.getCombos().forEach(combo => {
-      graph.setItemState(combo, 'dragenter', false);
-    });
-  });
+  // graph.on('combo:dragend', e => {
+  //   graph.getCombos().forEach(combo => {
+  //     graph.setItemState(combo, 'dragenter', false);
+  //   });
+  // });
   /*******************************************/
 
-  graph.on('aftercreateedge', e => {
-    // console.log(e);
-    setTimeout(() => {
-      // console.log(e);
-      let newEdge = {
-        id: '',
-        startkwaid: e.edge._cfg.sourceNode._cfg.model.kwaid,
-        startunitid: e.edge._cfg.sourceNode._cfg.model.unitid,
-        endkwaid: e.edge._cfg.targetNode._cfg.model.kwaid,
-        endunitid: e.edge._cfg.targetNode._cfg.model.unitid,
-        remark: ''
-      };
-      // console.log('source:',e.edge._cfg.source._cfg.model.kwaid,e.edge._cfg.source._cfg.model.label);
-      // console.log('target', e.edge._cfg.target._cfg.model.kwaid, e.edge._cfg.target._cfg.model.label)
-      // console.log(newEdge);
+  // graph.on('aftercreateedge', e => {
+  //   // console.log(e);
+  //   setTimeout(() => {
+  //     // console.log(e);
+  //     let newEdge = {
+  //       id: '',
+  //       startkwaid: e.edge._cfg.sourceNode._cfg.model.kwaid,
+  //       startunitid: e.edge._cfg.sourceNode._cfg.model.unitid,
+  //       endkwaid: e.edge._cfg.targetNode._cfg.model.kwaid,
+  //       endunitid: e.edge._cfg.targetNode._cfg.model.unitid,
+  //       remark: ''
+  //     };
+  //     // console.log('source:',e.edge._cfg.source._cfg.model.kwaid,e.edge._cfg.source._cfg.model.label);
+  //     // console.log('target', e.edge._cfg.target._cfg.model.kwaid, e.edge._cfg.target._cfg.model.label)
+  //     // console.log(newEdge);
 
-      request.evaluation
-        .post('/evaluation/lines/create', newEdge)
-        .then(res => {
-          if (res.code === 200) {
-            return request.evaluation
-              .get(`/evaluation/lines`)
-              .then(res => {
-                if (res.code === 200) {
-                  let newEdge = res.data.filter(resEdge => {
-                    return !data.edges.find(localEdge => localEdge.edgeid === resEdge.id);
-                  });
-                  // console.log(newEdge[0].id);
-                  edgesMap.set(newEdge[0].id, 'edge' + edgesId++);
-                  const edges = graph.save().edges;
-                  edges[edges.length - 1].edgeid = newEdge[0].id;
-                  // console.log(graph.save().edges);
-                  G6.Util.processParallelEdges(edges);
-                  graph.getEdges().forEach((edge, i) => {
-                    graph.updateItem(edge, {
-                      curveOffset: edges[i].curveOffset,
-                      curvePosition: edges[i].curvePosition
-                    });
-                  });
-                } else {
-                  ElMessage.error(res.msg);
-                }
-              })
-              .catch(error => {
-                ElMessage.error('获取边信息失败' + error);
-              });
-          } else {
-            ElMessage.error(res.msg);
-          }
-        })
-        .catch(error => {
-          ElMessage.error('创建边失败' + error);
-        });
-    }, 600);
-  });
+  //     request.evaluation
+  //       .post('/evaluation/lines/create', newEdge)
+  //       .then(res => {
+  //         if (res.code === 200) {
+  //           return request.evaluation
+  //             .get(`/evaluation/lines`)
+  //             .then(res => {
+  //               if (res.code === 200) {
+  //                 let newEdge = res.data.filter(resEdge => {
+  //                   return !data.edges.find(localEdge => localEdge.edgeid === resEdge.id);
+  //                 });
+  //                 // console.log(newEdge[0].id);
+  //                 edgesMap.set(newEdge[0].id, 'edge' + edgesId++);
+  //                 const edges = graph.save().edges;
+  //                 edges[edges.length - 1].edgeid = newEdge[0].id;
+  //                 // console.log(graph.save().edges);
+  //                 G6.Util.processParallelEdges(edges);
+  //                 graph.getEdges().forEach((edge, i) => {
+  //                   graph.updateItem(edge, {
+  //                     curveOffset: edges[i].curveOffset,
+  //                     curvePosition: edges[i].curvePosition
+  //                   });
+  //                 });
+  //               } else {
+  //                 ElMessage.error(res.msg);
+  //               }
+  //             })
+  //             .catch(error => {
+  //               ElMessage.error('获取边信息失败' + error);
+  //             });
+  //         } else {
+  //           ElMessage.error(res.msg);
+  //         }
+  //       })
+  //       .catch(error => {
+  //         ElMessage.error('创建边失败' + error);
+  //       });
+  //   }, 600);
+  // });
 
   /********************边的函数****************/
 
-  graph.on('edge:mouseenter', e => {
-    graph.setItemState(e.item, 'active', true);
-  });
+  // graph.on('edge:mouseenter', e => {
+  //   graph.setItemState(e.item, 'active', true);
+  // });
 
-  graph.on('edge:mouseleave', e => {
-    graph.setItemState(e.item, 'active', false);
-  });
+  // graph.on('edge:mouseleave', e => {
+  //   graph.setItemState(e.item, 'active', false);
+  // });
 
-  graph.on('edge:click', evt => {
-    // 获取被点击的边
-    // console.log(evt)
-    // console.log(evt.item._cfg.model.edgeid);
-    if (isCourseManager.value && evt.originalEvent.ctrlKey) {
-      ElMessageBox.confirm('是否删除该边？', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          const edge = evt.item;
-          const deletedEdgeId = [edge._cfg.model.edgeid];
-          request.evaluation
-            .post('/evaluation/lines/delete', deletedEdgeId)
-            .then(res => {
-              if (res.code === 200) {
-                graph.removeItem(edge);
-                // console.log(edgesMap.get(deletedEdgeId[0]))
-                edgesMap.delete(deletedEdgeId[0]);
-              } else {
-                ElMessage.error(res.msg);
-              }
-            })
-            .catch(error => {
-              ElMessage.error('删除边失败' + error);
-            });
-        })
-        .catch(error => {});
-    }
-  });
+  // graph.on('edge:click', evt => {
+  //   // 获取被点击的边
+  //   // console.log(evt)
+  //   // console.log(evt.item._cfg.model.edgeid);
+  //   if (isCourseManager.value && evt.originalEvent.ctrlKey) {
+  //     ElMessageBox.confirm('是否删除该边？', '警告', {
+  //       confirmButtonText: '确定',
+  //       cancelButtonText: '取消',
+  //       type: 'warning'
+  //     })
+  //       .then(() => {
+  //         const edge = evt.item;
+  //         const deletedEdgeId = [edge._cfg.model.edgeid];
+  //         request.evaluation
+  //           .post('/evaluation/lines/delete', deletedEdgeId)
+  //           .then(res => {
+  //             if (res.code === 200) {
+  //               graph.removeItem(edge);
+  //               // console.log(edgesMap.get(deletedEdgeId[0]))
+  //               edgesMap.delete(deletedEdgeId[0]);
+  //             } else {
+  //               ElMessage.error(res.msg);
+  //             }
+  //           })
+  //           .catch(error => {
+  //             ElMessage.error('删除边失败' + error);
+  //           });
+  //       })
+  //       .catch(error => {});
+  //   }
+  // });
 
-  if (isCourseManager.value) open1();
+  // if (isCourseManager.value) open1();
 
   /*******************************************/
 });
 </script>
 
-<style scoped></style>
+<style lang="less" scoped>
+.wrapper {
+  position: relative;
+  .text {
+    position: absolute;
+    z-index: 9999;
+    font-size: 14px;
+    color: #1a1a1a;
+  }
+}
+</style>

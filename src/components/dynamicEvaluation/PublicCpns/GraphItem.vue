@@ -6,7 +6,11 @@
     </div>
     <div class="split"></div>
     <div class="chart" style="z-index: 9999">
+      <div v-if="$slots.default">
+        <slot></slot>
+      </div>
       <v-chart
+        v-else
         @timeline-changed="props.onTimelineChanged"
         ref="chartRef"
         autoresize
@@ -65,11 +69,11 @@ defineExpose({
 
 /* ********************方法定义******************** */
 
-const inputSlider = () => {};
+// const inputSlider = () => {};
 
 onMounted(() => {});
 onBeforeUnmount(() => {
-  chartRef.value.dispose();
+  chartRef.value?.dispose();
   chartRef.value = null;
 });
 </script>

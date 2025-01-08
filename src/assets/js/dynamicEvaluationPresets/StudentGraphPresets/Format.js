@@ -349,6 +349,7 @@ export const formatClassroomGraphchartF = (
         tooltip: {
           // 让鼠标悬浮到此项时能够显示 `tooltip`。
           formatter: function (params) {
+            // console.log(params);
             return '第' + params.name + '次作业';
           }
         }
