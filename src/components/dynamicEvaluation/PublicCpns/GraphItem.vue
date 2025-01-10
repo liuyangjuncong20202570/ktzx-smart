@@ -5,7 +5,7 @@
       {{ props.title }}
     </div>
     <div class="split"></div>
-    <div class="chart" style="z-index: 9999">
+    <div class="chart" style="z-index: 1">
       <div v-if="$slots.default">
         <slot></slot>
       </div>

@@ -1479,6 +1479,11 @@
   resolved "https://registry.npmmirror.com/@types/raf/-/raf-3.4.3.tgz"
   integrity sha512-c4YAvMedbPZ5tEyxzQdMoOhhJ4RD3rngZIdwC2/qDN3d7JpEhB6fiBRKVY1lg5B7Wk+uPBjn5f39j1/2MY1oOw==
 
+"@types/sortablejs@^1.15.8":
+  version "1.15.8"
+  resolved "https://registry.npmmirror.com/@types/sortablejs/-/sortablejs-1.15.8.tgz"
+  integrity sha512-b79830lW+RZfwaztgs1aVPgbasJ8e7AXtZYHTELNXZPsERt4ymJdjV4OccDbHQAvHrCcFpbF78jkm0R6h/pZVg==
+
 "@types/video.js@7.x":
   version "7.3.58"
   resolved "https://registry.npmmirror.com/@types/video.js/-/video.js-7.3.58.tgz"
@@ -4580,10 +4585,10 @@ snabbdom@^3.1.0:
   resolved "https://registry.npmmirror.com/snabbdom/-/snabbdom-3.6.2.tgz"
   integrity sha512-ig5qOnCDbugFntKi6c7Xlib8bA6xiJVk8O+WdFrV3wxbMqeHO0hXFQC4nAhPVWfZfi8255lcZkNhtIBINCc4+Q==
 
-sortablejs@^1.15.2:
-  version "1.15.2"
-  resolved "https://registry.npmmirror.com/sortablejs/-/sortablejs-1.15.2.tgz"
-  integrity sha512-FJF5jgdfvoKn1MAKSdGs33bIqLi3LmsgVTliuX6iITj834F+JRQZN90Z93yql8h0K2t0RwDPBmxwlbZfDcxNZA==
+sortablejs@^1.15.6:
+  version "1.15.6"
+  resolved "https://registry.npmmirror.com/sortablejs/-/sortablejs-1.15.6.tgz"
+  integrity sha512-aNfiuwMEpfBM/CN6LY0ibyhxPfPbyFeBTYJKCvzkJ2GkUpazIt3H+QIPAMHwqQ7tMKaHz1Qj+rJJCqljnf4p3A==
 
 sortablejs@1.14.0:
   version "1.14.0"

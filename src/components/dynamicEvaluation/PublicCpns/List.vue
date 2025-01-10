@@ -11,11 +11,13 @@
     >
       <el-table-column label="序号" width="100%">
         <template #default="scope">{{
+          // 此处需要根据后端所传id名称进行配置获取正确序号
           props.listData.findIndex(
             item =>
               item.userId === scope.row.userId &&
               item.classroomId === scope.row.classroomId &&
-              item.testId === scope.row.testId
+              item.testId === scope.row.testId &&
+              item.id === scope.row.id
           ) + 1
         }}</template>
       </el-table-column>

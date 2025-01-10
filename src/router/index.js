@@ -22,7 +22,8 @@ const rolehome = [
   'assistanthome',
   'courseteacherhome',
   'studenthome',
-  'page'
+  'page',
+  'defaulthome'
 ];
 // superadminhome 超级管理员首页
 // secretariatehome 教学秘书首页
@@ -212,6 +213,17 @@ const routes = [
         path: 'evasys/formative/knowledgeunit', // 形成性评价模型-知识单元
         name: 'KnowledgeUnit',
         component: () => import('../components/evaluation/KnowledgeUnit.vue')
+      },
+      {
+        path: 'evaluation/dynamicEvaluation/portraitmangt', // 形成性评价模型-画像数据管理
+        name: 'portraitmangt',
+        component: () => import('../components/dynamicEvaluation/PortraitMangt/PortraitMangt.vue')
+      },
+      // 由于前期开发问题，此处courseGraph表示课堂画像，classroomGraph表示课程画像
+      {
+        path: 'evaluation/dynamicEvaluation/courseGraph', // 形成性评价模型-课堂画像
+        name: 'courseGraph',
+        component: () => import('../components/dynamicEvaluation/CourseGraph/CourseGraph.vue')
       },
       {
         path: 'evasys/formative/KWAgraph', // 形成性评价模型-知识能力图谱

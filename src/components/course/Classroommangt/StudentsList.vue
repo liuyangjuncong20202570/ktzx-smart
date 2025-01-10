@@ -11,7 +11,13 @@
         <el-button type="primary" @click="handleDelAll" color="#800000" v-blur-on-click
           >删除全部学生</el-button
         >
-        <el-button type="success" v-blur-on-click>保存</el-button>
+        <el-button
+          type="success"
+          v-if="roleName === '任课教师'"
+          @click="handleCreateReport"
+          v-blur-on-click
+          >生成学生报告</el-button
+        >
       </div>
     </el-header>
     <!-- 列表开始 -->
@@ -110,10 +116,36 @@
       <InsertStudent :parse-Token="parseToken" @close-tab="handleCloseTab" />
     </el-dialog>
     <!-- 插入学生结束 -->
+
+    <!-- 生成学生报告开始 -->
+
+    <el-dialog
+      :destroy-on-close="true"
+      :show-close="true"
+      :close-on-click-modal="true"
+      style="width: 50vw; padding-top: 0; height: 78vh"
+      v-model="createReport"
+    >
+      <div style="height: 100%" v-loading="creating">
+        <div class="wrapper">
+          <h2 style="margin-top: 0">学生列表</h2>
+          <List :titleList="titleList" :listData="selectedData" />
+          <el-button type="primary" @click="handleBack">返回</el-button>
+          <el-popconfirm @confirm="handleConfirm" title="您确定选择以上学生生成学生报告吗？">
+            <template #reference>
+              <el-button type="success">确认</el-button>
+            </template>
+          </el-popconfirm>
+        </div>
+      </div>
+    </el-dialog>
+
+    <!-- 生成学生报告结束 -->
   </div>
 </template>
 
 <script setup>
+import List from '../../dynamicEvaluation/PublicCpns/List.vue';
 import { storeToRefs } from 'pinia';
 import useTeacherInClass from '@/stores/useTeacherInClass.js';
 import parseJWT from '../../../utils/parseJWT';
@@ -124,6 +156,52 @@ import { exportTableToCSV } from '../../../utils/exportTableToCSV';
 
 /* ********************变量定义******************** */
 const selectedData = ref([]);
+
+const roleName = JSON.parse(sessionStorage.getItem('users')).rolename;
+
+const creating = ref(false);
+
+const titleList = [
+  { prop: 'stuno', label: '学号' },
+  { prop: 'userName', label: '姓名' },
+  { prop: 'obsName', label: '班级' }
+];
+
+const createReport = ref(false);
+
+const handleCreateReport = () => {
+  if (selectedData.value <= 0) {
+    ElMessage({
+      type: 'warning',
+      message: '还未选择学生，请先选择要生成报告的学生!'
+    });
+    return;
+  }
+
+  createReport.value = true;
+};
+
+const handleBack = () => {
+  createReport.value = false;
+};
+
+const handleConfirm = () => {
+  // TODO:点击此按钮后发送后端生成学生报告
+  creating.value = true;
+  // 模拟后端
+  new Promise(resolve => {
+    setTimeout(() => {
+      resolve(true);
+    }, 5000); // 模拟 2 秒延迟
+  }).then(() => {
+    handleBack();
+    creating.value = false;
+    ElMessage({
+      type: 'success',
+      message: '生成成功'
+    });
+  });
+};
 
 const handleSelectAll = selection => {
   selectedData.value = selection;
@@ -355,6 +433,10 @@ const pagedData = computed(() => {
   }
   .list {
     text-align: center;
+  }
+  .wrapper {
+    overflow: auto;
+    height: 67vh;
   }
 }
 </style>

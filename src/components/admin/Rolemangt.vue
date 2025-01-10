@@ -179,7 +179,7 @@ const handleRoleAdd = () => {
     rolename: '未命名角色',
     remark: '',
     homename: '',
-    homeurl: ''
+    homeurl: '/homes/defaulthome'
   });
   console.log(tempRoleinfo.value);
   //
