@@ -51,15 +51,16 @@ export const wordMapPreset = {
 
 export const wordOption = (timelineData, { series }, times) => ({
   toolbox,
-  graphic: [
-    {
-      ...graphicLegend
-    },
-    {
-      ...graphicTitle,
-      top: 35
-    }
-  ],
+  graphic: { ...graphicLegend },
+  // [
+  //   {
+  //     ...graphicLegend
+  //   }
+  //   // {
+  //   //   ...graphicTitle,
+  //   //   top: 35
+  //   // }
+  // ],
 
   timeline: {
     ...timeline(timelineData),

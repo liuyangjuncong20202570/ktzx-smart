@@ -34,8 +34,10 @@ export const getGraphAttendList = (classroomId, stuId, courseId) => {
 
 // 学生报告
 //    课堂列表
-export const getStuRepCourseList = courseId => {
-  return request.evaluation.get('/dynamic/portrait/testPaperInfo?courseId=' + courseId);
+export const getStuRepCourseList = (courseId, classroomId) => {
+  return request.evaluation.get(
+    `/dynamic/portrait/testPaperInfo?courseId=${courseId}&classroomId=${classroomId}`
+  );
 };
 
 //    学生名单

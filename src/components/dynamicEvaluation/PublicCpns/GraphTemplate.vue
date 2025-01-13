@@ -26,6 +26,7 @@
 </template>
 
 <script setup>
+import { getCourseId } from '@/utils/searchCourseId.js';
 import parseJWT from '../../../utils/parseJWT.js';
 import List from './List.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
@@ -63,6 +64,7 @@ const props = defineProps({
   }
 });
 
+const courseId = ref(0);
 const search = ref('');
 const pageSize = ref();
 const currentPage = ref();
@@ -81,10 +83,7 @@ const debouncedQuerySearch = _.debounce(() => {
 const querySearch = async () => {
   if (search.value.length >= 1 || search.value.length === 0) {
     mainStore.setDynamicSearchloading(true);
-    const { code, msg } = await props.store.fetchSearchList(
-      parseJWT(sessionStorage.getItem('token')).obsid,
-      search.value
-    );
+    const { code, msg } = await props.store.fetchSearchList(courseId.value, search.value);
     emits('flushList');
   }
 };
@@ -108,6 +107,18 @@ const pagedData = computed(() => {
     (currentPage.value - 1) * pageSize.value,
     currentPage.value * pageSize.value
   );
+});
+
+onMounted(async () => {
+  const role = JSON.parse(sessionStorage.getItem('users'));
+  if (role.rolename === '任课教师') {
+    const { code, msg, data } = await getCourseId(parseJWT(sessionStorage.getItem('token')).obsid);
+    if (code === 200 && msg === 'success') {
+      courseId.value = data;
+    }
+  } else if (role.rolename === '课程负责人') {
+    courseId.value = parseJWT(sessionStorage.getItem('token')).obsid;
+  }
 });
 
 /* ********************分页器******************** */

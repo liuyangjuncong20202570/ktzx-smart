@@ -6,6 +6,9 @@
     </div>
     <div class="split"></div>
     <div class="chart" style="z-index: 1">
+      <div v-if="props.isShow" class="ban">
+        当前展示第{{ props.currentTimes }}次评价，已评价{{ props.totalTimes }}次
+      </div>
       <div v-if="$slots.default">
         <slot></slot>
       </div>
@@ -27,6 +30,10 @@ import { defaultPreset } from '../../../assets/js/dynamicEvaluationPresets/defau
 /* ********************变量定义******************** */
 // props定义
 const props = defineProps({
+  isShow: {
+    type: Boolean,
+    defaul: false
+  },
   title: {
     type: String,
     default: '默认标题'
@@ -47,6 +54,14 @@ const props = defineProps({
   onTimelineChanged: {
     type: Function,
     defaul: event => ({})
+  },
+  currentTimes: {
+    type: Number,
+    defaul: 0
+  },
+  totalTimes: {
+    type: Number,
+    default: 0
   }
 });
 // 普通变量
@@ -114,6 +129,14 @@ onBeforeUnmount(() => {
   }
   .chart {
     padding-top: 20px;
+    position: relative;
+    .ban {
+      position: absolute;
+      z-index: 10;
+      top: 50px;
+      font-size: 12px;
+      color: #111111;
+    }
   }
 }
 </style>

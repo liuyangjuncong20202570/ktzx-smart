@@ -153,6 +153,7 @@ import InsertStudent from './StudentsListCpns/InsertStudent.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { ref, reactive, computed, onMounted } from 'vue';
 import { exportTableToCSV } from '../../../utils/exportTableToCSV';
+import useTeacherStuGra from '../../../stores/dynamicEvaluation/TeacherStuGraStore';
 
 /* ********************变量定义******************** */
 const selectedData = ref([]);
@@ -160,6 +161,8 @@ const selectedData = ref([]);
 const roleName = JSON.parse(sessionStorage.getItem('users')).rolename;
 
 const creating = ref(false);
+
+const TeacherStuGraStore = useTeacherStuGra();
 
 const titleList = [
   { prop: 'stuno', label: '学号' },
@@ -177,7 +180,6 @@ const handleCreateReport = () => {
     });
     return;
   }
-
   createReport.value = true;
 };
 

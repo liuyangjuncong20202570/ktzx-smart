@@ -46,21 +46,6 @@
                     <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
                   </template>
                   <template v-else>
-                    <el-drawer
-                      size="15%"
-                      style="z-index: 99999; background-color: #0064b1"
-                      v-model="showRoles"
-                      :with-header="false"
-                    >
-                      <div class="wrapper">
-                        <template class="item" v-for="role in roleList" :key="role.roleid">
-                          <div class="item" @click="switchRole(role)">
-                            <el-icon><House /></el-icon>
-                            {{ role.rolename }}
-                          </div>
-                        </template>
-                      </div>
-                    </el-drawer>
                     <!-- <el-dropdown-item
                       v-for="role in roleList"
                       :key="role.roleid"
@@ -72,6 +57,21 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
+            <el-drawer
+              size="15%"
+              style="z-index: 99999; background-color: #0064b1"
+              v-model="showRoles"
+              :with-header="false"
+            >
+              <div class="wrapper">
+                <template class="item" v-for="role in roleList" :key="role.roleid">
+                  <div class="item" @click="switchRole(role)">
+                    <el-icon><House /></el-icon>
+                    {{ role.rolename }}
+                  </div>
+                </template>
+              </div>
+            </el-drawer>
 
             <el-text style="font-size: calc(1vw + 3px); color: white; margin-left: 10px">{{
               loginInfo.username

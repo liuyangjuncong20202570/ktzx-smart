@@ -27,9 +27,10 @@
         :chartOption="currentWordOption"
         ref="wordmapCmp"
       />
-      <GraphItem title="KWA画像">
+      <GraphItem title="KWA画像" />
+      <!-- <GraphItem title="KWA画像">
         <KWAgraph />
-      </GraphItem>
+      </GraphItem> -->
       <GraphItem
         ref="treeCmp"
         title="知识单元画像"

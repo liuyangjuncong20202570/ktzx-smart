@@ -242,20 +242,33 @@ const initList = async () => {
     if (code === 200 && msg === 'success') {
       courseId.value = data;
     }
-  } else {
+    const { code: listCode, msg: listMsg } = await studentReportStore.fetchStuRepCourseList(
+      // parseJWT(sessionStorage.getItem('token')).obsid
+      courseId.value,
+      parseJWT(sessionStorage.getItem('token')).obsid
+    );
+    if (!(listCode === 200 && listMsg === 'success')) {
+      ElMessage({
+        type: 'error',
+        message: listMsg
+      });
+      return;
+    }
+  } else if (role.rolename === '课程负责人') {
     courseId.value = parseJWT(sessionStorage.getItem('token')).obsid;
+    const { code, msg } = await studentReportStore.fetchStuRepCourseList(
+      // parseJWT(sessionStorage.getItem('token')).obsid
+      courseId.value
+    );
+    if (!(code === 200 && msg === 'success')) {
+      ElMessage({
+        type: 'error',
+        message: msg
+      });
+      return;
+    }
   }
-  const { code, msg } = await studentReportStore.fetchStuRepCourseList(
-    // parseJWT(sessionStorage.getItem('token')).obsid
-    courseId.value
-  );
-  if (!(code === 200 && msg === 'success')) {
-    ElMessage({
-      type: 'error',
-      message: msg
-    });
-    return;
-  }
+
   lists.value = studentReportStore.courseList;
 };
 

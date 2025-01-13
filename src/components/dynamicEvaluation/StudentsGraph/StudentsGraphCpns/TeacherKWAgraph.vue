@@ -9,7 +9,7 @@
     >
     </v-chart>
     <div class="text">
-      当前展示第{{ currentTimes }}次评价，已评价{{ courseGraphStore.totalTimes }}次
+      当前展示第{{ currentTimes }}次评价，已评价{{ teacherStuGraStore.attendEvalList.length }}次
     </div>
     <div
       v-if="!nodes.length && !edges.length && !combos.length"
@@ -48,19 +48,34 @@ import { onBeforeMount, onMounted, ref } from 'vue';
 import request from '@/utils/request.js';
 import _ from 'lodash';
 import { graphicLegend, timeline } from '@/assets/js/dynamicEvaluationPresets/PublicPresets.js';
-import useCourseGraph from '../../../../stores/dynamicEvaluation/courseStore';
+import useTeacherStuGra from '../../../../stores/dynamicEvaluation/TeacherStuGraStore';
 
 const onTimelineChanged = params => {
+  if (!teacherStuGraStore.attendEvalList.includes(params.currentIndex + 1)) {
+    timeLineOption.value.baseOption.timeline = {
+      ...timeLineOption.value.baseOption.timeline,
+      currentIndex: currentTimes.value - 1
+    };
+    ElMessage({
+      type: 'error',
+      message: '暂无此次评价信息！'
+    });
+
+    return;
+  }
+
   currentTimes.value = params.currentIndex + 1;
 };
 
-const courseGraphStore = useCourseGraph();
+const teacherStuGraStore = useTeacherStuGra();
 
 const chartOption = {
   graphic: [{ ...graphicLegend }]
 };
 
-const currentTimes = ref(0);
+const currentTimes = ref(
+  teacherStuGraStore.attendEvalList[teacherStuGraStore.attendEvalList.length - 1]
+);
 
 const timeLineOption = ref();
 
@@ -219,7 +234,6 @@ const getNodesCombosProp = (data, parent = null) => {
 onMounted(async () => {
   await checkRole();
   await getData();
-  currentTimes.value = courseGraphStore.totalTimes;
   timeLineOption.value = {
     baseOption: {
       timeline: {
@@ -234,12 +248,21 @@ onMounted(async () => {
           showPrevBtn: true, // 显示上一页按钮
           showNextBtn: true // 显示下一页按钮
         },
-        data: courseGraphStore.charts[0].timelineData,
-        currentIndex: courseGraphStore.totalTimes,
+        data: teacherStuGraStore.charts[0].timelineData,
+        currentIndex:
+          teacherStuGraStore.attendEvalList[teacherStuGraStore.attendEvalList.length - 1] - 1,
         checkpointStyle: {
           symbol: 'diamond', // 设置时间节点符号样式
           symbolSize: 16, // 设置时间节点符号大小
           color: '#b7feb7' // 时间节点颜色
+        },
+        progress: {
+          lineStyle: {
+            color: '#a4b1d7'
+          },
+          itemStyle: {
+            color: '#a4b1d7'
+          }
         }
       },
       tooltip: {},

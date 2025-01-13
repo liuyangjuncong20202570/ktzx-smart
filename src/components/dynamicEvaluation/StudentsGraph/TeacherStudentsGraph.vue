@@ -1,31 +1,17 @@
 <template>
-  <!-- 课堂列表 -->
-  <GraphTemplate
-    :store="studentGraphStore"
-    :handleCellClick="handleCellClick"
-    :addCellStyle="addCellStyle"
-    :graphList="lists"
-    :titleList="titles"
-    @flushList="handleFlushList"
-    keyword="请输入课堂名称关键字检索"
-  />
-  <!-- 课堂列表结束 -->
-  <!-- 学生列表浮窗 -->
-  <DynamicStudentList
-    :store="studentGraphStore"
+  <List
+    :titleList="studentTitles"
+    :listData="studentLists"
     :handleCellClick="stuListCellClick"
     :addCellStyle="stuListCellStyle"
-    :studentList="studentLists"
-    :studentListTitle="studentTitles"
-  >
-    <template #title>画像学生列表</template>
-  </DynamicStudentList>
-  <!-- 学生列表浮窗结束 -->
+  />
   <!-- 图标列表 -->
   <!-- 在GraphChart组件的具名插槽中可以插入GraphItem，可自定义图表 -->
-  <GraphChart :store="studentGraphStore">
+  <GraphChart :store="teacherStuGraStore">
     <template #title
-      >学生课程画像：{{ stuInfo.courseName }} - {{ stuInfo.stuname }}({{ stuInfo.stuNo }})</template
+      >学生课程画像：{{ stuInfo.classroomName }} - {{ stuInfo.stuname }}({{
+        stuInfo.stuNo
+      }})</template
     >
     <template #GraphItem>
       <GraphItem
@@ -39,14 +25,14 @@
         title="关键字画像"
         :isShow="showTitle"
         :currentTimes="currentWordIndex + 1"
-        :totalTimes="studentGraphStore.attendEvalList.length"
+        :totalTimes="teacherStuGraStore.attendEvalList.length"
         :onTimelineChanged="onKWTimelineChanged"
         :chartOption="currentWordOption"
         ref="wordmapCmp"
       />
       <GraphItem title="KWA画像" />
       <!-- <GraphItem title="KWA画像">
-        <KWAgraph />
+        <TeacherKWAgraph />
       </GraphItem> -->
       <GraphItem
         ref="treeCmp"
@@ -60,6 +46,7 @@
 </template>
 
 <script setup>
+import List from '../PublicCpns/List.vue';
 import { storeToRefs } from 'pinia';
 import { getCourseId } from '@/utils/searchCourseId.js';
 import GraphChart from '../PublicCpns/GraphChart.vue';
@@ -70,12 +57,10 @@ import { wordMapPreset } from '../../../assets/js/dynamicEvaluationPresets/Stude
 import { radarOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Radar.js';
 import { treeOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Treemap';
 import { wordOption } from '../../../assets/js/dynamicEvaluationPresets/StudentGraphPresets/Wordmap.js';
-import useStudentGraph from '../../../stores/dynamicEvaluation/studentGraphStore';
-import DynamicStudentList from '../PublicCpns/DynamicStudentList.vue';
-import GraphTemplate from '../PublicCpns/GraphTemplate.vue';
 import { onMounted, reactive, ref, nextTick, onBeforeUnmount } from 'vue';
 import useMain from '../../../stores/useMain.js';
-import KWAgraph from './StudentsGraphCpns/KWAgraph.vue';
+import TeacherKWAgraph from './StudentsGraphCpns/TeacherKWAgraph.vue';
+import useTeacherStuGra from '../../../stores/dynamicEvaluation/TeacherStuGraStore';
 import { graphicTitle, graphicLegend } from '@/assets/js/dynamicEvaluationPresets/PublicPresets.js';
 
 /* ********************变量定义******************** */
@@ -102,29 +87,17 @@ const stuInfo = reactive({
   stuId: 0, //学生id
   courseName: '', //课程名称
   classroomId: 0, //课堂id
-  courseName: '',
+  classroomName: '',
   stuname: '',
   stuNo: ''
 });
 
 // pinia状态
-const studentGraphStore = useStudentGraph();
+const teacherStuGraStore = useTeacherStuGra();
 const mainStore = useMain();
-const { stuListVisible, chartVisible } = storeToRefs(studentGraphStore);
+const { stuListVisible, chartVisible } = storeToRefs(teacherStuGraStore);
 
 /* ********************课程数据定义******************** */
-const titles = [
-  { prop: 'classroomName', label: '课堂名称' }, //小
-  { prop: 'termName', label: '学期' },
-  { prop: 'courseName', label: '课程' }, //大
-  { prop: 'proName', label: '专业' },
-  { prop: 'teacherName', label: '主讲教师' },
-  { prop: 'labTeacher', label: '实验教师' },
-  { prop: 'practiceTeacher', label: '实践教师' },
-  { prop: 'creator', label: '创建人' }
-];
-
-const lists = ref([]);
 
 /* ********************学生数据数据定义******************** */
 const studentTitles = [
@@ -139,7 +112,7 @@ const studentLists = ref([]);
 
 /* ************课程单元格样式定义*********** */
 const onAbilityTimelineChanged = async params => {
-  if (!studentGraphStore.attendEvalList.includes(params.currentIndex + 1)) {
+  if (!teacherStuGraStore.attendEvalList.includes(params.currentIndex + 1)) {
     currentRadarOption.value.baseOption.timeline = {
       ...currentRadarOption.value.baseOption.timeline,
       currentIndex: currentRadarIndex.value
@@ -151,9 +124,11 @@ const onAbilityTimelineChanged = async params => {
 
     return;
   }
+  // 渲染数据
+  currentRadarIndex.value = params.currentIndex;
   if (currentRadarOption.value.options[params.currentIndex].series[0].data[0].value.length === 0) {
     // 如果保存的options中的配置数据为空，则发送请求，否则直接使用
-    const { code, msg } = await studentGraphStore.fetchGraphEvaluation(
+    const { code, msg } = await teacherStuGraStore.fetchGraphEvaluation(
       stuInfo.classroomId,
       // '292104772-9c9f88f0-7af9-438c-a117-e2efc2020b7b',
       stuInfo.stuId,
@@ -167,8 +142,7 @@ const onAbilityTimelineChanged = async params => {
         message: msg
       });
     }
-    // 渲染数据
-    currentRadarIndex.value = params.currentIndex;
+
     initChart(params.currentIndex + 1, false, 'RADAR');
   }
   currentRadarOption.value.baseOption.timeline = {
@@ -180,7 +154,7 @@ const onAbilityTimelineChanged = async params => {
     top: 5,
     style: {
       text: `当前展示第${params.currentIndex + 1}次评价，已评价${
-        studentGraphStore.attendEvalList.length
+        teacherStuGraStore.attendEvalList.length
       }次`
     }
   };
@@ -192,11 +166,12 @@ const onKWTimelineChanged = async params => {
   // 更新前先把原数据清空
   chartInstance.setOption({ series: { ...wordMapPreset, data: [] } }, { replaceMerge: 'series' });
   // 更新词云中的内容
-  if (!studentGraphStore.attendEvalList.includes(params.currentIndex + 1)) {
+  if (!teacherStuGraStore.attendEvalList.includes(params.currentIndex + 1)) {
     currentWordOption.value.timeline = {
       ...currentWordOption.value.timeline,
       currentIndex: currentWordIndex.value
     };
+
     ElMessage({
       type: 'error',
       message: '暂无此次评价信息！'
@@ -205,8 +180,8 @@ const onKWTimelineChanged = async params => {
   }
   currentWordIndex.value = params.currentIndex;
 
-  if (studentGraphStore.charts[1].options[currentWordIndex.value].length === 0) {
-    const { code, msg } = await studentGraphStore.fetchGraphEvaluation(
+  if (teacherStuGraStore.charts[1].options[currentWordIndex.value].series[0].data.length === 0) {
+    const { code, msg } = await teacherStuGraStore.fetchGraphEvaluation(
       stuInfo.classroomId,
       // '292104772-9c9f88f0-7af9-438c-a117-e2efc2020b7b',
       stuInfo.stuId,
@@ -231,7 +206,7 @@ const onTreeTimelineChanged = async params => {
   // 更新前先把原数据清空
   chartInstance.setOption({ series: { type: 'tree', data: [] } }, { replaceMerge: 'series' });
   // 更新树图
-  if (!studentGraphStore.attendEvalList.includes(params.currentIndex + 1)) {
+  if (!teacherStuGraStore.attendEvalList.includes(params.currentIndex + 1)) {
     currentTreeOption.value.baseOption.timeline = {
       ...currentTreeOption.value.baseOption.timeline,
       currentIndex: currentTreeIndex.value
@@ -244,7 +219,7 @@ const onTreeTimelineChanged = async params => {
   }
   currentTreeIndex.value = params.currentIndex;
   if (currentTreeOption.value.options[params.currentIndex].series[0].data.length === 0) {
-    const { code, msg } = await studentGraphStore.fetchGraphEvaluation(
+    const { code, msg } = await teacherStuGraStore.fetchGraphEvaluation(
       stuInfo.classroomId,
       // '292104772-9c9f88f0-7af9-438c-a117-e2efc2020b7b',
       stuInfo.stuId,
@@ -271,38 +246,10 @@ const onTreeTimelineChanged = async params => {
     ...currentTreeOption.value.baseOption.graphic[1],
     style: {
       text: `当前展示第${params.currentIndex + 1}次评价，已评价${
-        studentGraphStore.attendEvalList.length
+        teacherStuGraStore.attendEvalList.length
       }次`
     }
   };
-};
-// 单元格样式定义
-const addCellStyle = ({ row, column, rowIndex, columnIndex }) => {
-  if (column.property === 'classroomName') {
-    return {
-      color: '#86BFA8',
-      textAlign: 'center',
-      textDecoration: 'underline',
-      cursor: 'pointer'
-    };
-  }
-  return {
-    textAlign: 'center'
-  };
-};
-
-// 单元格点击事件
-const handleCellClick = (row, column, cell) => {
-  // 限定只有courseName单元格才能点击
-  if (column.property === 'classroomName') {
-    // 记录学生课堂信息
-    stuInfo.courseName = row.courseName;
-    stuInfo.classroomId = row.classroomId;
-    // 控制学生列表是否可见
-    studentGraphStore.setListVisible(true);
-    // 获取学生列表
-    initStuList(row.classroomId);
-  }
 };
 
 /* ************学生列表单元格样式定义*********** */
@@ -328,12 +275,13 @@ const stuListCellClick = async (row, column, cell) => {
     stuInfo.stuId = row.userId;
     stuInfo.stuname = row.userName;
     stuInfo.stuNo = row.stuno;
+    stuInfo.classroomId = parseJWT(sessionStorage.getItem('token')).obsid;
     // 清空数据
-    studentGraphStore.setChart(0, [], [], [], [], [], [], []);
-    studentGraphStore.setChart(1, [], [], [], [], [], [], []);
-    studentGraphStore.setChart(2, [], [], [], [], [], [], []);
+    teacherStuGraStore.setChart(0, [], [], [], [], [], [], []);
+    teacherStuGraStore.setChart(1, [], [], [], [], [], [], []);
+    teacherStuGraStore.setChart(2, [], [], [], [], [], [], []);
     // 1：获取总评价次数
-    const { code: timeCode, msg: timeMsg } = await studentGraphStore.fetchEvaluationTimes(
+    const { code: timeCode, msg: timeMsg } = await teacherStuGraStore.fetchEvaluationTimes(
       courseId.value,
       stuInfo.classroomId
       // '292104772-9c9f88f0-7af9-438c-a117-e2efc2020b7b'
@@ -347,7 +295,7 @@ const stuListCellClick = async (row, column, cell) => {
     }
 
     // 2：获取参与评价作业次数数组
-    const { code: evaCode, msg: evaMsg } = await studentGraphStore.fetchAttenfEvalList(
+    const { code: evaCode, msg: evaMsg } = await teacherStuGraStore.fetchAttenfEvalList(
       stuInfo.classroomId,
       stuInfo.stuId,
       courseId.value
@@ -360,15 +308,15 @@ const stuListCellClick = async (row, column, cell) => {
       return;
     }
 
-    studentGraphStore.setChartVisible(true);
-    const { code, msg } = await studentGraphStore.fetchGraphEvaluation(
+    teacherStuGraStore.setChartVisible(true);
+    const { code, msg } = await teacherStuGraStore.fetchGraphEvaluation(
       stuInfo.classroomId,
       stuInfo.stuId,
       // '292104772-9c9f88f0-7af9-438c-a117-e2efc2020b7b',
       courseId.value,
       // '1508003654-abbeeeba-9e13-4d5e-b0c2-254bdda7c4c9',
-      // studentGraphStore.totalTimes
-      studentGraphStore.attendEvalList[studentGraphStore.attendEvalList.length - 1]
+      // teacherStuGraStore.totalTimes
+      teacherStuGraStore.attendEvalList[teacherStuGraStore.attendEvalList.length - 1]
     );
     if (!(code === 200 && msg === 'success')) {
       ElMessage({
@@ -380,26 +328,26 @@ const stuListCellClick = async (row, column, cell) => {
 
     // 记录评价次数
     currentRadarIndex.value =
-      studentGraphStore.attendEvalList[studentGraphStore.attendEvalList.length - 1] - 1;
+      teacherStuGraStore.attendEvalList[teacherStuGraStore.attendEvalList.length - 1] - 1;
 
     currentWordIndex.value =
-      studentGraphStore.attendEvalList[studentGraphStore.attendEvalList.length - 1] - 1;
+      teacherStuGraStore.attendEvalList[teacherStuGraStore.attendEvalList.length - 1] - 1;
 
     currentTreeIndex.value =
-      studentGraphStore.attendEvalList[studentGraphStore.attendEvalList.length - 1] - 1;
+      teacherStuGraStore.attendEvalList[teacherStuGraStore.attendEvalList.length - 1] - 1;
 
     initChart(
-      studentGraphStore.totalTimes,
+      teacherStuGraStore.totalTimes,
       true,
       null,
-      studentGraphStore.attendEvalList[studentGraphStore.attendEvalList.length - 1]
+      teacherStuGraStore.attendEvalList[teacherStuGraStore.attendEvalList.length - 1]
     );
     // 雷达图图例更新
     currentRadarOption.value.baseOption.graphic = {
       ...currentRadarOption.value.baseOption.graphic,
       style: {
         text: `当前展示第${currentRadarIndex.value + 1}次评价，已评价${
-          studentGraphStore.attendEvalList.length
+          teacherStuGraStore.attendEvalList.length
         }次`
       },
       top: 15
@@ -410,7 +358,7 @@ const stuListCellClick = async (row, column, cell) => {
       ...currentWordOption.value.graphic[1],
       style: {
         text: `当前展示第${currentWordIndex.value + 1}次评价，已评价${
-          studentGraphStore.attendEvalList.length
+          teacherStuGraStore.attendEvalList.length
         }次`
       }
     };
@@ -420,7 +368,7 @@ const stuListCellClick = async (row, column, cell) => {
       ...currentTreeOption.value.baseOption.graphic[1],
       style: {
         text: `当前展示第${currentTreeIndex.value + 1}次评价，已评价${
-          studentGraphStore.attendEvalList.length
+          teacherStuGraStore.attendEvalList.length
         }次`
       }
     };
@@ -428,32 +376,32 @@ const stuListCellClick = async (row, column, cell) => {
 };
 
 // 需要传递第几次作业，默认最新一次评价
-const initChart = (num = studentGraphStore.totalTimes, isInit, which = 'all', times) => {
+const initChart = (num = teacherStuGraStore.totalTimes, isInit, which = 'all', times) => {
   // TODO 此处获取课堂名单
   // 加载数据前清空图表
   radarInstance?.clear();
   wordInstance?.clear();
   treeInstance?.clear();
   // 渲染图表
-  studentGraphStore.updateCharts(num, isInit, times);
+  teacherStuGraStore.updateCharts(num, isInit, times);
 
   if (which === 'RADAR') {
-    studentGraphStore.updateCharts(num, isInit, 0, 1);
+    teacherStuGraStore.updateCharts(num, isInit, 0, 1);
     currentRadarOption.value = {
       ...radarOption(
-        studentGraphStore.charts[0].timelineData,
-        studentGraphStore.charts[0].options,
-        studentGraphStore.charts[0].indicators,
+        teacherStuGraStore.charts[0].timelineData,
+        teacherStuGraStore.charts[0].options,
+        teacherStuGraStore.charts[0].indicators,
         true,
         null,
-        studentGraphStore.attendEvalList[studentGraphStore.attendEvalList.length - 1]
+        teacherStuGraStore.attendEvalList[teacherStuGraStore.attendEvalList.length - 1]
       )
     };
   } else if (which === 'WORD') {
-    studentGraphStore.updateCharts(num, isInit, 0, 2);
+    teacherStuGraStore.updateCharts(num, isInit, 0, 2);
     try {
       const chartInstance = wordmapCmp.value?.getChartInstance();
-      chartInstance.setOption(studentGraphStore.charts[1].options[currentWordIndex.value], {
+      chartInstance.setOption(teacherStuGraStore.charts[1].options[currentWordIndex.value], {
         replaceMerge: 'series'
       });
       chartInstance.setOption(
@@ -467,7 +415,7 @@ const initChart = (num = studentGraphStore.totalTimes, isInit, which = 'all', ti
               top: 35,
               style: {
                 text: `当前展示第${currentWordIndex.value + 1}次评价，已评价${
-                  studentGraphStore.attendEvalList.length
+                  teacherStuGraStore.attendEvalList.length
                 }次`
               }
             }
@@ -481,47 +429,48 @@ const initChart = (num = studentGraphStore.totalTimes, isInit, which = 'all', ti
       console.log(error);
     }
   } else if (which === 'TREE') {
-    studentGraphStore.updateCharts(num, isInit, 0, 3);
+    teacherStuGraStore.updateCharts(num, isInit, 0, 3);
     currentTreeOption.value = {
       ...treeOption(
-        studentGraphStore.charts[2].timelineData,
-        studentGraphStore.charts[2].options,
-        studentGraphStore.charts[2].response
+        teacherStuGraStore.charts[2].timelineData,
+        teacherStuGraStore.charts[2].options,
+        teacherStuGraStore.charts[2].response
       )
     };
   } else {
     currentRadarOption.value = {
       ...radarOption(
-        studentGraphStore.charts[0].timelineData,
-        studentGraphStore.charts[0].options,
-        studentGraphStore.charts[0].indicators,
+        teacherStuGraStore.charts[0].timelineData,
+        teacherStuGraStore.charts[0].options,
+        teacherStuGraStore.charts[0].indicators,
         true,
         [],
-        studentGraphStore.attendEvalList[studentGraphStore.attendEvalList.length - 1]
+        teacherStuGraStore.attendEvalList[teacherStuGraStore.attendEvalList.length - 1]
       )
     };
 
     currentWordOption.value = {
       ...wordOption(
-        studentGraphStore.charts[1].timelineData,
-        studentGraphStore.charts[1].options[
-          studentGraphStore.attendEvalList[studentGraphStore.attendEvalList.length - 1] - 1
+        teacherStuGraStore.charts[1].timelineData,
+        teacherStuGraStore.charts[1].options[
+          teacherStuGraStore.attendEvalList[teacherStuGraStore.attendEvalList.length - 1] - 1
         ],
-        studentGraphStore.attendEvalList[studentGraphStore.attendEvalList.length - 1]
+        teacherStuGraStore.attendEvalList[teacherStuGraStore.attendEvalList.length - 1]
       )
     };
     currentTreeOption.value = {
       ...treeOption(
-        studentGraphStore.charts[2].timelineData,
-        studentGraphStore.charts[2].options,
-        studentGraphStore.attendEvalList[studentGraphStore.attendEvalList.length - 1]
+        teacherStuGraStore.charts[2].timelineData,
+        teacherStuGraStore.charts[2].options,
+        teacherStuGraStore.attendEvalList[teacherStuGraStore.attendEvalList.length - 1]
       )
     };
   }
 };
 
 const initStuList = async classroomId => {
-  const { code, msg } = await studentGraphStore.fetchStuGraStudentlist(classroomId);
+  // TODO：此处返回的不应该是全体学生数据，后面应该是选择了的学生名单
+  const { code, msg } = await teacherStuGraStore.fetchStuGraStudentlist(classroomId);
   if (!(code === 200 && msg === 'success')) {
     ElMessage({
       type: 'error',
@@ -529,42 +478,38 @@ const initStuList = async classroomId => {
     });
     return;
   }
-  studentLists.value = studentGraphStore.studentList;
+  stuInfo.classroomId = classroomId;
+  studentLists.value = teacherStuGraStore.studentList;
 };
 
 const initList = async () => {
-  const role = JSON.parse(sessionStorage.getItem('users'));
-  if (role.rolename === '任课教师') {
-    const { code, msg, data } = await getCourseId(parseJWT(sessionStorage.getItem('token')).obsid);
-    if (code === 200 && msg === 'success') {
-      courseId.value = data;
-    }
-  } else {
-    courseId.value = parseJWT(sessionStorage.getItem('token')).obsid;
+  const { code, msg, data } = await getCourseId(stuInfo.classroomId);
+  if (code === 200 && msg === 'success') {
+    courseId.value = data;
   }
-  const { code, msg } = await studentGraphStore.fetchStuGraCourseList(
+
+  const { code: listCode, msg: listMsg } = await teacherStuGraStore.fetchStuGraCourseList(
     // parseJWT(sessionStorage.getItem('token')).obsid
     courseId.value
   );
-  if (!(code === 200 && msg === 'success')) {
+  if (!(listCode === 200 && listMsg === 'success')) {
     ElMessage({
       type: 'error',
-      message: msg
+      message: listMsg
     });
     return;
   }
-  lists.value = studentGraphStore.courseList;
-};
-const handleFlushList = () => {
-  lists.value = studentGraphStore.courseList;
-  mainStore.setDynamicSearchloading(false);
+  let obj = teacherStuGraStore.courseList.filter(
+    item => item.classroomId === stuInfo.classroomId
+  )[0];
+  stuInfo.classroomName = obj.classroomName;
+  stuInfo.courseName = obj.courseName;
 };
 
 onMounted(async () => {
   // 获取课程列表
-  initList();
-  // 此为异步操作，应为await，此处为模拟
-  // initChart();
+  await initStuList(parseJWT(sessionStorage.getItem('token')).obsid);
+  await initList();
 });
 
 onBeforeUnmount(() => {
@@ -577,9 +522,9 @@ onBeforeUnmount(() => {
     treeInstance = null;
   }
   // 初始化pinia数据
-  studentGraphStore.setChart(0);
-  studentGraphStore.setChart(1);
-  studentGraphStore.setChart(2);
+  teacherStuGraStore.setChart(0);
+  teacherStuGraStore.setChart(1);
+  teacherStuGraStore.setChart(2);
 });
 </script>
 
