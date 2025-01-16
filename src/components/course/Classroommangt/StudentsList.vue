@@ -46,7 +46,9 @@
             <el-switch
               @change="value => handleChange(value, scope, 0)"
               size="large"
-              v-model="tableData[tableData.findIndex(item => item.id === scope.row.id)].attendDynamic"
+              v-model="
+                tableData[tableData.findIndex(item => item.id === scope.row.id)].attendDynamic
+              "
             />
           </template>
         </el-table-column>
