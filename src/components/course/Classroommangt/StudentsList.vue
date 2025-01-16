@@ -16,7 +16,7 @@
           v-if="roleName === '任课教师'"
           @click="handleCreateReport"
           v-blur-on-click
-          >生成学生报告</el-button
+          >生成画像</el-button
         >
       </div>
     </el-header>
@@ -41,6 +41,24 @@
         <el-table-column prop="loginname" label="登录名称" />
         <el-table-column prop="userName" label="姓名" />
         <el-table-column prop="obsName" label="班级" />
+        <el-table-column label="参与评价(形成性)">
+          <template #default="scope">
+            <el-switch
+              @change="value => handleChange(value, scope, 0)"
+              size="large"
+              v-model="tableData[tableData.findIndex(item => item.id === scope.row.id)].attendDynamic"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column label="参与评价(达成性)">
+          <template #default="scope">
+            <el-switch
+              @change="value => handleChange(value, scope, 1)"
+              size="large"
+              v-model="tableData[scope.$index].attendEnd"
+            />
+          </template>
+        </el-table-column>
       </el-table>
       <!-- 分页器 -->
       <el-footer
@@ -124,14 +142,27 @@
       :show-close="true"
       :close-on-click-modal="true"
       style="width: 50vw; padding-top: 0; height: 78vh"
+      @close="handleBack"
       v-model="createReport"
     >
       <div style="height: 100%" v-loading="creating">
         <div class="wrapper">
           <h2 style="margin-top: 0">学生列表</h2>
-          <List :titleList="titleList" :listData="selectedData" />
+          <div
+            style="
+              display: flex;
+              width: 80%;
+              justify-content: space-around;
+              margin: 0 auto;
+              margin-bottom: 15px;
+            "
+          >
+            <el-button type="success" @click="handleDynamic">形成性评价</el-button>
+            <el-button type="success" @click="handleEnd">达成行评价</el-button>
+          </div>
+          <List :titleList="titleList" :listData="attendList" />
           <el-button type="primary" @click="handleBack">返回</el-button>
-          <el-popconfirm @confirm="handleConfirm" title="您确定选择以上学生生成学生报告吗？">
+          <el-popconfirm @confirm="handleConfirm" title="您确定选择以上学生生成评价吗？">
             <template #reference>
               <el-button type="success">确认</el-button>
             </template>
@@ -158,6 +189,8 @@ import useTeacherStuGra from '../../../stores/dynamicEvaluation/TeacherStuGraSto
 /* ********************变量定义******************** */
 const selectedData = ref([]);
 
+const attendList = ref([]);
+
 const roleName = JSON.parse(sessionStorage.getItem('users')).rolename;
 
 const creating = ref(false);
@@ -173,18 +206,29 @@ const titleList = [
 const createReport = ref(false);
 
 const handleCreateReport = () => {
-  if (selectedData.value <= 0) {
-    ElMessage({
-      type: 'warning',
-      message: '还未选择学生，请先选择要生成报告的学生!'
-    });
-    return;
-  }
   createReport.value = true;
+};
+
+const handleDynamic = () => {
+  attendList.value = tableData.value.filter(item => item.attendDynamic);
+};
+
+const handleEnd = () => {
+  attendList.value = tableData.value.filter(item => item.attendEnd);
 };
 
 const handleBack = () => {
   createReport.value = false;
+  attendList.value = [];
+};
+
+const handleChange = (value, scope, flag) => {
+  console.log(scope);
+  if (flag === 0) {
+    tableData.value[scope.$index].attendDynamic = value;
+  } else if (flag === 1) {
+    tableData.value[scope.$index].attendEnd = value;
+  }
 };
 
 const handleConfirm = () => {
@@ -345,7 +389,13 @@ const TeacherInClassStore = useTeacherInClass();
 const { stuList } = storeToRefs(TeacherInClassStore);
 onMounted(async () => {
   TeacherInClassStore.fetchStudentList(parseToken).then(res => {
-    tableData.value = stuList.value;
+    // 此处只需给tableData增加两个是否参加评价的字段
+    // filterdata是用于展示分页数据的真正绑定的是tableData中的数据
+    tableData.value = stuList.value.map(item => ({
+      ...item,
+      attendDynamic: true,
+      attendEnd: true
+    }));
     filteredData.value = stuList.value;
     total.value = tableData.value.length;
   });
