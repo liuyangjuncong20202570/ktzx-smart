@@ -45,9 +45,11 @@
           <template #default="scope">
             <el-switch
               @change="value => handleChange(value, scope, 0)"
+              :active-value="1"
+              :inactive-value="0"
               size="large"
               v-model="
-                tableData[tableData.findIndex(item => item.id === scope.row.id)].attendDynamic
+                tableData[tableData.findIndex(item => item.id === scope.row.id)].dynamicState
               "
             />
           </template>
@@ -55,9 +57,11 @@
         <el-table-column label="参与评价(达成性)">
           <template #default="scope">
             <el-switch
+              :active-value="1"
+              :inactive-value="0"
               @change="value => handleChange(value, scope, 1)"
               size="large"
-              v-model="tableData[scope.$index].attendEnd"
+              v-model="tableData[scope.$index].reachState"
             />
           </template>
         </el-table-column>
@@ -184,6 +188,7 @@ import useTeacherInClass from '@/stores/useTeacherInClass.js';
 import parseJWT from '../../../utils/parseJWT';
 import InsertStudent from './StudentsListCpns/InsertStudent.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { getCourseId } from '@/utils/searchCourseId.js';
 import { ref, reactive, computed, onMounted } from 'vue';
 import { exportTableToCSV } from '../../../utils/exportTableToCSV';
 import useTeacherStuGra from '../../../stores/dynamicEvaluation/TeacherStuGraStore';
@@ -191,7 +196,13 @@ import useTeacherStuGra from '../../../stores/dynamicEvaluation/TeacherStuGraSto
 /* ********************变量定义******************** */
 const selectedData = ref([]);
 
+const classroomId = ref('');
+
+const courseId = ref('');
+
 const attendList = ref([]);
+
+const stuIdList = ref([]);
 
 const roleName = JSON.parse(sessionStorage.getItem('users')).rolename;
 
@@ -212,11 +223,14 @@ const handleCreateReport = () => {
 };
 
 const handleDynamic = () => {
-  attendList.value = tableData.value.filter(item => item.attendDynamic);
+  attendList.value = tableData.value.filter(item => {
+    stuIdList.value.push(item.userId);
+    return item.dynamicState;
+  });
 };
 
 const handleEnd = () => {
-  attendList.value = tableData.value.filter(item => item.attendEnd);
+  attendList.value = tableData.value.filter(item => item.reachState);
 };
 
 const handleBack = () => {
@@ -224,31 +238,61 @@ const handleBack = () => {
   attendList.value = [];
 };
 
-const handleChange = (value, scope, flag) => {
+const handleChange = async (value, scope, flag) => {
   console.log(scope);
-  if (flag === 0) {
-    tableData.value[scope.$index].attendDynamic = value;
-  } else if (flag === 1) {
-    tableData.value[scope.$index].attendEnd = value;
+  console.log(scope.row.dynamicState);
+  console.log(scope.row.id);
+  const { code, msg, data } = await TeacherInClassStore.putAttendEvaluation(
+    scope.row.id,
+    scope.row.dynamicState
+  );
+  if (!(code === 200 && msg === 'success' && data)) {
+    ElMessage({
+      type: 'error',
+      message: msg
+    });
   }
+  // if (flag === 0) {
+  //   tableData.value[scope.$index].attendDynamic = value;
+  // } else if (flag === 1) {
+  //   tableData.value[scope.$index].attendEnd = value;
+  // }
 };
 
-const handleConfirm = () => {
+const handleConfirm = async () => {
   // TODO:点击此按钮后发送后端生成学生报告
   creating.value = true;
-  // 模拟后端
-  new Promise(resolve => {
-    setTimeout(() => {
-      resolve(true);
-    }, 5000); // 模拟 2 秒延迟
-  }).then(() => {
-    handleBack();
-    creating.value = false;
+  const { code, msg, data } = await TeacherInClassStore.generatePortraitInstant(
+    courseId.value,
+    classroomId.value,
+    stuIdList.value
+  );
+  if (!(code === 200 && data)) {
+    ElMessage({
+      type: 'error',
+      message: msg
+    });
+  } else {
     ElMessage({
       type: 'success',
-      message: '生成成功'
+      message: msg
     });
-  });
+  }
+  handleBack();
+  creating.value = false;
+  // 模拟后端
+  // new Promise(resolve => {
+  //   setTimeout(() => {
+  //     resolve(true);
+  //   }, 5000); // 模拟 2 秒延迟
+  // }).then(() => {
+  //   handleBack();
+  //   creating.value = false;
+  //   ElMessage({
+  //     type: 'success',
+  //     message: '生成成功'
+  //   });
+  // });
 };
 
 const handleSelectAll = selection => {
@@ -393,14 +437,15 @@ onMounted(async () => {
   TeacherInClassStore.fetchStudentList(parseToken).then(res => {
     // 此处只需给tableData增加两个是否参加评价的字段
     // filterdata是用于展示分页数据的真正绑定的是tableData中的数据
-    tableData.value = stuList.value.map(item => ({
-      ...item,
-      attendDynamic: true,
-      attendEnd: true
-    }));
+    tableData.value = stuList.value;
     filteredData.value = stuList.value;
     total.value = tableData.value.length;
   });
+  classroomId.value = parseJWT(sessionStorage.getItem('token')).obsid;
+  const { code, msg, data } = await getCourseId(classroomId.value);
+  if (code === 200 && msg === 'success') {
+    courseId.value = data;
+  }
 });
 // tableData.value = stuList.value;
 // filteredData.value = stuList.value;

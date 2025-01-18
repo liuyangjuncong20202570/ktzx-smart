@@ -5,7 +5,9 @@ import {
   delSingleStudent,
   getOrgnization,
   importStudentList,
-  importStudentmenu
+  importStudentmenu,
+  isAttendEvaluation,
+  generatePortrait
 } from '../api/teacherInclass';
 
 const useTeacherInClass = defineStore('TeacherInClass', {
@@ -58,6 +60,14 @@ const useTeacherInClass = defineStore('TeacherInClass', {
     async importStudent(list) {
       const res = await importStudentmenu(list);
       return res;
+    },
+    // 修改学生参与评价
+    async putAttendEvaluation(classroomStudentId, dynamicState) {
+      return await isAttendEvaluation(classroomStudentId, dynamicState);
+    },
+    // 一键生成画像
+    async generatePortraitInstant(courseId, classroomId, stuIdList, paperIdList) {
+      return await generatePortrait(courseId, classroomId, stuIdList, paperIdList);
     }
   }
 });

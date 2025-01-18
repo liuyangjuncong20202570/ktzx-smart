@@ -14,19 +14,30 @@
     <div class="stuList-container">
       <el-scrollbar>
         <List
+          v-if="props.isDefault"
           :titleList="props.studentListTitle"
           :listData="props.studentList"
           :handleCellClick="props.handleCellClick"
           :addCellStyle="props.addCellStyle"
         />
+        <ListWithSelection
+          v-else
+          :titleList="props.studentListTitle"
+          :listData="props.studentList"
+          :handleCellClick="props.handleCellClick"
+          :addCellStyle="props.addCellStyle"
+          :handleSelectAll="props.handleSelectAll"
+          :handleSelectionChange="props.handleSelectionChange"
+        />
       </el-scrollbar>
     </div>
-
+    <slot name="footer"></slot>
     <!-- 学生列表开始结束 -->
   </el-dialog>
 </template>
 
 <script setup>
+import ListWithSelection from './ListWithSelection.vue';
 import { storeToRefs } from 'pinia';
 import useStudentGraph from '../../../stores/dynamicEvaluation/studentGraphStore';
 import List from './List.vue';
@@ -52,6 +63,18 @@ const props = defineProps({
     default: ({ row, column, rowIndex, columnIndex }) => ({ textAlign: 'center' })
   },
   handleCellClick: {
+    type: Function,
+    default: () => ({})
+  },
+  isDefault: {
+    type: Boolean,
+    default: true
+  },
+  handleSelectionChange: {
+    type: Function,
+    default: () => ({})
+  },
+  handleSelectAll: {
     type: Function,
     default: () => ({})
   }

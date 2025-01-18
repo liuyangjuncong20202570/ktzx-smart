@@ -41,3 +41,26 @@ export const importStudentList = fd => {
 export const importStudentmenu = list => {
   return request.course.post('/coursemangt/classroommangt/student/create', list);
 };
+
+// 修改学生是否参与评价
+export const isAttendEvaluation = (classroomStudentId, dynamicState) => {
+  return request.evaluation.put('/dynamic/portrait/modifyStudentDynamicState', {
+    classroomStudentId,
+    dynamicState
+  });
+};
+
+// 一键生成画像
+export const generatePortrait = (courseId, classroomId, stuIdList = [], paperIdList = []) => {
+  const data = {
+    courseId,
+    classroomId,
+    ...qs.parse(
+      qs.stringify(
+        { stuIdList, paperIdList },
+        { arrayFormat: 'repeat' } // 数组以重复键的格式序列化
+      )
+    )
+  };
+  return request.evaluation.post('/dynamic/portrait/calculate', data);
+};

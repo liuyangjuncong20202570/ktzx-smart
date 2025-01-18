@@ -479,7 +479,7 @@ const initStuList = async classroomId => {
     return;
   }
   stuInfo.classroomId = classroomId;
-  studentLists.value = teacherStuGraStore.studentList;
+  studentLists.value = teacherStuGraStore.studentList.filter(item => item.dynamicState === 1);
 };
 
 const initList = async () => {

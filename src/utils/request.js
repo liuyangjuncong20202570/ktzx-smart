@@ -26,6 +26,16 @@ const request = {
 //   term: createAPI('http://120.46.201.4:10203/term')
 // };
 
+// const request = {
+//   admin: createAPI('http://120.46.201.4:8080/api'),
+//   course: createAPI('http://120.46.201.4:8082/api'),
+//   evaluation: createAPI('http://120.46.201.4:8083/api'),
+//   page: createAPI('http://120.46.201.4:10203/page'),
+//   fork: createAPI('http://120.46.201.4:10203/fork'),
+//   common: createAPI('http://120.46.201.4:10203/common'),
+//   term: createAPI('http://120.46.201.4:10203/term')
+// };
+
 // 60.205.178.180
 function createAPI(url) {
   // 构建不同端口的异步请求数据
