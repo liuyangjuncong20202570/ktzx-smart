@@ -160,7 +160,7 @@ const getAbility = () => {
     .then(res => {
       if (res.code === 200) {
         data.value = res.data;
-        console.log(res.data);
+        // console.log(res.data);
         tableData.value = [];
         initialize();
         tableLoading.value = false;
@@ -250,6 +250,7 @@ const openDeleteDialog = () => {
     });
     return;
   }
+  console.log(tableSelected.value);
 
   let deletedIds = [];
   tableSelected.value.forEach(item => {
@@ -269,7 +270,7 @@ const deleteAbility = async () => {
   });
 
   try {
-    const res = await request.evaluation.post(`/evaluation/getability/delete?courseid=${courseid.value}`, deletedIds);
+    const res = await request.evaluation.post(`/evaluation/getability/delete`, deletedIds);
     if (res.code === 200) {
       tableLoading.value = true;
       getAbility();

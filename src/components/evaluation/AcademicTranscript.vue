@@ -55,7 +55,7 @@ const gridOptions = ref({
                     title: '学生成绩',
                     children: [
                         {
-                            field: 'rowNo',
+                            type: 'seq',
                             title: '序号',
                             width: 50
                         },

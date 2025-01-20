@@ -17,7 +17,7 @@
 				highlight-current-row size="large" :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
 				:row-class-name="tableRowClassName" @selection-change="handleSelectionChange"
 				@current-change="changeSelRow">
-				<el-table-column type="selection" width="55"></el-table-column>
+				<el-table-column v-if="isCourseManager" type="selection" width="55"></el-table-column>
 				<el-table-column prop="type" label="类型" sortable width="180">
 					<!--          <template #default="tableRowData">-->
 					<!--            <span v-if="!editRef.get(tableRowData.row.id)['editType']"-->
