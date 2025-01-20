@@ -14,7 +14,8 @@
 				<div style="min-width: 385px;">名称</div>
 				<div style="min-width: 850px; width: 58vw;">
 					<div style="display: flex; flex: auto; justify-content: space-between;">
-						<div style="width: 200px; border-right: 1px solid #bbbbbb; border-left: 1px solid #bbbbbb;">层级码</div>
+						<div style="width: 200px; border-right: 1px solid #bbbbbb; border-left: 1px solid #bbbbbb;">层级码
+						</div>
 						<div style="min-width: 700px; width: 100%;">备注</div>
 					</div>
 				</div>
@@ -90,8 +91,6 @@ const treeData = ref([]);
 const expandedKeys = ref([]); // 用于存储展开的节点的键值
 const nodeExpand = ref(null);
 
-
-const nullNodeNum = ref(0);
 //展开所有或收起所有
 const expandAll = ref(false);
 const expandtip = ref('');
@@ -121,8 +120,9 @@ const getTreeData = () => {
 	request.admin.get('/sysmangt/units').then((res) => {
 		if (res.code === 200) {
 			treeData.value = res.data;
-			nullNodeNum.value = 0;
+			existingNum.value = new Set();
 			initialize(treeData.value);
+			findNullNodeNum();
 			// console.log("getTreeData 被触发");
 			console.log(treeData.value)
 		}
@@ -134,18 +134,47 @@ const getTreeData = () => {
 	});
 };
 
+const maxNum = ref(0);
+const nullNodeNum = ref(1);
+const nodeNameRegex1 = /^未命名节点$/;
+const nodeNameRegex2 = /^未命名节点\s\((\d+)\)$/;
+const existingNum = ref(null);
+
 // 递归初始化popVisible
 const initialize = (nodes) => {
 	nodes.forEach((node) => {
 		node.popVisible = false;
 		node.inputVisible = false;
 		node.tempData = '';
+		
+		// 查询未命名节点的编号
+		if (nodeNameRegex1.test(node.obsname)) {
+			if (maxNum.value < 1) maxNum.value = 1;
+			existingNum.value.add(1);
+		}
+		else if (nodeNameRegex2.test(node.obsname)) {
+			const match = node.obsname.match(nodeNameRegex2);
+			if (match) {
+				let num = parseInt(match[1], 10);
+				if (maxNum.value < num) {
+					maxNum.value = num;
+				}
+				existingNum.value.add(num);
+			}
+		}
 
 		if (node.children && node.children.length > 0) {
 			initialize(node.children); // 递归子节点
 		}
 	});
 };
+
+const findNullNodeNum = () => {
+	if (maxNum.value <= 0) return;
+	let num = 1;
+	while (num <= maxNum.value && existingNum.value.has(num)) num++;
+	nullNodeNum.value = num;
+}
 
 /*****************************/
 
@@ -154,50 +183,50 @@ const initialize = (nodes) => {
 
 
 /*********************删除节点****************************/
-	// 检查节点是否有子节点
-	// if ( deletedNode.children && deletedNode.children.length > 0 ) {
-		// 如果有子节点，显示错误提示并阻止删除
-		// ElMessage({
-		// 	type: 'error',
-		// 	message: '请先删除子节点',
-		// });
-		// deletedNode.popVisible = false;
-	// }
+// 检查节点是否有子节点
+// if ( deletedNode.children && deletedNode.children.length > 0 ) {
+// 如果有子节点，显示错误提示并阻止删除
+// ElMessage({
+// 	type: 'error',
+// 	message: '请先删除子节点',
+// });
+// deletedNode.popVisible = false;
+// }
 const confirmDeleteNodes = (deletedNode) => {
-  // 第一次弹窗的提示信息
-  const message = deletedNode.children && deletedNode.children.length > 0
-      ? `是否删除节点 "${deletedNode.obsname}"，及其子节点?`
-      : `是否删除节点 "${deletedNode.obsname}"?`;
+	// 第一次弹窗的提示信息
+	const message = deletedNode.children && deletedNode.children.length > 0
+		? `是否删除节点 "${deletedNode.obsname}"，及其子节点?`
+		: `是否删除节点 "${deletedNode.obsname}"?`;
 
-  ElMessageBox.confirm(
-      message, // 第一次弹窗提示
-      '警告',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      } as ElMessageBoxOptions
-  ).then(() => {
-    // 如果用户点击了“确定”，则弹出二次确认
-    ElMessageBox.confirm(
-        `确定要删除该节点吗？`, // 二次确认提示
-        '请再次确认',
-        {
-          confirmButtonText: '是',
-          cancelButtonText: '否',
-          type: 'warning',
-        } as ElMessageBoxOptions
-    ).then(() => {
-      // 如果用户在二次确认中点击“是”，则执行删除操作
-      deleteNodes(deletedNode);
-    }).catch(() => {
-      // 用户在二次确认中点击了“否”，关闭弹窗
-      deletedNode.popVisible = false;
-    });
-  }).catch(() => {
-    // 用户在第一次弹窗中点击了“取消”，关闭弹窗
-    deletedNode.popVisible = false;
-  });
+	ElMessageBox.confirm(
+		message, // 第一次弹窗提示
+		'警告',
+		{
+			confirmButtonText: '确定',
+			cancelButtonText: '取消',
+			type: 'warning',
+		} as ElMessageBoxOptions
+	).then(() => {
+		// 如果用户点击了“确定”，则弹出二次确认
+		ElMessageBox.confirm(
+			`确定要删除该节点吗？`, // 二次确认提示
+			'请再次确认',
+			{
+				confirmButtonText: '是',
+				cancelButtonText: '否',
+				type: 'warning',
+			} as ElMessageBoxOptions
+		).then(() => {
+			// 如果用户在二次确认中点击“是”，则执行删除操作
+			deleteNodes(deletedNode);
+		}).catch(() => {
+			// 用户在二次确认中点击了“否”，关闭弹窗
+			deletedNode.popVisible = false;
+		});
+	}).catch(() => {
+		// 用户在第一次弹窗中点击了“取消”，关闭弹窗
+		deletedNode.popVisible = false;
+	});
 }
 
 const deleteNodes = (deletedNode) => {
@@ -223,12 +252,12 @@ const deleteNodes = (deletedNode) => {
 					if (index > -1) expandedKeys.value.splice(index, 1);
 				})
 				console.log(expandedKeys.value);
-			}else if(res.code === 404){
-        ElMessage({
-          type: 'error',
-          message: `批量删除教学单位出错`
-        })
-      }
+			} else if (res.code === 404) {
+				ElMessage({
+					type: 'error',
+					message: `批量删除教学单位出错`
+				})
+			}
 		}).catch(error => {
 			ElMessage({
 				type: 'error',
@@ -296,14 +325,14 @@ const closeNode = (nodeData, node) => {
 /**************************处理节点新增逻辑******************/
 //同级新增事件
 const addSiblingNode = async (addedNode) => {
-	nullNodeNum.value += 1;
+	console.log((addedNode.obsdeep));
 	const newNodeData = {
 		id: addedNode.id,
 		pid: addedNode.pid,
-		obsdeep: addedNode.obsdeep.toString(), //点击的obs的obsdeep
+		obsdeep: addedNode.obsdeep, //点击的obs的obsdeep
 		type: "1", // type为1为同级新增，type为0为下级新增
 		smObs: { // 新增的数据
-			obsname: '未命名节点',
+			obsname: nullNodeNum.value > 1 ? '未命名节点 (' + nullNodeNum.value + ')' : '未命名节点',
 			remark: ""
 		}
 	};
@@ -315,6 +344,8 @@ const addSiblingNode = async (addedNode) => {
 					message: `新增同级教学单位成功`
 				})
 				getTreeData();
+			} else {
+				ElMessage.error(res.msg);
 			}
 		}).catch(error => {
 			ElMessage({
@@ -326,15 +357,15 @@ const addSiblingNode = async (addedNode) => {
 
 //下级新增事件
 const addChildNode = (addedNode) => {
-	nullNodeNum.value += 1;
+	console.log((addedNode.obsdeep));
 	const newNodeData = ref(
 		{
 			id: addedNode.id,
 			pid: addedNode.pid,
-			obsdeep: addedNode.obsdeep.toString(),//点击的obs的obsdeep
+			obsdeep: addedNode.obsdeep,//点击的obs的obsdeep
 			type: "2",//type为1为同级新增，type为0为下级新增
 			smObs: {//新增的数据
-				obsname: '未命名节点',
+				obsname: nullNodeNum.value > 1 ? '未命名节点 (' + nullNodeNum.value + ')' : '未命名节点',
 				remark: ""
 			}
 		}
@@ -348,11 +379,13 @@ const addChildNode = (addedNode) => {
 				})
 				expandedKeys.value.push(addedNode.id); //将该节点id追加到展开的id中
 				getTreeData();
+			} else {
+				ElMessage.error(res.msg);
 			}
 		}).catch(error => {
 			ElMessage({
 				type: 'error',
-				message: '新增下级教学单位失败'
+				message: '新增下级教学单位失败' + error
 			});
 		});
 }
@@ -517,7 +550,7 @@ const handleBlur = (node) => {
 			const editdata = ref({
 				id: node.id,
 				obsname: node.tempData,
-        obsdeep: node.obsdeep,
+				obsdeep: node.obsdeep,
 				remark: ''
 			})
 			request.admin.post('/sysmangt/units/update', editdata.value)
@@ -528,6 +561,8 @@ const handleBlur = (node) => {
 							message: `修改教学单位名称成功`
 						})
 						getTreeData();
+					} else {
+						ElMessage.error(res.msg);
 					}
 				}).catch(error => {
 					ElMessage({
