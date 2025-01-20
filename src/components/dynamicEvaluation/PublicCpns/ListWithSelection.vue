@@ -8,7 +8,10 @@
       :header-cell-style="{ textAlign: 'center' }"
       :cell-style="props.addCellStyle"
       @cell-click="props.handleCellClick"
+      @select-all="props.handleSelectAll"
+      @selection-change="props.handleSelectionChange"
     >
+      <el-table-column type="selection" />
       <el-table-column label="序号" width="100%">
         <template #default="scope">{{
           // 此处需要根据后端所传id名称进行配置获取正确序号
@@ -61,6 +64,14 @@ const props = defineProps({
     default: ({ row, column, rowIndex, columnIndex }) => ({ textAlign: 'center' })
   },
   handleCellClick: {
+    type: Function,
+    default: () => ({})
+  },
+  handleSelectAll: {
+    type: Function,
+    default: () => ({})
+  },
+  handleSelectionChange: {
     type: Function,
     default: () => ({})
   }

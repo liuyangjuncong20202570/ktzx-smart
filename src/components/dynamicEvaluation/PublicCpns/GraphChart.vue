@@ -41,11 +41,13 @@ const chartVisible = ref(props.store.chartVisible);
 const classroomGraphStore = useClassroomGraph();
 
 /* ********************方法定义******************** */
+const emits = defineEmits('close');
 const handleClose = () => {
   // 初始化pinia数据
   classroomGraphStore.setChart(0);
   classroomGraphStore.setChart(1);
   classroomGraphStore.setChart(2);
+  emits('close');
 };
 </script>
 

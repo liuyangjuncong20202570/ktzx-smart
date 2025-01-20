@@ -11,7 +11,13 @@
         <el-button type="primary" @click="handleDelAll" color="#800000" v-blur-on-click
           >删除全部学生</el-button
         >
-        <el-button type="success" v-blur-on-click>保存</el-button>
+        <el-button
+          type="success"
+          v-if="roleName === '任课教师'"
+          @click="handleCreateReport"
+          v-blur-on-click
+          >生成画像</el-button
+        >
       </div>
     </el-header>
     <!-- 列表开始 -->
@@ -35,6 +41,30 @@
         <el-table-column prop="loginname" label="登录名称" />
         <el-table-column prop="userName" label="姓名" />
         <el-table-column prop="obsName" label="班级" />
+        <el-table-column label="参与评价(形成性)">
+          <template #default="scope">
+            <el-switch
+              @change="value => handleChange(value, scope, 0)"
+              :active-value="1"
+              :inactive-value="0"
+              size="large"
+              v-model="
+                tableData[tableData.findIndex(item => item.id === scope.row.id)].dynamicState
+              "
+            />
+          </template>
+        </el-table-column>
+        <el-table-column label="参与评价(达成性)">
+          <template #default="scope">
+            <el-switch
+              :active-value="1"
+              :inactive-value="0"
+              @change="value => handleChange(value, scope, 1)"
+              size="large"
+              v-model="tableData[scope.$index].reachState"
+            />
+          </template>
+        </el-table-column>
       </el-table>
       <!-- 分页器 -->
       <el-footer
@@ -110,20 +140,160 @@
       <InsertStudent :parse-Token="parseToken" @close-tab="handleCloseTab" />
     </el-dialog>
     <!-- 插入学生结束 -->
+
+    <!-- 生成学生报告开始 -->
+
+    <el-dialog
+      :destroy-on-close="true"
+      :show-close="true"
+      :close-on-click-modal="true"
+      style="width: 50vw; padding-top: 0; height: 78vh"
+      @close="handleBack"
+      v-model="createReport"
+    >
+      <div style="height: 100%" v-loading="creating">
+        <div class="wrapper">
+          <h2 style="margin-top: 0">学生列表</h2>
+          <div
+            style="
+              display: flex;
+              width: 80%;
+              justify-content: space-around;
+              margin: 0 auto;
+              margin-bottom: 15px;
+            "
+          >
+            <el-button type="success" @click="handleDynamic">形成性评价</el-button>
+            <el-button type="success" @click="handleEnd">达成行评价</el-button>
+          </div>
+          <List :titleList="titleList" :listData="attendList" />
+          <el-button type="primary" @click="handleBack">返回</el-button>
+          <el-popconfirm @confirm="handleConfirm" title="您确定选择以上学生生成评价吗？">
+            <template #reference>
+              <el-button type="success">确认</el-button>
+            </template>
+          </el-popconfirm>
+        </div>
+      </div>
+    </el-dialog>
+
+    <!-- 生成学生报告结束 -->
   </div>
 </template>
 
 <script setup>
+import List from '../../dynamicEvaluation/PublicCpns/List.vue';
 import { storeToRefs } from 'pinia';
 import useTeacherInClass from '@/stores/useTeacherInClass.js';
 import parseJWT from '../../../utils/parseJWT';
 import InsertStudent from './StudentsListCpns/InsertStudent.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { getCourseId } from '@/utils/searchCourseId.js';
 import { ref, reactive, computed, onMounted } from 'vue';
 import { exportTableToCSV } from '../../../utils/exportTableToCSV';
+import useTeacherStuGra from '../../../stores/dynamicEvaluation/TeacherStuGraStore';
 
 /* ********************变量定义******************** */
 const selectedData = ref([]);
+
+const classroomId = ref('');
+
+const courseId = ref('');
+
+const attendList = ref([]);
+
+const stuIdList = ref([]);
+
+const roleName = JSON.parse(sessionStorage.getItem('users')).rolename;
+
+const creating = ref(false);
+
+const TeacherStuGraStore = useTeacherStuGra();
+
+const titleList = [
+  { prop: 'stuno', label: '学号' },
+  { prop: 'userName', label: '姓名' },
+  { prop: 'obsName', label: '班级' }
+];
+
+const createReport = ref(false);
+
+const handleCreateReport = () => {
+  createReport.value = true;
+};
+
+const handleDynamic = () => {
+  attendList.value = tableData.value.filter(item => {
+    stuIdList.value.push(item.userId);
+    return item.dynamicState;
+  });
+};
+
+const handleEnd = () => {
+  attendList.value = tableData.value.filter(item => item.reachState);
+};
+
+const handleBack = () => {
+  createReport.value = false;
+  attendList.value = [];
+};
+
+const handleChange = async (value, scope, flag) => {
+  console.log(scope);
+  console.log(scope.row.dynamicState);
+  console.log(scope.row.id);
+  const { code, msg, data } = await TeacherInClassStore.putAttendEvaluation(
+    scope.row.id,
+    scope.row.dynamicState
+  );
+  if (!(code === 200 && msg === 'success' && data)) {
+    ElMessage({
+      type: 'error',
+      message: msg
+    });
+  }
+  // if (flag === 0) {
+  //   tableData.value[scope.$index].attendDynamic = value;
+  // } else if (flag === 1) {
+  //   tableData.value[scope.$index].attendEnd = value;
+  // }
+};
+
+const handleConfirm = async () => {
+  // TODO:点击此按钮后发送后端生成学生报告
+  creating.value = true;
+  const { code, msg, data } = await TeacherInClassStore.generatePortraitInstant(
+    courseId.value,
+    classroomId.value,
+    stuIdList.value
+  );
+  if (!(code === 200 && data)) {
+    ElMessage({
+      type: 'error',
+      message: msg
+    });
+  } else {
+    ElMessage({
+      type: 'success',
+      message: msg
+    });
+  }
+  handleBack();
+  creating.value = false;
+  // 模拟后端
+  // new Promise(resolve => {
+  //   setTimeout(() => {
+  //     resolve(true);
+  //   }, 5000); // 模拟 2 秒延迟
+  // }).then(() => {
+  //   handleBack();
+  //   creating.value = false;
+  //   ElMessage({
+  //     type: 'success',
+  //     message: '生成成功'
+  //   });
+  // });
+};
 
 const handleSelectAll = selection => {
   selectedData.value = selection;
@@ -265,10 +435,17 @@ const TeacherInClassStore = useTeacherInClass();
 const { stuList } = storeToRefs(TeacherInClassStore);
 onMounted(async () => {
   TeacherInClassStore.fetchStudentList(parseToken).then(res => {
+    // 此处只需给tableData增加两个是否参加评价的字段
+    // filterdata是用于展示分页数据的真正绑定的是tableData中的数据
     tableData.value = stuList.value;
     filteredData.value = stuList.value;
     total.value = tableData.value.length;
   });
+  classroomId.value = parseJWT(sessionStorage.getItem('token')).obsid;
+  const { code, msg, data } = await getCourseId(classroomId.value);
+  if (code === 200 && msg === 'success') {
+    courseId.value = data;
+  }
 });
 // tableData.value = stuList.value;
 // filteredData.value = stuList.value;
@@ -355,6 +532,10 @@ const pagedData = computed(() => {
   }
   .list {
     text-align: center;
+  }
+  .wrapper {
+    overflow: auto;
+    height: 67vh;
   }
 }
 </style>

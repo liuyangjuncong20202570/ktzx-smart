@@ -10,9 +10,9 @@ export const formatStudentGraphchartF = (
   timelineData,
   options,
   indicators,
-  num,
-  isInit = true,
-  attendEvalList,
+  num, //评价总次数
+  isInit = true, //是否初始化
+  attendEvalList, //参与评价次数
   times
 ) => {
   const value = [];
@@ -27,71 +27,75 @@ export const formatStudentGraphchartF = (
     });
     // i表示评价次数，j表示attentEvallist数组下标，其元素是评价次数
     for (let i = 1; i <= num; i++) {
+      let isParticipated = false;
       for (let j = 0; j < attendEvalList.length; j++) {
         // 此次该学生已交作业
         if (i === attendEvalList[j]) {
-          timelineData.push({
-            value: i,
-            tooltip: {
-              // 让鼠标悬浮到此项时能够显示 `tooltip`。
-              formatter: function (params) {
-                return '第' + params.name + '次作业';
+          isParticipated = true;
+          break;
+        }
+      }
+      if (isParticipated) {
+        //已交作业
+        timelineData.push({
+          value: i,
+          tooltip: {
+            // 让鼠标悬浮到此项时能够显示 `tooltip`。
+            formatter: function (params) {
+              return '第' + params.name + '次作业';
+            }
+          }
+        });
+
+        options.push({
+          series: [
+            {
+              name: '个人能力值',
+              type: 'radar',
+              data: [{ value: [], name: `个人能力值 - 第${i}次作业` }],
+              lineStyle: {
+                color: '#42b983' // 折线颜色
+              },
+              itemStyle: {
+                color: '#42b983' // 数据点颜色
+              },
+              areaStyle: {
+                color: '#b1fab6' // 折线图填充区域颜色
               }
             }
-          });
-
-          options.push({
-            series: [
-              {
-                name: '个人能力值',
-                type: 'radar',
-                data: [{ value: [], name: `个人能力值 - 第${i}次作业` }],
-                lineStyle: {
-                  color: '#42b983' // 折线颜色
-                },
-                itemStyle: {
-                  color: '#42b983' // 数据点颜色
-                },
-                areaStyle: {
-                  color: '#b1fab6' // 折线图填充区域颜色
-                }
+          ]
+        });
+      } else {
+        // // 未交作业则插入默认样式数组
+        timelineData.push({
+          value: i,
+          tooltip: {
+            // 让鼠标悬浮到此项时能够显示 `tooltip`。
+            formatter: function (params) {
+              return '第' + params.name + '次作业';
+            }
+          },
+          symbol: errorSVG, // 此项的图形的特别设置。
+          symbolSize: 16 // 此项的图形大小的特别设置。
+        });
+        options.push({
+          series: [
+            {
+              name: '个人能力值',
+              type: 'radar',
+              data: [{ value: [], name: `个人能力值 - 第${i}次作业` }],
+              lineStyle: {
+                color: '#42b983' // 折线颜色
+              },
+              itemStyle: {
+                color: '#42b983' // 数据点颜色
+              },
+              areaStyle: {
+                color: '#b1fab6' // 折线图填充区域颜色
               }
-            ]
-          });
-        } else {
-          // 未交作业则插入默认样式数组
-          timelineData.push({
-            value: i,
-            tooltip: {
-              // 让鼠标悬浮到此项时能够显示 `tooltip`。
-              formatter: function (params) {
-                return '第' + params.name + '次作业';
-              }
-            },
-
-            symbol: errorSVG, // 此项的图形的特别设置。
-            symbolSize: 16 // 此项的图形大小的特别设置。
-          });
-
-          options.push({
-            series: [
-              {
-                name: '个人能力值',
-                type: 'radar',
-                data: [{ value: [], name: `个人能力值 - 第${i}次作业` }],
-                lineStyle: {
-                  color: '#42b983' // 折线颜色
-                },
-                itemStyle: {
-                  color: '#42b983' // 数据点颜色
-                },
-                areaStyle: {
-                  color: '#b1fab6' // 折线图填充区域颜色
-                }
-              }
-            ]
-          });
-        }
+            }
+          ]
+        });
       }
     }
     // 默认将参加评价的最新数据展示
@@ -141,50 +145,54 @@ export const formatStudentGraphchartS = (
   if (isInit) {
     // 默认展示最新数据
     for (let i = 1; i <= num; i++) {
+      let isParticipated = false;
       for (let j = 0; j < attendEvalList.length; j++) {
         // 此次该学生已交作业
         if (i === attendEvalList[j]) {
-          timelineData.push({
-            value: i,
-            tooltip: {
-              // 让鼠标悬浮到此项时能够显示 `tooltip`。
-              formatter: function (params) {
-                return '第' + params.name + '次作业';
-              }
-            }
-          });
-
-          options.push({
-            series: [
-              {
-                ...wordMapPreset,
-                data: []
-              }
-            ]
-          });
-        } else {
-          // 未交作业则插入默认样式数组
-          timelineData.push({
-            value: i,
-            tooltip: {
-              // 让鼠标悬浮到此项时能够显示 `tooltip`。
-              formatter: function (params) {
-                return '第' + params.name + '次作业';
-              }
-            },
-            symbol: errorSVG, // 此项的图形的特别设置。
-            symbolSize: 16 // 此项的图形大小的特别设置。
-          });
-
-          options.push({
-            series: [
-              {
-                ...wordMapPreset,
-                data: []
-              }
-            ]
-          });
+          isParticipated = true;
+          break;
         }
+      }
+      if (isParticipated) {
+        // 已交作业
+        timelineData.push({
+          value: i,
+          tooltip: {
+            // 让鼠标悬浮到此项时能够显示 `tooltip`。
+            formatter: function (params) {
+              return '第' + params.name + '次作业';
+            }
+          }
+        });
+        options.push({
+          series: [
+            {
+              ...wordMapPreset,
+              data: []
+            }
+          ]
+        });
+      } else {
+        // 未交作业则插入默认样式数组
+        timelineData.push({
+          value: i,
+          tooltip: {
+            // 让鼠标悬浮到此项时能够显示 `tooltip`。
+            formatter: function (params) {
+              return '第' + params.name + '次作业';
+            }
+          },
+          symbol: errorSVG, // 此项的图形的特别设置。
+          symbolSize: 16 // 此项的图形大小的特别设置。
+        });
+        options.push({
+          series: [
+            {
+              ...wordMapPreset,
+              data: []
+            }
+          ]
+        });
       }
     }
     response.map(item => {
@@ -217,71 +225,60 @@ export const formatStudentGraphchartT = (
 ) => {
   if (isInit) {
     for (let i = 1; i <= num; i++) {
-      // timelineData.push({
-      //   value: i,
-      //   tooltip: {
-      //     // 让鼠标悬浮到此项时能够显示 `tooltip`。
-      //     formatter: function (params) {
-      //       return '第' + params.name + '次作业';
-      //     }
-      //   }
-      // });
-      // options.push({
-      //   series: [
-      //     {
-      //       type: 'tree',
-      //       data: []
-      //     }
-      //   ]
-      // });
+      let isParticipated = false;
       for (let j = 0; j < attendEvalList.length; j++) {
         // 此次该学生已交作业
         if (i === attendEvalList[j]) {
-          timelineData.push({
-            value: i,
-            tooltip: {
-              // 让鼠标悬浮到此项时能够显示 `tooltip`。
-              formatter: function (params) {
-                return '第' + params.name + '次作业';
-              }
-            }
-          });
-          options.push({
-            series: [
-              {
-                type: 'tree',
-                data: [],
-                // 控制默认层级节点
-                expandAndCollapse: true,
-                initialTreeDepth: 1
-              }
-            ]
-          });
-        } else {
-          // 未交作业则插入默认样式数组;
-          timelineData.push({
-            value: i,
-            tooltip: {
-              // 让鼠标悬浮到此项时能够显示 `tooltip`。
-              formatter: function (params) {
-                return '第' + params.name + '次作业';
-              }
-            },
-            symbol: errorSVG, // 此项的图形的特别设置。
-            symbolSize: 16 // 此项的图形大小的特别设置。
-          });
-          options.push({
-            series: [
-              {
-                type: 'tree',
-                data: [],
-                // 控制默认层级节点
-                expandAndCollapse: true,
-                initialTreeDepth: 1
-              }
-            ]
-          });
+          isParticipated = true;
+          break;
         }
+      }
+      if (isParticipated) {
+        // 已交作业
+        timelineData.push({
+          value: i,
+          tooltip: {
+            // 让鼠标悬浮到此项时能够显示 `tooltip`。
+            formatter: function (params) {
+              return '第' + params.name + '次作业';
+            }
+          }
+        });
+        options.push({
+          series: [
+            {
+              type: 'tree',
+              data: [],
+              // 控制默认层级节点
+              expandAndCollapse: true,
+              initialTreeDepth: 1
+            }
+          ]
+        });
+      } else {
+        // 未交作业则插入默认样式数组;
+        timelineData.push({
+          value: i,
+          tooltip: {
+            // 让鼠标悬浮到此项时能够显示 `tooltip`。
+            formatter: function (params) {
+              return '第' + params.name + '次作业';
+            }
+          },
+          symbol: errorSVG, // 此项的图形的特别设置。
+          symbolSize: 16 // 此项的图形大小的特别设置。
+        });
+        options.push({
+          series: [
+            {
+              type: 'tree',
+              data: [],
+              // 控制默认层级节点
+              expandAndCollapse: true,
+              initialTreeDepth: 1
+            }
+          ]
+        });
       }
     }
     options[times - 1].series[0].data.push({

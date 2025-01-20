@@ -90,8 +90,8 @@ const useStudentReport = defineStore('StudentReport', {
       );
     },
     // 获取课堂列表
-    async fetchStuRepCourseList(courseId) {
-      const { code, msg, data } = await getStuRepCourseList(courseId);
+    async fetchStuRepCourseList(courseId, classroomId = null) {
+      const { code, msg, data } = await getStuRepCourseList(courseId, classroomId);
       this.courseList = data;
       return { code, msg };
     },

@@ -22,7 +22,8 @@ const rolehome = [
   'assistanthome',
   'courseteacherhome',
   'studenthome',
-  'page'
+  'page',
+  'defaulthome'
 ];
 // superadminhome 超级管理员首页
 // secretariatehome 教学秘书首页
@@ -214,6 +215,22 @@ const routes = [
         component: () => import('../components/evaluation/KnowledgeUnit.vue')
       },
       {
+        path: 'evaluation/dynamicEvaluation/portraitmangt', // 形成性评价模型-画像数据管理
+        name: 'portraitmangt',
+        component: () => import('../components/dynamicEvaluation/PortraitMangt/PortraitMangt.vue')
+      },
+      // // 由于前期开发问题，此处courseGraph表示课堂画像，classroomGraph表示课程画像
+      // {
+      //   path: 'evaluation/dynamicEvaluation/courseGraph', // 评估与画像-课堂画像
+      //   name: 'courseGraph',
+      //   component: () => import('../components/dynamicEvaluation/CourseGraph/CourseGraph.vue')
+      // },
+      {
+        path: 'dynamicmodel/graphlist', // 形成性评价模型-画像名单
+        name: 'GraphList',
+        component: () => import('../components/course/Classroommangt/StudentsList.vue')
+      },
+      {
         path: 'evasys/formative/KWAgraph', // 形成性评价模型-知识能力图谱
         name: 'KWAgraph',
         component: () => import('../components/evaluation/graph.vue')
@@ -246,12 +263,14 @@ const routes = [
       {
         path: 'evaluation/dynamicEvaluation/studentGraph', // 评估与画像-学生画像
         name: 'StudentGraph',
-        component: () => import('../components/dynamicEvaluation/StudentsGraph/StudentsGraph.vue')
+        component: () =>
+          import('../components/dynamicEvaluation/StudentsGraph/StudentGraphWrapper.vue')
       },
       {
         path: 'evaluation/dynamicEvaluation/classroomGraph', // 评估与画像-课堂画像
         name: 'ClassroomGraph',
-        component: () => import('../components/dynamicEvaluation/ClassroomGraph/ClassroomGraph.vue')
+        component: () =>
+          import('../components/dynamicEvaluation/ClassroomGraph/ClassroomGraphWrapper.vue')
       },
       {
         path: 'evaluation/dynamicEvaluation/academicTranscript', // 达成性评价-评价名单
