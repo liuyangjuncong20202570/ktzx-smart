@@ -169,7 +169,7 @@
             <el-scrollbar style="border-right: 1px solid #dedede">
               <el-menu :default-active="defaultActive">
                 <template v-for="(menu, index) in filteredMenus">
-                  <!-- <div>{{ menu }}</div> -->
+                  <!-- <div>{{ index }}</div> -->
                   <!-- 二级菜单 -->
                   <el-sub-menu
                     v-if="hasChildren(menu)"
@@ -270,7 +270,6 @@ console.log(isDefaultTerm.value);
 const isSHow = ref(isDefaultTerm.value);
 
 // 路由置空
-const handleJumpTo = () => {};
 
 // 创建introJS实例
 /**************指引框逻辑********************/

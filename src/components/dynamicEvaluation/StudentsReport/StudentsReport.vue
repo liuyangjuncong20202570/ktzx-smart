@@ -258,7 +258,8 @@ const initList = async () => {
     courseId.value = parseJWT(sessionStorage.getItem('token')).obsid;
     const { code, msg } = await studentReportStore.fetchStuRepCourseList(
       // parseJWT(sessionStorage.getItem('token')).obsid
-      courseId.value
+      courseId.value,
+      ''
     );
     if (!(code === 200 && msg === 'success')) {
       ElMessage({

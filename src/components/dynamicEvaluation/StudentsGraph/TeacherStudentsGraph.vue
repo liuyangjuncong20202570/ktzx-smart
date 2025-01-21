@@ -30,10 +30,10 @@
         :chartOption="currentWordOption"
         ref="wordmapCmp"
       />
-      <GraphItem title="KWA画像" />
-      <!-- <GraphItem title="KWA画像">
+      <!-- <GraphItem title="KWA画像" /> -->
+      <GraphItem title="KWA画像">
         <TeacherKWAgraph />
-      </GraphItem> -->
+      </GraphItem>
       <GraphItem
         ref="treeCmp"
         title="知识单元画像"
@@ -295,7 +295,11 @@ const stuListCellClick = async (row, column, cell) => {
     }
 
     // 2：获取参与评价作业次数数组
-    const { code: evaCode, msg: evaMsg } = await teacherStuGraStore.fetchAttenfEvalList(
+    const {
+      code: evaCode,
+      msg: evaMsg,
+      data
+    } = await teacherStuGraStore.fetchAttenfEvalList(
       stuInfo.classroomId,
       stuInfo.stuId,
       courseId.value
@@ -308,7 +312,14 @@ const stuListCellClick = async (row, column, cell) => {
       return;
     }
 
-    teacherStuGraStore.setChartVisible(true);
+    if (data.length === 0) {
+      ElMessage({
+        type: 'warning',
+        message: '暂无评价！'
+      });
+      return;
+    }
+
     const { code, msg } = await teacherStuGraStore.fetchGraphEvaluation(
       stuInfo.classroomId,
       stuInfo.stuId,
@@ -325,6 +336,8 @@ const stuListCellClick = async (row, column, cell) => {
       });
       return;
     }
+
+    teacherStuGraStore.setChartVisible(true);
 
     // 记录评价次数
     currentRadarIndex.value =

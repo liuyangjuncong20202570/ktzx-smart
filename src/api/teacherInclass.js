@@ -43,11 +43,8 @@ export const importStudentmenu = list => {
 };
 
 // 修改学生是否参与评价
-export const isAttendEvaluation = (classroomStudentId, dynamicState) => {
-  return request.evaluation.put('/dynamic/portrait/modifyStudentDynamicState', {
-    classroomStudentId,
-    dynamicState
-  });
+export const isAttendEvaluation = arr => {
+  return request.evaluation.put('/dynamic/portrait/modifyStudentDynamicState', arr);
 };
 
 // 一键生成画像

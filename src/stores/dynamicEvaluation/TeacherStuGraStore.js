@@ -156,7 +156,7 @@ const useTeacherStuGra = defineStore('TeacherStudentGraph', {
         this.charts[0].response = data.ability;
         (this.charts[1].response = data.keyword), (this.charts[2].response = data.unitTree);
       }
-      return { code, msg };
+      return { code, msg, data };
     },
     // 获取评价次数数组
     async fetchAttenfEvalList(classroomId, stuId, courseId) {
@@ -164,7 +164,7 @@ const useTeacherStuGra = defineStore('TeacherStudentGraph', {
       if (code === 200 && msg === 'success') {
         this.attendEvalList = data;
       }
-      return { code, msg };
+      return { code, msg, data };
     }
   }
 });

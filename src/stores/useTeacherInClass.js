@@ -62,8 +62,8 @@ const useTeacherInClass = defineStore('TeacherInClass', {
       return res;
     },
     // 修改学生参与评价
-    async putAttendEvaluation(classroomStudentId, dynamicState) {
-      return await isAttendEvaluation(classroomStudentId, dynamicState);
+    async putAttendEvaluation(arr) {
+      return await isAttendEvaluation(arr);
     },
     // 一键生成画像
     async generatePortraitInstant(courseId, classroomId, stuIdList, paperIdList) {

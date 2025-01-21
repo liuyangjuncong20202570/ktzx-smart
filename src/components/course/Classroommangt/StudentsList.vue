@@ -196,6 +196,8 @@ import useTeacherStuGra from '../../../stores/dynamicEvaluation/TeacherStuGraSto
 /* ********************变量定义******************** */
 const selectedData = ref([]);
 
+const resetList = ref(new Map());
+
 const classroomId = ref('');
 
 const courseId = ref('');
@@ -242,16 +244,22 @@ const handleChange = async (value, scope, flag) => {
   console.log(scope);
   console.log(scope.row.dynamicState);
   console.log(scope.row.id);
-  const { code, msg, data } = await TeacherInClassStore.putAttendEvaluation(
-    scope.row.id,
-    scope.row.dynamicState
-  );
-  if (!(code === 200 && msg === 'success' && data)) {
-    ElMessage({
-      type: 'error',
-      message: msg
-    });
-  }
+  // TODO:在此处将选择退出评价的学生id插入到一个数组中，评价后统一更改状态
+
+  resetList.value.set(scope.row.id, {
+    classroomStudentId: scope.row.id,
+    dynamicState: scope.row.dynamicState
+  });
+  // const { code, msg, data } = await TeacherInClassStore.putAttendEvaluation(
+  //   scope.row.id,
+  //   scope.row.dynamicState
+  // );
+  // if (!(code === 200 && msg === 'success' && data)) {
+  //   ElMessage({
+  //     type: 'error',
+  //     message: msg
+  //   });
+  // }
   // if (flag === 0) {
   //   tableData.value[scope.$index].attendDynamic = value;
   // } else if (flag === 1) {
@@ -260,8 +268,9 @@ const handleChange = async (value, scope, flag) => {
 };
 
 const handleConfirm = async () => {
-  // TODO:点击此按钮后发送后端生成学生报告
   creating.value = true;
+
+  // 生成画像与改变学生状态
   const { code, msg, data } = await TeacherInClassStore.generatePortraitInstant(
     courseId.value,
     classroomId.value,
@@ -272,12 +281,16 @@ const handleConfirm = async () => {
       type: 'error',
       message: msg
     });
+    return;
   } else {
     ElMessage({
       type: 'success',
       message: msg
     });
   }
+  // TODO：统一修改取消评价学生状态
+  await TeacherInClassStore.putAttendEvaluation(Array.from(resetList.value.values()));
+
   handleBack();
   creating.value = false;
   // 模拟后端
