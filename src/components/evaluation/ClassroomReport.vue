@@ -14,7 +14,8 @@
                 @click="hasChooseClassroom = false">切换课堂</el-button>
         </el-header>
         <div class="main-block" style="text-align: left; overflow: auto;">
-            <div v-loading="pageLoading" element-loading-background="rgba(0, 0, 0, 0.2)" style="width: 100%; padding: 10mm 0;">
+            <div v-loading="pageLoading" element-loading-background="rgba(0, 0, 0, 0.2)"
+                style="width: 100%; padding: 10mm 0;">
                 <div id="report-container"
                     style="width: 190mm; color: #0f0f0f; margin: 0 auto; font-size: 16px; font-weight: bolder; font-family: 'SimSun';">
                     <div style="margin-bottom: 30px; text-align: center;">{{ headerData.classroomName }}<br>课堂评价报告</div>
@@ -100,11 +101,14 @@
                                 <td v-for="t of courseTargetData" :key="t.id">{{ t.name }}</td>
                             </tr>
                             <tr v-for="s of studentList" :key="s.stuno">
-                                <td>{{ s.rowNo }}</td>
-                                <td style="width: 120px;">{{ s.stuno }}</td>
-                                <td style="width: 80px;">{{ s.username }}</td>
-                                <td v-for="t in courseTargetData" :key="t.id">{{ Number(s[t.id]) >= 0.6 ? '√' : '' }}
-                                </td>
+                                <template v-if="s.evaluationState">
+                                    <td>{{ s.rowNo }}</td>
+                                    <td style="width: 120px;">{{ s.stuno }}</td>
+                                    <td style="width: 80px;">{{ s.username }}</td>
+                                    <td v-for="t in courseTargetData" :key="t.id">{{ Number(s[t.id]) >= 0.6 ? '√' : ''
+                                        }}
+                                    </td>
+                                </template>
                             </tr>
                         </table>
                     </div>
@@ -119,11 +123,13 @@
                             <td v-for="t of courseTargetData" :key="t.id">{{ t.name }}</td>
                         </tr>
                         <tr v-for="s of studentList" :key="s.stuno">
-                            <td style="width: 50px;">{{ s.rowNo }}</td>
-                            <td style="width: 120px;">{{ s.stuno }}</td>
-                            <td style="width: 80px;">{{ s.username }}</td>
-                            <td style="width: 120px;">{{ s.className }}</td>
-                            <td v-for="t in courseTargetData" :key="t.id">{{ s[t.id] }}</td>
+                            <template v-if="s.evaluationState">
+                                <td style="width: 50px;">{{ s.rowNo }}</td>
+                                <td style="width: 120px;">{{ s.stuno }}</td>
+                                <td style="width: 80px;">{{ s.username }}</td>
+                                <td style="width: 120px;">{{ s.className }}</td>
+                                <td v-for="t in courseTargetData" :key="t.id">{{ s[t.id] }}</td>
+                            </template>
                         </tr>
                     </table>
                 </div>
@@ -467,7 +473,9 @@ const initialize = () => {
             xAxis: {
                 type: "category",
                 // 这里type为'category'，echarts会自动把data的数据转换为String类型的
-                data: studentList.value.map(t => t.rowNo)
+                data: studentList.value
+                    .filter(t => t.evaluationState) // 过滤掉不参加评价的学生
+                    .map(t => t.rowNo)
             },
             yAxis: {
                 type: "value",
@@ -555,11 +563,13 @@ const generateGradeDivData = () => {
 const calcTargetSumAchievementDegree = () => {      // 计算课程目标的整体达成度（均值）
     courseTargetData.value.forEach((ct) => {
         targetSumAchievementDegree.value[ct.id] = 0;
+        let excludeNum = 0;
         studentList.value.forEach(stu => {
-            targetSumAchievementDegree.value[ct.id] += stu[ct.id];
+            if (stu.evaluationState) targetSumAchievementDegree.value[ct.id] += stu[ct.id];
+            else excludeNum++;
         })
         let sum = targetSumAchievementDegree.value[ct.id];
-        targetSumAchievementDegree.value[ct.id] = Number((sum / studentList.value.length).toFixed(2));
+        targetSumAchievementDegree.value[ct.id] = Number((sum / (studentList.value.length - excludeNum)).toFixed(2));
     })
 }
 
@@ -580,19 +590,21 @@ const generatePersonalGraphData = (courseTargetId) => {     // 生成有关显�
     let res = [];
     let unAchieved = [];
     studentList.value.forEach((s => {
-        res.push({
-            value: [String(s.rowNo), s[courseTargetId]],
-            itemStyle: {
-                color: s[courseTargetId] >= 0.6 ? 'dodgerblue' : '#d00'
-            },
-            extraInfo: {
-                rowNo: s.rowNo,
-                username: s.username,
-                stuno: s.stuno,
-                className: s.className,
-            }
-        });
-        if (s[courseTargetId] < 0.6) unAchieved.push(s.rowNo);
+        if (s.evaluationState) {
+            res.push({
+                value: [String(s.rowNo), s[courseTargetId]],
+                itemStyle: {
+                    color: s[courseTargetId] >= 0.6 ? 'dodgerblue' : '#d00'
+                },
+                extraInfo: {
+                    rowNo: s.rowNo,
+                    username: s.username,
+                    stuno: s.stuno,
+                    className: s.className,
+                }
+            });
+            if (s[courseTargetId] < 0.6) unAchieved.push(s.rowNo);
+        }
     }))
     return [res, unAchieved];
 }

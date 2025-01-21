@@ -7,6 +7,7 @@ import {
 } from 'vue-router';
 import useMain from '../stores/useMain';
 import { storeToRefs } from 'pinia';
+import { component } from 'vxe-pc-ui';
 
 const rolehome = [
   'teacherhomne',
@@ -281,6 +282,11 @@ const routes = [
         path: 'evaluation/dynamicEvaluation/classroomReport', // 达成性评价-生成报告
         name: 'ClassroomReport',
         component: () => import('../components/evaluation/ClassroomReport.vue')
+      },
+      {
+        path: 'evaluation/graphList',
+        name: 'attainmentGraphList',
+        component: () => import('../components/course/Classroommangt/StudentsList.vue')
       },
       // 0822
       // 课程页
