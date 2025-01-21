@@ -160,7 +160,7 @@ const useStudentGraph = defineStore('StudentGraph', {
       if (code === 200 && msg === 'success') {
         this.attendEvalList = data;
       }
-      return { code, msg };
+      return { code, msg, data };
     }
   }
 });

@@ -347,7 +347,11 @@ const stuListCellClick = async (row, column, cell) => {
     }
 
     // 2：获取参与评价作业次数数组
-    const { code: evaCode, msg: evaMsg } = await studentGraphStore.fetchAttenfEvalList(
+    const {
+      code: evaCode,
+      msg: evaMsg,
+      data
+    } = await studentGraphStore.fetchAttenfEvalList(
       stuInfo.classroomId,
       stuInfo.stuId,
       courseId.value
@@ -356,6 +360,14 @@ const stuListCellClick = async (row, column, cell) => {
       ElMessage({
         type: 'error',
         message: evaMsg
+      });
+      return;
+    }
+
+    if (data.length === 0) {
+      ElMessage({
+        type: 'warning',
+        message: '暂无此次评价'
       });
       return;
     }
