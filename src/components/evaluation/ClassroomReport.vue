@@ -314,7 +314,8 @@ const initialize = () => {
         lowestScore: 100,
         failNum: 0
     });
-    for (let stu of studentList.value) {
+    for (let [index, stu] of studentList.value.entries()) {
+        stu.rowNo = index + 1;
         let score = stuTotalScoreMap.value.get(stu.id);
         if (!score) continue;
         stu.totalScore = Number(score.toFixed(0));
