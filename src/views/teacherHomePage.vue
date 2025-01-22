@@ -35,7 +35,7 @@
             class="right-div"
             style="flex-grow: 1; display: flex; align-items: center; justify-content: flex-end"
           >
-            <el-dropdown @visible-change="handleVisibleChange">
+            <el-dropdown>
               <el-avatar
                 src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
               />
@@ -574,15 +574,16 @@ onMounted(() => {
 
 <style lang="less" scoped>
 .wrapper {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
-  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0;
+  margin: 0;
+  overflow: auto;
+  scrollbar-width: none;
 
   .item {
     font-family: monospace; /* 等宽字体 */
@@ -591,6 +592,7 @@ onMounted(() => {
     height: 35px;
     line-height: 35px;
     width: 100%;
+    height: auto;
     cursor: pointer;
     text-align: center;
     color: #fff;
@@ -601,6 +603,10 @@ onMounted(() => {
       color: #ecf0f1; /* 悬停时文字颜色 */
     }
   }
+}
+
+.wrapper::-webkit-scrollbar {
+  display: none;
 }
 
 .customTooltip * {

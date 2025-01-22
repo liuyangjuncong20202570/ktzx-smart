@@ -7,7 +7,6 @@ import {
 } from 'vue-router';
 import useMain from '../stores/useMain';
 import { storeToRefs } from 'pinia';
-import { component } from 'vxe-pc-ui';
 
 const rolehome = [
   'teacherhomne',
