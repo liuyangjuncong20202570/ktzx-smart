@@ -38,11 +38,17 @@
             <span class="text_2">教师登录</span>
           </div>
         </div>
-        <div v-if="!isText" class="wrapper">
-          <div class="login-pannel flex absolute" style="left: 50%; transform: translateX(-50%)">
+        <div v-if="!isText" class="wrapper absolute" style="width: 425px; top: 250px">
+          <div class="login-pannel flex">
             <!--切换账号登录-->
 
-            <el-form :model="loginForm" :rules="rules" ref="ruleFormRef" size="large">
+            <el-form
+              style="width: 425px"
+              :model="loginForm"
+              :rules="rules"
+              ref="ruleFormRef"
+              size="large"
+            >
               <el-form-item prop="loginname">
                 <el-input
                   :prefix-icon="User"
@@ -64,8 +70,12 @@
             </el-form>
           </div>
 
-          <div @click="login" class="text-wrapper_2 flex flex-col cursor-pointer">
-            <span class="text_5">登录</span>
+          <div
+            @click="login"
+            class="text-wrapper_2 flex flex-col cursor-pointer absolute"
+            style="top: 200px; background-color: #fff; text-align: center"
+          >
+            <span style="color: #0177cc" class="text_5 cursor-pointer">登录</span>
           </div>
 
           <el-dialog
@@ -92,11 +102,15 @@
             </template>
           </el-dialog>
           <img
-            class="image_2"
+            class="image_2 absolute"
+            style="top: 300px; left: 50%; transform: translateX(-50%)"
             referrerpolicy="no-referrer"
             src="@/assets/images/redraw-images/bar.png"
           />
-          <div class="text-wrapper_3 flex flex-col cursor-pointer justify-center items-center">
+          <div
+            class="text-wrapper_3 flex flex-col cursor-pointer justify-center items-center absolute"
+            style="top: 330px; border-radius: 10px; border: 1px solid #ffffff"
+          >
             <span
               @click="
                 () => {
@@ -104,16 +118,28 @@
                 }
               "
               class="text_6"
+              style="color: #fff"
               >短信验证密码登录</span
             >
           </div>
+          <span
+            class="text_8 absolute"
+            style="top: 290px; color: #fff; left: 50%; transform: translateX(-50%)"
+            >or</span
+          >
         </div>
 
-        <div v-else class="wrapper">
+        <div v-else class="wrapper absolute" style="width: 425px; top: 250px">
           <div class="login-pannel flex">
             <!--切换账号登录-->
 
-            <el-form :model="loginwithText" :rules="rules" ref="ruleFormRef" size="large">
+            <el-form
+              style="width: 425px"
+              :model="loginwithText"
+              :rules="rules"
+              ref="ruleFormRef"
+              size="large"
+            >
               <el-form-item prop="phone">
                 <el-input
                   :prefix-icon="Phone"
@@ -147,8 +173,12 @@
             </el-form>
           </div>
 
-          <div @click="login" class="text-wrapper_2 flex flex-col cursor-pointer">
-            <span class="text_5">登录</span>
+          <div
+            @click="login"
+            class="text-wrapper_2 flex flex-col cursor-pointer absolute"
+            style="width: 425px; top: 200px; background-color: #fff; text-align: center"
+          >
+            <span style="color: #0177cc" class="text_5">登录</span>
           </div>
 
           <el-dialog
@@ -170,8 +200,9 @@
             </template>
           </el-dialog>
           <img
-            class="image_2"
+            class="image_2 absolute"
             referrerpolicy="no-referrer"
+            style="top: 300px; left: 50%; transform: translateX(-50%)"
             src="@/assets/images/redraw-images/bar.png"
           />
 
@@ -181,14 +212,19 @@
                 isText = !isText;
               }
             "
-            class="text-wrapper_3 flex flex-row cursor-pointer justify-center items-center"
+            class="text-wrapper_3 flex flex-row cursor-pointer justify-center items-center absolute"
+            style="top: 330px; border-radius: 10px; border: 1px solid #ffffff"
           >
-            <span class="text_6">账号密码登录</span>
+            <span class="text_6" style="color: #fff">账号密码登录</span>
           </div>
+          <span
+            class="text_8 absolute"
+            style="top: 290px; color: #fff; left: 50%; transform: translateX(-50%)"
+            >or</span
+          >
         </div>
       </div>
-      <span class="text_7 flex">北方工业大学&#64;2024版权所有</span>
-      <span class="text_8">or</span>
+      <span class="text_7 flex" style="color: #5581ad">北方工业大学&#64;2024版权所有</span>
     </div>
   </div>
 </template>
@@ -474,7 +510,7 @@ onMounted(() => {
 .el-form {
   width: 444px;
   height: 54px;
-  margin: 16px 0 0 1068px;
+  // margin: 16px 0 0 1068px;
   .el-form-item {
     :deep(.el-input__wrapper) {
       border: 2px solid rgba(204, 218, 226, 1);
@@ -625,11 +661,10 @@ onMounted(() => {
 }
 
 .text-wrapper_2 {
-  background-color: rgba(39, 165, 255, 1);
   border-radius: 10px;
   height: 50px;
-  width: 440px;
-  margin: 100px 0 0 1070px;
+  width: 425px;
+  // margin: 100px 0 0 1070px;
 }
 
 .text_5 {
@@ -648,17 +683,16 @@ onMounted(() => {
 }
 
 .image_2 {
-  width: 439px;
+  width: 425px;
   height: 2px;
-  margin: 36px 0 0 1071px;
+  // margin: 36px 0 0 1071px;
 }
 
 .text-wrapper_3 {
   border-radius: 10px;
   height: 50px;
   border: 2px solid rgba(39, 165, 255, 1);
-  width: 440px;
-  margin: 36px 0 0 1070px;
+  width: 425px;
 }
 
 .text_6 {
@@ -691,9 +725,9 @@ onMounted(() => {
 }
 
 .text_8 {
-  position: absolute;
-  left: 1280px;
-  top: 670px;
+  // position: absolute;
+  // left: 1280px;
+  // top: 670px;
   width: 22px;
   height: 19px;
   overflow-wrap: break-word;
