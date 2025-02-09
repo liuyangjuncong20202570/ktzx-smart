@@ -1,181 +1,190 @@
 <template>
   <div class="page flex flex-col">
-    <div class="section_1 flex-col">
-      <img
-        class="image_1"
-        referrerpolicy="no-referrer"
-        src="@/assets/images/redraw-images/title.png"
-      />
-      <div style="padding: 0 10px" class="block_1 flex flex-row justify-between items-center">
-        <div
-          style="height: 48px; width: 216px; color: rgba(39, 165, 255, 1)"
-          @click="() => switchRole(loginForm.catelog)"
-          :class="
-            loginForm.catelog === '1'
-              ? 'text-wrapper_1 flex flex-col cursor-pointer'
-              : 'flex all flex-col cursor-pointer'
-          "
-        >
-          <span class="text_1 flex">学生登录</span>
-        </div>
-        <div
-          @click="() => switchRole(loginForm.catelog)"
-          style="height: 48px; width: 216px; color: rgba(39, 165, 255, 1)"
-          :class="
-            loginForm.catelog === '2'
-              ? 'text-wrapper_1 flex flex-col cursor-pointer justify-center items-center'
-              : 'flex all flex-row cursor-pointer justify-center items-center'
-          "
-        >
-          <span class="text_2">教师登录</span>
-        </div>
-      </div>
-      <div v-if="!isText" class="wrapper">
-        <div class="login-pannel flex">
-          <!--切换账号登录-->
-
-          <el-form :model="loginForm" :rules="rules" ref="ruleFormRef" size="large">
-            <el-form-item prop="loginname">
-              <el-input
-                :prefix-icon="User"
-                placeholder="请输入用户名"
-                v-model="loginForm.loginname"
-                :rules="rules.loginname"
-              >
-              </el-input>
-            </el-form-item>
-            <el-form-item prop="pwd">
-              <el-input
-                :prefix-icon="Lock"
-                placeholder="请输入密码"
-                v-model="loginForm.pwd"
-                :rules="rules.pwd"
-                show-password
-              ></el-input>
-            </el-form-item>
-          </el-form>
-        </div>
-
-        <div @click="login" class="text-wrapper_2 flex flex-col cursor-pointer">
-          <span class="text_5">登录</span>
-        </div>
-
-        <el-dialog
-          :modelValue="showRoleModal"
-          :show-close="false"
-          :close-on-click-modal="false"
-          width="420px"
-          style="border-radius: 10px"
-        >
-          <template #header>
-            <div style="font-weight: bold; font-size: 18px" class="title">选 择 角 色</div>
-            <el-divider style="border-top: 1px solid #27a5ff !important" />
-          </template>
-          <el-radio-group style="width: 50%; margin: 0 auto" v-model="selectedRoleId">
-            <el-radio v-for="role in roledata.simpleRoleList" :key="role.roleid" :label="role.id"
-              >{{ role.rolename }}
-            </el-radio>
-          </el-radio-group>
-          <template #footer>
-            <!-- <el-button @click="showRoleModal = false">取消</el-button> -->
-            <el-button style="margin: 0 auto; width: 340px" type="primary" @click="confirmRole"
-              >确认</el-button
-            >
-          </template>
-        </el-dialog>
+    <div class="section_1 flex-col relative">
+      <div
+        style="width: 425px; height: 540px; margin: 200px 0 0 1075px"
+        class="inner relative flex-col"
+      >
         <img
-          class="image_2"
+          class="image_1 absolute"
+          style="top: 35px; left: 50%; transform: translateX(-50%)"
           referrerpolicy="no-referrer"
-          src="@/assets/images/redraw-images/bar.png"
+          src="@/assets/images/redraw-images/title.png"
         />
-        <div class="text-wrapper_3 flex flex-col cursor-pointer justify-center items-center">
-          <span
+        <div
+          class="absolute block_1 flex flex-row justify-between items-center"
+          style="top: 120px; left: 50%; transform: translateX(-50%)"
+        >
+          <div
+            style="height: 48px; width: 216px; color: rgba(39, 165, 255, 1)"
+            @click="() => switchRole(loginForm.catelog)"
+            :class="
+              loginForm.catelog === '1'
+                ? 'text-wrapper_1 flex flex-col cursor-pointer'
+                : 'flex all flex-col cursor-pointer'
+            "
+          >
+            <span class="text_1 flex">学生登录</span>
+          </div>
+          <div
+            @click="() => switchRole(loginForm.catelog)"
+            style="height: 48px; width: 216px; color: rgba(39, 165, 255, 1)"
+            :class="
+              loginForm.catelog === '2'
+                ? 'text-wrapper_1 flex flex-col cursor-pointer justify-center items-center'
+                : 'flex all flex-row cursor-pointer justify-center items-center'
+            "
+          >
+            <span class="text_2">教师登录</span>
+          </div>
+        </div>
+        <div v-if="!isText" class="wrapper">
+          <div class="login-pannel flex absolute" style="left: 50%; transform: translateX(-50%)">
+            <!--切换账号登录-->
+
+            <el-form :model="loginForm" :rules="rules" ref="ruleFormRef" size="large">
+              <el-form-item prop="loginname">
+                <el-input
+                  :prefix-icon="User"
+                  placeholder="请输入用户名"
+                  v-model="loginForm.loginname"
+                  :rules="rules.loginname"
+                >
+                </el-input>
+              </el-form-item>
+              <el-form-item prop="pwd">
+                <el-input
+                  :prefix-icon="Lock"
+                  placeholder="请输入密码"
+                  v-model="loginForm.pwd"
+                  :rules="rules.pwd"
+                  show-password
+                ></el-input>
+              </el-form-item>
+            </el-form>
+          </div>
+
+          <div @click="login" class="text-wrapper_2 flex flex-col cursor-pointer">
+            <span class="text_5">登录</span>
+          </div>
+
+          <el-dialog
+            :modelValue="showRoleModal"
+            :show-close="false"
+            :close-on-click-modal="false"
+            width="420px"
+            style="border-radius: 10px"
+          >
+            <template #header>
+              <div style="font-weight: bold; font-size: 18px" class="title">选 择 角 色</div>
+              <el-divider style="border-top: 1px solid #27a5ff !important" />
+            </template>
+            <el-radio-group style="width: 50%; margin: 0 auto" v-model="selectedRoleId">
+              <el-radio v-for="role in roledata.simpleRoleList" :key="role.roleid" :label="role.id"
+                >{{ role.rolename }}
+              </el-radio>
+            </el-radio-group>
+            <template #footer>
+              <!-- <el-button @click="showRoleModal = false">取消</el-button> -->
+              <el-button style="margin: 0 auto; width: 340px" type="primary" @click="confirmRole"
+                >确认</el-button
+              >
+            </template>
+          </el-dialog>
+          <img
+            class="image_2"
+            referrerpolicy="no-referrer"
+            src="@/assets/images/redraw-images/bar.png"
+          />
+          <div class="text-wrapper_3 flex flex-col cursor-pointer justify-center items-center">
+            <span
+              @click="
+                () => {
+                  isText = !isText;
+                }
+              "
+              class="text_6"
+              >短信验证密码登录</span
+            >
+          </div>
+        </div>
+
+        <div v-else class="wrapper">
+          <div class="login-pannel flex">
+            <!--切换账号登录-->
+
+            <el-form :model="loginwithText" :rules="rules" ref="ruleFormRef" size="large">
+              <el-form-item prop="phone">
+                <el-input
+                  :prefix-icon="Phone"
+                  placeholder="请输入手机号"
+                  v-model="loginwithText.telephone"
+                >
+                </el-input>
+              </el-form-item>
+              <el-form-item prop="captcha">
+                <el-input
+                  :prefix-icon="Message"
+                  placeholder="请输入手机验证码"
+                  v-model="loginwithText.message"
+                >
+                </el-input>
+                <el-button
+                  style="
+                    position: absolute;
+                    right: 3%;
+                    background-color: rgba(39, 165, 255, 0.15);
+                    border-radius: 7px;
+                    height: 42px;
+                    width: 140px;
+                    color: rgba(39, 165, 255, 1);
+                  "
+                  >获取短信验证码</el-button
+                >
+
+                <!-- 弹窗登录-->
+              </el-form-item>
+            </el-form>
+          </div>
+
+          <div @click="login" class="text-wrapper_2 flex flex-col cursor-pointer">
+            <span class="text_5">登录</span>
+          </div>
+
+          <el-dialog
+            :modelValue="showRoleModal"
+            :show-close="false"
+            :close-on-click-modal="false"
+            title="选择角色"
+            width="30%"
+            style="border-radius: 10px"
+          >
+            <el-radio-group v-model="selectedRoleId">
+              <el-radio v-for="role in roledata.simpleRoleList" :key="role.roleid" :label="role.id"
+                >{{ role.rolename }}
+              </el-radio>
+            </el-radio-group>
+            <template #footer>
+              <el-button @click="showRoleModal = false">取消</el-button>
+              <el-button type="primary" @click="confirmRole">确认</el-button>
+            </template>
+          </el-dialog>
+          <img
+            class="image_2"
+            referrerpolicy="no-referrer"
+            src="@/assets/images/redraw-images/bar.png"
+          />
+
+          <div
             @click="
               () => {
                 isText = !isText;
               }
             "
-            class="text_6"
-            >短信验证密码登录</span
+            class="text-wrapper_3 flex flex-row cursor-pointer justify-center items-center"
           >
-        </div>
-      </div>
-
-      <div v-else class="wrapper">
-        <div class="login-pannel flex">
-          <!--切换账号登录-->
-
-          <el-form :model="loginwithText" :rules="rules" ref="ruleFormRef" size="large">
-            <el-form-item prop="phone">
-              <el-input
-                :prefix-icon="Phone"
-                placeholder="请输入手机号"
-                v-model="loginwithText.telephone"
-              >
-              </el-input>
-            </el-form-item>
-            <el-form-item prop="captcha">
-              <el-input
-                :prefix-icon="Message"
-                placeholder="请输入手机验证码"
-                v-model="loginwithText.message"
-              >
-              </el-input>
-              <el-button
-                style="
-                  position: absolute;
-                  right: 3%;
-                  background-color: rgba(39, 165, 255, 0.15);
-                  border-radius: 7px;
-                  height: 42px;
-                  width: 140px;
-                  color: rgba(39, 165, 255, 1);
-                "
-                >获取短信验证码</el-button
-              >
-
-              <!-- 弹窗登录-->
-            </el-form-item>
-          </el-form>
-        </div>
-
-        <div @click="login" class="text-wrapper_2 flex flex-col cursor-pointer">
-          <span class="text_5">登录</span>
-        </div>
-
-        <el-dialog
-          :modelValue="showRoleModal"
-          :show-close="false"
-          :close-on-click-modal="false"
-          title="选择角色"
-          width="30%"
-          style="border-radius: 10px"
-        >
-          <el-radio-group v-model="selectedRoleId">
-            <el-radio v-for="role in roledata.simpleRoleList" :key="role.roleid" :label="role.id"
-              >{{ role.rolename }}
-            </el-radio>
-          </el-radio-group>
-          <template #footer>
-            <el-button @click="showRoleModal = false">取消</el-button>
-            <el-button type="primary" @click="confirmRole">确认</el-button>
-          </template>
-        </el-dialog>
-        <img
-          class="image_2"
-          referrerpolicy="no-referrer"
-          src="@/assets/images/redraw-images/bar.png"
-        />
-
-        <div
-          @click="
-            () => {
-              isText = !isText;
-            }
-          "
-          class="text-wrapper_3 flex flex-row cursor-pointer justify-center items-center"
-        >
-          <span class="text_6">账号密码登录</span>
+            <span class="text_6">账号密码登录</span>
+          </div>
         </div>
       </div>
       <span class="text_7 flex">北方工业大学&#64;2024版权所有</span>
@@ -185,7 +194,7 @@
 </template>
 
 <script setup>
-import '@/assets/css/tailwind.css';
+import '@/assets/css/taildwind.css';
 import { ref, reactive, getCurrentInstance, onMounted, computed } from 'vue';
 import { User, Lock, Edit, Phone, MessageBox, Message } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
@@ -491,19 +500,17 @@ onMounted(() => {
   background-size: 100% 100%;
 }
 
-.image_1 {
-  width: 320px;
-  height: 44px;
-  margin: 228px 0 0 1130px;
-}
-
 .block_1 {
-  box-shadow: 0px 1px 0px 0px rgba(255, 255, 255, 0.5);
-  border-radius: 10px;
-  width: 444px;
-  height: 60px;
-  border: 2px solid rgba(204, 218, 226, 1);
-  margin: 90px 0 0 1068px;
+  // box-shadow: 0px 1px 0px 0px rgba(255, 255, 255, 0.5);
+  // border-radius: 10px;
+  // width: 444px;
+  // height: 60px;
+  // border: 2px solid rgba(204, 218, 226, 1);
+  width: 380px;
+  height: 50px;
+  background: url('@/assets/images/redraw-images/blockbg.png') 0px 0px no-repeat;
+  // background-size: 380px 51px;
+  // margin: 31px 0 0 1068px;
 }
 
 .text-wrapper_1 {

@@ -1425,6 +1425,47 @@
   resolved "https://registry.npmmirror.com/@sindresorhus/merge-streams/-/merge-streams-2.3.0.tgz"
   integrity sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==
 
+"@tailwindcss/node@^4.0.5":
+  version "4.0.5"
+  resolved "https://registry.npmmirror.com/@tailwindcss/node/-/node-4.0.5.tgz"
+  integrity sha512-ffTz4DX1cgr4XPuqjhm32YV6Lyx58R1CxAAnSFTamg6wXwfk3oWdb6exgAbGesPzvUgicTO0gwUdQGSsg4nNog==
+  dependencies:
+    enhanced-resolve "^5.18.0"
+    jiti "^2.4.2"
+    tailwindcss "4.0.5"
+
+"@tailwindcss/oxide-win32-x64-msvc@4.0.5":
+  version "4.0.5"
+  resolved "https://registry.npmmirror.com/@tailwindcss/oxide-win32-x64-msvc/-/oxide-win32-x64-msvc-4.0.5.tgz"
+  integrity sha512-yjw6JhtyDXr+G0aZrj3L3NlEV7CobSqOdPyfo6G3d91WEZ5b8PyGm86IAreX08Jp9DChGXEd53gWysVpWCTs+w==
+
+"@tailwindcss/oxide@^4.0.5":
+  version "4.0.5"
+  resolved "https://registry.npmmirror.com/@tailwindcss/oxide/-/oxide-4.0.5.tgz"
+  integrity sha512-iWGyOCu0TuzvCBisWbGv2K9+7QCfE0ztgtrZOvb9iF7V7ChVkD15Obe3HevZrhjngAc34jDA+OMSuSvkrpTy4A==
+  optionalDependencies:
+    "@tailwindcss/oxide-android-arm64" "4.0.5"
+    "@tailwindcss/oxide-darwin-arm64" "4.0.5"
+    "@tailwindcss/oxide-darwin-x64" "4.0.5"
+    "@tailwindcss/oxide-freebsd-x64" "4.0.5"
+    "@tailwindcss/oxide-linux-arm-gnueabihf" "4.0.5"
+    "@tailwindcss/oxide-linux-arm64-gnu" "4.0.5"
+    "@tailwindcss/oxide-linux-arm64-musl" "4.0.5"
+    "@tailwindcss/oxide-linux-x64-gnu" "4.0.5"
+    "@tailwindcss/oxide-linux-x64-musl" "4.0.5"
+    "@tailwindcss/oxide-win32-arm64-msvc" "4.0.5"
+    "@tailwindcss/oxide-win32-x64-msvc" "4.0.5"
+
+"@tailwindcss/vite@^4.0.5":
+  version "4.0.5"
+  resolved "https://registry.npmmirror.com/@tailwindcss/vite/-/vite-4.0.5.tgz"
+  integrity sha512-/i4hjLTUYVjUG0MTUviQP3HR/hzwyzv8Sq4sz2pnsNuf+FIjjhJB0vcnIMH1KIX0k8ozD6CBv2Dl76tlm/JFFA==
+  dependencies:
+    "@tailwindcss/node" "^4.0.5"
+    "@tailwindcss/oxide" "^4.0.5"
+    lightningcss "^1.29.1"
+    tailwindcss "4.0.5"
+
 "@transloadit/prettier-bytes@0.0.7":
   version "0.0.7"
   resolved "https://registry.npmmirror.com/@transloadit/prettier-bytes/-/prettier-bytes-0.0.7.tgz"
@@ -2595,6 +2636,11 @@ destr@^2.0.3:
   resolved "https://registry.npmmirror.com/destr/-/destr-2.0.3.tgz"
   integrity sha512-2N3BOUU4gYMpTP24s5rF5iP7BDr7uNTCs4ozw3kf/eKfvWSIu93GEBi5m427YoyJoeOzQ5smuu4nNAPGb8idSQ==
 
+detect-libc@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.npmmirror.com/detect-libc/-/detect-libc-1.0.3.tgz"
+  integrity sha512-pGjwhsmsp4kL2RTz08wcOlGN83otlqHeD/Z5T8GXZB+/YcpQ/dgo+lbU8ZsGxV0HIvqqxo9l7mqYwyYMD9bKDg==
+
 dingbat-to-unicode@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npmmirror.com/dingbat-to-unicode/-/dingbat-to-unicode-1.0.1.tgz"
@@ -2707,10 +2753,10 @@ end-of-stream@^1.4.1:
   dependencies:
     once "^1.4.0"
 
-enhanced-resolve@^5.17.1:
-  version "5.17.1"
-  resolved "https://registry.npmmirror.com/enhanced-resolve/-/enhanced-resolve-5.17.1.tgz"
-  integrity sha512-LMHl3dXhTcfv8gM4kEzIUeTQ+7fpdA0l2tUf34BddXPkz2A5xJ5L/Pchd5BL6rdccM9QGvu0sWZzK1Z1t4wwyg==
+enhanced-resolve@^5.17.1, enhanced-resolve@^5.18.0:
+  version "5.18.1"
+  resolved "https://registry.npmmirror.com/enhanced-resolve/-/enhanced-resolve-5.18.1.tgz"
+  integrity sha512-ZSW3ma5GkcQBIpwZTSRAI8N71Uuwgs93IezB7mf7R60tC8ZbJideoDNKjHn2O9KIlx6rkGTTEk1xUCK2E1Y2Yg==
   dependencies:
     graceful-fs "^4.2.4"
     tapable "^2.2.0"
@@ -3380,10 +3426,10 @@ jest-worker@^27.4.5:
     merge-stream "^2.0.0"
     supports-color "^8.0.0"
 
-jiti@^2.3.0, jiti@^2.3.1, jiti@^2.4.0:
-  version "2.4.0"
-  resolved "https://registry.npmmirror.com/jiti/-/jiti-2.4.0.tgz"
-  integrity sha512-H5UpaUI+aHOqZXlYOaFP/8AzKsg+guWu+Pr3Y8i7+Y3zr1aXAvCvTAQ1RxSc6oVD8R8c7brgNtTVP91E7upH/g==
+jiti@^2.3.0, jiti@^2.3.1, jiti@^2.4.0, jiti@^2.4.2:
+  version "2.4.2"
+  resolved "https://registry.npmmirror.com/jiti/-/jiti-2.4.2.tgz"
+  integrity sha512-rg9zJN+G4n2nfJl5MW3BMygZX56zKPNVEYYqq7adpmMh4Jn2QNEwhvQlFy6jPVdcod7txZtKHWnyZiA3a0zP7A==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
@@ -3490,6 +3536,29 @@ lie@~3.3.0:
   integrity sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ==
   dependencies:
     immediate "~3.0.5"
+
+lightningcss-win32-x64-msvc@1.29.1:
+  version "1.29.1"
+  resolved "https://registry.npmmirror.com/lightningcss-win32-x64-msvc/-/lightningcss-win32-x64-msvc-1.29.1.tgz"
+  integrity sha512-NygcbThNBe4JElP+olyTI/doBNGJvLs3bFCRPdvuCcxZCcCZ71B858IHpdm7L1btZex0FvCmM17FK98Y9MRy1Q==
+
+lightningcss@^1.21.0, lightningcss@^1.29.1:
+  version "1.29.1"
+  resolved "https://registry.npmmirror.com/lightningcss/-/lightningcss-1.29.1.tgz"
+  integrity sha512-FmGoeD4S05ewj+AkhTY+D+myDvXI6eL27FjHIjoyUkO/uw7WZD1fBVs0QxeYWa7E17CUHJaYX/RUGISCtcrG4Q==
+  dependencies:
+    detect-libc "^1.0.3"
+  optionalDependencies:
+    lightningcss-darwin-arm64 "1.29.1"
+    lightningcss-darwin-x64 "1.29.1"
+    lightningcss-freebsd-x64 "1.29.1"
+    lightningcss-linux-arm-gnueabihf "1.29.1"
+    lightningcss-linux-arm64-gnu "1.29.1"
+    lightningcss-linux-arm64-musl "1.29.1"
+    lightningcss-linux-x64-gnu "1.29.1"
+    lightningcss-linux-x64-musl "1.29.1"
+    lightningcss-win32-arm64-msvc "1.29.1"
+    lightningcss-win32-x64-msvc "1.29.1"
 
 listenercount@~1.0.1:
   version "1.0.1"
@@ -4713,7 +4782,7 @@ systemjs@^6.15.1:
   resolved "https://registry.npmmirror.com/systemjs/-/systemjs-6.15.1.tgz"
   integrity sha512-Nk8c4lXvMB98MtbmjX7JwJRgJOL8fluecYCfCeYBznwmpOs8Bf15hLM6z4z71EDAhQVrQrI+wt1aLWSXZq+hXA==
 
-tailwindcss@^4.0.5:
+tailwindcss@^4.0.5, tailwindcss@4.0.5:
   version "4.0.5"
   resolved "https://registry.npmmirror.com/tailwindcss/-/tailwindcss-4.0.5.tgz"
   integrity sha512-DZZIKX3tA23LGTjHdnwlJOTxfICD1cPeykLLsYF1RQBI9QsCR3i0szohJfJDVjr6aNRAIio5WVO7FGB77fRHwg==
@@ -5020,7 +5089,7 @@ videojs-vtt.js@^0.15.5:
   dependencies:
     global "^4.3.1"
 
-"vite@^4.0.0 || ^5.0.0", vite@^5.0.0, vite@^5.0.8:
+"vite@^4.0.0 || ^5.0.0", vite@^5.0.0, vite@^5.0.8, "vite@^5.2.0 || ^6":
   version "5.4.8"
   resolved "https://registry.npmmirror.com/vite/-/vite-5.4.8.tgz"
   integrity sha512-FqrItQ4DT1NC4zCUqMB4c4AZORMKIa0m8/URVCZ77OZ/QSNeJ54bU1vrFADbDsuwfIPcgknRkmqakQcgnL4GiQ==
