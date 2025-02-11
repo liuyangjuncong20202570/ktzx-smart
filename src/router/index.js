@@ -90,7 +90,8 @@ const routes = [
   {
     path: '/homes/:rolehome(' + rolehome.join('|') + ')',
     name: 'Homepage',
-    component: () => import('../views/teacherHomePage.vue'),
+    // component: () => import('../views/teacherHomePage.vue'),
+    component: () => import('../views/redrawPages/teacherHomePage.vue'),
     // component: () => import('../views/Test.vue'),
     children: [
       {

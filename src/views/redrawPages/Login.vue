@@ -82,23 +82,58 @@
             :modelValue="showRoleModal"
             :show-close="false"
             :close-on-click-modal="false"
-            width="420px"
+            heigjt="340px"
             style="border-radius: 10px"
           >
             <template #header>
               <div style="font-weight: bold; font-size: 18px" class="title">选 择 角 色</div>
               <el-divider style="border-top: 1px solid #27a5ff !important" />
             </template>
-            <el-radio-group style="width: 50%; margin: 0 auto" v-model="selectedRoleId">
-              <el-radio v-for="role in roledata.simpleRoleList" :key="role.roleid" :label="role.id"
-                >{{ role.rolename }}
-              </el-radio>
+            <el-radio-group style="width: 646px; margin: 0 auto" v-model="selectedRoleId">
+              <div
+                class="flex flex-col flex-wrap content-between"
+                style="width: 646px; height: 442px"
+              >
+                <el-radio
+                  style="margin-bottom: 20px !important"
+                  v-for="role in roledata.simpleRoleList"
+                  :key="role.roleid"
+                  :label="role.id"
+                >
+                  <div style="font-size: 16px; color: #666">
+                    {{ role.rolename }}
+                  </div>
+                </el-radio>
+              </div>
             </el-radio-group>
             <template #footer>
-              <!-- <el-button @click="showRoleModal = false">取消</el-button> -->
-              <el-button style="margin: 0 auto; width: 340px" type="primary" @click="confirmRole"
-                >确认</el-button
-              >
+              <div class="button" style="margin: 0 auto">
+                <el-button
+                  style="
+                    width: 300px;
+                    height: 50px;
+                    border: 2px solid #27a5ff;
+                    border-radius: 10px;
+                    color: #27a5ff;
+                    font-size: 16px;
+                  "
+                  @click="showRoleModal = false"
+                  >取消</el-button
+                >
+                <el-button
+                  style="
+                    width: 300px;
+                    height: 50px;
+                    border: 2px solid #27a5ff;
+                    border-radius: 10px;
+                    color: #fff;
+                    font-size: 16px;
+                  "
+                  type="primary"
+                  @click="confirmRole"
+                  >确认</el-button
+                >
+              </div>
             </template>
           </el-dialog>
           <img
@@ -185,18 +220,58 @@
             :modelValue="showRoleModal"
             :show-close="false"
             :close-on-click-modal="false"
-            title="选择角色"
-            width="30%"
+            heigjt="340px"
             style="border-radius: 10px"
           >
-            <el-radio-group v-model="selectedRoleId">
-              <el-radio v-for="role in roledata.simpleRoleList" :key="role.roleid" :label="role.id"
-                >{{ role.rolename }}
-              </el-radio>
+            <template #header>
+              <div style="font-weight: bold; font-size: 18px" class="title">选 择 角 色</div>
+              <el-divider style="border-top: 1px solid #27a5ff !important" />
+            </template>
+            <el-radio-group style="width: 646px; margin: 0 auto" v-model="selectedRoleId">
+              <div
+                class="flex flex-col flex-wrap content-between"
+                style="width: 646px; height: 442px"
+              >
+                <el-radio
+                  style="margin-bottom: 20px !important"
+                  v-for="role in roledata.simpleRoleList"
+                  :key="role.roleid"
+                  :label="role.id"
+                >
+                  <div style="font-size: 16px; color: #666">
+                    {{ role.rolename }}
+                  </div>
+                </el-radio>
+              </div>
             </el-radio-group>
             <template #footer>
-              <el-button @click="showRoleModal = false">取消</el-button>
-              <el-button type="primary" @click="confirmRole">确认</el-button>
+              <div class="button" style="margin: 0 auto">
+                <el-button
+                  style="
+                    width: 300px;
+                    height: 50px;
+                    border: 2px solid #27a5ff;
+                    border-radius: 10px;
+                    color: #27a5ff;
+                    font-size: 16px;
+                  "
+                  @click="showRoleModal = false"
+                  >取消</el-button
+                >
+                <el-button
+                  style="
+                    width: 300px;
+                    height: 50px;
+                    border: 2px solid #27a5ff;
+                    border-radius: 10px;
+                    color: #fff;
+                    font-size: 16px;
+                  "
+                  type="primary"
+                  @click="confirmRole"
+                  >确认</el-button
+                >
+              </div>
             </template>
           </el-dialog>
           <img
