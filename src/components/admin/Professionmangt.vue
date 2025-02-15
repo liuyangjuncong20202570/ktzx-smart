@@ -423,9 +423,13 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 ::v-deep(.el-table .cell) {
   text-align: center;
+}
+
+:deep(.el-message-box) {
+  font-size: 50px !important;
 }
 
 .custom-icon:hover {

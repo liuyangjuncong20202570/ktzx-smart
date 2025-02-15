@@ -1,6 +1,7 @@
 <template>
   <el-container style="height: 92vh">
     <!--两个按钮，靠最左-->
+
     <el-header
       style="
         height: auto;
@@ -85,6 +86,7 @@
 </template>
 
 <script setup>
+import Header from '@/views/page/components/header/index.vue';
 import { ref, onMounted, watch } from 'vue';
 import { ElMessage } from 'element-plus';
 import { useProfileStore } from '../../stores/profileStore.js';
