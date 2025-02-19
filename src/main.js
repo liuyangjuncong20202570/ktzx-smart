@@ -1,4 +1,5 @@
 import { createApp, provide } from 'vue';
+import './custom.css';
 import './style.css';
 import App from './App.vue';
 import router from './router';
@@ -17,8 +18,8 @@ import 'vxe-pc-ui/lib/style.css';
 // 完整导入 表格库
 import VxeUITable from 'vxe-table';
 import 'vxe-table/lib/style.css';
-import VxeUIPluginExportXLSX from '@vxe-ui/plugin-export-xlsx'
-import ExcelJS from 'exceljs'
+import VxeUIPluginExportXLSX from '@vxe-ui/plugin-export-xlsx';
+import ExcelJS from 'exceljs';
 //---------------------
 // pinia持久化插件
 import piniaPersist from 'pinia-plugin-persist';
@@ -59,7 +60,7 @@ Object.keys(Icons).forEach(key => {
 
 VxeUI.use(VxeUIPluginExportXLSX, {
   ExcelJS
-})
+});
 
 app
   .use(router)

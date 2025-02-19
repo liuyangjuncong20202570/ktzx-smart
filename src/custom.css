@@ -1,0 +1,138 @@
+/* table 自定义样式  start */
+.custom-table .el-table__header-wrapper .el-table__header thead .el-table__cell {
+  background: rgba(39, 165, 255, 0.07);
+  border-radius: 10px 10px 0px 0px;
+  font-family: MicrosoftYaHei;
+  font-size: 16px;
+  color: #1b1b1b;
+}
+.custom-table .el-table__header-wrapper .el-table__header {
+  background: rgba(39, 165, 255, 0.07);
+  border-radius: 10px 10px 0px 0px;
+  border-bottom: 2px solid #8ccfff;
+}
+.custom-table .el-checkbox__inner {
+  background: rgba(39, 165, 255, 0.1);
+  border-radius: 3px;
+  border: 1px solid #27a5ff;
+}
+/* table 自定义样式  end */
+
+/* table 操作按钮  start */
+.custom-link-button {
+  height: auto !important;
+  font-family: MicrosoftYaHei !important;
+  font-size: 14px !important;
+  font-weight: normal !important;
+  line-height: 19px !important;
+  display: inline-block;
+  border-radius: 5px !important;
+  padding: 2px 5px !important;
+  margin: 0 5px;
+  cursor: pointer;
+}
+.custom-link-active-button {
+  color: #27a5ff !important;
+  border: 1px solid #27a5ff !important;
+}
+.custom-link-default-button {
+  color: #d2d2d2 !important;
+  border: 1px solid #d2d2d2 !important;
+}
+.custom-link-delete-button {
+  color: #ff4c48 !important;
+  border: 1px solid #ff4c48 !important;
+}
+/* table 操作按钮  end */
+
+/* 表头 操作按钮  start */
+.custom-nav-button {
+  border-radius: 10px !important;
+  padding: 0px 10px !important;
+  margin: 0 5px !important;
+  cursor: pointer !important;
+}
+.custom-nav-button-success {
+  background-color: #32b16c !important;
+  border: 1px solid #32b16c !important;
+  color: #fff !important;
+}
+.custom-nav-button-success:hover {
+  opacity: 0.8 !important;
+}
+.custom-nav-button-delete {
+  background-color: #ff4c48 !important;
+  border: 1px solid #ff4c48 !important;
+  color: #fff !important;
+}
+.custom-nav-button-delete:hover {
+  opacity: 0.8 !important;
+}
+.custom-nav-button-primary {
+  background-color: #27a5ff !important;
+  border: 1px solid #27a5ff !important;
+  color: #fff !important;
+}
+.custom-nav-button-primary:hover {
+  opacity: 0.8 !important;
+}
+.custom-nav-button-info {
+  background-color: #4b7fff !important;
+  border: 1px solid #4b7fff !important;
+  color: #fff !important;
+}
+.custom-nav-button-info:hover {
+  opacity: 0.8 !important;
+}
+/* 表头 操作按钮  end */
+
+/* 弹框 底部按钮  start */
+.custom-dialog-footer {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+}
+.custom-dialog-footer .el-button {
+  width: 300px;
+}
+/* 弹框 底部按钮  end */
+
+/* 自定义checkbox  start */
+.custom-checkbox .el-checkbox__input {
+  background: rgba(39, 165, 255, 0.1) !important;
+  border-radius: 5px;
+  border: 1px solid #27a5ff;
+}
+/* 自定义checkbox  end */
+
+.item-controls .el-input__wrapper {
+  box-shadow: none !important;
+}
+/* 自定义radio  start */
+.radio-class {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background: #27a5ff;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+.default-radio {
+  width: 14px;
+  height: 14px;
+  background: #d2d2d2;
+  border-radius: 50%;
+}
+.error-radio {
+  width: 14px;
+  height: 14px;
+  background: #ff4c48;
+  border-radius: 50%;
+}
+.info-radio {
+  width: 14px;
+  height: 14px;
+  background: #27a5ff;
+  border-radius: 50%;
+}
+/* 自定义radio  end */

@@ -4,17 +4,28 @@
     <el-header
       style="
         height: auto;
-        padding: 5px 0px;
+        padding: 30px 0px;
         width: 100%;
-        background-color: #deebf7;
+        background-color: #fff;
         display: flex;
         align-items: center;
+        justify-content: flex-end;
       "
     >
-      <el-button type="success" style="margin-left: 0.8vw" @click="exportData">导出专业</el-button>
+      <el-button
+        type="success"
+        class="custom-nav-button-success"
+        style="margin-left: 0.8vw"
+        @click="exportData"
+        ><el-icon><Plus /></el-icon>导出专业</el-button
+      >
 
-      <el-button type="primary" style="margin-left: 0.8vw" @click="handleRoleAdd"
-        >新增专业</el-button
+      <el-button
+        type="primary"
+        class="custom-nav-button-primary"
+        style="margin-left: 0.8vw"
+        @click="handleRoleAdd"
+        ><el-icon><Download /></el-icon>新增专业</el-button
       >
       <!--LQ提出删除前端所有有关删除按键-->
       <!--  <el-button type="danger" @click="handleRoleDel">删除专业</el-button>-->
@@ -23,6 +34,7 @@
     <el-main style="padding: 0; overflow: auto">
       <!--生成-->
       <el-table
+        class="custom-table"
         :data="tableData"
         style="height: 100%; table-layout: auto; width: 100%"
         @select-all="handleSelectAll"
@@ -154,7 +166,7 @@ import isEqual from 'lodash/isEqual.js';
 import { exportTableToCSV } from '../../utils/exportTableToCSV.js';
 import { useProfileStore } from '../../stores/profileStore.js';
 import EditHeadofProfession from './subcomponents/EditHeadofProfession.vue';
-import { Edit } from '@element-plus/icons-vue';
+import { Edit, Plus, Download } from '@element-plus/icons-vue';
 
 //获取Stroe
 const profileStore = useProfileStore();
