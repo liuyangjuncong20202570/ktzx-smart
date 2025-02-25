@@ -1,19 +1,27 @@
 <template>
+  <Header title="专业管理" style="text-align: center; border-bottom: 2px solid #27a5ff" />
   <el-container style="height: 92vh">
     <!--两个按钮，靠最左-->
     <el-header
-      style="
-        height: auto;
-        padding: 5px 0px;
-        width: 100%;
-        background-color: #deebf7;
-        display: flex;
-        align-items: center;
-      "
+      style="height: auto; padding: 30px 0px; width: 100%; display: flex; justify-content: flex-end"
     >
-      <el-button type="success" style="margin-left: 0.8vw" @click="exportData">导出学院</el-button>
-      <el-button type="primary" style="margin-left: 0.8vw" @click="handleRoleAdd"
-        >新增学院</el-button
+      <el-button
+        class="custom-nav-button custom-nav-button-success"
+        type="success"
+        style="margin-left: 0.8vw"
+        @click="exportData"
+      >
+        <el-icon><Download /></el-icon>
+        导出学院</el-button
+      >
+      <el-button
+        type="primary"
+        class="custom-nav-button custom-nav-button-info"
+        style="margin-left: 0.8vw"
+        @click="handleRoleAdd"
+      >
+        <el-icon><Plus /></el-icon>
+        新增学院</el-button
       >
       <!--LQ提出删除前端所有有关删除按键-->
       <!--      <el-button type="danger" @click="handleRoleDel">删除学院</el-button>-->
@@ -22,6 +30,7 @@
     <el-main style="padding: 0; overflow: auto">
       <!--生成-->
       <el-table
+        class="custom-table"
         :data="tableData"
         style="height: 100%; table-layout: auto; width: 100%"
         @select-all="handleSelectAll"
@@ -123,6 +132,7 @@
   </el-container>
 </template>
 <script setup>
+import Header from '@/views/page/components/header/index.vue';
 import { reactive, ref, computed, onMounted, nextTick, toRaw, isRef } from 'vue';
 import request from '../../utils/request.js';
 import { ElMessage, ElMessageBox } from 'element-plus';

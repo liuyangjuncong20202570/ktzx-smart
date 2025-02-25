@@ -1,18 +1,50 @@
 <template>
   <div v-loading="generating" class="container">
+    <div class="titel" style="font-weight: bold; padding: 10px 0">画像数据管理</div>
     <el-header
-      style="height: auto; padding: 5px 10px; width: 100%; background-color: #deebf7; display: flex"
+      style="
+        height: auto;
+        padding: 30px 10px;
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        border-top: 2px solid #27a5ff;
+      "
     >
       <div class="button">
-        <el-button type="primary" @click="handleUpload" v-blur-on-click>上传数据</el-button>
-        <el-button type="primary" @click="handleDelete" v-blur-on-click>删除数据</el-button>
-        <el-button type="primary" @click="handleGenerate" v-blur-on-click>生成画像</el-button>
+        <el-button
+          class="custom-nav-button custom-nav-button-info"
+          type="primary"
+          @click="handleUpload"
+          v-blur-on-click
+        >
+          <el-icon><Top /></el-icon>
+          上传数据</el-button
+        >
+        <el-button
+          class="custom-nav-button custom-nav-button-delete"
+          type="primary"
+          @click="handleDelete"
+          v-blur-on-click
+        >
+          <el-icon><DeleteFilled /></el-icon>
+          删除数据</el-button
+        >
+        <el-button
+          class="custom-nav-button custom-nav-button-success"
+          type="primary"
+          @click="handleGenerate"
+          v-blur-on-click
+        >
+          <el-icon><SwitchButton /></el-icon>
+          生成画像</el-button
+        >
       </div>
     </el-header>
 
     <div class="dragwrapper">
       <el-table
-        class="elTable"
+        class="elTable custom-table"
         :data="portraitStore.testLists"
         :border="true"
         style="width: 100%"
@@ -66,6 +98,7 @@
 </template>
 
 <script setup>
+import Header from '@/views/page/components/header/index.vue';
 import DynamicStudentList from '../PublicCpns/DynamicStudentList.vue';
 import Sortable from 'sortablejs';
 import List from '../PublicCpns/List.vue';
@@ -75,6 +108,7 @@ import { getCourseId } from '@/utils/searchCourseId.js';
 import { ref, reactive, computed, onMounted, nextTick } from 'vue';
 import usePortrait from '../../../stores/dynamicEvaluation/portraitStore';
 import { ElMessage } from 'element-plus';
+import { Upload } from 'vxe-pc-ui';
 /* ********************变量定义******************** */
 // props定义
 // 普通变量

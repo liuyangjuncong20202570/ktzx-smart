@@ -1,28 +1,72 @@
 <template>
+  <Header title="学生名单" style="text-align: center; border-bottom: 2px solid #27a5ff" />
   <div class="container">
     <el-header
-      style="height: auto; padding: 5px 0px; width: 100%; background-color: #deebf7; display: flex"
+      style="height: auto; padding: 30px 0px; width: 100%; display: flex; justify-content: flex-end"
     >
       <div class="button">
-        <el-button type="primary" @click="exportData" v-blur-on-click>导出到Excel文件</el-button>
-        <el-button type="primary" @click="handleInsert" v-blur-on-click>选择学生</el-button>
-        <el-button type="primary" @click="handleUpload" v-blur-on-click>导入Excel文件</el-button>
-        <el-button type="danger" @click="handleDelete" v-blur-on-click>删除选中学生</el-button>
-        <el-button type="primary" @click="handleDelAll" color="#800000" v-blur-on-click
-          >删除全部学生</el-button
+        <el-button
+          class="custom-nav-button custom-nav-button-info"
+          type="primary"
+          @click="exportData"
+          v-blur-on-click
+        >
+          <el-icon><Plus /></el-icon>
+          导出到Excel文件</el-button
         >
         <el-button
+          class="custom-nav-button custom-nav-button-info"
+          type="primary"
+          @click="handleInsert"
+          v-blur-on-click
+        >
+          <el-icon><Plus /></el-icon>
+          选择学生</el-button
+        >
+        <el-button
+          class="custom-nav-button custom-nav-button-info"
+          type="primary"
+          @click="handleUpload"
+          v-blur-on-click
+        >
+          <el-icon><Upload /></el-icon>
+          导入Excel文件</el-button
+        >
+        <el-button
+          class="custom-nav-button custom-nav-button-delete"
+          type="danger"
+          @click="handleDelete"
+          v-blur-on-click
+        >
+          <el-icon><DeleteFilled /></el-icon>
+          删除选中学生</el-button
+        >
+        <el-button
+          class="custom-nav-button custom-nav-button-delete"
+          type="primary"
+          @click="handleDelAll"
+          color="#800000"
+          v-blur-on-click
+        >
+          <el-icon><DeleteFilled /></el-icon>
+          删除全部学生</el-button
+        >
+        <el-button
+          class="custom-nav-button custom-nav-button-success"
           type="success"
           v-if="roleName === '任课教师'"
           @click="handleCreateReport"
           v-blur-on-click
-          >生成画像</el-button
+        >
+          <el-icon><SwitchButton /></el-icon>
+          生成画像</el-button
         >
       </div>
     </el-header>
     <!-- 列表开始 -->
     <div class="list">
       <el-table
+        class="custom-table"
         :data="pagedData"
         :border="true"
         style="width: 100%"
@@ -182,6 +226,7 @@
 </template>
 
 <script setup>
+import Header from '@/views/page/components/header/index.vue';
 import List from '../../dynamicEvaluation/PublicCpns/List.vue';
 import { storeToRefs } from 'pinia';
 import useTeacherInClass from '@/stores/useTeacherInClass.js';
@@ -536,9 +581,12 @@ const pagedData = computed(() => {
 
 <style lang="less" scoped>
 .container {
+  overflow: auto;
   height: 92vh;
   display: flex;
   flex-direction: column;
+  -ms-overflow-style: none; /* IE 和 Edge */
+  scrollbar-width: none; /* Firefox */
   .button {
     display: flex;
     padding-left: 10px;

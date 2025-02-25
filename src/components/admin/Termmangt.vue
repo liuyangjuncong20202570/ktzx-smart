@@ -1,28 +1,41 @@
 <template>
+  <Header
+    title="学期管理"
+    style="text-align: center; border-bottom: 2px solid #27a5ff !important"
+  />
   <div style="height: 92vh; display: flex; flex-direction: column">
     <el-header
-      style="
-        height: auto;
-        padding: 5px 0px;
-        width: 100%;
-        background-color: #deebf7;
-        display: flex;
-        align-items: center;
-      "
+      style="height: auto; padding: 30px 0px; width: 100%; display: flex; justify-content: flex-end"
     >
-      <el-button type="success" v-blur-on-click style="margin-left: 0.8vw" @click="exportData"
-        >导出</el-button
+      <el-button
+        class="custom-nav-button custom-nav-button-success"
+        type="success"
+        v-blur-on-click
+        style="margin-left: 0.8vw"
+        @click="exportData"
+      >
+        <el-icon><Download /></el-icon>
+        导出</el-button
       >
       <el-button
-        class="introductorTerm"
+        class="introductorTerm custom-nav-button custom-nav-button-info"
         type="primary"
         v-blur-on-click
         style="margin-left: 0.8vw"
         @click="addTerm"
-        >新建学期</el-button
       >
-      <el-button type="danger" v-blur-on-click style="margin-left: 0.8vw" @click="deleteTerm"
-        >删除学期</el-button
+        <el-icon><Plus /></el-icon>
+        新建学期</el-button
+      >
+      <el-button
+        class="custom-nav-button custom-nav-button-delete"
+        type="danger"
+        v-blur-on-click
+        style="margin-left: 0.8vw"
+        @click="deleteTerm"
+      >
+        <el-icon><DeleteFilled /></el-icon>
+        删除学期</el-button
       >
       <!--            <el-button type="success" style="margin-left: 0.8vw;">保存</el-button>-->
     </el-header>
@@ -34,7 +47,7 @@
           @select="handleSelect"
           @selection-change="handleSelectionChange"
           :default-sort="{ prop: 'enddate', order: 'descending' }"
-          class="my-custom-table"
+          class="my-custom-table custom-table"
           stripe
         >
           <el-table-column type="selection" width="55"></el-table-column>
@@ -134,6 +147,7 @@
 </template>
 
 <script lang="ts" setup>
+import Header from '@/views/page/components/header/index.vue';
 import intro from '../../utils/introConfigure.js';
 import { ElMessage, ElMessageBox, rowProps } from 'element-plus';
 import { nextTick, onMounted, reactive, ref, toRaw } from 'vue';
