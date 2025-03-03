@@ -139,7 +139,9 @@ const submitForm = () => {
               });
               emit('formSubmitted');
               closeDialog();
-
+            }
+            else {
+              ElMessage.error(res.msg);
             }
           }).catch(error => {
         ElMessage({

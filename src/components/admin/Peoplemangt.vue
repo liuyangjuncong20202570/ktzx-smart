@@ -24,17 +24,9 @@
                 </p>
               </template>
               <!-- 移除第一层节点，直接从 children 开始渲染树 -->
-              <el-tree
-                :data="topNode.children"
-                node-key="id"
-                highlight-current
-                :props="defaultProps"
-                :expand-on-click-node="true"
-                :check-on-click-node="false"
-                class="tree-with-header"
-                @node-click="treeNodeClick"
-                style="margin-bottom: 0"
-              >
+              <el-tree :data="topNode.children" node-key="id" highlight-current :props="defaultProps"
+                :expand-on-click-node="true" :check-on-click-node="false" class="tree-with-header"
+                @node-click="treeNodeClick" style="margin-bottom: 0">
                 <template #default="{ node }">
                   <span>
                     <el-icon v-if="node.data.children" color="orange">
@@ -55,60 +47,33 @@
 
       <div class="resize-handler" @mousedown="startResize"></div>
       <!--右侧-->
-      <el-main
-        v-show="showmenu"
-        style="height: 100%; width: 40vw; border: 1px solid #ccc; padding: 0"
-      >
-        <el-tabs
-          v-model="activeTab"
-          @tab-click="switchTab"
-          style="margin-left: 0.8vw; margin-bottom: 0"
-        >
+      <el-main v-show="showmenu" style="height: 100%; width: 40vw; border: 1px solid #ccc; padding: 0">
+        <el-tabs v-model="activeTab" @tab-click="switchTab" style="margin-left: 0.8vw; margin-bottom: 0">
           <el-tab-pane label="教师" name="2"></el-tab-pane>
           <el-tab-pane label="学生" name="1"></el-tab-pane>
         </el-tabs>
-        <div
-          style="
+        <div style="
             width: 99%;
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-top: 0;
-          "
-        >
+          ">
           <!-- 左侧按钮 -->
-          <div>
-            <el-button v-blur-on-click style="margin-left: 0.8vw" type="success" @click="exportData"
-              >导出</el-button
-            >
+          <div style="width: 70%;">
+            <el-button v-blur-on-click type="success" @click="exportData">导出</el-button>
             <el-button v-blur-on-click type="primary" @click="createPeople">新增</el-button>
             <el-button v-blur-on-click type="info" @click="importData">导入</el-button>
             <el-button v-blur-on-click type="danger" @click="deleteSelected">删除</el-button>
           </div>
-          <el-dialog
-            :destroy-on-close="true"
-            :show-close="false"
-            :close-on-click-modal="false"
-            style="width: 20vw; padding-top: 0"
-            v-model="importdialogViaible"
-          >
+          <el-dialog :destroy-on-close="true" :show-close="false" :close-on-click-modal="false"
+            style="width: 20vw; padding-top: 0" v-model="importdialogViaible">
             <h2 style="margin-top: 0">导入教师/学生</h2>
-            <el-upload
-              class="upload-demo"
-              ref="uploadRef"
-              auto-upload="false"
-              show-file-list="false"
-              :before-upload="beforeUpload"
-              style="margin-bottom: 20px"
-            >
+            <el-upload class="upload-demo" ref="uploadRef" auto-upload="false" show-file-list="false"
+              :before-upload="beforeUpload" style="margin-bottom: 20px">
               <!-- 使用输入框作为上传的触发器 -->
-              <el-input
-                slot="trigger"
-                v-model="fileName"
-                placeholder="未选择文件"
-                readonly
-                style="cursor: pointer; text-align: center"
-              ></el-input>
+              <el-input slot="trigger" v-model="fileName" placeholder="未选择文件" readonly
+                style="cursor: pointer; text-align: center"></el-input>
             </el-upload>
 
             <div style="text-align: center; margin-bottom: 20px">
@@ -120,9 +85,7 @@
             <div style="text-align: right">
               <!-- 添加内联样式 -->
               <!-- 上传按钮 -->
-              <el-button style="margin-right: 10px" @click="closeimportdialogViable"
-                >关闭</el-button
-              >
+              <el-button style="margin-right: 10px" @click="closeimportdialogViable">关闭</el-button>
               <!-- 添加内联样式 -->
               <el-button type="success" @click="submitUpload">上传</el-button>
             </div>
@@ -132,13 +95,8 @@
 
           <!-- 右侧搜索框和按钮 -->
           <div>
-            <el-input
-              v-model.lazy="searchKeyword"
-              @input="debouncedQuerySearch"
-              placeholder="请输入姓名关键字"
-              class="input-with-select"
-              style="width: 200px; margin-right: 0.8vw"
-            ></el-input>
+            <el-input v-model.lazy="searchKeyword" @input="debouncedQuerySearch" placeholder="请输入姓名关键字"
+              class="input-with-select" style="width: 70%;"></el-input>
             <el-button type="primary" @click="querySearch">搜索</el-button>
           </div>
         </div>
@@ -150,109 +108,96 @@
           <el-table :data="pagedData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="index" label=""></el-table-column>
             <el-table-column type="selection" label=""></el-table-column>
-            <el-table-column prop="username" label="用户名">
+            <el-table-column prop="username" label="用户名" width="100">
               <template #default="{ row }">
-                <el-input
-                  v-if="row.editingUsername"
-                  :ref="el => setInputRef(el, row)"
-                  style="width: 100%; height: 25px"
-                  v-model="row.username"
-                  @blur="handleBlur(row, 'editingUsername', 'username')"
-                ></el-input>
-                <div
-                  v-else
-                  style="width: 100%; height: 25px"
-                  @dblclick="handleClick(row, 'editingUsername', 'username')"
-                >
+                <el-input v-if="row.editingUsername" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px"
+                  v-model="row.username" @blur="handleBlur(row, 'editingUsername', 'username')"></el-input>
+                <div v-else style="width: 100%; height: 25px"
+                  @dblclick="handleClick(row, 'editingUsername', 'username')">
                   {{ row.username }}
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="loginname" label="登录名称">
+            <el-table-column prop="loginname" label="登录名称" width="100">
               <template #default="{ row }">
-                <el-input
-                  v-if="row.editingLoginname"
-                  :ref="el => setInputRef(el, row)"
-                  style="width: 100%; height: 25px"
-                  v-model="row.loginname"
-                  @blur="handleBlur(row, 'editingLoginname', 'loginname')"
-                ></el-input>
-                <div
-                  v-else
-                  style="width: 100%; height: 25px"
-                  @dblclick="handleClick(row, 'editingLoginname', 'loginname')"
-                >
+                <el-input v-if="row.editingLoginname" :ref="el => setInputRef(el, row)"
+                  style="width: 100%; height: 25px" v-model="row.loginname"
+                  @blur="handleBlur(row, 'editingLoginname', 'loginname')"></el-input>
+                <div v-else style="width: 100%; height: 25px"
+                  @dblclick="handleClick(row, 'editingLoginname', 'loginname')">
                   {{ row.loginname }}
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="phone" label="手机号">
+            <el-table-column prop="pwd" label="密码" width="100">
               <template #default="{ row }">
-                <el-input
-                  v-if="row.editingPhone"
-                  :ref="el => setInputRef(el, row)"
-                  style="width: 100%; height: 25px"
-                  v-model="row.phone"
-                  @blur="handleBlur(row, 'editingPhone', 'phone')"
-                ></el-input>
-                <div
-                  v-else
-                  style="width: 100%; height: 25px"
-                  @dblclick="handleClick(row, 'editingPhone', 'phone')"
-                >
+                <el-input v-if="row.editingPwd" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px"
+                  v-model="row.pwd" @blur="handleBlur(row, 'editingPwd', 'pwd')"></el-input>
+                <div v-else style="width: 100%; height: 25px" @dblclick="handleClick(row, 'editingPwd', 'pwd')">
+                  {{ row.pwd }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="personnelno" label="工号" width="120">
+              <template #default="{ row }">
+                <el-input v-if="row.editingPersonnelno" :ref="el => setInputRef(el, row)"
+                  style="width: 100%; height: 25px" v-model="row.personnelno"
+                  @blur="handleBlur(row, 'editingPersonnelno', 'personnelno')"></el-input>
+                <div v-else style="width: 100%; height: 25px"
+                  @dblclick="handleClick(row, 'editingPersonnelno', 'personnelno')">
+                  {{ row.personnelno }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="phone" label="手机号" width="120">
+              <template #default="{ row }">
+                <el-input v-if="row.editingPhone" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px"
+                  v-model="row.phone" @blur="handleBlur(row, 'editingPhone', 'phone')"></el-input>
+                <div v-else style="width: 100%; height: 25px" @dblclick="handleClick(row, 'editingPhone', 'phone')">
                   {{ row.phone }}
                 </div>
               </template>
             </el-table-column>
-            <el-table-column
-              prop="catelog"
-              label="分类"
-              :formatter="formatColumn"
-            ></el-table-column>
-            <el-table-column label="状态" :formatter="formatColumn">
+            <el-table-column prop="catelog" label="分类" :formatter="formatColumn"></el-table-column>
+            <el-table-column label="状态" :formatter="formatColumn" width="150">
               <template #default="{ row }">
                 <el-dropdown split-button trigger="click">
                   {{ row.status === '1' ? '正常' : '停用' }}
                   <template #dropdown>
                     <el-dropdown-menu>
-                      <el-dropdown-item
-                        @click="changeStatus(row, '1')"
-                        :disabled="row.status === '1' ? true : false"
-                        >正常</el-dropdown-item
-                      >
-                      <el-dropdown-item
-                        @click="changeStatus(row, '0')"
-                        :disabled="row.status === '0' ? true : false"
-                        >停用</el-dropdown-item
-                      >
+                      <el-dropdown-item @click="changeStatus(row, '1')"
+                        :disabled="row.status === '1' ? true : false">正常</el-dropdown-item>
+                      <el-dropdown-item @click="changeStatus(row, '0')"
+                        :disabled="row.status === '0' ? true : false">停用</el-dropdown-item>
                     </el-dropdown-menu>
                   </template>
                 </el-dropdown>
               </template>
             </el-table-column>
-            <el-table-column label="所属院系">
+            <el-table-column label="所属院系" width="150">
               <template #default="{ row }">
                 <!-- <el-input style="width: 100%; height: 25px;" v-model="row.obsname"></el-input> -->
-                <el-cascader
-                  v-model="row.obsname"
-                  :ref="el => setCascaderRef(el, row)"
-                  :options="obsmenulist"
-                  :id="row.id"
-                  :show-all-levels="false"
-                  @change="handleBlur(row)"
-                  :props="{
+                <el-cascader v-model="row.obsname" :ref="el => setCascaderRef(el, row)" :options="obsmenulist"
+                  :id="row.id" :show-all-levels="false" @change="handleBlur(row)" :props="{
                     value: 'obsname',
                     label: 'obsname',
                     children: 'children',
                     checkStrictly: true
-                  }"
-                  filterable
-                >
+                  }" filterable>
                 </el-cascader>
                 <!-- <div v-else style="width: 100%; height: 25px;"
 									@click="handleClick(row, 'editingObsname', 'obsname')">
 									{{ row.obsname }}
 								</div> -->
+              </template>
+            </el-table-column>
+            <el-table-column label="备注" min-width="150">
+              <template #default="{ row }">
+                <el-input v-if="row.editingRemark" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px"
+                  v-model="row.remark" @blur="handleBlur(row, 'editingRemark', 'remark')"></el-input>
+                <div v-else style="width: 100%; height: 25px" @dblclick="handleClick(row, 'editingRemark', 'remark')">
+                  {{ row.remark }}
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -262,30 +207,100 @@
           <el-table :data="pagedData" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="index" label=""></el-table-column>
             <el-table-column type="selection" label=""></el-table-column>
-            <el-table-column prop="username" label="用户名"></el-table-column>
-            <el-table-column prop="loginname" label="登录名称"></el-table-column>
-            <el-table-column prop="phone" label="手机号"></el-table-column>
-            <el-table-column
-              prop="catelog"
-              label="分类"
-              :formatter="formatColumn"
-            ></el-table-column>
-            <el-table-column prop="status" label="状态" :formatter="formatColumn"></el-table-column>
-            <el-table-column prop="obsname" label="所属院系"></el-table-column>
+            <el-table-column prop="username" label="用户名" width="100">
+              <template #default="{ row }">
+                <el-input v-if="row.editingUsername" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px"
+                  v-model="row.username" @blur="handleBlur(row, 'editingUsername', 'username')"></el-input>
+                <div v-else style="width: 100%; height: 25px"
+                  @dblclick="handleClick(row, 'editingUsername', 'username')">
+                  {{ row.username }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="loginname" label="登录名称" width="100">
+              <template #default="{ row }">
+                <el-input v-if="row.editingLoginname" :ref="el => setInputRef(el, row)"
+                  style="width: 100%; height: 25px" v-model="row.loginname"
+                  @blur="handleBlur(row, 'editingLoginname', 'loginname')"></el-input>
+                <div v-else style="width: 100%; height: 25px"
+                  @dblclick="handleClick(row, 'editingLoginname', 'loginname')">
+                  {{ row.loginname }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="pwd" label="密码" width="100">
+              <template #default="{ row }">
+                <el-input v-if="row.editingPwd" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px"
+                  v-model="row.pwd" @blur="handleBlur(row, 'editingPwd', 'pwd')"></el-input>
+                <div v-else style="width: 100%; height: 25px" @dblclick="handleClick(row, 'editingPwd', 'pwd')">
+                  {{ row.pwd }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="personnelno" label="学号" width="120">
+              <template #default="{ row }">
+                <el-input v-if="row.editingPersonnelno" :ref="el => setInputRef(el, row)"
+                  style="width: 100%; height: 25px" v-model="row.personnelno"
+                  @blur="handleBlur(row, 'editingPersonnelno', 'personnelno')"></el-input>
+                <div v-else style="width: 100%; height: 25px"
+                  @dblclick="handleClick(row, 'editingPersonnelno', 'personnelno')">
+                  {{ row.personnelno }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="phone" label="手机号" width="120">
+              <template #default="{ row }">
+                <el-input v-if="row.editingPhone" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px"
+                  v-model="row.phone" @blur="handleBlur(row, 'editingPhone', 'phone')"></el-input>
+                <div v-else style="width: 100%; height: 25px" @dblclick="handleClick(row, 'editingPhone', 'phone')">
+                  {{ row.phone }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="catelog" label="分类" :formatter="formatColumn"></el-table-column>
+            <el-table-column prop="status" label="状态" :formatter="formatColumn" width="150">
+              <template #default="{ row }">
+                <el-dropdown split-button trigger="click">
+                  {{ row.status === '1' ? '正常' : '停用' }}
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item @click="changeStatus(row, '1')"
+                        :disabled="row.status === '1' ? true : false">正常</el-dropdown-item>
+                      <el-dropdown-item @click="changeStatus(row, '0')"
+                        :disabled="row.status === '0' ? true : false">停用</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </template>
+            </el-table-column>
+            <el-table-column prop="obsname" label="所属院系" width="150">
+              <template #default="{ row }">
+                <el-cascader v-model="row.obsname" :ref="el => setCascaderRef(el, row)" :options="obsmenulist"
+                  :id="row.id" :show-all-levels="false" @change="handleBlur(row)" :props="{
+                    value: 'obsname',
+                    label: 'obsname',
+                    children: 'children',
+                    checkStrictly: true
+                  }" filterable>
+                </el-cascader>
+              </template>
+            </el-table-column>
+            <el-table-column prop="remark" label="备注" min-width="150">
+              <template #default="{ row }">
+                <el-input v-if="row.editingRemark" :ref="el => setInputRef(el, row)" style="width: 100%; height: 25px"
+                  v-model="row.remark" @blur="handleBlur(row, 'editingRemark', 'remark')"></el-input>
+                <div v-else style="width: 100%; height: 25px" @dblclick="handleClick(row, 'editingRemark', 'remark')">
+                  {{ row.remark }}
+                </div>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
         <el-footer style="display: flex; justify-content: center">
-          <el-pagination
-            style="margin-top: 20px; text-align: center"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="currentPage"
-            :page-sizes="[10, 20, 30, 40]"
-            :page-size="pageSize"
-            :hide-on-single-page="true"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="total"
-          >
+          <el-pagination style="margin-top: 20px; text-align: center" @size-change="handleSizeChange"
+            @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 30, 40]"
+            :page-size="pageSize" :hide-on-single-page="true" layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
           </el-pagination>
         </el-footer>
       </el-main>
@@ -682,23 +697,34 @@ const handleBlur = (row, editingField = '', dataField = '') => {
     if (row[dataField] !== oldData.value) {
       // 数据改动了再提交
 
+      if (editingField === 'editingPhone') {
+        const phoneRegex = /^1[3-9]\d{9}$/;
+        if (!phoneRegex.test(row[dataField])) {
+          ElMessage.error('手机号格式不正确');
+          row[dataField] = oldData.value;
+          return;
+        }
+      }
+
       if (typeof row.obsname !== 'string') {
         // 判断是否是级联选择器失去焦点的事件，因为被其绑定的值会变成数组类型
+        dataField = 'obsname';
         row.obsname = row.obsname[row.obsname.length - 1];
         CascaderRef.value[row.id].togglePopperVisible(); // 当选择级联选择器的任意选项后，关闭选择器
       }
+      console.log({ id: row.id, [dataField]: row[dataField] });
       try {
-        const res = await request.admin.post('/sysmangt/personnelmangt/update', row);
+        const res = await request.admin.post('/sysmangt/personnelmangt/update', { id: row.id, catelog: row.catelog, [dataField]: row[dataField] });
         if (res.code === 200) {
           ElMessage.success('修改成功');
-          getPeopleList();
         } else {
-          ElMessage.error(res.msg + '1');
+          ElMessage.error(res.msg);
         }
       } catch (error) {
         ElMessage.error('修改失败' + error);
       }
       oldData.value = null;
+      getPeopleList();
     }
   });
 };
@@ -706,11 +732,11 @@ const handleBlur = (row, editingField = '', dataField = '') => {
 const changeStatus = async (row, value) => {
   row.status = value;
   try {
-    const res = await request.admin.post('/sysmangt/personnelmangt/update', row);
+    const res = await request.admin.post('/sysmangt/personnelmangt/update', { id: row.id, catelog: row.catelog, status: value });
     if (res.code === 200) {
       ElMessage.success('修改成功');
     } else {
-      ElMessage.error(res.msg + '1');
+      ElMessage.error(res.msg);
     }
   } catch (error) {
     ElMessage.error('修改失败' + error);
