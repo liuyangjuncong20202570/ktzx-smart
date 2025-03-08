@@ -254,6 +254,11 @@ const handleRoleAdd = () => {
           message: '新增学院成功'
         });
         getTableData();
+      } else {
+        ElMessage({
+          type: 'warn',
+          message: res.msg
+        });
       }
     })
     .catch(() => {
