@@ -68,6 +68,7 @@
 </template>
 
 <script setup>
+import NProgress from 'nprogress';
 import { ref, onMounted, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import request from '../../utils/request.js';
@@ -166,6 +167,7 @@ const previewFile = async file => {
 const downloadFile = file => {
   const dotIndex = file.filename.lastIndexOf('.');
   let suffix = file.filename.substring(dotIndex + 1);
+  NProgress.start();
   let fileUrl = `${
     request.course.defaults.baseURL
   }/coursemangt/instructionalprogram/download/${encodeURIComponent(file.id)}.${suffix}`;
@@ -173,7 +175,14 @@ const downloadFile = file => {
     .course({
       url: fileUrl,
       method: 'GET',
-      responseType: 'blob' // 重要：设置响应类型为blob
+      responseType: 'blob', // 重要：设置响应类型为blob
+      onDownloadProgress: progressEvent => {
+        if (progressEvent.total) {
+          const percentCompleted = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+          // console.log(percentCompleted);
+          NProgress.set(percentCompleted / 100); // 更新进度条
+        }
+      }
     })
     .then(response => {
       const blob = response;
@@ -185,6 +194,8 @@ const downloadFile = file => {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      NProgress.done();
+      ElMessage.success('下载成功');
     })
     .catch(error => {
       console.error('There was a problem with the fetch operation:', error);
