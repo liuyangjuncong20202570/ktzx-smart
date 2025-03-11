@@ -5,16 +5,16 @@ import request from './request.js';
 
 export const uploadTeachingFile = async (file, uploadUrl, successCallback, errorCallback) => {
   // let flag = 0;
-  const isDoc = file.type === 'application/msword'; // 支持 .doc 文件
-  const isDocx =
-    file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-  const isPDF = file.type === 'application/pdf';
+  // const isDoc = file.type === 'application/msword'; // 支持 .doc 文件
+  // const isDocx =
+  //   file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+  // const isPDF = file.type === 'application/pdf';
 
-  // 检查文件类型
-  if (!isDoc && !isDocx && !isPDF) {
-    ElMessage.error('只能上传 .doc、.docx 或 .pdf 格式的文件!');
-    return false;
-  }
+  // // 检查文件类型
+  // if (!isDoc && !isDocx && !isPDF) {
+  //   ElMessage.error('只能上传 .doc、.docx 或 .pdf 格式的文件!');
+  //   return false;
+  // }
 
   // 检查文件大小
   //   const isLt30M = file.size / 1024 / 1024 < 30;

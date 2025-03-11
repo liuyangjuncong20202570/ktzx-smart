@@ -47,12 +47,14 @@ const routes = [
   {
     path: '/homes/studenthome',
     name: 'StudentHomePage',
-    component: () => import('../views/studentHomePage.vue')
+    // component: () => import('../views/studentHomePage.vue')
+    component: () => import('../views/redrawPages/studentHomePage.vue')
   },
   {
     path: '/homes/studentcourses',
     name: 'StudentCoursePage',
-    component: () => import('../views/StudentCoursePage.vue'),
+    // component: () => import('../views/StudentCoursePage.vue'),
+    component: () => import('../views/redrawPages/studentCoursePage.vue'),
     children: [
       // 学生端我的作业
       {
