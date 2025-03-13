@@ -84,7 +84,7 @@
 
         <el-table-column prop="loginname" label="登录名称" />
         <el-table-column prop="userName" label="姓名" />
-        <el-table-column prop="obsName" label="班级" />
+        <el-table-column prop="obsName" :label="unitName" />
         <el-table-column label="参与评价(形成性)">
           <template #default="scope">
             <el-switch
@@ -226,6 +226,7 @@
 </template>
 
 <script setup>
+import request from '../../../utils/request';
 import Header from '@/views/page/components/header/index.vue';
 import List from '../../dynamicEvaluation/PublicCpns/List.vue';
 import { storeToRefs } from 'pinia';
@@ -239,6 +240,8 @@ import { exportTableToCSV } from '../../../utils/exportTableToCSV';
 import useTeacherStuGra from '../../../stores/dynamicEvaluation/TeacherStuGraStore';
 
 /* ********************变量定义******************** */
+const unitName = ref('默认班级');
+
 const selectedData = ref([]);
 
 const resetList = ref(new Map());
@@ -495,10 +498,25 @@ onMounted(async () => {
   TeacherInClassStore.fetchStudentList(parseToken).then(res => {
     // 此处只需给tableData增加两个是否参加评价的字段
     // filterdata是用于展示分页数据的真正绑定的是tableData中的数据
+    // unitName.value = '专业';
     tableData.value = stuList.value;
     filteredData.value = stuList.value;
     total.value = tableData.value.length;
   });
+  await request.course
+    .get('/coursemangt/classroommangt/student/getStudentLevel')
+    .then(res => {
+      // 登录成功
+      if (res.code === 200 && res.msg === '成功') {
+        unitName.value = res.data;
+      } else {
+        ElMessage({
+          type: 'error',
+          message: '获取学生所在层级失败'
+        });
+      }
+    })
+    .catch(() => {});
   classroomId.value = parseJWT(sessionStorage.getItem('token')).obsid;
   const { code, msg, data } = await getCourseId(classroomId.value);
   if (code === 200 && msg === 'success') {

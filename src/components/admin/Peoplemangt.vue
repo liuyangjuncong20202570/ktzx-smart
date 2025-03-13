@@ -271,7 +271,7 @@
               :formatter="formatColumn"
             ></el-table-column>
             <el-table-column prop="status" label="状态" :formatter="formatColumn"></el-table-column>
-            <el-table-column prop="obsname" label="所属院系"></el-table-column>
+            <el-table-column prop="obsname" :label="unitName"></el-table-column>
           </el-table>
         </div>
         <el-footer style="display: flex; justify-content: center">
@@ -302,6 +302,8 @@ import { searchInTable } from '../../utils/searchInTable.js';
 import AddPeopleDialog from './subcomponents/AddPeopleDialog.vue';
 import EditRoleList from './subcomponents/EditRoleList.vue';
 import _ from 'lodash';
+
+const unitName = ref('默认班级');
 
 //tab显示，学生-1，老师-2，默认为老师
 const activeTab = ref('2');
@@ -425,7 +427,7 @@ const treeNodeClick = (data, node, event) => {
   getPeopleList();
 };
 
-const getPeopleList = () => {
+const getPeopleList = async () => {
   request.admin
     .get(
       '/sysmangt/personnelmangt/person?obsid=' + currentobsid.value + '&catelog=' + activeTab.value
@@ -445,6 +447,21 @@ const getPeopleList = () => {
         message: '获取师生列表失败'
       });
     });
+
+  request.course
+    .get('/coursemangt/classroommangt/student/getStudentLevel')
+    .then(res => {
+      // 登录成功
+      if (res.code === 200 && res.msg === '成功') {
+        unitName.value = res.data;
+      } else {
+        ElMessage({
+          type: 'error',
+          message: '获取学生所在层级失败'
+        });
+      }
+    })
+    .catch(() => {});
 };
 
 const currentPage = ref(1);
