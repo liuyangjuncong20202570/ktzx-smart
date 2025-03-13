@@ -136,3 +136,40 @@
   border-radius: 50%;
 }
 /* 自定义radio  end */
+/* 自定义dialog  start */
+.custom-dialog {
+  border-radius: 10px;
+}
+.custom-dialog .el-dialog__header {
+  border-bottom: 2px solid #93D2FF;
+  margin-bottom: 10px;
+}
+.custom-dialog .custom-dialog-footer {
+  margin-bottom: 10px;
+  margin-top: 50px;
+}
+.custom-dialog .bgd-kwa {
+  border-bottom: none !important;
+}
+/* 自定义dialog  end */
+
+/* 自定义checkbox  start */
+.custom-checkbox .el-checkbox__input {
+  background: rgba(39,165,255,0.1);
+  border-radius: 5px;
+  border: 1px solid #27A5FF;
+}
+.custom-checkbox .el-checkbox__inner {
+  background-color: transparent;
+  border: none;
+  border-radius: 5px;
+}
+.custom-checkbox .el-checkbox__label {
+  font-family: MicrosoftYaHei;
+  color: #414141;
+  font-weight: 400;
+}
+.custom-checkbox .is-checked .el-checkbox__inner {
+  border-radius: 0px !important;
+}
+/* 自定义checkbox  end */

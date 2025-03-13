@@ -64,9 +64,13 @@ const goToPath = (item) => {
 </script>
 <style scoped>
 .title {
+    font-family: MicrosoftYaHei;
+    font-size: 18px;
+    color: #1B1B1B;
+    line-height: 24px;
     padding: 10px 0;
-    text-align: left;
-    border-bottom: 1px solid #e1e1e1;
+    text-align: center;
+    border-bottom: 2px solid #93D2FF;
 }
 .title-header {
     font-weight: bold;

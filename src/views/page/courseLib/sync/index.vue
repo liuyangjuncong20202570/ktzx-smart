@@ -1,7 +1,7 @@
 <template>
   <div class="course-lib-sync">
     <Header :pathData="pathData" title="题库同步" />
-    <el-table ref="tableRef" row-key="date" :data="tableData" style="width: 100%">
+    <el-table ref="tableRef" class="custom-table" row-key="date" :data="tableData" style="width: 100%;margin-top: 20px;">
       <el-table-column type="index" width="50" />
       <el-table-column prop="address" label="题型">
         <template #default="scope">
@@ -24,9 +24,10 @@
     </el-table>
 
     <div class="pagination flex-end">
-      <el-pagination v-model:currentPage="params.pageIndex" v-model:page-size="params.pageSize"
+      <!-- <el-pagination v-model:currentPage="params.pageIndex" v-model:page-size="params.pageSize"
         :page-sizes="[20, 30, 40]" layout="total, sizes, prev, pager, next, jumper" :total="total"
-        @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        @size-change="handleSizeChange" @current-change="handleCurrentChange" /> -->
+      <Pagination v-if="total" :pageIndex="params.pageIndex" :pageSize="params.pageSize" :total="total" @update:pageIndex="handleCurrentChange" />
     </div>
     <!-- 无权限显示 -->
     <NoAccessPermission v-if="privilege === 'none'" />
@@ -39,6 +40,7 @@ import { ref, onMounted } from 'vue'
 import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
 import { courseLibSyncPager, syncAccept, syncReject, courseLibWR } from '@/api/courseLib.js'
 import Header from '../../components/header/index.vue'
+import Pagination from "@/views/page/components/pagination/index.vue";
 import NoAccessPermission from '@/views/page/components/noAccessPermission/index.vue'
 import { TOPICTYPE } from '@/utils/consts.js'
 

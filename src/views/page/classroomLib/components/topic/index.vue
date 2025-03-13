@@ -1,7 +1,8 @@
 <template>
+    <el-dialog v-model="dialogVisible" class="custom-dialog" :title="headline" width="1200px">
   <div class="cpirse-topic">
     <div class="topic-content">
-      <h3>{{ headline }}</h3>
+      <!-- <h3>{{ headline }}</h3> -->
 
       <el-input placeholder="题目title，请填写" style="margin-bottom: 10px;" v-model="item.title">
       </el-input>
@@ -48,7 +49,7 @@
       >
         <div class="flex-between">
           <div class="option-left flex-start">
-            {{ option.name }}: <el-input v-model="option.itemContent" placeholder="请输入选项" />
+            <span class="option-name">{{ option.name }}:</span> <el-input v-model="option.itemContent" placeholder="请输入选项" />
           </div>
           <div class="option-right flex-between cursor-pointer">
             <el-icon :class="headline === '判断题' ? 'no-click' : ''" @click="plus">
@@ -59,24 +60,29 @@
             </el-icon>
             <ImageUpload :item="option" />
             <Hint :item="option" />
-            <el-checkbox label="正确答案" @change="((value) => {topicCheckbox(value, index)})" v-model="option.isAnswer"></el-checkbox>
+            <el-checkbox class="custom-checkbox" label="正确答案" @change="((value) => {topicCheckbox(value, index)})" v-model="option.isAnswer"></el-checkbox>
           </div>
         </div>
         <div v-if="option.itemAnalysis" class="option-hint">提示:{{ option.itemAnalysis }}</div>
       </div>
 
-      <div class="topic-right">
+      <!-- <div class="topic-right">
         <el-button @click="handleClose">取消</el-button>
         <el-button type="primary" @click="save">保存</el-button>
-      </div>
+      </div> -->
     </div>
   </div>
+  <div class="custom-dialog-footer">
+    <el-button @click="handleClose">取消</el-button>
+    <el-button type="primary" @click="save">保存</el-button>
+  </div>
+</el-dialog>
 </template>
 
 <script>
 import { Plus, Minus, Picture, Tickets } from '@element-plus/icons-vue'
 import { defineComponent, ref, watch } from 'vue';
-import Kwa from '@/components/kwa/index.vue'
+import Kwa from '@/components/kwa/index-check.vue'
 import Hint from './components/hint/index.vue'
 import ImageUpload from './components/imageUpload/index.vue'
 import Wangeditor from '@/views/page/components/wangeditor/index.vue'
@@ -104,6 +110,7 @@ export default defineComponent({
     const gapFillingOptions = ref([])
     const wangeditor = ref(null)
     const keaData = ref([])
+    const dialogVisible = ref(true)
     item.value = {
       ...item.value,
       title,
@@ -304,7 +311,8 @@ export default defineComponent({
       keaData,
       wangeditor,
       insertContent,
-      topicCheckbox
+      topicCheckbox,
+      dialogVisible
     };
   }
 });
@@ -312,11 +320,11 @@ export default defineComponent({
 
 <style scoped>
 .cpirse-topic {
-  border-bottom: 1px solid #e1e1e1;
+  /* border-bottom: 1px solid #e1e1e1;
   padding-bottom: 10px;
   box-shadow: 0px 1px 13px #a9a9a9;
   padding: 0 10px 10px 10px;
-  border-radius: 5px;
+  border-radius: 5px; */
 }
 
 h3 {
@@ -329,15 +337,19 @@ h3 {
   text-align: right; */
   text-align: left;
 }
-
 .topic-option {
-  width: 500px;
-  margin-bottom: 5px;
+  width: 100%;
+  margin-bottom: 15px;
+}
+.option-name {
+  margin-right: 10px;
+  display: inline-block;
+  width: 20px;
 }
 
 .option-left {
-  width: 280px;
   font-size: 13px;
+  width: 980px;
 }
 
 .option-hint {
@@ -348,10 +360,15 @@ h3 {
 
 .option-right {
   width: 160px;
-  color: #3c2eff;
+  color: #0078CD;
 }
 
 .topic-right {
   text-align: right;
+}
+:deep(.el-form-item__label) {
+  font-family: MicrosoftYaHei;
+  font-size: 14px;
+  color: #707070;
 }
 </style>
