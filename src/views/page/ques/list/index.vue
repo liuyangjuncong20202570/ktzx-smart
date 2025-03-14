@@ -11,7 +11,7 @@
       </div>
     </header>
 
-    <el-table ref="multipleTableRef" :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
+    <el-table class="custom-table" ref="multipleTableRef" :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" />
       <el-table-column property="name" label="名称" />
       <el-table-column property="createTime" label="创建时间" />
@@ -61,9 +61,10 @@
     </el-table>
 
     <div class="pagination flex-end">
-      <el-pagination v-model:currentPage="params.pageIndex" v-model:page-size="params.pageSize"
+      <!-- <el-pagination v-model:currentPage="params.pageIndex" v-model:page-size="params.pageSize"
         :page-sizes="[10, 20, 30, 40]" layout="total, sizes, prev, pager, next, jumper" :total="total"
-        @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        @size-change="handleSizeChange" @current-change="handleCurrentChange" /> -->
+      <Pagination :pageIndex="params.pageIndex" :pageSize="params.pageSize" :total="total" @update:pageIndex="handleCurrentChange" />
     </div>
     <!-- 无权限显示 -->
     <NoAccessPermission v-if="privilege === 'none'" />
@@ -77,6 +78,7 @@ import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
 import { Delete, Plus } from '@element-plus/icons-vue'
 import { queFormPager, queFormDel, queFormWR, quePublish } from '@/api/ques.js'
 import Header from '@/views/page/components/header/index.vue'
+import Pagination from "@/views/page/components/pagination/index.vue";
 import NoAccessPermission from '@/views/page/components/noAccessPermission/index.vue'
 
 const router = useRouter()
@@ -96,6 +98,7 @@ const pathData = [
     path: ''
   }
 ]
+
 
 onMounted(() => {
   getWR()

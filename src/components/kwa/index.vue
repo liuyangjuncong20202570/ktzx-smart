@@ -1,7 +1,7 @@
 <template>
   <div class="bgd-kwa">
     <el-form label-position="left" :model="form" label-width="80px" v-if="['courseLibSearch', 'classroomLibSearch'].includes(type)">
-      <el-form-item label="关键字 " class="kwa-form-item">
+      <el-form-item label="关键字 " class="kwa-form-item" v-if="keywordOptions.length">
         <custom-checkbox-group
           v-model="form.keyIds"
           :options="keywordOptions"
@@ -9,7 +9,7 @@
         />
       </el-form-item>
 
-      <el-form-item label="能力" class="kwa-form-item">
+      <el-form-item label="能力" class="kwa-form-item" v-if="abilityOptions.length">
         <custom-checkbox-group
           v-model="form.abilityIds"
           :options="abilityOptions"
@@ -17,7 +17,7 @@
         />
       </el-form-item>
 
-      <el-form-item label="题型" class="kwa-form-item">
+      <el-form-item label="题型" class="kwa-form-item" v-if="queTypeOptions.length">
         <custom-checkbox-group
           v-model="form.queTypeIds"
           :options="[{ label: '全部', value: '0' }, ...queTypeOptions]"
@@ -28,7 +28,7 @@
     </el-form>
 
     <el-form v-if="['courseLibaAdd', 'classroomLibAdd'].includes(type)" label-position="left" :model="form" label-width="60px">
-      <el-form-item label="关键字 ">
+      <el-form-item label="关键字 " v-if="kwaTreeOptions.length">
         <custom-checkbox-group
           v-model="form.treeIds"
           :options="kwaTreeOptions"
@@ -48,7 +48,7 @@
     </el-form>
 
     <el-form v-if="['taskKwa'].includes(type)" label-position="left" :model="form" label-width="60px">
-      <el-form-item label="关键字 ">
+      <el-form-item label="关键字 " v-if="keywordOptions.length">
         <custom-checkbox-group
           v-model="form.keyIds"
           :options="keywordOptions"
@@ -56,7 +56,7 @@
         />
       </el-form-item>
 
-      <el-form-item label="能力">
+      <el-form-item label="能力" v-if="abilityOptions.length">
         <custom-checkbox-group
           v-model="form.abilityIds"
           :options="abilityOptions"

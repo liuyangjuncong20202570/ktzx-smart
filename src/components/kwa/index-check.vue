@@ -215,7 +215,7 @@ defineExpose({
 
 <style>
 .bgd-kwa .el-form-item {
-  margin-bottom: 1px !important;
+  margin-bottom: 15px !important;
 }
 .bgd-kwa .el-form-item__content {
   text-align: left;
