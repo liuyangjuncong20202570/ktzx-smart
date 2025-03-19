@@ -16,27 +16,27 @@
                         {{ row.row.code }}
                     </template>
                 </el-table-column>
-                <el-table-column label="课程目标" min-width="150">
+                <el-table-column label="课程目标" width="300">
                     <template v-slot="row">
-                        <el-input v-if="row.row.editingName" style="width: 100%; height: 25px;" v-model="row.row.name"
+                        <el-input v-if="row.row.editingName" autosize type="textarea" style="width: 100%;" v-model="row.row.name"
                             :ref="el => setInputRef(el, row.row)" @blur="handleBlur(row.row, 'editingName')"></el-input>
-                        <div v-else style="width: 100%; height: 25px;" @dblclick="handleClick(row.row, 'editingName')">
+                        <div v-else style="width: 100%; min-height: 25px;" @dblclick="handleClick(row.row, 'editingName')">
                             {{ row.row.name }}
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="备注" min-width="300">
+                <el-table-column label="备注" width="200">
                     <template v-slot="row">
-                        <el-input v-if="row.row.editingRemark" style="width: 100%; height: 25px;"
+                        <el-input v-if="row.row.editingRemark" autosize type="textarea" style="width: 100%;"
                             v-model="row.row.remark" :ref="el => setInputRef(el, row.row)"
                             @blur="handleBlur(row.row, 'editingRemark')"></el-input>
-                        <div v-else style="width: 100%; height: 25px;"
+                        <div v-else style="width: 100%; min-height: 25px;"
                             @dblclick="handleClick(row.row, 'editingRemark')">
                             {{ row.row.remark }}
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="关联KWA" min-width="400">
+                <el-table-column label="关联KWA">
                     <template #default="{ row }">
                         <el-popover placement="left-end" width="500" :visible="kwaPopoverVisible[row.id]">
                             <div style="text-align: right;">
@@ -201,14 +201,15 @@ const setInputRef = (el, row) => {
     }
 };
 
-const handleClick = (row, field) => {
+const handleClick = async (row, field) => {
     nextTick(() => {
         tempRowData.value = _.cloneDeep(row);     // 存一份修改之前的数据用作比对
         // console.log(targetData.value);
         row[field] = true;
         setTimeout(() => {
-            if (inputRefs.value[row.id] && inputRefs.value[row.id].$refs.input) {
-                inputRefs.value[row.id].$refs.input.focus();
+            const inputRef = inputRefs.value[row.id];
+            if (inputRef && inputRef.$refs.textarea) {
+                inputRef.$refs.textarea.focus();
             }
         }, 0);
     });

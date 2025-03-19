@@ -244,7 +244,7 @@ onMounted(async () => {
 	let planeDist = 1.2;
 
 	// 添加能照亮整个球型节点的光源
-	const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x000520, 4); // 三个参数分别是上光源颜色，下光源颜色，光源强度
+	const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 6); // 三个参数分别是上光源颜色，下光源颜色，光源强度
 	hemisphereLight.castShadow = true;
 	scene.add(hemisphereLight);
 
@@ -276,7 +276,7 @@ onMounted(async () => {
 		abilityPlaneGridCount++;
 	}
 
-	// 第一层平面的大小(最下层)
+	// 第一层平面的大小(最下层平面)
 	let firstPlaneSize =
 		data.keywords.length || data.abilities.length
 			? 
@@ -353,7 +353,7 @@ onMounted(async () => {
 	let targetPlaneGridCount = 1;
 	const targetPlanePadding = 0.8;
 	while (targetPlaneGridCount * targetPlaneGridCount <= data.targets.length) {
-		thirdPlaneSize += 2.5;
+		thirdPlaneSize += 1.8;
 		targetPlaneGridCount++;
 	}
 	// console.log(targetPlaneGridCount);
@@ -386,22 +386,22 @@ onMounted(async () => {
 	}
 
 	// 平面的透明度
-	const opacity = 0.8;
+	const opacity = 0.9;
 	/***********************创建三个不同颜色的材质********************************/
-	const material1 = new THREE.MeshBasicMaterial({
-		color: "rgb(252, 151, 13)",
+	const material1 = new THREE.MeshBasicMaterial({		// 最下层平面
+		color: "rgb(43, 64, 95)",
 		side: THREE.DoubleSide,
 		transparent: true,
 		opacity,
 	});
 	const material2 = new THREE.MeshBasicMaterial({
-		color: "rgb(74, 49, 153)",
+		color: "rgb(232, 223, 206)",
 		side: THREE.DoubleSide,
 		transparent: true,
 		opacity,
 	});
 	const material3 = new THREE.MeshBasicMaterial({
-		color: "rgb(255, 0, 0)",
+		color: "rgb(172, 138, 103)",
 		side: THREE.DoubleSide,
 		transparent: true,
 		opacity,
@@ -513,11 +513,12 @@ onMounted(async () => {
 		data.keywords.forEach((keyword, index) => {
 			// console.log(keyword);
 			// 创建球形节点的材质
-			const sphereMaterial = new THREE.MeshStandardMaterial({
-				color: "#00ff00",
+			const sphereMaterial = new THREE.MeshBasicMaterial({
+				color: "rgb(255, 178, 28)",
+				side: THREE.DoubleSide,
 			});
 			// 创建球形节点的几何体
-			const sphereGeometry = new THREE.SphereGeometry(0.2, 64, 64); // 半径为0.2，水平和垂直分段数均为32
+			const sphereGeometry = new THREE.CircleGeometry(0.2, 64, 64); // 半径为0.2，水平和垂直分段数均为32
 
 			const keywordPlaneGridPoints = createGridPointsByNodeAmount(
 				keywordPlaneSize,
@@ -546,11 +547,12 @@ onMounted(async () => {
 		// 创建能力节点
 		data.abilities.forEach((ability, index) => {
 			// 创建球形节点的材质
-			const sphereMaterial = new THREE.MeshStandardMaterial({
-				color: "#00ff00",
+			const sphereMaterial = new THREE.MeshBasicMaterial({
+				color: "rgb(255, 178, 28)",
+				side: THREE.DoubleSide,
 			});
 			// 创建球形节点的几何体
-			const sphereGeometry = new THREE.SphereGeometry(0.2, 64, 64); // 半径为0.2，水平和垂直分段数均为32
+			const sphereGeometry = new THREE.CircleGeometry(0.2, 64); // 半径为0.2，水平和垂直分段数均为32
 
 			const abilityPlaneGridPoints = createGridPointsByNodeAmount(
 				abilityPlaneSize,
@@ -585,7 +587,7 @@ onMounted(async () => {
 		data.units.forEach((unit, index) => {
 			// 知识单元的材质
 			const unitMaterial = new THREE.MeshBasicMaterial({
-				color: "grey",
+				color: "rgb(167, 170, 175)",
 				side: THREE.DoubleSide,
 				transparent: true,
 				opacity,
@@ -607,7 +609,7 @@ onMounted(async () => {
 			unitPlane.position.set(
 				secondPlaneGridPoints[index].x,
 				secondPlaneGridPoints[index].y,
-				-0.1
+				-0.01
 			);
 
 			planes[1].add(unitPlane);
@@ -626,10 +628,11 @@ onMounted(async () => {
 			unit.kwas.forEach((kwa, index) => {
 				// 创建球形节点的材质
 				const sphereMaterial = new THREE.MeshStandardMaterial({
-					color: kwa.status === 1 ? "#00ff00" : "#ff0000",
+					color: kwa.status === 1 ? "rgb(85, 200, 123)" : "rgb(230, 71, 49)",
+					side: THREE.DoubleSide,
 				});
 				// 创建球形节点的几何体
-				const sphereGeometry = new THREE.SphereGeometry(0.2, 64, 64); // 半径为0.2，水平和垂直分段数均为32
+				const sphereGeometry = new THREE.CircleGeometry(0.2, 64); // 半径为0.2，水平和垂直分段数均为32
 
 				const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 				sphere.userData = {
@@ -654,7 +657,7 @@ onMounted(async () => {
 
 				const kwainfo = kwadict.find((item) => item.id === kwa.kwaid);
 				const startPosition = kwa.position;
-				const lineMaterial = new THREE.LineBasicMaterial({ color: 0xf6e432 });
+				const lineMaterial = new THREE.LineBasicMaterial({ color: 0xfac603 });
 
 				const abilityPosition = abilityPositionMap.get(kwainfo.abilityid);
 				// 将局部坐标转换为全局坐标
@@ -692,11 +695,12 @@ onMounted(async () => {
 		// 创建课程目标节点
 		data.targets.forEach((target, index) => {
 			// 创建球形节点的材质
-			const sphereMaterial = new THREE.MeshStandardMaterial({
-				color: "#00ff00",
+			const sphereMaterial = new THREE.MeshBasicMaterial({
+				color: "rgb(255, 178, 28)",
+				side: THREE.DoubleSide,
 			});
 			// 创建球形节点的几何体
-			const sphereGeometry = new THREE.SphereGeometry(0.2, 64, 64); // 半径为0.2，水平和垂直分段数均为64
+			const sphereGeometry = new THREE.CircleGeometry(0.2, 64); // 半径为0.2，水平和垂直分段数均为64
 
 			const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 			sphere.userData = {
@@ -719,7 +723,7 @@ onMounted(async () => {
 				startPosition.clone()
 			);
 
-			const lineMaterial = new THREE.LineBasicMaterial({ color: 0xf6e432 });
+			const lineMaterial = new THREE.LineBasicMaterial({ color: 0xfac603 });
 			target.kwas.forEach(kwa => {
 				kwaIdGlobalPositionMap[kwa.id].forEach(position => {
 					const keywordVertices = [globalStartPosition, position];
@@ -736,7 +740,7 @@ onMounted(async () => {
 		// 创建知识单元间kwa的连线
 		data.kwaLines.forEach((line) => {
 			// 创建连线
-			const lineMaterial = new THREE.LineBasicMaterial({ color: 0xf6e432 });
+			const lineMaterial = new THREE.LineBasicMaterial({ color: 0xfac603 });
 			const lineGeometry = new THREE.BufferGeometry();
 			// 获取球形节点的位置并创建连线的顶点
 			const startPosition = kwaUnitPositionMap.get(
@@ -834,7 +838,7 @@ const createGridPointsByNodeAmount = (size, gridCount, edgeWidth) => {
 			// 计算当前节点相对于中心节点的角度
 			const angle = Math.atan2(dy, dx);
 			const distance = Math.sqrt(dx * dx + dy * dy);
-			points.push({ point: new THREE.Vector3(x, y, -0.2), angle, distance });
+			points.push({ point: new THREE.Vector3(x, y, -0.01), angle, distance });
 		}
 	}
 
@@ -906,5 +910,6 @@ const findSecondPlaneGridSize = (array, len, maxUnitSizeR) => {
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 	z-index: 99;
 	border-radius: 7px;
+	max-width: 300px;
 }
 </style>
