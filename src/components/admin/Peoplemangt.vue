@@ -273,7 +273,7 @@
                 </el-dropdown>
               </template>
             </el-table-column>
-            <el-table-column prop="obsname" label="所属院系" width="150">
+            <el-table-column prop="obsname" :label="unitName" width="150">
               <template #default="{ row }">
                 <el-cascader v-model="row.obsname" :ref="el => setCascaderRef(el, row)" :options="obsmenulist"
                   :id="row.id" :show-all-levels="false" @change="handleBlur(row)" :props="{
