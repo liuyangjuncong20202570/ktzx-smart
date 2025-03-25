@@ -85,13 +85,17 @@ const currentobsname = ref('');
 
 // TODO:在异步处理时，应将currentobsID获取以便找到对应班级的学生
 const nodeClick = (data, node, event) => {
-  if (!node.childNodes || node.childNodes.length === 0) {
-    node.checked = !node.checked;
-    currentobsId.value = data.id;
-    getPeopleList();
-  } else {
-    currentobsname.value = data.obsname;
-  }
+  node.checked = !node.checked;
+  currentobsId.value = data.id;
+  getPeopleList();
+  currentobsname.value = data.obsname;
+  // if (!node.childNodes || node.childNodes.length === 0) {
+  //   node.checked = !node.checked;
+  //   currentobsId.value = data.id;
+  //   getPeopleList();
+  // } else {
+  //   currentobsname.value = data.obsname;
+  // }
 };
 
 // *****************搜索框逻辑***********
