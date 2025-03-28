@@ -159,7 +159,7 @@ const previewFile = async file => {
     previewFileType.value = 'word';
     fileUrl += '.docx';
   } else {
-    ElMessage.error('无法预览此文件类型');
+    ElMessage.error('无法预览此文件类型，目前预览功能仅支持pdf和docx文件格式');
     return;
   }
   previewFileUrl.value = fileUrl;
