@@ -126,14 +126,14 @@
           </template>
         </el-table-column>
         <el-table-column prop="datavalue" label="权值">
-          <template v-slot="row">
+          <!-- <template v-slot="row">
             <el-input v-if="row.row.editingDatavalue" style="width: 100%; height: 25px"
                       v-model="row.row.datavalue" :ref="el => setInputRef(el, row)"
                       @blur="handleBlur(row, 'editingDatavalue')"></el-input>
             <div v-else style="width: 100%; height: 25px" @dblclick="handleClick(row, 'editingDatavalue')">
               {{ row.row.datavalue }}
             </div>
-          </template>
+          </template> -->
         </el-table-column>
         <el-table-column prop="importantlevelid" label="重要程度"></el-table-column>
       </el-table>
@@ -295,7 +295,7 @@ const handleBlur = (row, field) => {
   if (row.row.abilityid && row.row.keywordid && !_.isEqual(tempRowData.value, row.row)) {
     // 当数据发生改变了再传数据给后端
     request.evaluation
-        .post('/evaluation/kwadict', row.row)
+        .post('/evaluation/kwadict/updateKwadict', row.row)
         .then(res => {
           if (res.code === 200) {
             getKWAData();
@@ -462,7 +462,7 @@ const setKeyword = row => {
 		} else if (created && oldKeyword !== selectedKeyword.value.id) {
 			// 数据变化了再传给后端
 			request.evaluation
-				.post('/evaluation/kwadict', row.row)
+				.post('/evaluation/kwadict/updateKwadict', row.row)
 				.then(res => {
 					if (res.code === 200) {
 						getKWAData();
@@ -498,7 +498,7 @@ const openAbilityDictionary = row => {
   openedAbilityPop.value = row.row;
 
   request.evaluation
-      .get(`/evaluation/kwadict/getabilitydict?courseid=${courseid.value}`)
+      .get(`/evaluation/kwadict/getabilitydict`)
       .then(res => {
         if (res.code === 200) {
           abilityData.value = res.data;
@@ -542,7 +542,7 @@ const setAbility = row => {
 		} else if (created && oldAbility !== selectedAbility.value.id) {
 			// 数据变化了再传给后端
 			request.evaluation
-				.post('/evaluation/kwadict', row.row)
+				.post('/evaluation/kwadict/updateKwadict', row.row)
 				.then(res => {
 					if (res.code === 200) {
 						getKWAData();
