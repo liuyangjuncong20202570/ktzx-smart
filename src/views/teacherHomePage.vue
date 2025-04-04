@@ -179,6 +179,10 @@
                   >
                     <template #title>
                       <!--0822有更改-->
+                      <img
+                        src="@/assets/images/redraw-images/choseSecond.png"
+                        class="course-icon"
+                      />
                       <div class="titleBox" @click="navigateTo(menu.url)">
                         {{ menu.name }}
                       </div>
@@ -192,6 +196,10 @@
                         style="border-top: 1px solid #efefef; position: relative"
                       >
                         <template #title>
+                          <img
+                            src="@/assets/images/redraw-images/choseThird.png"
+                            class="course-icon"
+                          />
                           <div class="childtitleBox" @click="navigateTo(child.url)">
                             {{ child.name }}
                           </div>
@@ -230,6 +238,7 @@
                     @click="navigateTo(menu.url)"
                     style="border-top: 1px solid #efefef"
                   >
+                    <img src="@/assets/images/redraw-images/choseIcon.png" class="course-icon" />
                     <div class="titleBox">
                       {{ menu.name }}
                     </div>
@@ -573,6 +582,10 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
+.course-icon {
+  height: 20px;
+  margin-right: 10px;
+}
 .wrapper {
   width: 100%;
   height: 100%;
