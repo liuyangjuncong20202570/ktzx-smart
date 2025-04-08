@@ -292,7 +292,7 @@ const submit = (name) => {
         if (res.code === "200") {
           ElMessage.success(name === "save" ? "保存成功" : "提交成功");
           if (name === "submit") {
-            routes.push("/homes/studentcourses/exam/myexperiment");
+            routes.push("/homes/studenthome/exam/myexperiment");
           }
         }
       });
