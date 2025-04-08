@@ -11,8 +11,8 @@
       </div>
     </header>
 
-    <el-table ref="multipleTableRef" :data="tableData" style="width: 100%">
-      <el-table-column type="index" label="序号" width="55" />
+    <el-table class="custom-table" ref="multipleTableRef" :data="tableData" style="width: 100%">
+      <el-table-column type="index" label="序号" width="100" />
       <el-table-column property="name" label="名称" />
       <el-table-column property="createTime" label="创建时间" />
       <el-table-column fixed="right" label="操作">
@@ -36,9 +36,10 @@
     </el-table>
 
     <div class="pagination flex-end">
-      <el-pagination v-model:currentPage="params.pageIndex" v-model:page-size="params.pageSize"
+      <!-- <el-pagination v-model:currentPage="params.pageIndex" v-model:page-size="params.pageSize"
         :page-sizes="[10, 20, 30, 40]" layout="total, sizes, prev, pager, next, jumper" :total="total"
-        @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        @size-change="handleSizeChange" @current-change="handleCurrentChange" /> -->
+      <Pagination :pageIndex="params.pageIndex" :pageSize="params.pageSize" :total="total" @update:pageIndex="handleCurrentChange" />
     </div>
 
   </div>
@@ -50,6 +51,7 @@ import { useRouter } from 'vue-router'
 import { ElTable, ElMessage, ElMessageBox } from 'element-plus'
 import { getTermAll, taskCopy, prevPager } from '@/api/taskMgmt.js'
 import Header from '@/views/page/components/header/index.vue'
+import Pagination from "@/views/page/components/pagination/index.vue";
 
 const router = useRouter()
 const multipleTableRef = ref()

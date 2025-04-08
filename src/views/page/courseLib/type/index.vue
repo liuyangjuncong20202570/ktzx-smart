@@ -4,7 +4,7 @@
     <div style="margin-top: 20px" class="flex-end" v-if="!(privilege === 'read')">
       <el-button type="primary" @click="save">保存</el-button>
     </div>
-    <el-table ref="multipleTableRef" :data="typeList" style="width: 100%;" @selection-change="handleSelectionChange">
+    <el-table ref="multipleTableRef" class="custom-table" :data="typeList" style="width: 100%;margin-top: 20px;" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" />
       <el-table-column property="name" label="题型" show-overflow-tooltip />
       <el-table-column property="status" label="状态" show-overflow-tooltip>

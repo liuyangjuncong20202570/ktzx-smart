@@ -2,7 +2,7 @@
   <div class="task-list">
     <Header title="问卷学生列表" :pathData="pathData" />
     <!-- 作业列表 -->
-    <el-table ref="multipleTableRef" :data="tableData" style="width: 100%;margin-top: 10px;" @selection-change="handleSelectionChange">
+    <el-table class="custom-table" ref="multipleTableRef" :data="tableData" style="width: 100%;margin-top: 10px;" @selection-change="handleSelectionChange">
       <el-table-column type="index" label="序号" width="80" />
       <el-table-column property="stuNo" label="学号" />
       <el-table-column property="userName" label="姓名" />
