@@ -84,6 +84,14 @@ const routes = [
       {
         path: pathHeader + '/exam/detail',
         component: () => import('../views/page/stuQues/detail/index.vue')
+      },
+      {
+        path: pathHeader +'/coursemangt/classroommangt/academiccalendar', // 实验大纲
+        component: () => import('../components/course/Classroommangt/AcademiccalendarStu.vue')
+      },
+      {
+        path: pathHeader +'/coursemangt/classroommangt/lessonplan', // 实验资源
+        component: () => import('../components/course/Classroommangt/LessonPlanStu.vue')
       }
     ]
   },

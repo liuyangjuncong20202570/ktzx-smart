@@ -25,6 +25,7 @@
         v-for="(item, i) in practiceDetail.items" 
         :key="i" 
       >
+
         <template v-if="item.beDefault === 0 && item.beValid">
           <div class="item-title" style="flex-wrap: wrap;">{{ item.itemName }}</div>
           <div class="flex-start">
@@ -50,7 +51,7 @@
                   </div>
                 </div>
               </div>
-              <div v-else class="flex-center task-no-data" style="width: 100%;">暂无提交实验材料</div>
+              <div v-else class="flex-center" style="width: 100%;">暂无提交实验材料</div>
             </div>
             <div class="item-right">
               <el-checkbox-group v-model="item.check" disabled :min="0" @change="handleCheck($event, item)">
@@ -102,11 +103,11 @@
   const pathData = [
     {
       name: '实验管理',
-      path: '/homes/studenthome/exam/experimental/labmangt'
+      path: '/homes/courseteacherhome/exam/experimental/labmangt'
     },
     {
       name: '实验学生列表',
-      path: '/homes/studenthome/exam/experimental/student',
+      path: '/homes/courseteacherhome/exam/experimental/student',
       query: {
         id: route.query.id,
         privilege: route.query.privilege,
@@ -261,10 +262,5 @@
   }
   .item-right {
     width: 220px;
-  }
-  .task-no-data{
-    width: 200px  !important;
-    height: 288px  !important;
-    border: 1px solid #d9d9d9;
   }
   </style>
