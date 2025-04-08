@@ -382,6 +382,10 @@ const routes = [
       {
         path: pathHeader + '/exam/view',
         component: () => import('../views/page/ques/view/index.vue')
+      },
+      {
+        path: pathHeader + '/exp/scoreList',
+        component: () => import('../views/page/grade/list/index.vue')
       }
     ]
   },
