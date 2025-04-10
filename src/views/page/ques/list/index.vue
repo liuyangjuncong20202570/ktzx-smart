@@ -15,10 +15,10 @@
       <el-table-column type="selection" width="55" />
       <el-table-column property="name" label="名称" />
       <el-table-column property="createTime" label="创建时间" />
-      <el-table-column fixed="right" label="操作" width="150px">
+      <el-table-column fixed="right" label="操作" width="250px">
         <template #default="scope">
           <div class="flex-start table-btn-wrap">
-            <el-button type="text" @click="(() => {
+            <el-button class="custom-link-button custom-link-active-button" @click="(() => {
               router.push({
                 path: '/homes/courseteacherhome/exam/view',
                 query: {
@@ -30,7 +30,7 @@
               预览
             </el-button>
 
-            <el-button v-if="[1, 2].includes(scope.row.status)" type="text" @click="(() => {
+            <el-button v-if="[1, 2].includes(scope.row.status)" class="custom-link-button custom-link-active-button" @click="(() => {
               router.push({
                 path: '/homes/courseteacherhome/exam/studentList',
                 query: {
@@ -42,18 +42,20 @@
               查看学生
             </el-button>
 
+          
+            <el-button v-if="!scope.row.status" class="custom-link-button custom-link-active-button" @click="publish(scope.row.id)">
+              发布
+            </el-button>
             <template v-if="!(privilege === 'read')">
-              <el-button :disabled="scope.row.status" type="text" @click="edit(scope.row.id)">
+              <el-button :disabled="scope.row.status" class="custom-link-button custom-link-active-button" @click="edit(scope.row.id)">
+                <!-- <el-button class="custom-link-button custom-link-active-button" @click="edit(scope.row.id)"> -->
                 编辑
               </el-button>
 
-              <el-button :disabled="scope.row.status" type="text" @click="del(scope.row, '确认删除此问卷吗?')">
+              <el-button :disabled="scope.row.status" class="custom-link-button custom-link-delete-button" @click="del(scope.row, '确认删除此问卷吗?')">
                 删除
               </el-button>
             </template>
-            <el-button v-if="!scope.row.status" type="text" @click="publish(scope.row.id)">
-              发布
-            </el-button>
           </div>
 
         </template>
@@ -277,7 +279,7 @@ const handleSelectionChange = (val) => {
   flex-wrap: wrap;
 
   button {
-    padding-left: 0 !important;
+    /* padding-left: 0 !important; */
     margin-left: 0 !important;
     margin-right: 5px !important;
   }

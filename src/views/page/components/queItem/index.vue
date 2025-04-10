@@ -2,9 +2,9 @@
   <!-- 问卷item组件 -->
   <div class="stu-ques-item">
     <div class="item-title">
-      {{ index+1 }}、{{ row.title }}({{ TOPICTYPE[row.typeId] }})
+      {{ index+1 }}、{{ row.title }}<span class="item-type">{{ TOPICTYPE[row.typeId] }}</span>
     </div>
-    <span v-html="row.content"></span>
+    <span class="item-content" v-html="row.content"></span>
     <div class="task-select flex-between" v-if="['单选题', '判断题'].includes(TOPICTYPE[row.typeId])">
       <el-radio-group v-model="row.selectId" :disabled="disabled">
         <el-radio v-for="item in row.items" :key="item.id" :label="item.itemOption">
@@ -29,7 +29,6 @@
         v-if="!row?.selectId?.length" 
         v-model="row.other" 
         :disabled="row?.selectId?.length || disabled" 
-        style="width: 500px;margin-top: 10px;" 
         placeholder="其他 请输入"
         show-word-limit type="textarea"
         maxlength="3000"
@@ -37,7 +36,7 @@
     </div>
 
     <div class="task-select flex-between" v-if="['简答题'].includes(TOPICTYPE[row.typeId])">
-      <el-input v-model="row.selectId" :disabled="disabled" maxlength="3000" style="width: 500px" placeholder="请填写答案"
+      <el-input v-model="row.selectId" :disabled="disabled" maxlength="3000" placeholder="请填写答案"
         show-word-limit type="textarea" />
     </div>
 
@@ -95,9 +94,27 @@ onMounted(() => {
     justify-content: center !important;
     align-items: center !important;
   }
+  .stu-ques-item  .el-textarea__inner{
+    width: calc(100% - 20px);
+    height: 120px;
+    margin-left: 20px;
+    margin-bottom: 10px;
+    background: rgba(238,238,238,0.3);
+}
+.stu-ques-item  .el-checkbox{
+    display: flex;
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+.stu-ques-item  .el-radio{
+    width: 100%;
+    display: flex;
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
 </style>
 
-<style scoped>
+<style lang="scss" scoped>
 .stu-ques-item {
   font-size: 13px;
   border-bottom: 1px solid #efefef;
@@ -109,7 +126,32 @@ onMounted(() => {
   }
 }
 .item-title {
-  font-size: 14px;
-  font-weight: bold;
+  font-family: MicrosoftYaHei;
+  font-size: 16px;
+  color: #1B1B1B;
+  line-height: 21px;
+  .item-type{
+    background: rgba(39,165,255,0.15);
+    border-radius: 5px;
+    font-family: MicrosoftYaHei;
+    font-size: 14px;
+    color: #0078CD;
+    padding: 0 5px;
+    margin-left: 10px;
+  }
+}
+.item-content{
+  font-family: MicrosoftYaHei;
+  font-size: 16px;
+  color: #1B1B1B;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: block;
+  margin-left: 20px;
+}
+.task-select{
+  img{
+    margin-left: 10px;
+  }
 }
 </style>

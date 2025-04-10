@@ -25,15 +25,16 @@
       <template #item="{ element, index }">
         <div class="topic-item">
           <div class="topic-kwa">
-            <span v-for="(kwa, kwaIdx) in element.lib.kwas" :key="kwaIdx" style="margin-right: 20px">
+            <span class="topic-kwa-item" v-for="(kwa, kwaIdx) in element.lib.kwas" :key="kwaIdx" style="margin-right: 10px">
               {{ kwa.kwaName }}
             </span>
+            <span class="topic-kwa-item">{{ TOPICTYPE[element.lib.questionTypeId] }}</span>
           </div>
           <div>
             <span class="flex-start">
               <el-checkbox v-model="element.checkbox" label=""></el-checkbox>
-              <span style="font-size: 13px;">{{index+1}}、</span>
-              <span class="topic-title">{{ element.lib.title }}({{ TOPICTYPE[element.lib.questionTypeId] }})</span>
+              <!-- <span style="font-size: 13px;"></span> -->
+              <span class="topic-title">{{index+1}}、{{ element.lib.title }}（ {{ TOPICTYPE[element.lib.questionTypeId] }} ）</span>
             </span>
             <div class="topic-contents">
               <div v-show="element.lib.content !== '<p><br></p>'" v-html="element.lib.content"></div>
@@ -47,24 +48,30 @@
               </div>
             </div>
           </div>
-          <div class="topic-item-icon flex-between">
-            <el-icon title="上移" @click="(() => {
+          <div class="topic-item-icon">
+            <span class="topic-item-icon-item" :style="index === 0 ? 'background: #c8c9cb;' : ''"> 
+            <el-icon title="上移"  @click="(() => {
               if (index !== 0) {
                 swapArrayElements(taskList, index, index - 1)
               }
             })">
-              <Top :style="index === 0 ? 'color: #c8c9cb;' : ''" />
+              <Top  />
             </el-icon>
-            <el-icon title="下移" @click="(() => {
-              if (index !== taskList.length - 1) {
-                swapArrayElements(taskList, index, index + 1)
-              }
-            })">
-              <Bottom :style="index === taskList.length - 1 ? 'color: #c8c9cb;' : ''" />
+            </span>
+            <span class="topic-item-icon-item" :style="index === taskList.length - 1 ? 'background: #c8c9cb;' : ''"> 
+              <el-icon title="下移"  @click="(() => {
+                if (index !== taskList.length - 1) {
+                  swapArrayElements(taskList, index, index + 1)
+                }
+              })">
+              <Bottom  />
             </el-icon>
-            <el-icon @click="del(element)">
-              <Delete />
-            </el-icon>
+            </span>
+            <span class="topic-item-icon-item"> 
+              <el-icon @click="del(element)">
+                <Delete />
+              </el-icon>
+            </span>
           </div>
         </div>
       </template>
@@ -227,7 +234,7 @@ const save = () => {
 }
 
 </script>
-<style scoped>
+<style scoped lang="scss">
 .tpAssembly-type {
   text-align: left;
   background: #fff;
@@ -262,15 +269,16 @@ const save = () => {
   position: relative;
 
   .topic-title {
-    font-size: 14px;
-    font-weight: bold;
+    font-family: MicrosoftYaHei;
+    font-size: 16px !important;
+    color: #1B1B1B;
   }
 
   .topic-item-icon {
     position: absolute;
     right: 10px;
     bottom: 10px;
-    width: 60px;
+    // width: 60px;
     font-size: 18px;
     color: #103ccc;
   }
@@ -286,18 +294,108 @@ const save = () => {
   }
 
   .task-grade {
-    font-size: 12px;
+    font-size: 16px;
     position: absolute;
     top: 10px;
     right: 10px;
+    color: #1B1B1B;
   }
 }
 
-.topic-kwa {
+/* .topic-kwa {
   font-size: 13px;
   margin-left: 22px;
-}
+}*/
 .topic-contents {
   margin-left: 22px;
+  font-family: MicrosoftYaHei;
+  font-size: 16px;
+  color: #1B1B1B;
+} 
+.topic-kwa {
+  width: 98%;
+  height: 25px;
+  line-height: 25px;
+  transform: translateY(5px);
+  margin-bottom: 10px;
+}
+
+.topic-kwa-item {
+  background: #dff2ff;
+  border-radius: 5px;
+  padding: 3px 10px;
+  margin-right: 10px;
+  color: #0078cd;
+  font-size: 14px;
+}
+
+.cpirse-lib-btn {
+  padding: 30px 0 10px;
+}
+
+.topic-item {
+  text-align: left;
+  padding: 0 10px;
+  position: relative;
+  margin-left: 11px;
+  border-bottom: 1px solid #EEEEEE !important;
+  padding-bottom: 20px;
+
+  .topic-title {
+    font-size: 14px;
+  }
+
+  .topic-item-icon {
+    position: absolute;
+    right: 0;
+    // width: 60px;
+    font-size: 18px;
+    color: #103ccc;
+    
+  }
+
+  .topic-answer-item {
+    font-family: MicrosoftYaHei;
+    font-size: 16px;
+    color: #949494;
+    line-height: 30px;
+
+    span {
+      font-size: 12px;
+      margin-left: 8px;
+      color: #019a48;
+      background: rgba(50, 177, 108, 0.15);
+      border-radius: 5px;
+      padding: 3px 10px;
+    }
+  }
+  .topic-course-content {
+    font-family: MicrosoftYaHei;
+    font-size: 16px;
+    color: #1b1b1b;
+    line-height: 30px;
+  }
+}
+.flex-start1 {
+  align-items: flex-start;
+}
+.pagination {
+  margin-top: 10px;
+}
+.topic-item-icon-item {
+  font-size: 16px;
+  color: #fff;
+  width: 26px;
+  height: 26px;
+  line-height: 26px;
+  text-align: center;
+  background: #27a5ff;
+  border-radius: 5px;
+  display: inline-block;
+  margin-left: 10px;
+  cursor: pointer;
+}
+.topic-item-icon-item-delete {
+  background: #ff4c48;
 }
 </style>

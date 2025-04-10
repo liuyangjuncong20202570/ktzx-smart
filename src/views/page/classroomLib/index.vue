@@ -299,7 +299,11 @@ export default defineComponent({
     }
 
     const getClassroomLibList = () => {
-      classroomLibList(params.value).then(res => {
+      let paramsValue = { ...params.value }
+      if (paramsValue.queTypeIds && paramsValue.queTypeIds.includes("0")) {
+        paramsValue.queTypeIds = [];
+      }
+      classroomLibList(paramsValue).then(res => {
         if (res.code === '200') {
           total.value = res?.data?.recordSize ?? 0
           courseList.value = res?.data?.data ?? []

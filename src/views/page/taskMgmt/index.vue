@@ -23,11 +23,12 @@
       <el-table-column type="selection" width="55" />
       <el-table-column property="name" label="名称" />
       <el-table-column property="createTime" label="创建时间" />
-      <el-table-column fixed="right" label="操作" width="200">
+      <el-table-column fixed="right" label="操作" width="350">
         <template #default="scope">
           <div class="flex-start table-btn-wrap">
             <el-button 
               type="text" 
+              class="custom-link-button custom-link-active-button"
               @click="(() => {
                 router.push({
                   path: '/homes/courseteacherhome/exam/test/taskMgmt/view',
@@ -41,7 +42,7 @@
               预览
             </el-button>
 
-            <el-button v-if="[1, 2].includes(scope.row.status)" @click="(() => {
+            <el-button class="custom-link-button custom-link-active-button" v-if="[1, 2].includes(scope.row.status)" @click="(() => {
               router.push({
                 path: '/homes/courseteacherhome/exam/test/taskList',
                 query: {
@@ -54,23 +55,23 @@
             </el-button>
 
             <template v-if="!(privilege === 'read')">
-              <el-button type="text" @click="copy(scope.row.id)">
+              <el-button class="custom-link-button custom-link-active-button"  @click="copy(scope.row.id)">
                 复制
               </el-button>
 
-              <el-button :disabled="scope.row.locked" v-if="[0, 1].includes(scope.row.status)" type="text" @click="edit(scope.row.id)">
+              <el-button :disabled="scope.row.locked" v-if="[0, 1].includes(scope.row.status)" class="custom-link-button custom-link-active-button"  @click="edit(scope.row.id)">
                 编辑
               </el-button>
 
-              <el-button v-if="[0].includes(scope.row.status)" @click="publish(scope.row.id)" type="text">
+              <el-button v-if="[0].includes(scope.row.status)" @click="publish(scope.row.id)" class="custom-link-button custom-link-active-button" >
                 发布作业
               </el-button>
 
-              <el-button v-if="[0, 1].includes(scope.row.locked)" @click="lock(scope.row)" type="text">
+              <el-button v-if="[0, 1].includes(scope.row.locked)" @click="lock(scope.row)" class="custom-link-button custom-link-active-button" >
                 {{ scope.row.locked ? '解锁' : '锁定' }}
               </el-button>
 
-              <el-button :disabled="scope.row.locked" v-if="[0, 1].includes(scope.row.status)" type="text" @click="del(scope.row)">
+              <el-button :disabled="scope.row.locked" v-if="[0, 1].includes(scope.row.status)" class="custom-link-button custom-link-delete-button"  @click="del(scope.row)">
                 删除
               </el-button>
 
@@ -374,7 +375,7 @@ const handleSelectionChange = (val) => {
 .table-btn-wrap {
   flex-wrap: wrap;
   button {
-    padding-left: 0 !important;
+    /* padding-left: 0 !important; */
     margin-left: 0 !important;
     margin-right: 5px !important;
   }

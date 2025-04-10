@@ -64,8 +64,8 @@ onMounted(() => {
   margin: 10px 0;
 }
 .task-msg {
-  font-size: 14px;
-  font-weight: bold;
-  min-width: 400px;
+  font-family: MicrosoftYaHei;
+font-size: 16px;
+color: #1B1B1B;
 }
 </style>
