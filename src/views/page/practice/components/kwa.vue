@@ -5,7 +5,7 @@
  * @FilePath: \smarttt_ktzx\src\views\page\practice\components\kwa.vue
 -->
 <template>
-  <el-form :model="kwaForm" label-width="auto" >
+  <el-form :model="kwaForm" label-width="auto" class="custom-form">
     <el-form-item label="关键字" prop="key">
       <el-radio-group v-model="kwaForm.key">
         <el-radio :value="item.keyId" :label="item.keyId" v-for="item in kwaArr" :key="item.keyId" @change="radioChange">{{ item.name }}</el-radio>
@@ -97,3 +97,9 @@
     getKwaData()
   })
 </script>
+<style>
+.custom-form .el-radio__label{
+  font-size: 14px;
+  font-weight: normal;
+}
+</style>

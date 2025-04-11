@@ -128,6 +128,7 @@
             >
               批改设定
             </el-button>
+            <el-button class="custom-link-button custom-link-active-button"  :text="true" v-if="scope.row.setKwa == 1" @click="openKwa(scope.row)">KWA关联</el-button>
           </template>
           <template v-if="scope.row.beValid==1&&scope.$index<2">
             <el-button v-if="scope.row.beDefault&&scope.row.defaultPath"  class="custom-link-button custom-link-active-button" type="primary" :text="true" @click="openUpload(scope.row)" :disabled="disable">重新上传</el-button>
@@ -146,10 +147,11 @@
     title="选择KWA"
     width="850"
     :before-close="beforeCloseDialog"
+    class="custom-dialog"
   >
     <Kwa ref="kwa" :kwaId="kwaId"></Kwa>
     <template #footer>
-      <div class="dialog-footer">
+      <div class="dialog-footer custom-dialog-footer">
         <el-button @click="isOpenDialog = false">取消</el-button>
         <el-button type="primary" @click="sureSelect">确定</el-button>
       </div>
@@ -394,7 +396,7 @@ const sureSelect = async () => {
   if (selectRowKeyData) {
     let arr = JSON.parse(JSON.stringify(tableData));
     arr.forEach((item: any) => {
-      if (item.id == selectRowData.id) {
+      if (item.id == selectRowKeyData.id) {
         item.fullName = data.fullName;
         item.kwaName = data.name;
         item.kwaId = data.kwaId;
