@@ -2,7 +2,7 @@
   <div class="task-list">
     <Header title="问卷列表" :pathData="pathData" />
     <!-- 作业列表 -->
-    <el-table ref="multipleTableRef" :data="tableData" style="width: 100%;margin-top: 10px;"
+    <el-table ref="multipleTableRef" class="custom-table" :data="tableData" style="width: 100%;margin-top: 15px;"
       @selection-change="handleSelectionChange">
       <el-table-column type="index" label="序号" width="80" />
       <el-table-column property="name" label="名称" />
@@ -16,7 +16,7 @@
         <template #default="scope">
           <el-button 
             v-if="scope.row.status === 0" 
-            type="text" 
+            class="custom-link-button custom-link-active-button"
             @click="(() => {
             router.push({
               path: '/homes/studenthome/exam/detail',
@@ -28,7 +28,7 @@
           })">
             去做问卷
           </el-button>
-          <el-button v-else type="text" @click="(() => {
+          <el-button v-else class="custom-link-button custom-link-active-button" @click="(() => {
             router.push({
               path: '/homes/studenthome/exam/detail',
               query: {
@@ -43,14 +43,16 @@
       </el-table-column>
     </el-table>
     <div class="pagination flex-end">
-      <el-pagination v-model:currentPage="params.pageIndex" v-model:page-size="params.pageSize"
+      <!-- <el-pagination v-model:currentPage="params.pageIndex" v-model:page-size="params.pageSize"
         :page-sizes="[10, 20, 30, 40]" layout="total, sizes, prev, pager, next, jumper" :total="total"
-        @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+        @size-change="handleSizeChange" @current-change="handleCurrentChange" /> -->
+        <Pagination :pageIndex="params.pageIndex" :pageSize="params.pageSize" :total="total" @update:pageIndex="handleCurrentChange" />
     </div>
   </div>
 </template>
 
 <script setup>
+import Pagination from "@/views/page/components/pagination/index.vue";
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElTable } from 'element-plus'

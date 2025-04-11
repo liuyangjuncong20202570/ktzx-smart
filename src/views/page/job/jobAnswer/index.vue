@@ -184,7 +184,7 @@
     box-sizing: border-box;
   }
   .task-title {
-    font-size: 13px;
+    font-size: 16px;
     margin: 10px 0;
   }
   .task-msg span {

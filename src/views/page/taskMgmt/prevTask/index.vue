@@ -17,7 +17,7 @@
       <el-table-column property="createTime" label="创建时间" />
       <el-table-column fixed="right" label="操作">
         <template #default="scope">
-          <el-button type="text" size="small" @click="(() => {
+          <el-button  class="custom-link-button custom-link-active-button" size="small" @click="(() => {
             router.push({
               path: '/homes/courseteacherhome/exam/test/taskMgmt/view',
               query: {
@@ -28,7 +28,7 @@
             预览
           </el-button>
 
-          <el-button type="text" size="small" @click="copy(scope.row.id)">
+          <el-button  class="custom-link-button custom-link-active-button" size="small" @click="copy(scope.row.id)">
             复制
           </el-button>
         </template>

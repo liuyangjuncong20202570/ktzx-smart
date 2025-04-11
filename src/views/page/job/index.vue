@@ -7,7 +7,7 @@
         <span>完成度：{{ convertToPercentage(summaryMsg?.finishedPercent ?? 0) }}</span>
       </div>
       <!-- 作业列表 -->
-      <el-table ref="multipleTableRef" :data="tableData" style="width: 100%;margin-top: 10px;" @selection-change="handleSelectionChange">
+      <el-table ref="multipleTableRef" class="custom-table" :data="tableData" style="width: 100%;margin-top: 15px;" @selection-change="handleSelectionChange">
         <el-table-column type="index" label="序号" width="80" />
         <el-table-column property="title" label="名称" />
         <el-table-column property="submitTime" label="上传时间" />
@@ -19,7 +19,7 @@
         <el-table-column property="address" label="操作">
           <template #default="scope">
             <el-button
-              type="text"
+              class="custom-link-button custom-link-active-button"
               v-if="scope.row.status === 0"
               @click="(() => {
                 router.push({
@@ -35,7 +35,7 @@
             </el-button>
             <el-button
               v-else
-              type="text"
+              class="custom-link-button custom-link-active-button"
               @click="(() => {
                 router.push({
                   path: '/homes/studenthome/exam/jobAnswer',
@@ -53,14 +53,16 @@
       </el-table>
 
       <div class="pagination flex-end">
-        <el-pagination v-model:currentPage="params.pageIndex" v-model:page-size="params.pageSize"
+        <!-- <el-pagination v-model:currentPage="params.pageIndex" v-model:page-size="params.pageSize"
           :page-sizes="[10, 20, 30, 40]" layout="total, sizes, prev, pager, next, jumper" :total="total"
-          @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+          @size-change="handleSizeChange" @current-change="handleCurrentChange" /> -->
+        <Pagination :pageIndex="params.pageIndex" :pageSize="params.pageSize" :total="total" @update:pageIndex="handleCurrentChange" />
       </div>
     </div>
   </template>
   
   <script setup>
+  import Pagination from "@/views/page/components/pagination/index.vue";
   import { ref, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import { ElTable } from 'element-plus'
@@ -129,6 +131,7 @@
   }
   .task-title {
     margin: 10px 0;
+    font-size: 16px;
     span {
       margin-right: 20px;
     }

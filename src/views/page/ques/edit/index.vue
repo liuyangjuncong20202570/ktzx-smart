@@ -7,7 +7,15 @@
     <div class="ques-lib-btn flex-between">
       <el-checkbox label="全选" @change="handleSelectAll"></el-checkbox>
       <div>
-        <el-button type="primary" :icon="Plus" @click="add">新增题目</el-button>
+        <el-dropdown placement="bottom" style="margin-right: 10px;">
+            <el-button type="primary" :icon="Plus">新增题目</el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item v-for="(item,i) in libTypeList" :key="i"  @click="handleLibTypeConfirm(item)">{{ item.name }}</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        <!-- <el-button type="primary" :icon="Plus" @click="add">新增题目</el-button> -->
         <el-button type="danger" :icon="Delete" @click="batchDel" :disabled="!(courseList && courseList.length)">批量删除</el-button>
         <el-button type="primary" @click="save" :disabled="!(courseList && courseList.length)">保存</el-button>
         <el-button type="primary" :icon="Upload" @click="publish" :disabled="!(courseList && courseList.length)" v-if="status === 0">发布</el-button>
@@ -143,6 +151,7 @@ import { useRouter } from "vue-router";
 import { queFormDetail, deleteTopic, queFormUpdate, quePublish } from "@/api/ques.js";
 import { TOPICTYPE } from "@/utils/consts";
 import { swapArrayElements } from "@/utils/index.js";
+import { queFormTypeList } from '@/api/ques.js' 
 
 export default defineComponent({
   components: {
@@ -162,6 +171,7 @@ export default defineComponent({
 
     onMounted(() => {
       getCourseLibList();
+      getCourseLibTypeList();
     });
     const item = ref({});
     const topicFlag = ref(false);
@@ -357,6 +367,26 @@ export default defineComponent({
       }
     };
 
+    // 获取新增类型
+    const libTypeList = ref([])
+    const getCourseLibTypeList = () => {
+      queFormTypeList().then(res => {
+        if (res.code === '200') {
+          libTypeList.value = res?.data.filter((item) => item.status)
+        }
+      })
+    }
+
+    const handleLibTypeConfirm = (libType) => {
+      console.log(libType,'libTypelibTypelibTypelibType')
+      item.value = {
+        questionTypeId: libType.queTypeId,
+        typeId: libType.id,
+      };
+      console.log(item.value,'item.valueitem.valueitem.valueitem.value')
+      topicFlag.value = true;
+    }
+
     return {
       name,
       item,
@@ -384,6 +414,8 @@ export default defineComponent({
       Plus,
       Delete,
       pathData,
+      libTypeList,
+      handleLibTypeConfirm
     };
   },
 });

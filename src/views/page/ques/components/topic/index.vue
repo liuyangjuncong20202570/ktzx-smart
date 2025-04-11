@@ -1,58 +1,61 @@
 <template>
-  <div class="cpirse-topic">
-    <div class="topic-content">
-      <h3>{{ headline }}</h3>
+  <el-dialog v-model="dialogVisible" class="custom-dialog" :title="headline" width="1200px">
+    <div class="cpirse-topic">
+      <div class="topic-content">
+        <h3>{{ headline }}</h3>
 
-      <el-input placeholder="题目title，请填写" style="margin-bottom: 10px;" v-model="item.title">
-      </el-input>
+        <el-input placeholder="题目title，请填写" style="margin-bottom: 10px;" v-model="item.title">
+        </el-input>
 
-      <Wangeditor style="z-index: 999;" ref="wangeditor" :data="item.content" @change="handleRichEditorChange" />
+        <Wangeditor style="z-index: 999;" ref="wangeditor" :data="item.content" @change="handleRichEditorChange" />
 
-      <el-button 
-        v-if="headline === '填空题'" 
-        @click="insertContent"
-        type="text"
-      >插入填空符</el-button>
+        <el-button 
+          v-if="headline === '填空题'" 
+          @click="insertContent"
+          type="text"
+        >插入填空符</el-button>
 
-      <el-input
-        v-if="headline === '填空题'"
-        disabled
-        style="width: 100%;margin-bottom: 10px;"
-        :rows="4"
-        type="textarea"
-        maxlength="3000"
-      />
+        <el-input
+          v-if="headline === '填空题'"
+          disabled
+          style="width: 100%;margin-bottom: 10px;"
+          :rows="4"
+          type="textarea"
+          maxlength="3000"
+        />
 
-      <div 
-        v-if="['判断题', '单选题', '多选题'].includes(headline)" 
-        class="topic-option" 
-        v-for="(option, index) in options" :key="index"
-      >
-        <div class="flex-between">
-          <div class="option-left flex-start">
-            {{ option.name }}: <el-input v-model="option.itemContent" placeholder="请输入选项" />
+        <div 
+          v-if="['判断题', '单选题', '多选题'].includes(headline)" 
+          class="topic-option" 
+          v-for="(option, index) in options" :key="index"
+        >
+          <div class="flex-between">
+            <div class="option-left flex-start">
+              <span class="option-name">{{ option.name }} : </span>
+              <el-input v-model="option.itemContent" placeholder="请输入选项" />
+            </div>
+            <div class="option-right flex-between cursor-pointer">
+              <el-icon :class="headline === '判断题' ? 'no-click' : ''" @click="plus">
+                <Plus />
+              </el-icon>
+              <el-icon :class="headline === '判断题' ? 'no-click' : ''" @click="del(index)">
+                <Minus />
+              </el-icon>
+              <ImageUpload :item="option" />
+              <!-- <Hint :item="option" /> -->
+              <!-- <el-checkbox label="正确答案" v-model="option.isAnswer"></el-checkbox> -->
+            </div>
           </div>
-          <div class="option-right flex-between cursor-pointer">
-            <el-icon :class="headline === '判断题' ? 'no-click' : ''" @click="plus">
-              <Plus />
-            </el-icon>
-            <el-icon :class="headline === '判断题' ? 'no-click' : ''" @click="del(index)">
-              <Minus />
-            </el-icon>
-            <ImageUpload :item="option" />
-            <!-- <Hint :item="option" /> -->
-            <!-- <el-checkbox label="正确答案" v-model="option.isAnswer"></el-checkbox> -->
-          </div>
+          <!-- <div v-if="option.itemAnalysis" class="option-hint">提示:{{ option.itemAnalysis }}</div> -->
         </div>
-        <!-- <div v-if="option.itemAnalysis" class="option-hint">提示:{{ option.itemAnalysis }}</div> -->
-      </div>
 
-      <div class="topic-right">
-        <el-button type="primary" @click="save">保存</el-button>
-        <el-button @click="handleClose">取消</el-button>
+        <div class="topic-right custom-dialog-footer">
+          <el-button type="primary" @click="save">保存</el-button>
+          <el-button @click="handleClose">取消</el-button>
+        </div>
       </div>
     </div>
-  </div>
+  </el-dialog>
 </template>
 
 <script>
@@ -77,9 +80,11 @@ export default defineComponent({
   },
   props: ['item', 'courseList', 'name', 'id'],
   setup(props, { emit }) {
+    const dialogVisible = ref(true)
     console.log('topic-props', props)
     let {  courseList = [], name = '' } = props
     const { typeId, title, content, items = [] } = props?.item
+    console.log(typeId,'typeIdtypeIdtypeIdtypeId')
     const item = ref({})
     const headline = ref(TOPICTYPE[typeId] ?? '预留题')
     const options = ref([])
@@ -227,7 +232,8 @@ export default defineComponent({
       handleClose,
       handleRichEditorChange,
       insertContent,
-      wangeditor
+      wangeditor,
+      dialogVisible
     };
   }
 });
@@ -235,11 +241,11 @@ export default defineComponent({
 
 <style scoped>
 .cpirse-topic {
-  border-bottom: 1px solid #e1e1e1;
+  /* border-bottom: 1px solid #e1e1e1;
   padding-bottom: 10px;
-  box-shadow: 0px 1px 13px #a9a9a9;
-  padding: 0 10px 10px 10px;
-  border-radius: 5px;
+  box-shadow: 0px 1px 13px #a9a9a9; */
+  /* padding: 0 10px 10px 10px; */
+  /* border-radius: 5px; */
 }
 
 h3 {
@@ -254,12 +260,12 @@ h3 {
 }
 
 .topic-option {
-  width: 350px;
+  /* width: 350px; */
   margin-top: 10px;
 }
 
 .option-left {
-  width: 280px;
+  width: 1100px;
   font-size: 13px;
 }
 
@@ -271,11 +277,16 @@ h3 {
 
 .option-right {
   width: 55px;
-  color: #3c2eff;
+  color: #0078CD;
 }
 
 .topic-right {
   margin-top: 10px;
   text-align: right;
+}
+.option-name {
+  margin-right: 10px;
+  display: inline-block;
+  width: 20px;
 }
 </style>

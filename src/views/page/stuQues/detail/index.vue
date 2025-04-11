@@ -151,5 +151,6 @@
   }
   .ques-title {
     margin: 10px 0;
+    font-size: 16px;
   }
   </style>
