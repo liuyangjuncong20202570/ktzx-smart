@@ -73,7 +73,7 @@
 			</el-dialog>
 			<!-------------------------------------------------------------------------------------->
 
-			<el-table :data="filteredTableData" stripe style="width: 100%" @selection-change="handleSelectionChange"
+			<el-table :data="filteredTableData" stripe style="width: 100%; height: 100%;" @selection-change="handleSelectionChange"
 				size="large">
 				<el-table-column type="selection" width="55"></el-table-column>
 				<el-table-column prop="showId" label="序号" width="60"></el-table-column>

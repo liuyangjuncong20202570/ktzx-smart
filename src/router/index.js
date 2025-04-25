@@ -58,41 +58,41 @@ const routes = [
     children: [
       // 学生端我的作业
       {
-        path: pathHeader + '/exam/myhomework',
+        path: 'exam/myhomework',
         component: () => import('../views/page/job/index.vue')
       },
       {
-        path: pathHeader + '/exam/jobAnswer',
+        path: 'exam/jobAnswer',
         component: () => import('../views/page/job/jobAnswer/index.vue')
       },
       {
-        path: pathHeader + '/exam/jobWjList',
+        path: 'exam/jobWjList',
         component: () => import('../views/page/job/jobWjList/index.vue')
       },
       // 学生端实验
       {
-        path: pathHeader + '/exam/myexperiment',
+        path: 'exam/myexperiment',
         component: () => import('../views/page/stuPractice/index.vue')
       },
       {
-        path: pathHeader + '/exam/submitPractice',
+        path: 'exam/submitPractice',
         component: () => import('../views/page/stuPractice/submitPractice/index.vue')
       },
       // 学生端问卷
       {
-        path: pathHeader + '/exam/myquestionnaire',
+        path: 'exam/myquestionnaire',
         component: () => import('../views/page/stuQues/index.vue')
       },
       {
-        path: pathHeader + '/exam/detail',
+        path: 'exam/detail',
         component: () => import('../views/page/stuQues/detail/index.vue')
       },
       {
-        path: pathHeader +'/coursemangt/classroommangt/academiccalendar', // 实验大纲
+        path: 'coursemangt/classroommangt/academiccalendar', // 实验大纲
         component: () => import('../components/course/Classroommangt/AcademiccalendarStu.vue')
       },
       {
-        path: pathHeader +'/coursemangt/classroommangt/lessonplan', // 实验资源
+        path: 'coursemangt/classroommangt/lessonplan', // 实验资源
         component: () => import('../components/course/Classroommangt/LessonPlanStu.vue')
       }
     ]
@@ -195,6 +195,11 @@ const routes = [
         path: 'coursemangt/classroommangt/classStudentList', //课堂学生名单
         name: 'StudentsList',
         component: () => import('../components/course/Classroommangt/StudentsList.vue')
+      },
+      {
+        path: 'coursemangt/pastCourse', // 复制往届课程
+        name: 'PastCourse',
+        component: () => import('../components/course/CopyPastCourseInfo.vue')
       },
       {
         path: 'coursemangt/classroommangt', // 课程负责人首页

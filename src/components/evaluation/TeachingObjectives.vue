@@ -17,7 +17,7 @@
     </el-header>
     <el-main style="padding: 0">
       <el-table :data="filterTableData" style="height: 100%; width: 100%" v-model="tableSelected"
-                @select="tableSelect" @select-all="tableSelectAll" v-loading="filterTableLoading"
+                @select="tableSelect" @select-all="tableSelectAll" element-loading-text="Loading..." v-loading="filterTableLoading"
                 element-loading-background="rgba(0, 0, 0, 0.2)" stripe>
         <el-table-column type="selection" width="55"></el-table-column>
         <!-- <el-table-column prop="id" label="序码" width="100"></el-table-column> -->
@@ -253,7 +253,7 @@ const getKWAData = async () => {
       tableData.value = res.data;
       initialize();
       filterTableLoading.value = false;
-      console.log(tableData.value);
+      console.log(res.data);
     } else {
       ElMessage.error(res.msg);
       filterTableLoading.value = false;
@@ -431,7 +431,7 @@ const openKeywordDictionary = row => {
           for (let i = 0; i < keywordData.value.length; i++) {
             kwdSelFlag.value[keywordData.value[i].id] = false;
             if (keywordData.value[i].id === row.row.keywordid) {
-              selectedKeyword.value = keywordData.value[i]; // 保存当前用户选择的关键字，防止用户不进行操作导致表格单元置空
+              selectedKeyword.value = keywordData.value[i]; // 保存当前用户选择的关键字，防止用户取消勾选导致表格单元置空
               selectedKeywordIndex = i;
               kwdSelFlag.value[keywordData.value[i].id] = true;
             }
@@ -507,7 +507,7 @@ const openAbilityDictionary = row => {
           for (let i = 0; i < abilityData.value.length; i++) {
             abSelFlag.value[abilityData.value[i].id] = false;
             if (abilityData.value[i].id === row.row.abilityid) {
-              selectedAbility.value = abilityData.value[i]; // 保存当前选择的能力，以防止用户不进行任何操作关闭弹框导致表格单元置空
+              selectedAbility.value = abilityData.value[i]; // 保存当前选择的能力，以防止用户取消勾选后关闭弹框导致表格单元置空
               selectedAbilityIndex = i;
               abSelFlag.value[abilityData.value[i].id] = true;
             }

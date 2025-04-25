@@ -16,7 +16,7 @@
 
         <div v-loading="pageLoading" element-loading-background="rgba(0, 0, 0, 0.2)" id="container"
             style="height: 86vh;">
-            <vxe-grid ref="gridRef" v-bind="gridOptions" class="scroll-container"></vxe-grid>
+            <vxe-grid ref="gridRef" v-bind="gridOptions" class="mytable-scrollbar"></vxe-grid>
         </div>
     </el-container>
 </template>
@@ -39,7 +39,7 @@ const gridRef = ref();
 const gridOptions = ref({
     size: 'mini',
     border: true,
-    height: 200, // 表格默认高度，在钩子函数中会修改
+    maxHeight: 200, // 表格默认高度，在钩子函数中会修改
     align: 'center',
     showOverflow: true,
     showHeaderOverflow: true,
@@ -151,7 +151,7 @@ onMounted(async () => {
         await getData(classroomId.value);
         nextTick(() => {
             const container = document.getElementById('container');
-            gridOptions.value.height = container.clientHeight;
+            gridOptions.value.maxHeight = container.clientHeight;
         })
     }
 })
@@ -280,13 +280,31 @@ const exportData = () => {
 </script>
 
 <style lang="scss" scoped>
-[v-cloak] {
-    display: none;
+
+.mytable-scrollbar {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+  }
 }
 
-.scroll-container {
-    ::-webkit-scrollbar {
-        display: none;
+[data-vxe-ui-theme="light"] {
+  .mytable-scrollbar {
+    ::-webkit-scrollbar-track,
+    ::-webkit-scrollbar-corner {
+      background-color: #ffffff;
     }
+    ::-webkit-scrollbar-thumb {
+      background-color: #aeaeae;
+    }
+    ::-webkit-scrollbar-thumb:hover,
+    ::-webkit-scrollbar-thumb:active {
+      background-color: #8e8e8e;
+    }
+  }
 }
+
 </style>
