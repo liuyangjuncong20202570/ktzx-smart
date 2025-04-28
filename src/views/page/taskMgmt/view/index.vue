@@ -44,6 +44,9 @@ onMounted(() => {
   previewDetail(id).then(res => {
     if (res.code === '200') {
       taskDetail.value = res.data
+      taskDetail.value.items.forEach(item => {
+        item.lib.score = item.score ?? 0
+      })
     }
   })
 })

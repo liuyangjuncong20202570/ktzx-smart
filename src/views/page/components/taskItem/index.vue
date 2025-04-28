@@ -56,7 +56,7 @@
             />
         </template>
         <div class="task-score" v-if="disabled">
-            得分：{{ lib.currentScore ?? 0 }}
+            分数：{{ lib.score ?? 0 }}
         </div>
     </div>
 </template>
@@ -118,7 +118,7 @@ onMounted(() => {
 }
 .task-score {
     position: absolute;
-    top: 57px;
+    top: 30px;
     right: 0;
     bottom: 0;
     font-family: MicrosoftYaHei;
