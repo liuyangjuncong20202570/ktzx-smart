@@ -5,7 +5,7 @@
       <el-button type="danger" :icon="Download" @click="download">成绩下载</el-button>
     </div>
     <!-- 作业列表 -->
-    <el-table ref="multipleTableRef" :data="tableData" style="width: 100%;margin-top: 10px;" @selection-change="handleSelectionChange">
+    <el-table class="custom-table" ref="multipleTableRef" :data="tableData" style="width: 100%;margin-top: 10px;" @selection-change="handleSelectionChange">
       <el-table-column type="index" label="序号" width="80" />
       <el-table-column property="stuNo" label="学号" />
       <el-table-column property="userName" label="姓名" />
@@ -19,8 +19,7 @@
         <template #default="scope">
           <span v-if="scope.row.status === 0">--</span>
           <el-button
-            type="text"
-            size="small"
+          class="custom-link-button custom-link-active-button" 
             v-if="scope.row.status === 1"
             @click="(() => {
               routes.push({
@@ -38,8 +37,7 @@
           </el-button>
 
           <el-button
-            type="text"
-            size="small"
+          class="custom-link-button custom-link-active-button" 
             v-if="scope.row.status === 2"
             @click="(() => {
               routes.push({

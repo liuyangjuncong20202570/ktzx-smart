@@ -179,12 +179,13 @@ const handleSelectionChange = (val) => {
 }
 
 const kwaEvent = (val) => {
+    console.log('val', val)
     const { abilityIds = [], keyIds = [] } = val || {}
     console.log('???', abilityIds, abilityIds)
     ruleForm.value.abilityIds = abilityIds
     ruleForm.value.keyIds = keyIds
-    selectedTableData.value = []
-    tableData.value = []
+    // selectedTableData.value = []
+    // tableData.value = []
 }
 
 const submitForm = () => {

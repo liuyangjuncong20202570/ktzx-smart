@@ -258,5 +258,6 @@
     background: rgba(39, 165, 255, 0.1) !important;
     border-radius: 3px !important;
     border: none !important;
+    overflow: hidden !important;
   }
 }
