@@ -26,9 +26,9 @@ const baseURL = window.__APP_CONFIG__?.API_BASE_URL || 'http://127.0.0.1';
 // export const host = `${baseURL}:10203`;
 
 // const request = {
-//   admin: createAPI(`${baseURL}:9000/api/admin`),
-//   course: createAPI(`${baseURL}:9000/api/course`),
-//   evaluation: createAPI(`${baseURL}:9000/api/evaluation`),
+//   admin: createAPI(`${baseURL}:9000/api`),
+//   course: createAPI(`${baseURL}:9000/api`),
+//   evaluation: createAPI(`${baseURL}:9000/api`),
 //   page: createAPI(`${baseURL}:10203/page`),
 //   fork: createAPI(`${baseURL}:10203/fork`),
 //   common: createAPI(`${baseURL}:10203/common`),
