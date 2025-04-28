@@ -1,85 +1,88 @@
 <template>
   <div class="edit-container" v-loading="isloading" element-loading-text="加载中...">
     <div class="toolbar">
-      <!-- 上一页  -->
-      <!-- <el-button class="custom-page-btn" :disabled="currentPageIndex <= 0" @click="prevPage"
-        ><el-icon><ArrowLeft /></el-icon
-      ></el-button> -->
       <div>
-        <!-- 矩形 -->
         <el-button :class="sharedState.currentTool == 'rectangle' ? 'tool-active' : 'custom-default-btn'" @click="setTool('rectangle')" title="矩形">
           <el-icon><Crop /></el-icon> <span>矩形</span>
         </el-button>
-        <!-- 高亮 -->
         <el-button :class="sharedState.currentTool == 'highlight' ? 'tool-active' : 'custom-default-btn'" @click="setTool('highlight')" title="高亮">
           <el-icon><Brush /></el-icon><span>高亮</span>
         </el-button>
-        <!-- 划线 -->
         <el-button :class="sharedState.currentTool == 'line' ? 'tool-active' : 'custom-default-btn'" @click="setTool('line')" title="划线">
           <el-icon><Minus /></el-icon><span>划线</span>
         </el-button>
-        <!-- 备注 -->
         <el-button :class="sharedState.currentTool == 'text' ? 'tool-active' : 'custom-default-btn'" @click="setTool('text')" title="备注">
           <el-icon><EditPen /></el-icon><span>备注</span>
         </el-button>
-        <!-- 手写 -->
         <el-button :class="sharedState.currentTool == 'handwriting' ? 'tool-active' : 'custom-default-btn'" @click="setTool('handwriting')" title="手写">
           <el-icon><EditPen /></el-icon><span>手写</span>
         </el-button>
-        <!-- 对勾 -->
         <el-button :class="sharedState.currentTool == 'checkmark' ? 'tool-active' : 'custom-default-btn'" @click="setSymbolTool('checkmark')" title="添加对勾">
           <el-icon><Check /></el-icon> <span>对号</span>
         </el-button>
-        <!-- 叉号 -->
         <el-button :class="sharedState.currentTool == 'cross' ? 'tool-active' : 'custom-default-btn'" @click="setSymbolTool('cross')" title="添加叉号">
           <el-icon><Close /></el-icon> <span>错号</span>
         </el-button>
       </div>
       <div>
-        <!-- 选择 -->
         <el-button :class="['custom-select-btn', { 'tool-active': sharedState.currentTool === 'select' }]" @click="setSelectTool" title="选择">
           <el-icon><Pointer /></el-icon> <span>选择</span>
         </el-button>
-        <!-- 删除 -->
-        <el-button type="danger" @click="deleteSelected" :disabled="!selectState.selectedAnnotation"
-          ><el-icon><Delete /></el-icon><span>删除</span></el-button
-        >
-        <!-- 清空 -->
-        <el-button class="custom-warning-btn" @click="clearCurrentPage"
-          ><el-icon><Close /></el-icon><span>清空</span></el-button
-        >
-        <!-- 保存 -->
-        <el-button class="custom-info-btn" @click="saveAnnotations"
-          ><el-icon><CopyDocument /></el-icon><span>保存</span></el-button
-        >
+        <el-button type="danger" @click="deleteSelected" :disabled="!selectState.selectedAnnotation">
+          <el-icon><Delete /></el-icon><span>删除</span>
+        </el-button>
+        <el-button class="custom-warning-btn" @click="clearCurrentPage">
+          <el-icon><Close /></el-icon><span>清空</span>
+        </el-button>
+        <el-button class="custom-info-btn" @click="saveAnnotations">
+          <el-icon><CopyDocument /></el-icon><span>保存</span>
+        </el-button>
       </div>
-      <!-- 下一页 -->
-      <!-- <el-button class="custom-page-btn" :disabled="currentPageIndex >= files.length - 1" @click="nextPage"
-        ><el-icon><ArrowRight /></el-icon
-      ></el-button> -->
     </div>
     <div class="edit-img-container">
       <div class="canvas-container" ref="containerRef">
-        <canvas ref="canvasRef" @mousedown="handleMouseDown" @mousemove="handleMouseMove" @mouseup="handleMouseUp" @mouseleave="handleMouseLeave" :style="{ cursor: getCanvasCursor }"></canvas>
+        <img 
+          ref="imageRef" 
+          :src="imageUrl" 
+          @load="handleImageLoad" 
+          class="base-image"
+          crossorigin="anonymous"
+          :style="{
+            width: '100%',
+            height: 'auto',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: 1
+          }"
+        />
+        <canvas 
+          ref="canvasRef" 
+          @mousedown="handleMouseDown" 
+          @mousemove="handleMouseMove" 
+          @mouseup="handleMouseUp" 
+          @mouseleave="handleMouseLeave"
+          :style="{ 
+            cursor: getCanvasCursor,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: 2
+          }"
+          class="annotation-canvas"
+        ></canvas>
         <div
           v-show="showTextInput"
           class="text-input"
           :class="{ 'handwriting-input': sharedState.currentTool === 'handwriting' }"
-          :style="{
-            left: `${textPosition.x}px`,
-            top: `${textPosition.y}px`,
-            position: 'absolute',
-            transform: 'translate(10px, -50%)',
-            width: sharedState.currentTool === 'handwriting' ? `${Math.max(200, fontSize * 4)}px` : '200px',
-            zIndex: 1000,
-          }"
+          :style="textInputStyle"
         >
           <el-input
             v-model="textContent"
             type="textarea"
             :rows="2"
             @blur="handleTextBlur"
-            @keyup.enter.native="handleTextEnter"
+            @keyup.enter="handleTextEnter"
             ref="textInput"
             :placeholder="sharedState.currentTool === 'handwriting' ? '请输入手写文字' : '请输入备注文字'"
             :autosize="{ minRows: 2, maxRows: 4 }"
@@ -369,12 +372,26 @@ const sharedState = reactive({
   isDrawing: false,
 });
 
+// 修改选择工具的状态类型定义
+interface SelectState {
+  isSelected: boolean;
+  selectedAnnotation: any;
+  isDragging: boolean;
+  dragStartPos: { x: number; y: number } | null;
+  isSelecting: boolean;
+  selectionStart: { x: number; y: number } | null;
+  selectionEnd: { x: number; y: number } | null;
+}
+
 // 选择工具的状态
-const selectState = reactive({
+const selectState = reactive<SelectState>({
   isSelected: false,
-  selectedAnnotation: null as any,
+  selectedAnnotation: null,
   isDragging: false,
-  dragStartPos: null as { x: number; y: number } | null,
+  dragStartPos: null,
+  isSelecting: false,
+  selectionStart: null,
+  selectionEnd: null
 });
 
 // 选中样式配置
@@ -426,15 +443,31 @@ const backgroundImage = ref<HTMLImageElement | null>(null);
 const imageLoaded = ref(false);
 const imageUrl = ref(props.imgEditUrl);
 
+// 添加图片引用
+const imageRef = ref<HTMLImageElement | null>(null);
+
 // 工具相关方法
 const setTool = (toolName: string) => {
-  if (sharedState.currentTool === "select" && toolName === "select") return;
+  if (sharedState.currentTool === toolName) return;
 
+  // 保存当前工具
   if (toolName === "select") {
     lastTool.value = sharedState.currentTool;
   }
 
+  // 清除当前状态
+  sharedState.isDrawing = false;
+  startPos.value = null;
+  selectState.isDragging = false;
+  selectState.dragStartPos = null;
+  selectState.isSelecting = false;
+  selectState.selectionStart = null;
+  selectState.selectionEnd = null;
+  selectState.selectedAnnotation = null;
+
+  // 设置新工具
   sharedState.currentTool = toolName;
+  redrawAnnotations();
 };
 
 const setSymbolTool = (symbolType: "checkmark" | "cross") => {
@@ -528,32 +561,41 @@ const lastTool = ref<string | null>(null);
 // 鼠标事件处理方法
 const handleMouseDown = (e: MouseEvent) => {
   e.preventDefault();
-  if (!canvasRef.value) return;
+  if (!canvasRef.value || !ctx.value) return;
 
   const clickPos = getCanvasPoint(e);
 
+  // 处理选择工具
   if (sharedState.currentTool === "select") {
     // 检查是否点击在已有标注上
     const clickedAnnotation = [...sharedState.annotations].reverse().find((annotation) => isPointInAnnotation(clickPos, annotation));
 
     if (clickedAnnotation) {
-      console.log("选中标注:", clickedAnnotation);
       selectState.selectedAnnotation = clickedAnnotation;
       selectState.isDragging = true;
       selectState.dragStartPos = clickPos;
+      redrawAnnotations();
+      return;
     } else {
-      console.log("取消选中");
       selectState.selectedAnnotation = null;
       selectState.isDragging = false;
       selectState.dragStartPos = null;
+      selectState.isSelecting = true;
+      selectState.selectionStart = clickPos;
+      selectState.selectionEnd = clickPos;
+      redrawAnnotations();
+      return;
     }
-    redrawAnnotations();
-    return;
   }
 
   // 处理文本和手写工具
   if (sharedState.currentTool === "text" || sharedState.currentTool === "handwriting") {
+    // 保存点击位置
     textPosition.value = clickPos;
+    
+    // 保存鼠标事件用于定位
+    lastMouseEvent.value = e;
+    
     showTextInput.value = true;
     nextTick(() => {
       const input = document.querySelector(".text-input textarea") as HTMLTextAreaElement;
@@ -570,7 +612,7 @@ const handleMouseDown = (e: MouseEvent) => {
       id: Date.now().toString(),
       type: sharedState.currentTool,
       start: clickPos,
-      color: "#FF0000",
+      color: sharedState.currentTool === "checkmark" ? "#FF0000" : "#FF0000",
       lineWidth: 3,
     };
     saveToUndoStack();
@@ -579,59 +621,38 @@ const handleMouseDown = (e: MouseEvent) => {
     return;
   }
 
-  // 选择工具的处理
-  if (sharedState.currentTool === "select") {
-    // 检查是否点击在已有标注上
-    const clickedAnnotation = [...sharedState.annotations].reverse().find((annotation) => isPointInAnnotation(clickPos, annotation));
-
-    if (clickedAnnotation) {
-      console.log("选中标注:", clickedAnnotation);
-      selectState.selectedAnnotation = clickedAnnotation;
-      selectState.isDragging = true;
-      selectState.dragStartPos = clickPos;
-    } else {
-      console.log("取消选中");
-      selectState.selectedAnnotation = null;
-      selectState.isDragging = false;
-      selectState.dragStartPos = null;
-    }
-    redrawAnnotations();
-    return;
-  } else if (["line", "rectangle", "highlight"].includes(sharedState.currentTool)) {
+  // 处理绘制工具
+  if (["line", "rectangle", "highlight"].includes(sharedState.currentTool)) {
     startPos.value = clickPos;
     sharedState.isDrawing = true;
+    redrawAnnotations();
   }
-
-  redrawAnnotations();
 };
 
 const handleMouseUp = (e: MouseEvent) => {
   e.preventDefault();
-  if (!canvasRef.value) return;
+  if (!canvasRef.value || !ctx.value) return;
 
-  const rect = canvasRef.value.getBoundingClientRect();
-  const endPos = {
-    x: e.clientX - rect.left,
-    y: e.clientY - rect.top,
-  };
+  const endPos = getCanvasPoint(e);
 
   // 处理选择结束
   if (selectState.isSelecting) {
     const selectedAnnotations = findAnnotationsInSelection();
     if (selectedAnnotations.length > 0) {
-      // 选择最上层的标注
-      sharedState.selectedAnnotation = selectedAnnotations[selectedAnnotations.length - 1];
+      selectState.selectedAnnotation = selectedAnnotations[selectedAnnotations.length - 1];
     }
     selectState.isSelecting = false;
     selectState.selectionStart = null;
     selectState.selectionEnd = null;
+    redrawAnnotations();
   }
 
   // 处理拖动结束
   if (selectState.isDragging) {
     selectState.isDragging = false;
     selectState.dragStartPos = null;
-    saveToUndoStack(); // 保存拖动操作到撤销栈
+    saveToUndoStack();
+    redrawAnnotations();
   }
 
   // 处理绘制结束
@@ -639,9 +660,8 @@ const handleMouseUp = (e: MouseEvent) => {
     addAnnotation(endPos);
     sharedState.isDrawing = false;
     startPos.value = null;
+    redrawAnnotations();
   }
-
-  redrawAnnotations();
 };
 
 const handleMouseLeave = () => {
@@ -674,35 +694,40 @@ const startDrawing = (e: MouseEvent) => {
 };
 
 // 修改 handleMouseMove 方法
-const handleMouseMove = (e: MouseEvent) => {
-  e.preventDefault();
-  if (!canvasRef.value) return;
+const handleMouseMove = (() => {
+  let lastTime = 0;
+  const throttleDelay = 16; // 约60fps
+  
+  return (e: MouseEvent) => {
+    const now = Date.now();
+    if (now - lastTime < throttleDelay) return;
+    lastTime = now;
+    
+    e.preventDefault();
+    if (!canvasRef.value || !ctx.value) return;
 
-  const currentPos = getCanvasPoint(e);
+    const currentPos = getCanvasPoint(e);
 
-  // 处理拖动选中的标注
-  if (selectState.isDragging && selectState.dragStartPos && selectState.selectedAnnotation) {
-    const dx = currentPos.x - selectState.dragStartPos.x;
-    const dy = currentPos.y - selectState.dragStartPos.y;
+    if (selectState.isDragging && selectState.dragStartPos && selectState.selectedAnnotation) {
+      const dx = currentPos.x - selectState.dragStartPos.x;
+      const dy = currentPos.y - selectState.dragStartPos.y;
+      updateAnnotationPosition(selectState.selectedAnnotation, dx, dy);
+      selectState.dragStartPos = currentPos;
+      redrawAnnotations();
+      return;
+    }
 
-    updateAnnotationPosition(selectState.selectedAnnotation, dx, dy);
-    selectState.dragStartPos = currentPos;
-    redrawAnnotations();
-    return;
-  }
+    if (selectState.isSelecting && selectState.selectionStart) {
+      selectState.selectionEnd = currentPos;
+      redrawAnnotations();
+      return;
+    }
 
-  // 处理选择区域
-  if (selectState.isSelecting && selectState.selectionStart) {
-    selectState.selectionEnd = currentPos;
-    redrawAnnotations();
-    return;
-  }
-
-  // 处理绘制
-  if (sharedState.isDrawing && startPos.value && ["line", "rectangle", "highlight"].includes(sharedState.currentTool)) {
-    drawCurrentTool(currentPos);
-  }
-};
+    if (sharedState.isDrawing && startPos.value && ["line", "rectangle", "highlight"].includes(sharedState.currentTool)) {
+      drawCurrentTool(currentPos);
+    }
+  };
+})();
 
 const stopDrawing = (e: MouseEvent) => {
   if (!sharedState.isDrawing || !canvasRef.value || !startPos.value) return;
@@ -730,7 +755,6 @@ const isPointInAnnotation = (point: { x: number; y: number }, annotation: any) =
   if (annotation.type === "text" || annotation.type === "handwriting") {
     // 文本类型标注的点击检测
     const textBounds = getTextBounds(annotation);
-    console.log("文本边界:", textBounds);
     return (
       point.x >= textBounds.x - tolerance && point.x <= textBounds.x + textBounds.width + tolerance && point.y >= textBounds.y - tolerance && point.y <= textBounds.y + textBounds.height + tolerance
     );
@@ -758,7 +782,6 @@ const isPointInAnnotation = (point: { x: number; y: number }, annotation: any) =
       width: Math.abs(annotation.end.x - annotation.start.x) + tolerance * 2,
       height: Math.abs(annotation.end.y - annotation.start.y) + tolerance * 2,
     };
-    console.log("矩形边界:", bounds);
 
     return point.x >= bounds.x && point.x <= bounds.x + bounds.width && point.y >= bounds.y && point.y <= bounds.y + bounds.height;
   } else if (annotation.type === "checkmark" || annotation.type === "cross") {
@@ -780,15 +803,26 @@ const getTextBounds = (annotation: any) => {
   if (!ctx.value) return { x: 0, y: 0, width: 0, height: 0 };
 
   ctx.value.save();
-  ctx.value.font = `${annotation.fontSize}px ${annotation.fontFamily}`;
+  const scaledFontSize = (annotation.fontSize || 16) * scaleFactor.value;
+  
+  if (annotation.type === "handwriting") {
+    ctx.value.font = `${scaledFontSize}px ${annotation.fontFamily || handwritingStyle.value}`;
+  } else {
+    ctx.value.font = `${scaledFontSize}px ${annotation.fontFamily || 'Arial'}`;
+  }
+  
   const metrics = ctx.value.measureText(annotation.text);
   ctx.value.restore();
 
+  // 调整文本边界框的计算
+  const height = scaledFontSize;
+  const yOffset = annotation.type === "handwriting" ? height / 2 : 0;
+
   return {
     x: annotation.position.x,
-    y: annotation.position.y - annotation.fontSize,
+    y: annotation.position.y - yOffset,
     width: metrics.width,
-    height: annotation.fontSize * 1.2,
+    height: height,
   };
 };
 
@@ -861,74 +895,38 @@ const clearCurrentPage = () => {
     .catch(() => {});
 };
 
-// 保存标注
+// 添加 CorrectionData 接口定义
+interface CorrectionConfig {
+  mode: string;
+  map: Record<string, number>;
+  total: number;
+  index?: number;
+  selectedScoreName?: string;
+}
+
+interface CorrectionData {
+  annotations: any[];
+  originalImage: string | undefined;
+  currentCanvas: string | undefined;
+  scoreConfig: CorrectionConfig;
+}
+
+// 修改 saveAnnotations 方法
 const saveAnnotations = () => {
   saveCurrentPageState();
 
-  const correctionData = {
+  const correctionData: CorrectionData = {
     annotations: sharedState.annotations,
     originalImage: imageUrl.value,
     currentCanvas: canvasRef.value?.toDataURL("image/png"),
     scoreConfig: {
-      mode: props.scoreCfg?.mode,
-      map: {} as Record<string, number>,
-      total: 0,
-    },
-    selectedScoreName: '',
+      mode: props.scoreCfg?.mode || '',
+      map: props.scoreCfg?.map || {},
+      total: props.score || 0,
+      index: props.index,
+      selectedScoreName: props.dataObj?.selectedScoreName
+    }
   };
-
-  if (props.scoreCfg?.mode === "subs") {
-    // 获取 ScoreInput 组件的评分数据
-    const scoreInputComponent = document.querySelector(".tool-container .score-input-container");
-    if (scoreInputComponent) {
-      // 获取所有评分项
-      const scoreItems = Array.from(scoreInputComponent.querySelectorAll(".score-item")).map((item) => {
-        const label = item.querySelector(".item-label")?.textContent?.trim() || "";
-        const scoreInput = item.querySelector(".score-input input") as HTMLInputElement;
-        const score = scoreInput ? parseFloat(scoreInput.value) || 0 : 0;
-        return { label, score };
-      });
-      const totalScoreInput = scoreInputComponent.querySelector(".total-score input") as HTMLInputElement;
-      const totalScore = totalScoreInput ? parseFloat(totalScoreInput.value) || 0 : 0;
-      // scoreItems.forEach((item) => {
-      //   if (item.label != "得分") {
-      //     correctionData.scoreConfig.map[item.label] = item.score;
-      //   }
-      // });
-      // console.log(props.index,'index')
-      console.log(props.scoreCfg,'scoreCfg')
-      correctionData.scoreConfig.map = props.scoreCfg.map;
-      correctionData.scoreConfig.mode = props.scoreCfg.mode;
-      correctionData.scoreConfig.total = props.score;
-      correctionData.scoreConfig.index = props.index;
-    }
-  } else if (props.scoreCfg?.mode === "percent") {
-    // 获取 GradeInput 组件的评分数据
-    const gradeInputComponent = gradeInputRef.value;
-    if (gradeInputComponent) {
-      // 获取选中项和总分
-      console.log(props.dataObj,'dataObj')
-      // const totalScore = gradeInputComponent.totalScore;
-
-      // // 设置总分
-      // correctionData.scoreConfig.total = totalScore;
-      correctionData.scoreConfig.map = props.scoreCfg.map;
-      correctionData.scoreConfig.mode = props.scoreCfg.mode;
-      correctionData.scoreConfig.index = props.index;
-      correctionData.scoreConfig.total = props.score;
-      correctionData.scoreConfig.selectedScoreName = props.dataObj.selectedScoreName;
-      // // 获取选中项
-      // const selectedIndex = gradeInputComponent.selectedIndex;
-      // // 保存选中项的分数
-      // if (selectedIndex >= 0 && gradeItems[selectedIndex]) {
-      //   const selectedItem = gradeItems[selectedIndex];
-      //   correctionData.scoreConfig.map[selectedItem.label] = selectedItem.score;
-      // }
-    }
-  }
-
-  // 打印评分配置，用于调试
-  console.log("Score Config:", correctionData.scoreConfig);
 
   // 发送数据给父组件
   emit("saveCorrection", correctionData);
@@ -954,15 +952,19 @@ const saveToServer = async () => {
     isSaving.value = true;
 
     // 准备要保存的数据
-    const saveData = {
-      pageIndex: currentPageIndex.value,
+    const saveData: CorrectionData = {
       annotations: sharedState.annotations,
-      imageUrl: imageUrl.value,
-      timestamp: Date.now(),
+      originalImage: imageUrl.value,
+      currentCanvas: canvasRef.value?.toDataURL("image/png"),
+      scoreConfig: {
+        mode: props.scoreCfg?.mode || '',
+        map: props.scoreCfg?.map || {},
+        total: props.score || 0,
+        index: props.index,
+        selectedScoreName: props.dataObj?.selectedScoreName
+      }
     };
-    console.log(saveData);
   } catch (error) {
-    console.error("Failed to save annotations:", error);
     ElMessage.error(error instanceof Error ? error.message : "保存失败，请重试");
   } finally {
     isSaving.value = false;
@@ -974,13 +976,9 @@ const textInputRef = ref();
 
 // 修改 drawBackground 方法
 const drawBackground = () => {
-  if (!ctx.value || !canvasRef.value || !backgroundImage.value) return;
-
-  // 清除画布
+  if (!ctx.value || !canvasRef.value) return;
+  // 只需清除画布，不需要重绘图片
   ctx.value.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
-
-  // 绘制图片
-  ctx.value.drawImage(backgroundImage.value, 0, 0, canvasRef.value.width / (window.devicePixelRatio || 1), canvasRef.value.height / (window.devicePixelRatio || 1));
 };
 
 // 修改图片加载方法
@@ -988,15 +986,12 @@ const loadImage = (url: string) => {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    console.log("Loading image:", url); // 添加日志
 
     img.onload = () => {
-      console.log("Image loaded successfully"); // 添加日志
       resolve(img);
     };
 
     img.onerror = (error) => {
-      console.error("Image load error:", error); // 添加错误日志
       reject(error);
     };
 
@@ -1006,70 +1001,108 @@ const loadImage = (url: string) => {
 
 // 修改 initCanvas 方法
 const initCanvas = async () => {
-  if (!canvasRef.value || !containerRef.value) return;
-
-  console.log("Initializing canvas...");
-
-  // 固定画布宽度为1000px
-  const fixedWidth = 1000;
-
-  // 加载图片以获取比例
-  try {
-    if (imageUrl.value) {
-      backgroundImage.value = await loadImage(imageUrl.value);
-
-      // 计算缩放比例，保持宽度为1000px
-      const scale = fixedWidth / backgroundImage.value.width;
-
-      // 计算缩放后的尺寸
-      const scaledWidth = backgroundImage.value.width * scale;
-      const scaledHeight = backgroundImage.value.height * scale;
-
-      // 设置 canvas 尺寸
-      canvasRef.value.style.width = `${scaledWidth}px`;
-      canvasRef.value.style.height = `${scaledHeight}px`;
-
-      // 设置实际尺寸（考虑设备像素比）
-      const dpr = window.devicePixelRatio || 1;
-      canvasRef.value.width = scaledWidth * dpr;
-      canvasRef.value.height = scaledHeight * dpr;
-
-      // 获取上下文
-      ctx.value = canvasRef.value.getContext("2d");
-      if (!ctx.value) {
-        console.error("Failed to get canvas context");
-        return;
-      }
-
-      // 缩放以支持高清屏
-      ctx.value.scale(dpr, dpr);
-
-      imageLoaded.value = true;
-      drawBackground();
-
-      // 加载完图片后，如果有批改步骤，则渲染它们
-      if (props.correctStep && props.correctStep.length > 0) {
-        sharedState.annotations = [...props.correctStep];
-        redrawAnnotations();
-      }
-    }
-  } catch (error) {
-    console.error("Failed to load or draw image:", error);
-    ElMessage.error("图片加载失败");
+  if (!canvasRef.value || !containerRef.value || !imageRef.value) return;
+  
+  // 等待图片加载完成
+  if (!imageRef.value.complete) {
+    await new Promise((resolve) => {
+      imageRef.value!.onload = resolve;
+    });
   }
+  
+  // 获取图片实际尺寸
+  const imgWidth = imageRef.value.naturalWidth;
+  const imgHeight = imageRef.value.naturalHeight;
+  
+  // 设置画布尺寸为图片实际尺寸
+  const dpr = window.devicePixelRatio || 1;
+  canvasRef.value.width = imgWidth * dpr;
+  canvasRef.value.height = imgHeight * dpr;
+  canvasRef.value.style.width = '100%';
+  canvasRef.value.style.height = 'auto';
+
+  // 获取上下文并设置缩放
+  ctx.value = canvasRef.value.getContext('2d', {
+    alpha: true,
+    willReadFrequently: true
+  });
+  
+  if (!ctx.value) {
+    return;
+  }
+
+  // 设置缩放
+  ctx.value.scale(dpr, dpr);
+  
+  // 设置初始样式
+  ctx.value.fillStyle = 'transparent';
+  ctx.value.strokeStyle = '#000000';
+  ctx.value.lineWidth = 1;
+  
+  // 清除画布
+  ctx.value.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
+  
+  imageLoaded.value = true;
+  redrawAnnotations();
 };
 
-// 修改获取点击位置的方法
+// 修改 handleImageLoad 方法
+const handleImageLoad = () => {
+  if (!imageRef.value || !canvasRef.value || !containerRef.value) return;
+  
+  // 获取图片实际尺寸
+  const imgWidth = imageRef.value.naturalWidth;
+  const imgHeight = imageRef.value.naturalHeight;
+  
+  // 设置图片显示尺寸
+  imageRef.value.style.width = '100%';
+  imageRef.value.style.height = 'auto';
+  
+  // 设置画布尺寸为图片实际尺寸
+  const dpr = window.devicePixelRatio || 1;
+  canvasRef.value.width = imgWidth * dpr;
+  canvasRef.value.height = imgHeight * dpr;
+  canvasRef.value.style.width = '100%';
+  canvasRef.value.style.height = 'auto';
+  
+  // 获取上下文并设置缩放
+  ctx.value = canvasRef.value.getContext('2d', {
+    alpha: true,
+    willReadFrequently: true
+  });
+  
+  if (ctx.value) {
+    ctx.value.scale(dpr, dpr);
+    ctx.value.fillStyle = 'transparent';
+    ctx.value.strokeStyle = '#000000';
+  }
+  
+  // 重新绘制标注
+  redrawAnnotations();
+};
+
+// 添加缩放比例状态
+const scaleFactor = ref(1);
+
+// 修改 getCanvasPoint 方法
 const getCanvasPoint = (e: MouseEvent) => {
-  if (!canvasRef.value) return { x: 0, y: 0 };
+  if (!canvasRef.value || !imageRef.value) return { x: 0, y: 0 };
 
   const rect = canvasRef.value.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
 
-  return {
-    x: (e.clientX - rect.left) * (canvasRef.value.width / rect.width / dpr),
-    y: (e.clientY - rect.top) * (canvasRef.value.height / rect.height / dpr),
-  };
+  // 计算实际图片尺寸与显示尺寸的比例
+  const scaleX = imageRef.value.naturalWidth / rect.width;
+  const scaleY = imageRef.value.naturalHeight / rect.height;
+
+  // 更新缩放比例
+  scaleFactor.value = scaleX;
+
+  // 计算相对于画布的点击位置
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+
+  return { x, y };
 };
 
 // 修改原有的 handleResize 方法
@@ -1088,96 +1121,81 @@ const handleResize = () => {
 };
 
 // 绘制相关方法
-const drawLine = (annotation: any) => {
-  if (!ctx.value) return;
-
-  // 保存当前画布状态
-  ctx.value.save();
-
-  ctx.value.beginPath();
-  ctx.value.strokeStyle = annotation.color || lineConfig.color;
-  ctx.value.lineWidth = annotation.lineWidth || lineConfig.lineWidth;
-  ctx.value.moveTo(annotation.start.x, annotation.start.y);
-  ctx.value.lineTo(annotation.end.x, annotation.end.y);
-  ctx.value.stroke();
-
-  // 恢复画布状态
-  ctx.value.restore();
+const drawLine = (annotation: any, context: CanvasRenderingContext2D = ctx.value!) => {
+  context.save();
+  context.beginPath();
+  context.strokeStyle = annotation.color || lineConfig.color;
+  context.lineWidth = (annotation.lineWidth || lineConfig.lineWidth) * scaleFactor.value;
+  context.moveTo(annotation.start.x, annotation.start.y);
+  context.lineTo(annotation.end.x, annotation.end.y);
+  context.stroke();
+  context.restore();
 };
 
-const drawRectangle = (annotation: any) => {
-  if (!ctx.value) return;
-
-  // 保存当前画布状态
-  ctx.value.save();
-
-  ctx.value.beginPath();
-  ctx.value.strokeStyle = annotation.color || rectConfig.color;
-  ctx.value.lineWidth = annotation.lineWidth || rectConfig.lineWidth;
-
-  // 计算矩形的宽度和高度
+const drawRectangle = (annotation: any, context: CanvasRenderingContext2D = ctx.value!) => {
+  context.save();
+  context.beginPath();
+  context.strokeStyle = annotation.color || rectConfig.color;
+  context.lineWidth = (annotation.lineWidth || rectConfig.lineWidth) * scaleFactor.value;
   const width = annotation.end.x - annotation.start.x;
   const height = annotation.end.y - annotation.start.y;
-
-  ctx.value.strokeRect(annotation.start.x, annotation.start.y, width, height);
-
-  // 恢复画布状态
-  ctx.value.restore();
+  context.strokeRect(annotation.start.x, annotation.start.y, width, height);
+  context.restore();
 };
 
-const drawCheckmark = (annotation: any) => {
-  if (!ctx.value) return;
-
-  ctx.value.save();
-  ctx.value.beginPath();
-  ctx.value.strokeStyle = annotation.color || "#32CD32";
-  ctx.value.lineWidth = annotation.lineWidth || 3;
-
+const drawCheckmark = (annotation: any, context: CanvasRenderingContext2D = ctx.value!) => {
+  context.save();
+  context.beginPath();
+  context.strokeStyle = annotation.color || "#FF0000";
+  context.lineWidth = (annotation.lineWidth || 3) * scaleFactor.value;
   const { x, y } = annotation.start;
-  const size = 30; // 对勾大小
-
-  // 绘制对勾
-  ctx.value.moveTo(x - size / 2, y);
-  ctx.value.lineTo(x - size / 6, y + size / 2);
-  ctx.value.lineTo(x + size / 2, y - size / 2);
-  ctx.value.stroke();
-  ctx.value.restore();
+  const size = 30 * scaleFactor.value;
+  context.moveTo(x - size / 2, y);
+  context.lineTo(x - size / 6, y + size / 2);
+  context.lineTo(x + size / 2, y - size / 2);
+  context.stroke();
+  context.restore();
 };
 
-const drawCross = (annotation: any) => {
-  if (!ctx.value) return;
-
-  ctx.value.save();
-  ctx.value.beginPath();
-  ctx.value.strokeStyle = annotation.color || "#FF0000";
-  ctx.value.lineWidth = annotation.lineWidth || 3;
-
+const drawCross = (annotation: any, context: CanvasRenderingContext2D = ctx.value!) => {
+  context.save();
+  context.beginPath();
+  context.strokeStyle = annotation.color || "#FF0000";
+  context.lineWidth = (annotation.lineWidth || 3) * scaleFactor.value;
   const { x, y } = annotation.start;
-  const size = 30; // 叉号大小
-
-  // 绘制叉号
-  ctx.value.moveTo(x - size / 2, y - size / 2);
-  ctx.value.lineTo(x + size / 2, y + size / 2);
-  ctx.value.moveTo(x + size / 2, y - size / 2);
-  ctx.value.lineTo(x - size / 2, y + size / 2);
-  ctx.value.stroke();
-  ctx.value.restore();
+  const size = 30 * scaleFactor.value;
+  context.moveTo(x - size / 2, y - size / 2);
+  context.lineTo(x + size / 2, y + size / 2);
+  context.moveTo(x + size / 2, y - size / 2);
+  context.lineTo(x - size / 2, y + size / 2);
+  context.stroke();
+  context.restore();
 };
 
-// 绘制文本
-const drawText = (annotation: any) => {
-  if (!ctx.value) return;
-
-  ctx.value.save();
+const drawText = (annotation: any, context: CanvasRenderingContext2D = ctx.value!) => {
+  if (!context) return;
+  
+  context.save();
+  
+  // 计算缩放后的字体大小
+  const scaledFontSize = (annotation.fontSize || 16) * scaleFactor.value;
+  
+  // 设置字体样式
   if (annotation.type === "handwriting") {
-    ctx.value.font = `${annotation.fontSize || fontSize.value}px ${annotation.fontFamily || handwritingStyle.value}`;
-    ctx.value.textBaseline = "middle"; // 添加这行以确保文本垂直居中
+    context.font = `${scaledFontSize}px ${annotation.fontFamily || handwritingStyle.value}`;
+    context.textBaseline = "middle";
   } else {
-    ctx.value.font = `${annotation.fontSize || 16}px Arial`;
+    context.font = `${scaledFontSize}px ${annotation.fontFamily || 'Arial'}`;
+    context.textBaseline = "top";
   }
-  ctx.value.fillStyle = annotation.color || "#000000";
-  ctx.value.fillText(annotation.text, annotation.position.x, annotation.position.y);
-  ctx.value.restore();
+  
+  // 设置颜色
+  context.fillStyle = annotation.color || "#000000";
+  
+  // 绘制文本
+  context.fillText(annotation.text, annotation.position.x, annotation.position.y);
+  
+  context.restore();
 };
 
 // 添加选中状态的样式配置
@@ -1194,79 +1212,97 @@ const selectedStyle = {
 // 修改 redrawAnnotations 方法
 const redrawAnnotations = () => {
   if (!ctx.value || !canvasRef.value) return;
-
+  
+  // 清除画布
   ctx.value.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
-  drawBackground();
-
-  // 先绘制所有未选中的标注
-  sharedState.annotations.forEach((annotation) => {
-    drawAnnotation(annotation);
+  
+  // 绘制所有标注
+  sharedState.annotations.forEach(annotation => {
+    if (annotation !== selectState.selectedAnnotation) {
+      drawAnnotation(annotation);
+    }
   });
-
-  // 如果有选中的标注，最后绘制它（包括选中效果）
+  
+  // 如果有选中的标注，最后绘制它
   if (selectState.selectedAnnotation) {
     drawAnnotation(selectState.selectedAnnotation);
     drawSelectedAnnotation(selectState.selectedAnnotation);
   }
+  
+  // 如果正在选择，绘制选择框
+  if (selectState.isSelecting && selectState.selectionStart && selectState.selectionEnd) {
+    drawSelectionArea();
+  }
 };
 
-// 添加统一的标注绘制方法
-const drawAnnotation = (annotation: any) => {
+// 修改 drawAnnotation 方法
+const drawAnnotation = (annotation: any, context: CanvasRenderingContext2D = ctx.value!) => {
+  if (!context) return;
+
   switch (annotation.type) {
     case "line":
-      drawLine(annotation);
+      drawLine(annotation, context);
       break;
     case "rectangle":
-      drawRectangle(annotation);
+      drawRectangle(annotation, context);
       break;
     case "highlight":
-      drawHighlight(annotation);
+      drawHighlight(annotation, context);
       break;
     case "checkmark":
-      drawCheckmark(annotation);
+      drawCheckmark(annotation, context);
       break;
     case "cross":
-      drawCross(annotation);
+      drawCross(annotation, context);
       break;
     case "text":
     case "handwriting":
-      drawText(annotation);
+      drawText(annotation, context);
       break;
   }
 };
 
-// 添加统一的选中框绘制方法
-const drawSelectedAnnotation = (annotation: any) => {
-  if (!ctx.value) return;
+const drawSelectedAnnotation = (annotation: any, context: CanvasRenderingContext2D = ctx.value!, yOffset: number = 0) => {
+  if (!context) return;
 
-  ctx.value.save();
-
-  const bounds = getAnnotationBounds(annotation);
-
-  // 绘制选中阴影
-  ctx.value.shadowColor = selectStyle.selectedBorderColor;
-  ctx.value.shadowBlur = 8;
-  ctx.value.strokeStyle = selectStyle.selectedBorderColor;
-  ctx.value.lineWidth = selectStyle.selectedBorderWidth; // 移除额外的宽度
-  ctx.value.strokeRect(bounds.x - selectStyle.padding, bounds.y - selectStyle.padding, bounds.width + selectStyle.padding * 2, bounds.height + selectStyle.padding * 2);
-
-  // 清除阴影
-  ctx.value.shadowBlur = 0;
-
-  // 绘制半透明背景
-  ctx.value.fillStyle = selectStyle.selectedBgColor;
-  ctx.value.fillRect(bounds.x - selectStyle.padding, bounds.y - selectStyle.padding, bounds.width + selectStyle.padding * 2, bounds.height + selectStyle.padding * 2);
-
-  // 绘制选中边框
-  ctx.value.strokeStyle = selectStyle.selectedBorderColor;
-  ctx.value.lineWidth = selectStyle.selectedBorderWidth;
-  ctx.value.setLineDash(selectStyle.dashPattern);
-  ctx.value.strokeRect(bounds.x - selectStyle.padding, bounds.y - selectStyle.padding, bounds.width + selectStyle.padding * 2, bounds.height + selectStyle.padding * 2);
-
-  // 绘制控制点
-  drawControlHandles(bounds);
-
-  ctx.value.restore();
+  const adjustedAnnotation = {...annotation};
+  
+  // 应用Y轴偏移
+  if (annotation.type === "text" || annotation.type === "handwriting") {
+    adjustedAnnotation.position = {
+      x: annotation.position.x,
+      y: annotation.position.y + yOffset
+    };
+  } else {
+    adjustedAnnotation.start = {
+      x: annotation.start.x,
+      y: annotation.start.y + yOffset
+    };
+    if (annotation.end) {
+      adjustedAnnotation.end = {
+        x: annotation.end.x,
+        y: annotation.end.y + yOffset
+      };
+    }
+  }
+  
+  const bounds = getAnnotationBounds(adjustedAnnotation);
+  
+  context.save();
+  
+  // 绘制选中效果
+  context.shadowColor = selectStyle.selectedBorderColor;
+  context.shadowBlur = 8;
+  context.strokeStyle = selectStyle.selectedBorderColor;
+  context.lineWidth = selectStyle.selectedBorderWidth;
+  context.strokeRect(
+    bounds.x - selectStyle.padding,
+    bounds.y - selectStyle.padding,
+    bounds.width + selectStyle.padding * 2,
+    bounds.height + selectStyle.padding * 2
+  );
+  
+  context.restore();
 };
 
 // 获取标注的边界框
@@ -1284,10 +1320,7 @@ const getAnnotationBounds = (annotation: any) => {
 
     const metrics = ctx.value.measureText(annotation.text);
     // 增加手写文本的高度计算
-    const height =
-      annotation.type === "handwriting"
-        ? (annotation.fontSize || fontSize.value) * 1.5 // 增加手写文本的高度系数
-        : 20; // 普通文本的高度
+    const height = annotation.type === "handwriting" ? annotation.fontSize || fontSize.value : annotation.fontSize || 16;
 
     ctx.value.restore();
 
@@ -1511,7 +1544,6 @@ const loadCurrentPage = async () => {
     // 重绘
     redrawAnnotations();
   } catch (error) {
-    console.error("Failed to load page:", error);
     ElMessage.error("页面加载失败");
   }
 };
@@ -1519,15 +1551,24 @@ const loadCurrentPage = async () => {
 // 组件挂载和卸载
 onMounted(() => {
   window.addEventListener("resize", handleResize);
-  initCanvas();
+  window.addEventListener("scroll", handleScroll);
+  window.addEventListener("keydown", handleKeyDown);
+  
+  // 确保图片加载完成后初始化画布
+  if (imageRef.value?.complete) {
+    initCanvas();
+  } else {
+    imageRef.value?.addEventListener('load', initCanvas);
+  }
+  
   loadSavedAnnotations();
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", handleResize);
-  if (redrawRequestId.value) {
-    cancelAnimationFrame(redrawRequestId.value);
-  }
+  window.removeEventListener("scroll", handleScroll);
+  window.removeEventListener("keydown", handleKeyDown);
+  imageRef.value?.removeEventListener('load', handleImageLoad);
 });
 
 // 导出组件方法
@@ -1570,9 +1611,15 @@ const handleTextBlur = () => {
     id: Date.now().toString(),
     type: sharedState.currentTool,
     text: textContent.value,
-    position: textPosition.value,
+    position: {
+      x: textPosition.value.x,
+      y: textPosition.value.y
+    },
+    // 保存原始大小，不乘以缩放因子
     fontSize: sharedState.currentTool === "handwriting" ? fontSize.value : textConfig.fontSize,
-    fontFamily: sharedState.currentTool === "handwriting" ? (handwritingStyles.find((s) => s.value === handwritingStyle.value) || handwritingStyles[0]).fontFamily : textConfig.fontFamily,
+    fontFamily: sharedState.currentTool === "handwriting" ? 
+      (handwritingStyles.find((s) => s.value === handwritingStyle.value) || handwritingStyles[0]).fontFamily : 
+      textConfig.fontFamily,
     color: sharedState.currentTool === "handwriting" ? handwritingColor.value : textConfig.color,
     style: sharedState.currentTool === "handwriting" ? handwritingStyle.value : undefined,
   };
@@ -1585,8 +1632,20 @@ const handleTextBlur = () => {
 };
 
 const loadSavedAnnotations = () => {
-  // 实现加载已保存标注的逻辑
+  // 清空当前标注
+  sharedState.annotations = [];
+  
+  // 重新加载批改步骤
+  if (props?.correctStep) {
+    props.correctStep.forEach((step) => {
+      sharedState.annotations.push(step);
+    });
+  }
+  
+  // 重新绘制
+  redrawAnnotations();
 };
+
 
 const generatePreview = () => {
   if (!canvasRef.value) return;
@@ -1800,24 +1859,17 @@ onBeforeUnmount(() => {
 });
 
 // 修改高亮绘制方法
-const drawHighlight = (annotation: any) => {
-  if (!ctx.value) return;
-
-  ctx.value.save();
-  ctx.value.globalAlpha = annotation.opacity || highlightConfig.opacity;
-  ctx.value.beginPath();
-  ctx.value.fillStyle = annotation.color || highlightConfig.color;
-
-  // 计算矩形区域
+const drawHighlight = (annotation: any, context: CanvasRenderingContext2D = ctx.value!) => {
+  context.save();
+  context.globalAlpha = annotation.opacity || highlightConfig.opacity;
+  context.beginPath();
+  context.fillStyle = annotation.color || highlightConfig.color;
   const x = Math.min(annotation.start.x, annotation.end.x);
   const y = Math.min(annotation.start.y, annotation.end.y);
   const width = Math.abs(annotation.end.x - annotation.start.x);
   const height = Math.abs(annotation.end.y - annotation.start.y);
-
-  // 绘制半透明矩形
-  ctx.value.fillRect(x, y, width, height);
-
-  ctx.value.restore();
+  context.fillRect(x, y, width, height);
+  context.restore();
 };
 
 // 监听图片URL变化
@@ -1828,7 +1880,6 @@ watch(imageUrl, async (newUrl) => {
       imageLoaded.value = true;
       await initCanvas();
     } catch (error) {
-      console.error("Failed to load image:", error);
       ElMessage.error("图片加载失败");
     }
   }
@@ -1837,7 +1888,6 @@ watch(imageUrl, async (newUrl) => {
 watch(
   () => props.imgEditUrl,
   async (newUrl) => {
-    console.log("newUrl", newUrl);
     if (newUrl) {
       imageUrl.value = newUrl;
     }
@@ -1992,6 +2042,122 @@ const getCanvasCursor = computed(() => {
 
 // 在 script 部分添加 ref
 const gradeInputRef = ref(null);
+
+// 添加虚拟滚动相关状态
+const viewportHeight = ref(0);
+const scrollTop = ref(0);
+const visibleStart = ref(0);
+const visibleEnd = ref(0);
+const itemHeight = ref(1000); // 每块的高度
+const bufferSize = 2; // 缓冲区大小
+
+// 添加分块渲染相关的状态
+const CHUNK_SIZE = 5000; // 每块的最大高度
+const chunks = ref<Array<{start: number, end: number}>>([]);
+const currentChunk = ref(0);
+
+// 修改滚动处理方法
+const handleScroll = (e: Event) => {
+  if (!canvasRef.value) return;
+  
+  const target = e.target as HTMLElement;
+  const scrollTop = target.scrollTop;
+  
+  // 计算当前应该显示哪个块
+  const newChunkIndex = Math.floor(scrollTop / CHUNK_SIZE);
+  
+  if (newChunkIndex !== currentChunk.value) {
+    currentChunk.value = newChunkIndex;
+    renderCurrentChunk();
+  }
+};
+
+// ... existing code ...
+
+// 修改文本输入框的样式
+const textInputStyle = computed(() => {
+  if (!showTextInput.value || !canvasRef.value || !containerRef.value || !lastMouseEvent.value) return {};
+  
+  // 获取canvas容器的位置和滚动位置
+  const containerRect = containerRef.value.getBoundingClientRect();
+  const containerScrollTop = containerRef.value.scrollTop;
+  const containerScrollLeft = containerRef.value.scrollLeft;
+  
+  // 计算相对于canvas容器的位置
+  const relativeX = lastMouseEvent.value.clientX - containerRect.left + containerScrollLeft;
+  const relativeY = lastMouseEvent.value.clientY - containerRect.top + containerScrollTop;
+  
+  return {
+    left: `${relativeX}px`,
+    top: `${relativeY}px`,
+    position: 'absolute', // 改回绝对定位
+    width: sharedState.currentTool === 'handwriting' ? `${Math.max(200, fontSize.value * 4)}px` : '200px',
+    zIndex: 1000,
+  };
+});
+
+// ... existing code ...
+
+// 添加鼠标事件引用
+const lastMouseEvent = ref<MouseEvent | null>(null);
+
+watch(
+  () => props.correctStep,
+  (newCorrectStep) => {
+    if (newCorrectStep) {
+      loadSavedAnnotations();
+    }
+  },
+  { immediate: true }
+)
+
+// 添加弹框可见性监听
+watch(
+  () => props.isloading,
+  (newIsloading) => {
+    if (newIsloading) {
+      loadSavedAnnotations();
+    }
+  },
+  { immediate: true }
+);
+</script>
+
+<style scoped>
+.edit-container {
+  /* padding: 20px;
+  viewportHeight.value = window.innerHeight - 200; // 减去工具栏等高度
+  
+  // 计算可见区域
+  updateVisibleRange();
+  
+  // 如果有批改步骤，渲染它们
+  if (props.correctStep && props.correctStep.length > 0) {
+    sharedState.annotations = [...props.correctStep];
+    redrawAnnotations();
+  }
+};
+
+// 添加更新可见区域的方法
+const updateVisibleRange = () => {
+  if (!canvasRef.value) return;
+  
+  const start = Math.floor(scrollTop.value / itemHeight.value) - bufferSize;
+  const end = Math.ceil((scrollTop.value + viewportHeight.value) / itemHeight.value) + bufferSize;
+  
+  visibleStart.value = Math.max(0, start);
+  visibleEnd.value = Math.min(Math.ceil(canvasRef.value.height / itemHeight.value), end);
+};
+
+// 添加滚动事件处理
+const handleScroll = (e: Event) => {
+  if (!canvasRef.value) return;
+  
+  const target = e.target as HTMLElement;
+  scrollTop.value = target.scrollTop;
+  updateVisibleRange();
+  redrawAnnotations();
+};
 </script>
 
 <style scoped>
@@ -2029,16 +2195,39 @@ const gradeInputRef = ref(null);
   flex-shrink: 0;
 }
 .canvas-container {
-  width: 1000px; /* 固定宽度 */
-  min-width: 1000px; /* 确保最小宽度 */
-  position: relative;
-  overflow-y: auto; /* 垂直方向滚动 */
-  overflow-x: auto; /* 允许水平滚动 */
+  position: relative; /* 确保是相对定位 */
+  width: 1000px;
+  min-width: 1000px;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   justify-content: center;
   background: #f5f5f5;
   height: calc(100vh - 150px);
-  margin: 0 auto; /* 居中显示 */
+  margin: 0 auto;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.base-image {
+  width: 1000px;
+  height: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.annotation-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  background: transparent;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 canvas {
@@ -2090,16 +2279,19 @@ canvas {
 
 /* 基础输入框样式 */
 .text-input {
-  position: absolute;
+  position: absolute; /* 改回绝对定位 */
   background-color: white;
   border-radius: 4px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   padding: 8px;
   max-width: 300px;
+  transform-origin: center top;
+  z-index: 1000;
 }
 
 .handwriting-input {
   background-color: rgba(255, 255, 255, 0.95);
+  font-family: var(--handwriting-font, "Ma Shan Zheng"), cursive;
 }
 
 /* 添加输入框容器的样式 */

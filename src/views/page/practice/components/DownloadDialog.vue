@@ -19,11 +19,11 @@
             </a>
           </div>
           <div v-if="downloadInfo.job.state === 'failed'" class="status-text1 error">
-            <div style="width: 100%" class="status-text">
+            <div style="width: 100%;" class="status-text">
               <el-icon><Warning color="#f56c6c" /></el-icon>
               任务执行失败，可重新开始
             </div>
-            <div style="width: 100%; margin-left: 20px" v-if="downloadInfo.job.msg" class="error-msg">失败原因: {{ downloadInfo.job.msg }}</div>
+            <div style="width: 100%;margin-left: 20px;" v-if="downloadInfo.job.msg" class="error-msg">失败原因: {{ downloadInfo.job.msg }}</div>
           </div>
         </div>
       </div>
@@ -130,7 +130,7 @@ const getFileName = (url) => {
   gap: 8px;
 }
 .status-text1 {
-  text-align: left;
+ text-align: left;
 }
 
 .error {
@@ -172,7 +172,7 @@ const getFileName = (url) => {
 }
 
 :deep(.el-checkbox__inner) {
-  background: rgba(39, 165, 255, 0.1) !important;
+  background: rgba(39,165,255,0.1) !important;
   border-radius: 3px !important;
   border: 1px solid #27a5ff !important;
 }
@@ -196,16 +196,11 @@ const getFileName = (url) => {
 .download-link:hover {
   text-decoration: underline;
 }
-.running-icon {
+.running-icon{
   animation: spin 2s linear infinite;
 }
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
-

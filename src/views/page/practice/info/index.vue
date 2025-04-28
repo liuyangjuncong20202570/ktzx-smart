@@ -204,7 +204,7 @@ import { onMounted, reactive, ref, nextTick, computed, watch } from "vue";
 import { getTemplate,savePractice,practiceDetail,kwaTree, practiceUpdate } from "@/api/practice/index.ts";
 import { PracticeTemplateVO,ParamVO ,DefaultParamVO,KwaVO,KwaParamVO,ResVO } from "@/api/practice/type.ts";
 import { RuleForm } from "./type";
-import { host } from "@/api/host.js";
+import { host } from "@/utils/request";
 import Kwa from "../components/kwa.vue";
 import LabReport from "../components/labReport.vue";
 import Upload from "@/components/upload/index.vue";
