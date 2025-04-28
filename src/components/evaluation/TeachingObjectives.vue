@@ -1140,7 +1140,7 @@ const setAbility = row => {
 
 <style scoped>
 :deep(.el-tree-node) {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .edit-icon {

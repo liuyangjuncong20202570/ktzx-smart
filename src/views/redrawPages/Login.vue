@@ -1,34 +1,27 @@
 <template>
   <div class="page flex flex-col">
     <div class="section_1 flex-col relative">
-      <div
-        style="width: 425px; height: 540px; margin: 200px 0 0 1075px"
-        class="inner relative flex-col"
-      >
+      <div class="inner relative flex-col">
         <img
           class="image_1 absolute"
-          style="top: 35px; left: 50%; transform: translateX(-50%)"
           referrerpolicy="no-referrer"
           src="@/assets/images/redraw-images/title.png"
         />
-        <div
-          class="absolute block_1 flex flex-row justify-between items-center"
-          style="top: 120px; left: 50%; transform: translateX(-50%)"
-        >
+        <div class="absolute block_1 flex flex-row justify-between items-center">
           <div
-            style="height: 48px; width: 216px; color: rgba(39, 165, 255, 1)"
+            style="width: 11.25vw; color: rgba(39, 165, 255, 1)"
             @click="() => switchRole(loginForm.catelog)"
             :class="
               loginForm.catelog === '1'
-                ? 'text-wrapper_1 flex flex-col cursor-pointer'
-                : 'flex all flex-col cursor-pointer'
+                ? 'text-wrapper_1 flex flex-col cursor-pointer justify-center items-center'
+                : 'flex all flex-row cursor-pointer justify-center items-center'
             "
           >
-            <span class="text_1 flex">学生登录</span>
+            <span class="text_1">学生登录</span>
           </div>
           <div
             @click="() => switchRole(loginForm.catelog)"
-            style="height: 48px; width: 216px; color: rgba(39, 165, 255, 1)"
+            style="width: 11.25vw; color: rgba(39, 165, 255, 1)"
             :class="
               loginForm.catelog === '2'
                 ? 'text-wrapper_1 flex flex-col cursor-pointer justify-center items-center'
@@ -38,17 +31,11 @@
             <span class="text_2">教师登录</span>
           </div>
         </div>
-        <div v-if="!isText" class="wrapper absolute" style="width: 425px; top: 250px">
+        <div v-if="!isText" class="wrapper absolute">
           <div class="login-pannel flex">
             <!--切换账号登录-->
 
-            <el-form
-              style="width: 425px"
-              :model="loginForm"
-              :rules="rules"
-              ref="ruleFormRef"
-              size="large"
-            >
+            <el-form :model="loginForm" :rules="rules" ref="ruleFormRef" size="large">
               <el-form-item prop="loginname">
                 <el-input
                   :prefix-icon="User"
@@ -70,32 +57,18 @@
             </el-form>
           </div>
 
-          <div
-            @click="login"
-            class="text-wrapper_2 flex flex-col cursor-pointer absolute"
-            style="top: 200px; background-color: #fff; text-align: center"
-          >
+          <div @click="login" class="text-wrapper_2 flex flex-col cursor-pointer absolute">
             <span style="color: #0177cc" class="text_5 cursor-pointer">登录</span>
           </div>
 
-          <el-dialog
-            :modelValue="showRoleModal"
-            :show-close="false"
-            :close-on-click-modal="false"
-            heigjt="340px"
-            style="border-radius: 10px"
-          >
+          <el-dialog :modelValue="showRoleModal" :show-close="false" :close-on-click-modal="false">
             <template #header>
               <div style="font-weight: bold; font-size: 18px" class="title">选 择 角 色</div>
               <el-divider style="border-top: 1px solid #27a5ff !important" />
             </template>
-            <el-radio-group style="width: 646px; margin: 0 auto" v-model="selectedRoleId">
-              <div
-                class="flex flex-col flex-wrap content-between overflow-auto radio-wrap"
-                style="width: 646px; height: 442px"
-              >
+            <el-radio-group v-model="selectedRoleId">
+              <div class="flex flex-col flex-wrap content-between overflow-auto radio-wrap">
                 <el-radio
-                  style="margin-bottom: 20px !important"
                   v-for="role in roledata.simpleRoleList"
                   :key="role.roleid"
                   :label="role.id"
@@ -106,43 +79,18 @@
             </el-radio-group>
             <template #footer>
               <div class="button" style="margin: 0 auto">
-                <el-button
-                  style="
-                    width: 300px;
-                    height: 50px;
-                    border: 2px solid #27a5ff;
-                    border-radius: 10px;
-                    color: #27a5ff;
-                    font-size: 16px;
-                  "
-                  @click="showRoleModal = false"
-                  >取消</el-button
-                >
-                <el-button
-                  style="
-                    width: 300px;
-                    height: 50px;
-                    border: 2px solid #27a5ff;
-                    border-radius: 10px;
-                    color: #fff;
-                    font-size: 16px;
-                  "
-                  type="primary"
-                  @click="confirmRole"
-                  >确认</el-button
-                >
+                <el-button class="cancel" @click="showRoleModal = false">取消</el-button>
+                <el-button class="confirm" type="primary" @click="confirmRole">确认</el-button>
               </div>
             </template>
           </el-dialog>
           <img
             class="image_2 absolute"
-            style="top: 300px; left: 50%; transform: translateX(-50%)"
             referrerpolicy="no-referrer"
             src="@/assets/images/redraw-images/bar.png"
           />
           <div
             class="text-wrapper_3 flex flex-col cursor-pointer justify-center items-center absolute"
-            style="top: 330px; border-radius: 10px; border: 1px solid #ffffff"
           >
             <span
               @click="
@@ -155,24 +103,14 @@
               >短信验证密码登录</span
             >
           </div>
-          <span
-            class="text_8 absolute"
-            style="top: 290px; color: #fff; left: 50%; transform: translateX(-50%)"
-            >or</span
-          >
+          <span class="text_8 absolute">or</span>
         </div>
 
-        <div v-else class="wrapper absolute" style="width: 425px; top: 250px">
+        <div v-else class="wrapper absolute">
           <div class="login-pannel flex">
             <!--切换账号登录-->
 
-            <el-form
-              style="width: 425px"
-              :model="loginwithText"
-              :rules="rules"
-              ref="ruleFormRef"
-              size="large"
-            >
+            <el-form :model="loginwithText" :rules="rules" ref="ruleFormRef" size="large">
               <el-form-item prop="phone">
                 <el-input
                   :prefix-icon="Phone"
@@ -188,50 +126,25 @@
                   v-model="loginwithText.message"
                 >
                 </el-input>
-                <el-button
-                  style="
-                    position: absolute;
-                    right: 3%;
-                    background-color: rgba(39, 165, 255, 0.15);
-                    border-radius: 7px;
-                    height: 42px;
-                    width: 140px;
-                    color: rgba(39, 165, 255, 1);
-                  "
-                  >获取短信验证码</el-button
-                >
+                <el-button class="text">获取短信验证码</el-button>
 
                 <!-- 弹窗登录-->
               </el-form-item>
             </el-form>
           </div>
 
-          <div
-            @click="login"
-            class="text-wrapper_2 flex flex-col cursor-pointer absolute"
-            style="width: 425px; top: 200px; background-color: #fff; text-align: center"
-          >
+          <div @click="login" class="text-wrapper_2 flex flex-col cursor-pointer absolute">
             <span style="color: #0177cc" class="text_5">登录</span>
           </div>
 
-          <el-dialog
-            :modelValue="showRoleModal"
-            :show-close="false"
-            :close-on-click-modal="false"
-            heigjt="340px"
-            style="border-radius: 10px"
-          >
+          <el-dialog :modelValue="showRoleModal" :show-close="false" :close-on-click-modal="false">
             <template #header>
               <div style="font-weight: bold; font-size: 18px" class="title">选 择 角 色</div>
               <el-divider style="border-top: 1px solid #27a5ff !important" />
             </template>
-            <el-radio-group style="width: 646px; margin: 0 auto" v-model="selectedRoleId">
-              <div
-                class="flex flex-col flex-wrap content-between"
-                style="width: 646px; height: 442px"
-              >
+            <el-radio-group v-model="selectedRoleId">
+              <div class="flex flex-col flex-wrap content-between">
                 <el-radio
-                  style="margin-bottom: 20px !important"
                   v-for="role in roledata.simpleRoleList"
                   :key="role.roleid"
                   :label="role.id"
@@ -244,38 +157,14 @@
             </el-radio-group>
             <template #footer>
               <div class="button" style="margin: 0 auto">
-                <el-button
-                  style="
-                    width: 300px;
-                    height: 50px;
-                    border: 2px solid #27a5ff;
-                    border-radius: 10px;
-                    color: #27a5ff;
-                    font-size: 16px;
-                  "
-                  @click="showRoleModal = false"
-                  >取消</el-button
-                >
-                <el-button
-                  style="
-                    width: 300px;
-                    height: 50px;
-                    border: 2px solid #27a5ff;
-                    border-radius: 10px;
-                    color: #fff;
-                    font-size: 16px;
-                  "
-                  type="primary"
-                  @click="confirmRole"
-                  >确认</el-button
-                >
+                <el-button class="cancel" @click="showRoleModal = false">取消</el-button>
+                <el-button class="confirm" type="primary" @click="confirmRole">确认</el-button>
               </div>
             </template>
           </el-dialog>
           <img
             class="image_2 absolute"
             referrerpolicy="no-referrer"
-            style="top: 300px; left: 50%; transform: translateX(-50%)"
             src="@/assets/images/redraw-images/bar.png"
           />
 
@@ -286,15 +175,10 @@
               }
             "
             class="text-wrapper_3 flex flex-row cursor-pointer justify-center items-center absolute"
-            style="top: 330px; border-radius: 10px; border: 1px solid #ffffff"
           >
             <span class="text_6" style="color: #fff">账号密码登录</span>
           </div>
-          <span
-            class="text_8 absolute"
-            style="top: 290px; color: #fff; left: 50%; transform: translateX(-50%)"
-            >or</span
-          >
+          <span class="text_8 absolute">or</span>
         </div>
       </div>
       <span class="text_7 flex" style="color: #5581ad">北方工业大学&#64;2024版权所有</span>
@@ -564,6 +448,56 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
+.text {
+  position: absolute;
+  right: 3%;
+  background-color: rgba(39, 165, 255, 0.15);
+  border-radius: 7px;
+  height: 42px;
+  width: 140px;
+  color: rgba(39, 165, 255, 1);
+}
+.confirm {
+  width: 300px;
+  height: 50px;
+  border: 2px solid #27a5ff;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 16px;
+}
+.cancel {
+  width: 300px;
+  height: 50px;
+  border: 2px solid #27a5ff;
+  border-radius: 10px;
+  color: #27a5ff;
+  font-size: 16px;
+}
+:deep(.el-radio) {
+  margin-bottom: 20px !important;
+}
+:deep(.el-radio-group) {
+  width: 646px;
+  margin: 0 auto;
+}
+.wrapper {
+  width: 425px;
+  top: 250px;
+}
+.image_1 {
+  top: 35px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.inner {
+  width: 425px;
+  height: 540px;
+  margin: 200px 0 0 1075px;
+}
+.radio-wrap {
+  width: 646px;
+  height: 442px;
+}
 .radio-wrap::-webkit-scrollbar {
   width: 8px; /* 垂直滚动条宽度 */
   height: 8px; /* 水平滚动条高度 */
@@ -584,6 +518,10 @@ onMounted(() => {
   height: 1080px;
   overflow: hidden;
   // display: flex;
+}
+
+:deep(.el-dialog) {
+  border-radius: 10px;
 }
 
 :deep(.el-dialog__header) {
@@ -624,6 +562,9 @@ onMounted(() => {
 }
 
 .block_1 {
+  top: 120px;
+  left: 50%;
+  transform: translateX(-50%);
   // box-shadow: 0px 1px 0px 0px rgba(255, 255, 255, 0.5);
   // border-radius: 10px;
   // width: 444px;
@@ -652,10 +593,9 @@ onMounted(() => {
   letter-spacing: 2.25px;
   font-family: MicrosoftYaHei;
   font-weight: normal;
-  text-align: right;
+  text-align: center;
   white-space: nowrap;
   line-height: 24px;
-  margin: 12px 0 0 67px;
 }
 
 .text_2 {
@@ -670,7 +610,6 @@ onMounted(() => {
   text-align: right;
   white-space: nowrap;
   line-height: 24px;
-  // margin: 18px 69px 0 72px;
 }
 
 .block_2 {
@@ -748,6 +687,12 @@ onMounted(() => {
 }
 
 .text-wrapper_2 {
+  width: 425px;
+  top: 200px;
+  background-color: #fff;
+  text-align: center;
+  background-color: #fff;
+  text-align: center;
   border-radius: 10px;
   height: 50px;
   width: 425px;
@@ -770,15 +715,20 @@ onMounted(() => {
 }
 
 .image_2 {
+  top: 300px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 425px;
   height: 2px;
   // margin: 36px 0 0 1071px;
 }
 
 .text-wrapper_3 {
+  top: 330px;
   border-radius: 10px;
+
   height: 50px;
-  border: 2px solid rgba(39, 165, 255, 1);
+  border: 1px solid #ffffff;
   width: 425px;
 }
 
@@ -791,7 +741,7 @@ onMounted(() => {
   letter-spacing: 3.200000047683716px;
   font-family: MicrosoftYaHei;
   font-weight: normal;
-  text-align: right;
+  text-align: center;
   white-space: nowrap;
   line-height: 21px;
   // margin: 14px 0 0 143px;
@@ -812,13 +762,14 @@ onMounted(() => {
 }
 
 .text_8 {
-  // position: absolute;
-  // left: 1280px;
-  // top: 670px;
+  top: 290px;
+  color: #fff;
+  left: 50%;
+  transform: translateX(-50%);
   width: 22px;
   height: 19px;
   overflow-wrap: break-word;
-  color: rgba(39, 165, 255, 0.4);
+  // color: rgba(39, 165, 255, 0.4);
   font-size: 14px;
   letter-spacing: 3.5px;
   font-family: MicrosoftYaHei;
