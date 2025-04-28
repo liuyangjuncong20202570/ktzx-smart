@@ -91,7 +91,7 @@
             </template>
             <el-radio-group style="width: 646px; margin: 0 auto" v-model="selectedRoleId">
               <div
-                class="flex flex-col flex-wrap content-between"
+                class="flex flex-col flex-wrap content-between overflow-auto radio-wrap"
                 style="width: 646px; height: 442px"
               >
                 <el-radio
@@ -100,9 +100,7 @@
                   :key="role.roleid"
                   :label="role.id"
                 >
-                  <div style="font-size: 16px; color: #666">
-                    {{ role.rolename }}
-                  </div>
+                  <div style="font-size: 16px; color: #666">{{ role.rolename }}</div>
                 </el-radio>
               </div>
             </el-radio-group>
@@ -566,6 +564,20 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
+.radio-wrap::-webkit-scrollbar {
+  width: 8px; /* 垂直滚动条宽度 */
+  height: 8px; /* 水平滚动条高度 */
+}
+/* 滚动条上的滑块 */
+.radio-wrap::-webkit-scrollbar-thumb {
+  background-color: rgba(64, 158, 254, 0.5); /* 半透明灰色 */
+  border-radius: 4px;
+}
+
+/* 滚动条轨道 */
+.radio-wrap::-webkit-scrollbar-track {
+  background: #f0f0f0; /* 浅灰色 */
+}
 .page {
   position: relative;
   width: 1920px;

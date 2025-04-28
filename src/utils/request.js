@@ -1,4 +1,5 @@
 import axios from 'axios';
+import JSONBig from 'json-bigint';
 import { ElMessage } from 'element-plus';
 //60.205.178.180
 //127.0.0.1
@@ -16,7 +17,7 @@ export const host = 'http://120.46.201.4:10203';
 // };
 
 const request = {
-  admin: createAPI('http://localhost:8080/api'),
+  admin: createAPI('http://127.0.0.1:8080/api'),
   course: createAPI('http://localhost:8082/api'),
   evaluation: createAPI('http://localhost:8083/api'),
   page: createAPI('http://120.46.201.4:10203/page'),
@@ -61,8 +62,19 @@ const request = {
 function createAPI(url) {
   // 构建不同端口的异步请求数据
   const axiosData = axios.create({
-    baseURL: url
-    // timeout: 70000
+    baseURL: url,
+    timeout: 7000,
+    transformResponse: [
+      data => {
+        try {
+          // 用 json-bigint 解析返回数据
+          return JSONBig({ storeAsString: true }).parse(data);
+        } catch (err) {
+          // 如果解析失败，比如返回的不是标准JSON（可能是文件流等），就原样返回
+          return data;
+        }
+      }
+    ]
   });
 
   // request 拦截器
