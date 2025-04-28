@@ -118,7 +118,7 @@ import { onMounted, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { host } from "@/utils/request.js";
-import { studentList, practiceDownload, fallBackApi, setStuCanReadCorrect } from "@/api/practice/index.ts";
+import { studentList, practiceDownload, fallBackApi, setStuCanReadCorrect,practiceDetail } from "@/api/practice/index.ts";
 import { ResVO, StudentPracticePageVO } from "@/api/practice/type.ts";
 import { downloadFile } from "@/utils/index";
 import Header from "@/views/page/components/header/index.vue";
@@ -155,7 +155,7 @@ const pathData = [
   },
 ];
 
-const canReadCorrect = ref(true);
+const canReadCorrect = ref(false);
 
 const handleCanReadCorrectChange = async (val: boolean) => {
   try {
@@ -231,6 +231,12 @@ const loadStudentData = async () => {
         }
       }
     });
+    if(tableData.length>0){
+      const resData1 = await practiceDetail(tableData[0].practiceId)
+      if(resData1.code==200){
+        canReadCorrect.value = resData1.data.stuCanReadCorrect==1?true:false
+      }
+    }
   }
 };
 const fallBack = (data: any) => {

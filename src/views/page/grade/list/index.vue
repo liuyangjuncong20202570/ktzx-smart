@@ -21,7 +21,7 @@
       <el-table-column label="姓名" prop="name" />
       <el-table-column label="图片" prop="image" v-if="isShowImage">
         <template #default="scope">
-          <span v-if="scope.row.itemMap?.image?.itemScore">
+          <span v-if="scope.row.itemMap?.image?.itemScore || scope.row.itemMap?.image?.itemScore == 0">
             {{ scope.row.itemMap?.image?.itemScore }}
           </span>
           <span v-else> -- </span>
@@ -29,7 +29,7 @@
       </el-table-column>
       <el-table-column label="视频" prop="video" v-if="isShowVideo">
         <template #default="scope">
-          <span v-if="scope.row.itemMap?.video?.itemScore">
+          <span v-if="scope.row.itemMap?.video?.itemScore || scope.row.itemMap?.video?.itemScore == 0">
             {{ scope.row.itemMap?.video?.itemScore }}
           </span>
           <span v-else> -- </span>
@@ -37,7 +37,7 @@
       </el-table-column>
       <el-table-column label="实验报告" prop="report" width="100" v-if="isShowReport">
         <template #default="scope">
-          <span v-if="scope.row.itemMap?.report?.itemScore">
+          <span v-if="scope.row.itemMap?.report?.itemScore || scope.row.itemMap?.report?.itemScore == 0">
             {{ scope.row.itemMap?.report?.itemScore }}
           </span>
           <span v-else> -- </span>
@@ -45,7 +45,7 @@
       </el-table-column>
       <el-table-column label="实验预习报告" prop="previewReport" width="150" v-if="isShowpReviewReports">
         <template #default="scope">
-          <span v-if="scope.row.itemMap?.previewReport?.itemScore">
+          <span v-if="scope.row.itemMap?.previewReport?.itemScore || scope.row.itemMap?.previewReport?.itemScore == 0">
             {{ scope.row.itemMap?.previewReport?.itemScore }}
           </span>
           <span v-else> -- </span>
@@ -53,7 +53,7 @@
       </el-table-column>
       <el-table-column label="答辩验收" prop="defence" width="100" v-if="isShowDefence">
         <template #default="scope">
-          <span v-if="scope.row.itemMap?.defence?.itemScore">
+          <span v-if="scope.row.itemMap?.defence?.itemScore || scope.row.itemMap?.defence?.itemScore == 0">
             {{ scope.row.itemMap?.defence?.itemScore }}
           </span>
           <span v-else> -- </span>
@@ -61,7 +61,7 @@
       </el-table-column>
       <el-table-column label="总评成绩" prop="resultScore" fixed="right" width="100">
         <template #default="scope">
-          <span v-if="scope.row.resultScore">{{ scope.row.resultScore }}</span>
+          <span v-if="scope.row.resultScore || scope.row.resultScore == 0">{{ scope.row.resultScore }}</span>
           <span v-else> -- </span>
         </template>
       </el-table-column>

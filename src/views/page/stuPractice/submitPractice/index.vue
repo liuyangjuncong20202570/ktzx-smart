@@ -93,7 +93,7 @@
               <div class="pg-score">
                 <p>此项得分：{{ item.other?.realScore || 0 }}</p>
                 <br>
-                <el-button v-if="item?.other?.correctImg && practiceDetail.stuCanReadCorrect == 1" class="custom-link-button custom-link-active-button" @click="handleViewCorrection(item?.other?.correctImg)">查看批改</el-button>
+                <el-button v-if="item?.other?.correctImg && practiceDetail.stuCanReadCorrect == 1" class="custom-link-button custom-link-active-button" @click="handleViewCorrection(item?.other?.correctImg,item)">查看批改</el-button>
               </div>
             </div>
             <div v-else style="display: flex; justify-content: flex-start;">
@@ -208,7 +208,7 @@
         </div>
       </template>
     </el-dialog>
-    <ViewCorrectionDialog v-model="viewCorrectionVisible" :img-url="viewCorrectionImg" />
+    <ViewCorrectionDialog v-model="viewCorrectionVisible" :img-url="viewCorrectionImg" :original-img-url="uploadedOriginalImagePath" />
   </div>
 </template>
 
@@ -224,6 +224,7 @@ import { getFileExtensionFromUrl, isImageURL, downloadFile } from "@/utils/index
 import ImageSwiper from "@/views/page/practice/components/ImageSwiper.vue";
 import WordPreview from "@/components/WordPreview/WordPreview.vue";
 import ViewCorrectionDialog from "@/views/page/practice/components/ViewCorrectionDialog.vue";
+import { synthesisImgApi } from "@/api/practice/index.ts";
 import mammoth from "mammoth";
 const routes = useRouter();
 const { currentRoute } = routes;
@@ -259,7 +260,23 @@ onMounted(() => {
 
 const viewCorrectionVisible = ref(false);
 const viewCorrectionImg = ref("");
-const handleViewCorrection = (imgUrl) => {
+const isloading = ref(false);
+const uploadedOriginalImagePath = ref("");
+const handleViewCorrection = (imgUrl,item) => {
+  console.log(item,'item')
+  isloading.value = true;
+  synthesisImgApi({ practiceId: item.other.practiceId, stuId: item.other.stuId, itemId: item.other.itemId })
+    .then((res) => {
+      if (res.code == 200) {
+        uploadedOriginalImagePath.value = res.data;
+        isloading.value = false;
+      } else {
+        isloading.value = false;
+      }
+    })
+    .finally(() => {
+      isloading.value = false;
+    });
   viewCorrectionVisible.value = true;
   viewCorrectionImg.value = imgUrl;
 };
@@ -292,7 +309,7 @@ const submit = (name) => {
         if (res.code === "200") {
           ElMessage.success(name === "save" ? "保存成功" : "提交成功");
           if (name === "submit") {
-            routes.push("/homes/studenthome/exam/myexperiment");
+            routes.push("/homes/studentcourses/exam/myexperiment");
           }
         }
       });

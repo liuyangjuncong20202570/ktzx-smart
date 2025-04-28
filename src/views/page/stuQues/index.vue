@@ -19,7 +19,7 @@
             class="custom-link-button custom-link-active-button"
             @click="(() => {
             router.push({
-              path: '/homes/studenthome/exam/detail',
+              path: '/homes/studentcourses/exam/detail',
               query: {
                 id: scope.row.id,
                 type: 'edit'
@@ -30,7 +30,7 @@
           </el-button>
           <el-button v-else class="custom-link-button custom-link-active-button" @click="(() => {
             router.push({
-              path: '/homes/studenthome/exam/detail',
+              path: '/homes/studentcourses/exam/detail',
               query: {
                 id: scope.row.id,
                 type: 'view'

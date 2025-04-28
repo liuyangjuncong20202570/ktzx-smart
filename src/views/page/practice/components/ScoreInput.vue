@@ -84,7 +84,9 @@
     <ViewCorrectionDialog
       v-model="viewCorrectionVisible"
       :img-url="viewCorrectionImg"
+      :original-img-url="uploadedOriginalImagePath"
     />
+    
   </div>
 </template>
 
@@ -146,6 +148,22 @@ const handleClose = () => {
 const viewCorrectionVisible = ref(false);
 const viewCorrectionImg = ref("");
 const handleViewCorrection = () => {
+  // dialogVisible.value = true;
+  // 添加loding
+  isloading.value = true;
+  synthesisImgApi({ practiceId: props.dataObj.practiceId, stuId: props.stuId, itemId: props.dataObj.id })
+    .then((res) => {
+      if (res.code == 200) {
+        imgUrl.value = host + res.data;
+        uploadedOriginalImagePath.value = res.data;
+        isloading.value = false;
+      } else {
+        isloading.value = false;
+      }
+    })
+    .finally(() => {
+      isloading.value = false;
+    });
   viewCorrectionVisible.value = true;
   viewCorrectionImg.value = props.dataObj.other.correctImg;
 };

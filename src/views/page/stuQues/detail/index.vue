@@ -31,7 +31,7 @@
   const pathData = [
     {
       name: '问卷列表',
-      path: '/homes/studenthome/exam/myquestionnaire'
+      path: '/homes/studentcourses/exam/myquestionnaire'
     },
     {
       name: route.query.type === 'view' ? '查看问卷' : '编辑问卷',
@@ -133,7 +133,7 @@
       }).then(res => {
         if (res.code === '200') {
           ElMessage.success('提交成功')
-          router.push('/homes/studenthome/exam/myquestionnaire')
+          router.push('/homes/studentcourses/exam/myquestionnaire')
         }
       })
     }).catch(() => { })
