@@ -10,15 +10,15 @@ const HOST_COURSE = import.meta.env.VITE_API_HOST_COURSE;
 const HOST_EVALUATION = import.meta.env.VITE_API_HOST_EVALUATION;
 // 图片上传用到的域名
 export const host = import.meta.env.VITE_UPLOAD_HOST;
-const request = {
-  admin: createAPI(`${HOST_ADMIN}`),
-  course: createAPI(`${HOST_COURSE}`),
-  evaluation: createAPI(`${HOST_EVALUATION}`),
-  page: createAPI(`${WDD_HOST}:10203/page`),
-  fork: createAPI(`${WDD_HOST}:10203/fork`),
-  common: createAPI(`${WDD_HOST}:10203/common`),
-  term: createAPI(`${WDD_HOST}:10203/term`)
-};
+// const request = {
+//   admin: createAPI(`${HOST_ADMIN}`),
+//   course: createAPI(`${HOST_COURSE}`),
+//   evaluation: createAPI(`${HOST_EVALUATION}`),
+//   page: createAPI(`${WDD_HOST}:10203/page`),
+//   fork: createAPI(`${WDD_HOST}:10203/fork`),
+//   common: createAPI(`${WDD_HOST}:10203/common`),
+//   term: createAPI(`${WDD_HOST}:10203/term`)
+// };
 
 // request.js 物理机配置
 const baseURL = window.__APP_CONFIG__?.API_BASE_URL || 'http://127.0.0.1';
@@ -37,15 +37,15 @@ const baseURL = window.__APP_CONFIG__?.API_BASE_URL || 'http://127.0.0.1';
 // 图片上传用到的域名
 // export const host = 'http://120.46.201.4:10203';
 
-// const request = {
-//   admin: createAPI('http://localhost:8080/api'),
-//   course: createAPI('http://localhost:8082/api'),
-//   evaluation: createAPI('http://localhost:8083/api'),
-//   page: createAPI('http://120.46.201.4:10203/page'),
-//   fork: createAPI('http://120.46.201.4:10203/fork'),
-//   common: createAPI('http://120.46.201.4:10203/common'),
-//   term: createAPI('http://120.46.201.4:10203/term')
-// };
+const request = {
+  admin: createAPI('http://localhost:8080/api'),
+  course: createAPI('http://localhost:8082/api'),
+  evaluation: createAPI('http://localhost:8083/api'),
+  page: createAPI('http://120.46.201.4:10203/page'),
+  fork: createAPI('http://120.46.201.4:10203/fork'),
+  common: createAPI('http://120.46.201.4:10203/common'),
+  term: createAPI('http://120.46.201.4:10203/term')
+};
 
 // const request = {
 //   admin: createAPI('http://120.46.201.4:9000/api'),
@@ -77,7 +77,8 @@ function createAPI(url) {
       data => {
         try {
           // 用 json-bigint 解析返回数据
-          return JSONBig({ storeAsString: true }).parse(data);
+          // return JSONBig({ storeAsString: true }).parse(data);
+          return JSON.parse(JSON.stringify(JSONBig({ storeAsString: true }).parse(data)));
         } catch (err) {
           // 如果解析失败，比如返回的不是标准JSON（可能是文件流等），就原样返回
           return data;

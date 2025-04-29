@@ -1,8 +1,7 @@
 <template>
   <div style="height: 100vh; background-color: rgb(238, 247, 255); min-width: 100vw">
     <el-container class="layout-container-demo">
-      <el-header
-        style="
+      <el-header style="
           position: relative;
           text-align: right;
           font-size: 15px;
@@ -11,28 +10,16 @@
           background-color: #fff;
           box-shadow: 0px 0px 15px 0px rgba(0, 30, 56, 0.07);
           z-index: 999;
-        "
-      >
+        ">
         <template #default>
           <div class="header">
-            <div
-              class="inner flex justify-between"
-              style="width: 1250px; height: 100%; margin: 0 auto"
-            >
+            <div class="inner flex justify-between" style="width: 1250px; height: 100%; margin: 0 auto">
               <div class="icon flex justify-center items-center">
-                <img
-                  style="width: 29px; height: 47px; padding-right: 5px"
-                  referrerpolicy="no-referrer"
-                  src="@/assets/images/redraw-images/icon.png"
-                />
-                <img
-                  style="width: 184px; height: 28px"
-                  referrerpolicy="no-referrer"
-                  src="@/assets/images/redraw-images/title.png"
-                />
-                <span
-                  class="term"
-                  style="
+                <img style="width: 29px; height: 47px; padding-right: 5px" referrerpolicy="no-referrer"
+                  src="@/assets/images/redraw-images/icon.png" />
+                <img style="width: 184px; height: 28px" referrerpolicy="no-referrer"
+                  src="@/assets/images/redraw-images/title.png" />
+                <span class="term" style="
                     font-size: 24px;
                     width: 116px;
                     height: 31px;
@@ -41,26 +28,19 @@
                     line-height: 31px;
                     font-family: MicrosoftYaHei;
                     margin-left: 33px;
-                  "
-                  >{{ loginInfo.currentterm }}</span
-                >
+                  ">{{ loginInfo.currentterm }}</span>
               </div>
               <div class="right flex justify-center items-center" style="height: 100%">
                 <img referrerpolicy="no-referrer" src="@/assets/images/redraw-images/divider.png" />
                 <div class="mainner flex justify-between items-center">
-                  <div
-                    class="avatar flex justify-center items-center"
-                    style="width: 60px; height: 60px; margin-left: 15px; margin-right: 5px"
-                  >
-                    <el-avatar
-                      src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-                    />
+                  <div class="avatar flex justify-center items-center"
+                    style="width: 60px; height: 60px; margin-left: 15px; margin-right: 5px">
+                    <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
                   </div>
                   <div class="text">
                     <div class="group_4">
                       <div class="top" style="margin-bottom: 5px">
-                        <span
-                          style="
+                        <span style="
                             width: 144px;
                             height: 24px;
                             overflow-wrap: break-word;
@@ -71,13 +51,10 @@
                             text-align: left;
                             white-space: nowrap;
                             line-height: 24px;
-                          "
-                          >{{ loginInfo.username }}</span
-                        >
+                          ">{{ loginInfo.username }}</span>
                       </div>
                       <div class="bottom flex justify-between items-center">
-                        <div
-                          style="
+                        <div style="
                             width: 62px;
                             height: 19px;
                             overflow-wrap: break-word;
@@ -92,12 +69,10 @@
                             margin-right: 5px;
                             overflow: hidden; /* 隐藏超出的部分 */
                             text-overflow: ellipsis;
-                          "
-                        >
+                          ">
                           <el-tag type="primary">{{ loginInfo.rolename }}</el-tag>
                         </div>
-                        <div
-                          style="
+                        <div style="
                             width: 31px;
                             height: 19px;
                             overflow-wrap: break-word;
@@ -109,8 +84,7 @@
                             text-align: right;
                             white-space: nowrap;
                             line-height: 19px;
-                          "
-                        >
+                          ">
                           <el-tag type="success">在线</el-tag>
                         </div>
                       </div>
@@ -120,13 +94,11 @@
                   </div>
                   <!-- 下拉按钮 -->
                   <el-dropdown @visible-change="handleVisibleChange">
-                    <img
-                      style="margin-left: 37px; width: 26px; height: 26px"
-                      referrerpolicy="no-referrer"
-                      src="@/assets/images/redraw-images/dropdown.png"
-                    />
+                    <img style="margin-left: 37px; width: 26px; height: 26px" referrerpolicy="no-referrer"
+                      src="@/assets/images/redraw-images/dropdown.png" />
                     <template #dropdown>
                       <el-dropdown-menu>
+                        <el-dropdown-item @click="openChangePwdDialog">修改密码</el-dropdown-item>
                         <el-dropdown-item>查看详情</el-dropdown-item>
                         <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
                       </el-dropdown-menu>
@@ -176,14 +148,11 @@
         </div> -->
       </el-header>
       <el-container style="width: 1250px; height: 100vh; overflow-x: hidden; margin: 0 auto">
-        <el-aside
-          width="200px"
-          style="
+        <el-aside width="200px" style="
             height: 100%;
             background-color: #fff;
             box-shadow: 0px 0px 15px 0px rgba(0, 30, 56, 0.07);
-          "
-        >
+          ">
           <!--左侧我的课程部分-->
           <div style="height: 100%; position: relative">
             <div v-if="isSHow" class="instrutor"></div>
@@ -288,15 +257,12 @@
           </div> -->
         </el-aside>
 
-        <el-main
-          style="-ms-overflow-style: none; /* IE 和 Edge */ scrollbar-width: none; /* Firefox */"
-        >
+        <el-main style="-ms-overflow-style: none; /* IE 和 Edge */ scrollbar-width: none; /* Firefox */">
           <!--右侧内容部分-->
           <el-card style="max-width: 910px; margin-left: 30px; margin-top: 50px">
             <router-view></router-view>
           </el-card>
-          <span
-            style="
+          <span style="
               display: inline-block;
               width: 257px;
               height: 24px;
@@ -309,9 +275,7 @@
               white-space: nowrap;
               line-height: 24px;
               margin-top: 25px;
-            "
-            >北方工业大学2024&nbsp;CopyRight</span
-          >
+            ">北方工业大学2024&nbsp;CopyRight</span>
           <!-- <div class="right-content-container" style="margin-right: 20px; margin-top: 10px">
             <div class="header">
               <el-text style="color: white; font-size: large">课程详情</el-text>
@@ -326,15 +290,39 @@
       </el-container>
     </el-container>
   </div>
+
+  <el-dialog v-model="changePwdVisible" title="修改密码" width="400" class="h-[260px]" align-center destroy-on-close>
+    <el-form ref="changePwdRef" :model="pwdInfo" class="pr-14 pl-7 grid gap-y-4 mt-2" :rules="changePwdRules"
+      autocomplete="off">
+      <el-form-item label="当前密码" prop="currentPwd" label-width="65">
+        <el-input type="password" show-password v-model="pwdInfo.currentPwd" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="新密码" prop="newPwd" label-width="65">
+        <el-input type="password" show-password v-model="pwdInfo.newPwd" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="确认密码" prop="confirmPwd" label-width="65">
+        <el-input type="password" show-password v-model="pwdInfo.confirmPwd" autocomplete="off" />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div>
+        <el-button @click="changePwdVisible = false">取消</el-button>
+        <el-button type="primary" @click="changePwd(changePwdRef)">
+          确定
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import '@/assets/css/taildwind.css';
 import { ref, reactive, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import request from '@/utils/request.js';
 import { ElMessage } from 'element-plus';
 import { useProfileStore } from '@/stores/profileStore.js';
+import { FormInstance } from 'element-plus';
 
 // 获取Store
 const profileStore = useProfileStore();
@@ -402,6 +390,69 @@ const navigateTo = id => {
     });
 };
 
+
+//--------修改密码
+const changePwdVisible = ref(false);
+const pwdInfo = ref({
+  currentPwd: '',
+  newPwd: '',
+  confirmPwd: ''
+});
+const changePwdRef = ref<FormInstance>();
+
+const openChangePwdDialog = () => {
+  pwdInfo.value = {
+    currentPwd: '',
+    newPwd: '',
+    confirmPwd: ''
+  };
+  changePwdVisible.value = true;
+}
+
+const validateNew = (rule: any, value: String, callback: any) => {
+  if (value === '') {
+    callback(new Error('请输入新密码'))
+  } else {
+    if (value.length < 3 || value.length > 15) callback(new Error('密码长度在3到15个字符之间'));
+    callback()
+  }
+}
+const validateConfirm = (rule: any, value: String, callback: any) => {
+  if (value === '') {
+    callback(new Error('请再次输入新密码'))
+  } else if (value !== pwdInfo.value.newPwd) {
+    callback(new Error("两次输入的密码不一致"))
+  } else {
+    callback()
+  }
+}
+
+const changePwdRules = ref({
+  currentPwd: [{ required: true, message: '请输入当前密码', trigger: 'blur' }],
+  newPwd: [{ required: true, validator: validateNew, trigger: 'blur' }],
+  confirmPwd: [{ required: true, validator: validateConfirm, trigger: 'blur' }]
+});
+
+const changePwd = (formEl: FormInstance | undefined) => {
+  if (!formEl) return;
+  formEl.validate(async (valid) => {
+    if (valid) {
+      try {
+        const res = await request.admin.get(`/homes/teacherChangePwd?currentPwd=${pwdInfo.value.currentPwd}&newPwd=${pwdInfo.value.newPwd}`);
+        if (res.code === 200) {
+          ElMessage.success("修改成功");
+          changePwdVisible.value = false;
+        } else ElMessage.error(res.msg);
+      } catch (error) {
+        ElMessage.error("修改失败" + error);
+      }
+    } else {
+      return;
+    }
+  })
+
+}
+
 // 钩子函数用来刷新后重新获取数据
 
 onMounted(() => {
@@ -466,7 +517,8 @@ onMounted(() => {
   flex-wrap: nowrap;
 
   .item {
-    font-family: monospace; /* 等宽字体 */
+    font-family: monospace;
+    /* 等宽字体 */
     font-size: 16px;
     margin-bottom: 30px;
     height: 35px;
@@ -477,9 +529,12 @@ onMounted(() => {
     color: #fff;
     font-weight: 400;
     transition: background-color 0.5s ease, color 0.5s ease;
+
     &:hover {
-      background-color: #2ecc71; /* 悬停时背景颜色 */
-      color: #ecf0f1; /* 悬停时文字颜色 */
+      background-color: #2ecc71;
+      /* 悬停时背景颜色 */
+      color: #ecf0f1;
+      /* 悬停时文字颜色 */
     }
   }
 }
@@ -491,6 +546,7 @@ onMounted(() => {
 :deep(.el-sub-menu__title),
 :deep(.el-menu-item) {
   font-size: 16px;
+
   &:hover {
     background-color: #eee;
   }
@@ -498,6 +554,7 @@ onMounted(() => {
 
 :deep(.el-sub-menu.is-opened .el-menu-item) {
   background-color: #e5e5e5;
+
   &:hover {
     background-color: #eee;
   }
