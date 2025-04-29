@@ -127,6 +127,7 @@
                     />
                     <template #dropdown>
                       <el-dropdown-menu>
+                        <el-dropdown-item @click="openChangePwdDialog">修改密码</el-dropdown-item>
                         <el-dropdown-item>查看详情</el-dropdown-item>
                         <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
                       </el-dropdown-menu>
@@ -318,6 +319,29 @@
       </el-container>
     </el-container>
   </div>
+
+  <el-dialog v-model="changePwdVisible" title="修改密码" width="400" class="h-[260px]" align-center destroy-on-close>
+    <el-form ref="changePwdRef" :model="pwdInfo" class="pr-14 pl-7 grid gap-y-4 mt-2" :rules="changePwdRules"
+      autocomplete="off">
+      <el-form-item label="当前密码" prop="currentPwd" label-width="65">
+        <el-input type="password" show-password v-model="pwdInfo.currentPwd" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="新密码" prop="newPwd" label-width="65">
+        <el-input type="password" show-password v-model="pwdInfo.newPwd" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="确认密码" prop="confirmPwd" label-width="65">
+        <el-input type="password" show-password v-model="pwdInfo.confirmPwd" autocomplete="off" />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div>
+        <el-button @click="changePwdVisible = false">取消</el-button>
+        <el-button type="primary" @click="changePwd(changePwdRef)">
+          确定
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -416,6 +440,69 @@ const getmenu = () => {
       });
     });
 };
+
+
+//--------修改密码
+const changePwdVisible = ref(false);
+const pwdInfo = ref({
+  currentPwd: '',
+  newPwd: '',
+  confirmPwd: ''
+});
+const changePwdRef = ref<FormInstance>();
+
+const openChangePwdDialog = () => {
+  pwdInfo.value = {
+    currentPwd: '',
+    newPwd: '',
+    confirmPwd: ''
+  };
+  changePwdVisible.value = true;
+}
+
+const validateNew = (rule: any, value: String, callback: any) => {
+  if (value === '') {
+    callback(new Error('请输入新密码'))
+  } else {
+    if (value.length < 3 || value.length > 15) callback(new Error('密码长度在3到15个字符之间'));
+    callback()
+  }
+}
+const validateConfirm = (rule: any, value: String, callback: any) => {
+  if (value === '') {
+    callback(new Error('请再次输入新密码'))
+  } else if (value !== pwdInfo.value.newPwd) {
+    callback(new Error("两次输入的密码不一致"))
+  } else {
+    callback()
+  }
+}
+
+const changePwdRules = ref({
+  currentPwd: [{ required: true, message: '请输入当前密码', trigger: 'blur' }],
+  newPwd: [{ required: true, validator: validateNew, trigger: 'blur' }],
+  confirmPwd: [{ required: true, validator: validateConfirm, trigger: 'blur' }]
+});
+
+const changePwd = (formEl: FormInstance | undefined) => {
+  if (!formEl) return;
+  formEl.validate(async (valid) => {
+    if (valid) {
+      try {
+        const res = await request.admin.get(`/homes/studentChangePwd?currentPwd=${pwdInfo.value.currentPwd}&newPwd=${pwdInfo.value.newPwd}`);
+        if (res.code === 200) {
+          ElMessage.success("修改成功");
+          changePwdVisible.value = false;
+        } else ElMessage.error(res.msg);
+      } catch (error) {
+        ElMessage.error("修改失败" + error);
+      }
+    } else {
+      return;
+    }
+  })
+
+}
 
 //钩子函数用来刷新后重新获取数据
 
