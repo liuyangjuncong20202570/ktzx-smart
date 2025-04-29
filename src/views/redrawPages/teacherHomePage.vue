@@ -534,7 +534,7 @@ const validateNew = (rule: any, value: String, callback: any) => {
     callback()
   }
 }
-const validateConfirm = (rule: any, value: any, callback: any) => {
+const validateConfirm = (rule: any, value: String, callback: any) => {
   if (value === '') {
     callback(new Error('请再次输入新密码'))
   } else if (value !== pwdInfo.value.newPwd) {
@@ -555,7 +555,7 @@ const changePwd = (formEl: FormInstance | undefined) => {
   formEl.validate(async (valid) => {
     if (valid) {
       try {
-        const res = await request.admin.get(`/homes/teacherChangePwd?currentPwd=${pwdInfo.value.currentPwd}&newPwd=${pwdInfo.value.newPwd}`);
+        const res = await request.admin.get(`/homes/studentChangePwd?currentPwd=${pwdInfo.value.currentPwd}&newPwd=${pwdInfo.value.newPwd}`);
         if (res.code === 200) {
           ElMessage.success("修改成功");
           changePwdVisible.value = false;
