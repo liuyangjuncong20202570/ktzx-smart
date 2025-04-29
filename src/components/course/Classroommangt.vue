@@ -1,34 +1,52 @@
 <template>
-  <div style="height: 92vh; display: flex; flex-direction: column;">
+  <div style="height: 92vh; display: flex; flex-direction: column">
     <el-header
-        style="height: auto; padding: 5px 0px; width:100%; background-color:#deebf7; display: flex;">
-      <el-button type="primary" v-blur-on-click style="margin-left: 0.8vw;" @click="importClassroom">导入课堂列表
+      style="height: auto; padding: 5px 0px; width: 100%; background-color: #deebf7; display: flex"
+    >
+      <el-button type="primary" v-blur-on-click style="margin-left: 0.8vw" @click="importClassroom"
+        >导入课堂列表
       </el-button>
       <!--      <el-button type="primary" v-blur-on-click style="margin-left: 0.8vw;" @click="addClassroom">新增课堂</el-button>-->
-      <el-button type="danger" v-blur-on-click style="margin-left: 0.8vw;" @click="deleteClassroom">删除课堂
+      <el-button type="danger" v-blur-on-click style="margin-left: 0.8vw" @click="deleteClassroom"
+        >删除课堂
       </el-button>
     </el-header>
-    <div style="max-height: 100%; height: 100%; overflow:auto;">
-      <AddClassroomDialog v-show="AdddialogVisible" ref="AddDialogShow" @formSubmitted="getClassRoomList"/>
-      <EditClassroomDialog v-show="EditdialogVisible" ref="EditDialogShow" @formSubmitted="getClassRoomList"/>
+    <div style="max-height: 100%; height: 100%; overflow: auto">
+      <AddClassroomDialog
+        v-show="AdddialogVisible"
+        ref="AddDialogShow"
+        @formSubmitted="getClassRoomList"
+      />
+      <EditClassroomDialog
+        v-show="EditdialogVisible"
+        ref="EditDialogShow"
+        @formSubmitted="getClassRoomList"
+      />
 
-      <el-table :data="classroomList" style="table-layout:auto; width: 100%; height: 100%;" ref="classroomTable"
-                @selection-change="handleSelectionChange" stripe border :span-method="arraySpanMethod">
+      <el-table
+        :data="classroomList"
+        style="table-layout: auto; width: 100%; height: 100%"
+        ref="classroomTable"
+        @selection-change="handleSelectionChange"
+        stripe
+        border
+        :span-method="arraySpanMethod"
+      >
         <el-table-column type="selection" min-width="27px"></el-table-column>
         <el-table-column width="49">
           <template v-slot="row">{{ row.$index + 1 }}</template>
         </el-table-column>
 
         <el-table-column prop="courseChineseName" label="课程名称" min-width="140">
-          <template #default="{ row }">
+          <template class="name-con" #default="{ row }">
             <el-tooltip :content="row.courseChineseName" placement="top" :hide-after="0.002">
-              <div style="width: 100%; height: 25px;" class="dynamic-font-size">
+              <div style="width: 100%; height: 25px" class="dynamic-font-size">
                 {{ row.courseChineseName }}
-                <el-icon class="edit-icon" style="font-size: 14px" @click="addClassroom(row)">
-                  <CirclePlusFilled/>
-                </el-icon>
               </div>
             </el-tooltip>
+            <el-icon class="edit-icon" style="font-size: 14px" @click="addClassroom(row)">
+              <CirclePlusFilled />
+            </el-icon>
           </template>
         </el-table-column>
 
@@ -36,7 +54,7 @@
           <template #default="{ row }">
             <div v-if="row.classroomName">
               <el-tooltip :content="row.classroomName" placement="top">
-                <div class="dynamic-font-size" style="width: 100%; height: 25px;">
+                <div class="dynamic-font-size" style="width: 100%; height: 25px">
                   {{ row.classroomName }}
                 </div>
               </el-tooltip>
@@ -49,7 +67,7 @@
 
         <el-table-column prop="teacherName" label="主讲教师" min-width="120">
           <template #default="{ row }">
-            <div style="width: 100%; height: 25px;">
+            <div style="width: 100%; height: 25px">
               {{ row.teacherName }}
             </div>
           </template>
@@ -57,14 +75,14 @@
         <!--这个字段不展示v-if="false"-->
         <el-table-column v-if="false" prop="teacherId" label="主讲教师ID" min-width="120">
           <template #default="{ row }">
-            <div style="width: 100%; height: 25px;">
+            <div style="width: 100%; height: 25px">
               {{ row.teacherId }}
             </div>
           </template>
         </el-table-column>
         <el-table-column prop="labTeacher" label="实验教师" min-width="70">
           <template #default="{ row }">
-            <div style="width: 100%; height: 25px;">
+            <div style="width: 100%; height: 25px">
               {{ row.labTeacher }}
             </div>
           </template>
@@ -72,7 +90,7 @@
         <!--这个字段不展示-->
         <el-table-column v-if="false" prop="labTeacherId" label="实验教师ID">
           <template #default="{ row }">
-            <div style="width: 100%; height: 25px;">
+            <div style="width: 100%; height: 25px">
               {{ row.labTeacherId }}
             </div>
           </template>
@@ -80,35 +98,35 @@
 
         <el-table-column prop="practiceTeacher" label="实践教师" min-width="90">
           <template #default="{ row }">
-            <div style="width: 100%; height: 25px;">
+            <div style="width: 100%; height: 25px">
               {{ row.practiceTeacher }}
             </div>
           </template>
         </el-table-column>
         <el-table-column v-if="false" prop="practiceTeacherId" label="实践教师ID" min-width="90">
           <template #default="{ row }">
-            <div style="width: 100%; height: 25px;">
+            <div style="width: 100%; height: 25px">
               {{ row.practiceTeacherId }}
             </div>
           </template>
         </el-table-column>
         <el-table-column prop="teachTime" label="讲授学时" min-width="90">
           <template #default="{ row }">
-            <div style="width: 100%; height: 25px;">
+            <div style="width: 100%; height: 25px">
               {{ row.teachTime }}
             </div>
           </template>
         </el-table-column>
         <el-table-column prop="labTime" label="实验学时" min-width="90">
           <template #default="{ row }">
-            <div style="width: 100%; height: 25px;">
+            <div style="width: 100%; height: 25px">
               {{ row.labTime }}
             </div>
           </template>
         </el-table-column>
         <el-table-column prop="practiceTime" label="实践学时" min-width="90">
           <template #default="{ row }">
-            <div style="width: 100%; height: 25px;">
+            <div style="width: 100%; height: 25px">
               {{ row.practiceTime }}
             </div>
           </template>
@@ -116,7 +134,7 @@
         <el-table-column prop="" label="编辑" min-width="50">
           <template #default="{ row }">
             <el-icon class="edit-icon" @click="editClassroom(row)">
-              <Edit/>
+              <Edit />
             </el-icon>
           </template>
         </el-table-column>
@@ -125,43 +143,39 @@
   </div>
 </template>
 <script setup>
-
-import {Edit, Plus, CirclePlusFilled} from '@element-plus/icons-vue';
-import {ref, onMounted, onUnmounted, nextTick, watch} from 'vue';
-import request from "../../utils/request.js";
-import {ElMessage, ElMessageBox} from "element-plus";
-import {exportTableToCSV} from "../../utils/exportTableToCSV.js";
-import AddClassroomDialog from "./subcomponents/AddClassroomDialog.vue";
-import EditClassroomDialog from "./subcomponents/EditClassroomDialog.vue";
-
+import { Edit, Plus, CirclePlusFilled } from '@element-plus/icons-vue';
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
+import request from '../../utils/request.js';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import { exportTableToCSV } from '../../utils/exportTableToCSV.js';
+import AddClassroomDialog from './subcomponents/AddClassroomDialog.vue';
+import EditClassroomDialog from './subcomponents/EditClassroomDialog.vue';
 
 const classroomList = ref([]);
 const classroomTable = ref(null);
 const getClassRoomList = async () => {
-  await request.course.get('/coursemangt/classroom')
-      .then(res => {
-        // 登录成功
-        if (res.code === 200) {
-          classroomList.value = initialize(res.data);
-          console.log(classroomList.value)
-        } else {
-          ElMessage({
-            type: 'error',
-            message: '获取课堂列表失败'
-          });
-        }
-      })
-      .catch(() => {
-          }
-      );
-
+  await request.course
+    .get('/coursemangt/classroom')
+    .then(res => {
+      // 登录成功
+      if (res.code === 200) {
+        classroomList.value = initialize(res.data);
+        console.log(classroomList.value);
+      } else {
+        ElMessage({
+          type: 'error',
+          message: '获取课堂列表失败'
+        });
+      }
+    })
+    .catch(() => {});
 };
 
 function initialize(data) {
   let result = [];
 
   data.forEach(course => {
-    const {id: courseId, courseChineseName, classroomReqList} = course;
+    const { id: courseId, courseChineseName, classroomReqList } = course;
 
     if (classroomReqList.length === 0) {
       // 如果没有课堂信息，直接添加课程信息
@@ -196,8 +210,9 @@ function initialize(data) {
   return result;
 }
 
-const arraySpanMethod = ({row, column, rowIndex, columnIndex}) => {
-  if (columnIndex === 2) { // 合并courseChineseName列
+const arraySpanMethod = ({ row, column, rowIndex, columnIndex }) => {
+  if (columnIndex === 2) {
+    // 合并courseChineseName列
     const courseChineseName = row.courseChineseName;
     const currentRow = classroomList.value[rowIndex];
     if (rowIndex > 0) {
@@ -220,44 +235,39 @@ const arraySpanMethod = ({row, column, rowIndex, columnIndex}) => {
   return [1, 1];
 };
 
+const AdddialogVisible = ref(false);
+const AddDialogShow = ref(null);
+const EditdialogVisible = ref(false);
+const EditDialogShow = ref(null);
+const importClassroom = () => {};
 
-const AdddialogVisible = ref(false)
-const AddDialogShow = ref(null)
-const EditdialogVisible = ref(false)
-const EditDialogShow = ref(null)
-const importClassroom = () => {
-}
-
-const addClassroom = (row) => {
+const addClassroom = row => {
   const courseinfo = {
     courseid: row.courseId,
     coursename: row.courseChineseName
-  }
-  AdddialogVisible.value = true;  // 打开弹窗
+  };
+  AdddialogVisible.value = true; // 打开弹窗
   AddDialogShow.value.init(courseinfo);
-}
+};
 
 const selectedRows = ref([]);
 const selectedClassroomId = ref([]);
 
-const handleSelectionChange = (selection) => {
+const handleSelectionChange = selection => {
   selectedRows.value = selection;
 };
 
-
-const editClassroom = (row) => {
-  console.log("beforerow", row)
-  EditdialogVisible.value = true;  // 打开弹窗
+const editClassroom = row => {
+  console.log('beforerow', row);
+  EditdialogVisible.value = true; // 打开弹窗
   EditDialogShow.value.init(row);
-}
+};
 
 const deleteClassroom = () => {
-
-
   if (selectedRows.value.length === 0) {
     ElMessage({
       type: 'info',
-      message: '尚未选中任何行',
+      message: '尚未选中任何行'
     });
 
     return;
@@ -270,64 +280,66 @@ const deleteClassroom = () => {
   if (selectedClassrooms.length === 0) {
     ElMessage({
       type: 'info',
-      message: '所选内容中没有包括课堂',
-    })
+      message: '所选内容中没有包括课堂'
+    });
     // 确保消息显示后再清空选中行
 
     return;
   }
 
-  const message = selectedClassroomNames.length > 0
-      ? `所选内容中包括 ${selectedClassroomNames.length} 个课堂： ${selectedClassroomNames.join('，')}  是否删除？`
+  const message =
+    selectedClassroomNames.length > 0
+      ? `所选内容中包括 ${selectedClassroomNames.length} 个课堂： ${selectedClassroomNames.join(
+          '，'
+        )}  是否删除？`
       : `是否要删除勾选的 ${selectedClassroomIds.length} 条记录？`;
 
-  ElMessageBox.confirm(
-      message,
-      '提示',
-      {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消',
-        type: 'info',
-      }
-  )
-      .then(() => {
-        const deleteClassroomList = ref(selectedClassroomIds);
-        console.log(deleteClassroomList.value);
+  ElMessageBox.confirm(message, '提示', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'info'
+  })
+    .then(() => {
+      const deleteClassroomList = ref(selectedClassroomIds);
+      console.log(deleteClassroomList.value);
 
-        request.course.post('/coursemangt/classroom/delete', deleteClassroomList.value)
-            .then(res => {
-              if (res.code === 200) {
-                ElMessage({
-                  type: 'success',
-                  message: '删除课堂成功'
-                });
-                getClassRoomList();
-              }
-            })
-            .catch(error => {
-              ElMessage({
-                type: 'error',
-                message: '删除课堂失败，请稍后尝试'
-              });
+      request.course
+        .post('/coursemangt/classroom/delete', deleteClassroomList.value)
+        .then(res => {
+          if (res.code === 200) {
+            ElMessage({
+              type: 'success',
+              message: '删除课堂成功'
             });
-      })
-      .catch(() => {
-        ElMessage({
-          type: 'info',
-          message: '取消删除',
+            getClassRoomList();
+          }
+        })
+        .catch(error => {
+          ElMessage({
+            type: 'error',
+            message: '删除课堂失败，请稍后尝试'
+          });
         });
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '取消删除'
       });
+    });
 };
 
-
 onMounted(() => {
-  getClassRoomList()
-})
+  getClassRoomList();
+});
 </script>
 
 <style scoped>
 ::v-deep(.el-table .cell) {
   text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .custom-icon:hover {
@@ -344,7 +356,7 @@ onMounted(() => {
 }
 
 .user-bubble {
-  background-color: #E6F7FF; /* 气泡的背景颜色 */
+  background-color: #e6f7ff; /* 气泡的背景颜色 */
   border-radius: 15px; /* 边框圆角，使其看起来像气泡 */
   padding: 5px 10px; /* 内边距 */
   font-size: 14px; /* 文本大小 */
@@ -367,7 +379,7 @@ onMounted(() => {
 }
 
 .edit-icon:hover {
-  color: #409EFF; /* 悬浮时的颜色 */
+  color: #409eff; /* 悬浮时的颜色 */
 }
 
 .dynamic-font-size {
@@ -376,6 +388,4 @@ onMounted(() => {
   text-overflow: ellipsis; /* 用省略号表示被裁剪的文本 */
   white-space: nowrap; /* 不允许文本换行 */
 }
-
-
 </style>
