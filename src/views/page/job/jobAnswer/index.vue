@@ -47,7 +47,7 @@
   const pathData = [
     {
       name: '我的作业',
-      path: '/homes/studenthome/exam/myhomework'
+      path: '/homes/studentcourses/exam/myhomework'
     },
     {
       name: type === 'edit' ? '作业答题' : '作业预览',

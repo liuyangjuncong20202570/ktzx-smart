@@ -23,7 +23,7 @@
               v-if="scope.row.status === 0"
               @click="(() => {
                 router.push({
-                  path: '/homes/studenthome/exam/jobAnswer',
+                  path: '/homes/studentcourses/exam/jobAnswer',
                   query: {
                     id: scope.row.testId,
                     type: 'edit'
@@ -38,7 +38,7 @@
               class="custom-link-button custom-link-active-button"
               @click="(() => {
                 router.push({
-                  path: '/homes/studenthome/exam/jobAnswer',
+                  path: '/homes/studentcourses/exam/jobAnswer',
                   query: {
                     id: scope.row.testId,
                     type: 'view'
