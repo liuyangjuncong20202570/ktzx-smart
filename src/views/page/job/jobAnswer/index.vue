@@ -47,7 +47,7 @@
   const pathData = [
     {
       name: '我的作业',
-      path: '/homes/studenthome/exam/myhomework'
+      path: '/homes/studentcourses/exam/myhomework'
     },
     {
       name: type === 'edit' ? '作业答题' : '作业预览',
@@ -165,7 +165,7 @@
       answerSubmit(params).then(res => {
         if (res.code === '200') {
           ElMessage.success('提交成功')
-          routes.push('/homes/studenthome/exam/myhomework')
+          routes.push('/homes/studentcourses/exam/myhomework')
         }
       })
     }).catch(() => { })

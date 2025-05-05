@@ -46,6 +46,9 @@
                 >
               </div>
               <div class="right flex justify-center items-center" style="height: 100%">
+                <div @click="handleCourseSelect" class="jump-course-select" style="">
+                  返回课堂列表
+                </div>
                 <img referrerpolicy="no-referrer" src="@/assets/images/redraw-images/divider.png" />
                 <div class="mainner flex justify-between items-center">
                   <div
@@ -503,6 +506,11 @@ const changePwd = (formEl: FormInstance | undefined) => {
   })
 
 }
+// 跳转到课程选择
+const handleCourseSelect = () => {
+  // /homes/studenthome
+  router.push('/homes/studenthome');
+};
 
 //钩子函数用来刷新后重新获取数据
 
@@ -542,5 +550,16 @@ onMounted(() => {
   justify-content: center;
   height: 100%;
   right: 20px;
+}
+.jump-course-select {
+  white-space: nowrap;
+  line-height: 31px;
+  font-family: MicrosoftYaHei;
+  margin-right: 10px;
+  cursor: pointer;
+  color: #0078cd;
+}
+.jump-course-select:hover {
+  color: #0078cd;
 }
 </style>
