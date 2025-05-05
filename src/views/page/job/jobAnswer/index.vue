@@ -165,7 +165,7 @@
       answerSubmit(params).then(res => {
         if (res.code === '200') {
           ElMessage.success('提交成功')
-          routes.push('/homes/studenthome/exam/myhomework')
+          routes.push('/homes/studentcourses/exam/myhomework')
         }
       })
     }).catch(() => { })
