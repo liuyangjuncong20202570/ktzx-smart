@@ -281,13 +281,15 @@ const routes = [
         path: 'evaluation/dynamicEvaluation/studentGraph', // 评估与画像-学生画像
         name: 'StudentGraph',
         component: () =>
-          import('../components/dynamicEvaluation/StudentsGraph/StudentGraphWrapper.vue')
+          // import('../components/dynamicEvaluation/StudentsGraph/StudentGraphWrapper.vue')
+          import('../components/dynamicEvaluation/StudentsGraph/Wrapper.vue')
       },
       {
         path: 'evaluation/dynamicEvaluation/classroomGraph', // 评估与画像-课堂画像
         name: 'ClassroomGraph',
         component: () =>
-          import('../components/dynamicEvaluation/ClassroomGraph/ClassroomGraphWrapper.vue')
+          // import('../components/dynamicEvaluation/ClassroomGraph/ClassroomGraphWrapper.vue')
+          import('../components/dynamicEvaluation/ClassroomGraph/Wrapper.vue')
       },
       {
         path: 'evaluation/dynamicEvaluation/academicTranscript', // 达成性评价-评价名单

@@ -86,3 +86,17 @@ export const getEvaluationTimes = (courseId, classroomId) => {
     `/dynamic/portrait/getEvalTotal?courseId=${courseId}&classroomId=${classroomId}`
   );
 };
+
+// 状态轮询
+export const circleSearch = taskid => {
+  return request.evaluation.get(`/dynamic/portrait/task?taskId=${taskid}`);
+};
+
+// 获取实验学生名单
+export const expStuList = practiceId => {
+  return request.page.post('/practice/student/pager', {
+    pageIndex: 1,
+    pageSize: 100,
+    practiceId
+  });
+};

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import _ from 'lodash';
+import { expStuList } from '../../api/dynamic';
 import { getTestList, getStuList } from '@/api/portraitManagt.js';
 import {
   changeOrder,
@@ -23,10 +24,15 @@ const usePortrait = defineStore('PortraitMangt', {
       { id: 0, name: '李静', stuno: '202131', classno: '自xx-1' },
       { id: 1, name: '李明', stuno: '202132', classno: '自xx-1' },
       { id: 2, name: '金立', stuno: '202133', classno: '自xx-1' }
-    ]
+    ],
+    // 用于轮询
+    taskid: ''
   }),
   // 此处用于定义异步请求函数与state状态管理
   actions: {
+    setTaskId(payload) {
+      this.taskid = payload;
+    },
     setChartVisible(payload) {
       this.chartVisible = payload;
     },
@@ -53,7 +59,15 @@ const usePortrait = defineStore('PortraitMangt', {
       return await delStuList(arr);
     },
     async fetchGenerateInstant(courseId, classroomId, stuIdList, paperIdList) {
-      return await generatePortrait(courseId, classroomId, stuIdList, paperIdList);
+      const { code, msg, data } = await generatePortrait(
+        courseId,
+        classroomId,
+        stuIdList,
+        paperIdList
+      );
+      this.taskid = data;
+      console.log(this.taskid);
+      return { code, msg };
     },
     async fetchChangeOrder(classroomId, arr) {
       return await changeOrder(classroomId, arr);
@@ -65,6 +79,16 @@ const usePortrait = defineStore('PortraitMangt', {
     },
     async fetchInsertTests(arr) {
       return insertTests(arr);
+    },
+    async fetchExpStuList(id, classname) {
+      const { data, result, message } = await expStuList(id);
+      this.submitTestsLists = data.data.map(item => ({
+        id: item.stuId,
+        userName: item.name,
+        stuNo: item.stuNo,
+        obsName: classname
+      }));
+      return { result, message };
     }
   }
 });

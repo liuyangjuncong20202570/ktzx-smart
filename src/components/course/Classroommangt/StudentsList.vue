@@ -226,6 +226,7 @@
 </template>
 
 <script setup>
+import usePortrait from '../../../stores/dynamicEvaluation/portraitStore';
 import request from '../../../utils/request';
 import Header from '@/views/page/components/header/index.vue';
 import List from '../../dynamicEvaluation/PublicCpns/List.vue';
@@ -259,6 +260,8 @@ const roleName = JSON.parse(sessionStorage.getItem('users')).rolename;
 const creating = ref(false);
 
 const TeacherStuGraStore = useTeacherStuGra();
+
+const portraitStore = usePortrait();
 
 const titleList = [
   { prop: 'stuno', label: '学号' },
@@ -335,25 +338,13 @@ const handleConfirm = async () => {
       type: 'success',
       message: msg
     });
+    portraitStore.setTaskId(data);
   }
   // TODO：统一修改取消评价学生状态
   await TeacherInClassStore.putAttendEvaluation(Array.from(resetList.value.values()));
 
   handleBack();
   creating.value = false;
-  // 模拟后端
-  // new Promise(resolve => {
-  //   setTimeout(() => {
-  //     resolve(true);
-  //   }, 5000); // 模拟 2 秒延迟
-  // }).then(() => {
-  //   handleBack();
-  //   creating.value = false;
-  //   ElMessage({
-  //     type: 'success',
-  //     message: '生成成功'
-  //   });
-  // });
 };
 
 const handleSelectAll = selection => {

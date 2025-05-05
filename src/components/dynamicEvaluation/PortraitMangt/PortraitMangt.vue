@@ -109,6 +109,7 @@ import { ref, reactive, computed, onMounted, nextTick } from 'vue';
 import usePortrait from '../../../stores/dynamicEvaluation/portraitStore';
 import { ElMessage } from 'element-plus';
 import { Upload } from 'vxe-pc-ui';
+import arraysEqual from '../../../utils/arrayEqual.js';
 /* ********************变量定义******************** */
 // props定义
 // 普通变量
@@ -127,6 +128,9 @@ const courseId = ref('');
 const classroomId = ref('');
 
 const attendList = ref([]);
+
+// 进行浅比较数组
+const originList = ref([]);
 
 const selectionData = ref([]);
 
@@ -267,34 +271,50 @@ const handleGenerate = async () => {
     .filter(item => attendSet.has(item.paperId))
     .map(item => item.paperId);
 
-  // 进行生成画像
-  Promise.all([
-    portraitStore.fetchGenerateInstant(courseId.value, classroomId.value, [], arr),
-    portraitStore.fetchChangeOrder(classroomId.value, rankingList.value)
-  ])
-    .then(([{ code, msg, data }]) => {
-      if (code === 200 && data) {
-        ElMessage({
-          type: 'success',
-          message: msg
-        });
-      }
-    })
-    .catch(err => {
+  if (!arraysEqual(originList.value, rankingList.value)) {
+    const { code, msg } = await portraitStore.fetchChangeOrder(
+      classroomId.value,
+      rankingList.value
+    );
+    if (code !== 200) {
       ElMessage({
         type: 'error',
-        message: '生成失败，请稍后再试！'
+        message: msg
       });
-      console.log(err);
-    })
-    .finally(() => {
-      generating.value = false;
+      return;
+    }
+  }
+  // 发送计算请求
+  const { code, msg } = await portraitStore.fetchGenerateInstant(
+    courseId.value,
+    classroomId.value,
+    [],
+    arr
+  );
+  if (code !== 200) {
+    ElMessage({
+      type: 'error',
+      message: msg
     });
+    return;
+  }
+  generating.value = false;
+  ElMessage({
+    type: 'success',
+    message: msg
+  });
 };
 
 const handleSingleClick = async scope => {
   // 此处通过scope中的id或相关信息发送请求得到已交对应作业的学生列表
-  console.log(scope.row.testId);
+  console.log(scope.row);
+  // 通过scope.row.catelog字段来判断发送请求类别
+  // 如果scope.row.catelog === 3则调用王工接口，否则调用实验室接口
+  if (scope.row.catelog === '3') {
+    await portraitStore.fetchExpStuList(scope.row.testId, scope.row.classroomName);
+    portraitStore.setChartVisible(true);
+    return;
+  }
   // 发送请求获取名单
   const { code, msg } = await portraitStore.fetchSubmitList(scope.row.testId);
   if (!(code === 200 && msg === 'success')) {
@@ -330,6 +350,7 @@ onMounted(async () => {
   portraitStore.testLists.forEach(item => {
     attendList.value.push(item.paperId);
     rankingList.value.push(item.id);
+    originList.value.push(item.id);
   });
   initSort();
 });
