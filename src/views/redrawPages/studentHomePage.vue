@@ -291,17 +291,26 @@
     </el-container>
   </div>
 
-  <el-dialog v-model="changePwdVisible" title="修改密码" width="400" class="h-[260px]" align-center destroy-on-close>
-    <el-form ref="changePwdRef" :model="pwdInfo" class="pr-14 pl-7 grid gap-y-4 mt-2" :rules="changePwdRules"
+  <el-dialog v-model="changePwdVisible" title="修改密码" width="420" align-center destroy-on-close>
+    <el-form ref="changePwdRef" :model="pwdInfo" class="ml-[-1.5vw] grid gap-y-4 mt-2" :rules="changePwdRules"
       autocomplete="off">
-      <el-form-item label="当前密码" prop="currentPwd" label-width="65">
-        <el-input type="password" show-password v-model="pwdInfo.currentPwd" autocomplete="off" />
+      <el-form-item prop="currentPwd" class="ml-10 mr-10">
+        <div class="flex items-center space-x-2 w-full">
+          <span class="whitespace-nowrap mr-2 min-w-[90px]"><span class="text-red-500 mr-1">*</span>当前密码：</span>
+          <el-input type="password" show-password v-model="pwdInfo.currentPwd" autocomplete="off" />
+        </div>
       </el-form-item>
-      <el-form-item label="新密码" prop="newPwd" label-width="65">
-        <el-input type="password" show-password v-model="pwdInfo.newPwd" autocomplete="off" />
+      <el-form-item prop="newPwd" class="ml-10 mr-10">
+        <div class="flex items-center space-x-2 w-full">
+          <span class="whitespace-nowrap mr-2 min-w-[90px]"><span class="text-red-500 mr-1">*</span>新密码：</span>
+          <el-input type="password" show-password v-model="pwdInfo.newPwd" autocomplete="off" />
+        </div>
       </el-form-item>
-      <el-form-item label="确认密码" prop="confirmPwd" label-width="65">
-        <el-input type="password" show-password v-model="pwdInfo.confirmPwd" autocomplete="off" />
+      <el-form-item prop="confirmPwd" class="ml-10 mr-10">
+        <div class="flex items-center space-x-2 w-full">
+          <span class="whitespace-nowrap mr-2 min-w-[90px]"><span class="text-red-500 mr-1">*</span>确认密码：</span>
+          <el-input type="password" show-password v-model="pwdInfo.confirmPwd" autocomplete="off" />
+        </div>
       </el-form-item>
     </el-form>
     <template #footer>
