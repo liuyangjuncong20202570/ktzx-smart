@@ -301,6 +301,7 @@ const routes = [
         name: 'ClassroomReport',
         component: () => import('../components/evaluation/ClassroomReport.vue')
       },
+      // 达成性评价画像名单
       {
         path: 'evaluation/graphList',
         name: 'attainmentGraphList',
@@ -475,6 +476,7 @@ router.beforeEach((to, from, next) => {
   const { selectedRoute } = storeToRefs(MainStore);
   // 如果当前路由与选中的路由不一致，则根据 URL 跳转
   console.log(to);
+  MainStore.setTarget(to.fullPath);
   if (
     !from.path.includes('exam') &&
     to.path !== selectedRoute.value &&

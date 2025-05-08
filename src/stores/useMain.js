@@ -4,7 +4,8 @@ const useMain = defineStore('Main', {
   state: () => ({
     selectedRoute: '',
     isLoading: false,
-    dynamicSearchloading: false
+    dynamicSearchloading: false,
+    target: ''
   }),
   actions: {
     setSelectedRoute(route) {
@@ -15,6 +16,9 @@ const useMain = defineStore('Main', {
     },
     setDynamicSearchloading(payload) {
       this.dynamicSearchloading = payload;
+    },
+    setTarget(payload) {
+      this.target = payload;
     }
   },
   persist: {

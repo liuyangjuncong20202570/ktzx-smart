@@ -508,6 +508,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
+label[data-v-b871a43a] ::v-deep(.el-checkbox__inner) {
+  border-radius: 50%;
+}
+
 .el-table .cell {
   text-align: center;
 }

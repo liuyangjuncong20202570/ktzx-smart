@@ -361,7 +361,29 @@ onMounted(async () => {
   height: 92vh;
   display: flex;
   flex-direction: column;
+  overflow: auto;
 
+  /* 整个滚动条 */
+  .container::-webkit-scrollbar {
+    display: none !important;
+    width: 8px; /* 垂直滚动条宽度 */
+    height: 8px; /* 水平滚动条高度 */
+  }
+
+  /* 滚动条轨道（背景） */
+  .container::-webkit-scrollbar-track {
+    background: transparent !important;
+    border-radius: 4px;
+  }
+
+  /* 滚动条滑块 */
+  .container::-webkit-scrollbar-thumb {
+    display: none !important;
+    background-color: #888;
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
   .title {
     display: flex;
     height: 15vh;
