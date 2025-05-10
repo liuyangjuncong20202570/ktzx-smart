@@ -13,7 +13,6 @@
           @change="
             () => {
               ruleForm.queTypeIds = '';
-              selectedTableData = [];
               tableData = [];
               getCourseLibTypeList();
             }
@@ -166,6 +165,7 @@ const handleDelete = (index, row) => {
     .catch(() => {});
 };
 const handleSeachAllSelect = (val) => {
+    console.log("选择SeachAllSelect", selectedTableData.value);
   //   获取取消选中的项 多个
   // 去掉id的项
   if (val.length == 0) {
@@ -186,8 +186,11 @@ const handleSeachAllSelect = (val) => {
 };
 
 const handleSeachSelect = (val) => {
+  console.log("选择sellect", val);
+  console.log("multipleSelection.value", multipleSelection.value);
   //获取取消选中的项
   const cancelSelection = multipleSelection.value.filter((item) => !val.includes(item));
+  console.log("取消cancelSelection", cancelSelection);
   // selectedTableData去掉取消选中的项
   selectedTableData.value = selectedTableData.value.filter((item) => !cancelSelection.some((cancelItem) => cancelItem.id === item.id));
   multipleSelection.value = val;
@@ -225,6 +228,7 @@ const kwaEvent = (val) => {
 
 const submitForm = () => {
   console.log("ruleForm", ruleForm.value);
+  multipleSelection.value = [];
   getTeskSearch();
 };
 
