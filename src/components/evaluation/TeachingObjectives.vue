@@ -346,14 +346,14 @@
                   <template v-if="!Object.prototype.hasOwnProperty.call(node.data, 'typeId')">
                     <br />
                   </template>
-                  <el-button
+                  <!-- <el-button
                     style="margin-top: 6px; width: 100%"
                     type="danger"
                     plain
                     round
                     @click="confirmDeleteNodes(node.data)"
                     >删除</el-button
-                  >
+                  > -->
                   <template #reference>
                     <!-- 这里用一个临时量来存新节点，否则直接绑定node.data.obsname输入框会出问题 -->
                     <el-input
