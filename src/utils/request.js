@@ -14,10 +14,10 @@ const request = {
   admin: createAPI(`${HOST_ADMIN}`),
   course: createAPI(`${HOST_COURSE}`),
   evaluation: createAPI(`${HOST_EVALUATION}`),
-  page: createAPI(`${WDD_HOST}:10203/page`),
-  fork: createAPI(`${WDD_HOST}:10203/fork`),
-  common: createAPI(`${WDD_HOST}:10203/common`),
-  term: createAPI(`${WDD_HOST}:10203/term`)
+  page: createAPI(`${WDD_HOST}/page`),
+  fork: createAPI(`${WDD_HOST}/fork`),
+  common: createAPI(`${WDD_HOST}/common`),
+  term: createAPI(`${WDD_HOST}/term`)
 };
 
 // request.js 物理机配置

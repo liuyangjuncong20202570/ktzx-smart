@@ -1,7 +1,8 @@
 <template>
   <div style="width: 100vw; background-color: #eef7ff">
     <el-container class="layout-container-demo">
-      <el-header style="
+      <el-header
+        style="
           position: relative;
           text-align: right;
           font-size: 15px;
@@ -10,16 +11,28 @@
           background-color: #fff;
           box-shadow: 0px 0px 15px 0px rgba(0, 30, 56, 0.07);
           z-index: 999;
-        ">
+        "
+      >
         <template #default>
           <div class="header">
-            <div class="inner flex justify-between" style="width: 1250px; height: 100%; margin: 0 auto">
+            <div
+              class="inner flex justify-between"
+              style="width: 1250px; height: 100%; margin: 0 auto"
+            >
               <div class="icon flex justify-center items-center">
-                <img style="width: 29px; height: 47px; padding-right: 5px" referrerpolicy="no-referrer"
-                  src="@/assets/images/redraw-images/icon.png" />
-                <img style="width: 184px; height: 28px" referrerpolicy="no-referrer"
-                  src="@/assets/images/redraw-images/title.png" />
-                <span class="term" style="
+                <img
+                  style="width: 29px; height: 47px; padding-right: 5px"
+                  referrerpolicy="no-referrer"
+                  src="@/assets/images/redraw-images/icon.png"
+                />
+                <img
+                  style="width: 184px; height: 28px"
+                  referrerpolicy="no-referrer"
+                  src="@/assets/images/redraw-images/title.png"
+                />
+                <span
+                  class="term"
+                  style="
                     font-size: 24px;
                     width: 116px;
                     height: 31px;
@@ -28,19 +41,26 @@
                     line-height: 31px;
                     font-family: MicrosoftYaHei;
                     margin-left: 33px;
-                  ">{{ currentterm }}</span>
+                  "
+                  >{{ currentterm }}</span
+                >
               </div>
               <div class="right flex justify-center items-center" style="height: 100%">
                 <img referrerpolicy="no-referrer" src="@/assets/images/redraw-images/divider.png" />
                 <div class="mainner flex justify-between items-center">
-                  <div class="avatar flex justify-center items-center"
-                    style="width: 60px; height: 60px; margin-left: 15px; margin-right: 5px">
-                    <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+                  <div
+                    class="avatar flex justify-center items-center"
+                    style="width: 60px; height: 60px; margin-left: 15px; margin-right: 5px"
+                  >
+                    <el-avatar
+                      src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+                    />
                   </div>
                   <div class="text">
                     <div class="group_4">
                       <div class="top" style="margin-bottom: 5px">
-                        <span style="
+                        <span
+                          style="
                             width: 144px;
                             height: 24px;
                             overflow-wrap: break-word;
@@ -51,10 +71,13 @@
                             text-align: left;
                             white-space: nowrap;
                             line-height: 24px;
-                          ">{{ loginInfo.username }}</span>
+                          "
+                          >{{ loginInfo.username }}</span
+                        >
                       </div>
                       <div class="bottom flex justify-between items-center">
-                        <div style="
+                        <div
+                          style="
                             width: 62px;
                             height: 19px;
                             overflow-wrap: break-word;
@@ -68,10 +91,12 @@
                             line-height: 19px;
                             text-overflow: ellipsis !important;
                             overflow: hidden;
-                          ">
+                          "
+                        >
                           <el-tag type="primary">{{ loginInfo.rolename }}</el-tag>
                         </div>
-                        <div style="
+                        <div
+                          style="
                             width: 31px;
                             height: 19px;
                             overflow-wrap: break-word;
@@ -83,7 +108,8 @@
                             text-align: right;
                             white-space: nowrap;
                             line-height: 19px;
-                          ">
+                          "
+                        >
                           <el-tag type="success">在线</el-tag>
                         </div>
                       </div>
@@ -93,17 +119,25 @@
                   </div>
                   <!-- 下拉按钮 -->
                   <el-dropdown @visible-change="handleVisibleChange">
-                    <img style="margin-left: 37px; width: 26px; height: 26px" referrerpolicy="no-referrer"
-                      src="@/assets/images/redraw-images/dropdown.png" />
+                    <img
+                      style="margin-left: 37px; width: 26px; height: 26px"
+                      referrerpolicy="no-referrer"
+                      src="@/assets/images/redraw-images/dropdown.png"
+                    />
                     <template #dropdown>
                       <el-dropdown-menu>
                         <template v-if="!showRoles">
                           <el-dropdown-item @click="openChangePwdDialog">修改密码</el-dropdown-item>
                           <el-dropdown-item @click="getRolelist">切换角色</el-dropdown-item>
                           <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
+                          <el-dropdown-item @click="handleHistory">查看历史学期</el-dropdown-item>
                         </template>
                         <template v-else>
-                          <el-dropdown-item v-for="role in roleList" :key="role.roleid" @click="switchRole(role)">
+                          <el-dropdown-item
+                            v-for="role in roleList"
+                            :key="role.roleid"
+                            @click="switchRole(role)"
+                          >
                             {{ role.rolename }}
                           </el-dropdown-item>
                         </template>
@@ -115,81 +149,16 @@
             </div>
           </div>
         </template>
-        <!--右侧按钮-->
-        <!-- <div
-          style="
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 0;
-          "
-        >
-          <div class="left-div" style="flex-grow: 1; display: flex; align-items: center">
-            <img src="../assets/images/logo.png" style="height: 5.5vh" />
-            <el-text style="font-size: calc(1vw + 6px); color: white; margin-left: 10px"
-              >智能教学平台</el-text
-            >
-          </div>
-
-          <div style="flex-grow: 2; text-align: center">
-            <el-text style="font-size: calc(1.5vw + 6px); color: white">{{ currentterm }}</el-text>
-          </div>
-
-          <div
-            class="right-div"
-            style="flex-grow: 1; display: flex; align-items: center; justify-content: flex-end"
-          >
-            <el-dropdown @visible-change="handleVisibleChange">
-              <el-avatar
-                src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-              />
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <template v-if="!showRoles">
-                    <el-dropdown-item @click="getRolelist">切换角色</el-dropdown-item>
-                    <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
-                  </template>
-                  <template v-else>
-                    <el-dropdown-item
-                      v-for="role in roleList"
-                      :key="role.roleid"
-                      @click="switchRole(role)"
-                    >
-                      {{ role.rolename }}
-                    </el-dropdown-item>
-                  </template>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-            <el-drawer
-              size="15%"
-              style="z-index: 99999; background-color: #0064b1"
-              v-model="showRoles"
-              :with-header="false"
-            >
-              <div class="wrapper">
-                <template class="item" v-for="role in roleList" :key="role.roleid">
-                  <div class="item" @click="switchRole(role)">
-                    <el-icon><House /></el-icon>
-                    {{ role.rolename }}
-                  </div>
-                </template>
-              </div>
-            </el-drawer>
-
-            <el-text style="font-size: calc(1vw + 3px); color: white; margin-left: 10px">{{
-              loginInfo.username
-            }}</el-text>
-          </div>
-        </div> -->
       </el-header>
       <el-container style="width: 1250px; height: 100vh; overflow-x: hidden; margin: 0 auto">
-        <el-aside width="200px" style="
+        <el-aside
+          width="200px"
+          style="
             height: 100%;
             background-color: #fff;
             box-shadow: 0px 0px 15px 0px rgba(0, 30, 56, 0.07);
-          ">
+          "
+        >
           <!-- 使用 el-scrollbar 包裹 el-menu，设置高度为 70% -->
 
           <!--页面左侧导航栏-->
@@ -201,8 +170,12 @@
                 <template v-for="(menu, index) in filteredMenus">
                   <!-- <div>{{ menu }}</div> -->
                   <!-- 二级菜单 -->
-                  <el-sub-menu v-if="hasChildren(menu)" :index="menu.id" :key="menu.id"
-                    style="border-top: 1px solid #efefef; position: relative">
+                  <el-sub-menu
+                    v-if="hasChildren(menu)"
+                    :index="menu.id"
+                    :key="menu.id"
+                    style="border-top: 1px solid #efefef; position: relative"
+                  >
                     <template #title>
                       <!--0822有更改-->
                       <img src="@/assets/images/redraw-images/choseIcon.png" class="course-icon" />
@@ -212,36 +185,63 @@
                     </template>
                     <template v-for="child in getChildrenMenus(menu)">
                       <!-- 三级菜单 -->
-                      <el-sub-menu v-if="hasChildren(child)" :index="child.id" :key="child.id"
-                        style="border-top: 1px solid #efefef; position: relative">
+                      <el-sub-menu
+                        v-if="hasChildren(child)"
+                        :index="child.id"
+                        :key="child.id"
+                        style="border-top: 1px solid #efefef; position: relative"
+                      >
                         <template #title>
-                          <img src="@/assets/images/redraw-images/choseSecond.png" class="course-icon" />
+                          <img
+                            src="@/assets/images/redraw-images/choseSecond.png"
+                            class="course-icon"
+                          />
                           <div class="childtitleBox" @click="navigateTo(child.url)">
                             {{ child.name }}
                           </div>
                         </template>
-                        <el-menu-item v-for="grandchild in getChildrenMenus(child)" :index="grandchild.url"
-                          :key="grandchild.id" style="border-top: 1px solid #efefef"
-                          @click="navigateTo(grandchild.url)">
+                        <el-menu-item
+                          v-for="grandchild in getChildrenMenus(child)"
+                          :index="grandchild.url"
+                          :key="grandchild.id"
+                          style="border-top: 1px solid #efefef"
+                          @click="navigateTo(grandchild.url)"
+                        >
                           <template #title>
-                            <img src="@/assets/images/redraw-images/choseThird.png" class="course-icon" />
+                            <img
+                              src="@/assets/images/redraw-images/choseThird.png"
+                              class="course-icon"
+                            />
                             <div class="childtitleBox">{{ grandchild.name }}</div>
                           </template>
                         </el-menu-item>
                       </el-sub-menu>
                       <!-- 无三级菜单 -->
-                      <el-menu-item v-else :index="child.url" :key="child.id" style="border-top: 1px solid #efefef"
-                        @click="navigateTo(child.url)">
+                      <el-menu-item
+                        v-else
+                        :index="child.url"
+                        :key="child.id"
+                        style="border-top: 1px solid #efefef"
+                        @click="navigateTo(child.url)"
+                      >
                         <template #title>
-                          <img src="@/assets/images/redraw-images/choseSecond.png" class="course-icon" />
+                          <img
+                            src="@/assets/images/redraw-images/choseSecond.png"
+                            class="course-icon"
+                          />
                           <div class="childtitleBox">{{ child.name }}</div>
                         </template>
                       </el-menu-item>
                     </template>
                   </el-sub-menu>
                   <!-- 无二级菜单 -->
-                  <el-menu-item v-else :index="menu.url" :key="menu.id" @click="navigateTo(menu.url)"
-                    style="border-top: 1px solid #efefef">
+                  <el-menu-item
+                    v-else
+                    :index="menu.url"
+                    :key="menu.id"
+                    @click="navigateTo(menu.url)"
+                    style="border-top: 1px solid #efefef"
+                  >
                     <img src="@/assets/images/redraw-images/choseIcon.png" class="course-icon" />
                     <div class="titleBox">
                       {{ menu.name }}
@@ -253,7 +253,9 @@
           </div>
         </el-aside>
 
-        <el-main style="-ms-overflow-style: none; /* IE 和 Edge */ scrollbar-width: none; /* Firefox */">
+        <el-main
+          style="-ms-overflow-style: none; /* IE 和 Edge */ scrollbar-width: none; /* Firefox */"
+        >
           <!-- 在 el-main 区域显示路由组件 -->
 
           <el-card style="max-width: 910px; margin-left: 30px; margin-top: 50px">
@@ -266,7 +268,8 @@
             <p v-for="o in 4" :key="o" class="text item">{{ 'List item ' + o }}</p>
             <template #footer>Footer content</template> -->
           </el-card>
-          <span style="
+          <span
+            style="
               display: inline-block;
               width: 257px;
               height: 24px;
@@ -279,30 +282,43 @@
               white-space: nowrap;
               line-height: 24px;
               margin-top: 25px;
-            ">北方工业大学2024&nbsp;CopyRight</span>
+            "
+            >北方工业大学2024&nbsp;CopyRight</span
+          >
         </el-main>
       </el-container>
     </el-container>
   </div>
 
   <el-dialog v-model="changePwdVisible" title="修改密码" width="420" align-center destroy-on-close>
-    <el-form ref="changePwdRef" :model="pwdInfo" class="ml-[-1.5vw] grid gap-y-4 mt-2" :rules="changePwdRules"
-      autocomplete="off">
+    <el-form
+      ref="changePwdRef"
+      :model="pwdInfo"
+      class="ml-[-1.5vw] grid gap-y-4 mt-2"
+      :rules="changePwdRules"
+      autocomplete="off"
+    >
       <el-form-item prop="currentPwd" class="ml-10 mr-10">
         <div class="flex items-center space-x-2 w-full">
-          <span class="whitespace-nowrap mr-2 min-w-[90px]"><span class="text-red-500 mr-1">*</span>当前密码：</span>
+          <span class="whitespace-nowrap mr-2 min-w-[90px]"
+            ><span class="text-red-500 mr-1">*</span>当前密码：</span
+          >
           <el-input type="password" show-password v-model="pwdInfo.currentPwd" autocomplete="off" />
         </div>
       </el-form-item>
       <el-form-item prop="newPwd" class="ml-10 mr-10">
         <div class="flex items-center space-x-2 w-full">
-          <span class="whitespace-nowrap mr-2 min-w-[90px]"><span class="text-red-500 mr-1">*</span>新密码：</span>
+          <span class="whitespace-nowrap mr-2 min-w-[90px]"
+            ><span class="text-red-500 mr-1">*</span>新密码：</span
+          >
           <el-input type="password" show-password v-model="pwdInfo.newPwd" autocomplete="off" />
         </div>
       </el-form-item>
       <el-form-item prop="confirmPwd" class="ml-10 mr-10">
         <div class="flex items-center space-x-2 w-full">
-          <span class="whitespace-nowrap mr-2 min-w-[90px]"><span class="text-red-500 mr-1">*</span>确认密码：</span>
+          <span class="whitespace-nowrap mr-2 min-w-[90px]"
+            ><span class="text-red-500 mr-1">*</span>确认密码：</span
+          >
           <el-input type="password" show-password v-model="pwdInfo.confirmPwd" autocomplete="off" />
         </div>
       </el-form-item>
@@ -310,9 +326,7 @@
     <template #footer>
       <div>
         <el-button @click="changePwdVisible = false">取消</el-button>
-        <el-button type="primary" @click="changePwd(changePwdRef)">
-          确定
-        </el-button>
+        <el-button type="primary" @click="changePwd(changePwdRef)"> 确定 </el-button>
       </div>
     </template>
   </el-dialog>
@@ -341,7 +355,7 @@ console.log(isDefaultTerm.value);
 const isSHow = ref(isDefaultTerm.value);
 
 // 路由置空
-const handleJumpTo = () => { };
+const handleJumpTo = () => {};
 
 // 创建introJS实例
 /**************指引框逻辑********************/
@@ -381,6 +395,10 @@ const imageUrl = ref('https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55
 const currentterm = ref('');
 
 // const imageUrl = ref('')
+
+const handleHistory = () => {
+  console.log('查看历史数据');
+};
 
 // 定义处理上传成功的函数
 const handleAvatarSuccess: UploadProps['onSuccess'] = (
@@ -533,25 +551,25 @@ const openChangePwdDialog = () => {
     confirmPwd: ''
   };
   changePwdVisible.value = true;
-}
+};
 
 const validateNew = (rule: any, value: String, callback: any) => {
   if (value === '') {
-    callback(new Error('请输入新密码'))
+    callback(new Error('请输入新密码'));
   } else {
     if (value.length < 3 || value.length > 15) callback(new Error('密码长度在3到15个字符之间'));
-    callback()
+    callback();
   }
-}
+};
 const validateConfirm = (rule: any, value: String, callback: any) => {
   if (value === '') {
-    callback(new Error('请再次输入新密码'))
+    callback(new Error('请再次输入新密码'));
   } else if (value !== pwdInfo.value.newPwd) {
-    callback(new Error("两次输入的密码不一致"))
+    callback(new Error('两次输入的密码不一致'));
   } else {
-    callback()
+    callback();
   }
-}
+};
 
 const changePwdRules = ref({
   currentPwd: [{ required: true, message: '请输入当前密码', trigger: 'blur' }],
@@ -561,24 +579,24 @@ const changePwdRules = ref({
 
 const changePwd = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
-  formEl.validate(async (valid) => {
+  formEl.validate(async valid => {
     if (valid) {
       try {
-        const res = await request.admin.get(`/homes/teacherChangePwd?currentPwd=${pwdInfo.value.currentPwd}&newPwd=${pwdInfo.value.newPwd}`);
+        const res = await request.admin.get(
+          `/homes/teacherChangePwd?currentPwd=${pwdInfo.value.currentPwd}&newPwd=${pwdInfo.value.newPwd}`
+        );
         if (res.code === 200) {
-          ElMessage.success("修改成功");
+          ElMessage.success('修改成功');
           changePwdVisible.value = false;
         } else ElMessage.error(res.msg);
       } catch (error) {
-        ElMessage.error("修改失败" + error);
+        ElMessage.error('修改失败' + error);
       }
     } else {
       return;
     }
-  })
-
-}
-
+  });
+};
 
 const userlogin = loginuserFrom => {
   request.admin

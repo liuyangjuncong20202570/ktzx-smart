@@ -85,7 +85,10 @@
         <el-table-column prop="loginname" label="登录名称" />
         <el-table-column prop="userName" label="姓名" />
         <el-table-column prop="obsName" :label="unitName" />
-        <el-table-column label="参与评价(形成性)">
+        <el-table-column
+          v-if="MainStore.selectedRoute !== '/homes/courseteacherhome/evaluation/graphList'"
+          label="参与评价(形成性)"
+        >
           <template #default="scope">
             <el-switch
               @change="value => handleChange(value, scope, 0)"
@@ -98,7 +101,10 @@
             />
           </template>
         </el-table-column>
-        <el-table-column label="参与评价(达成性)">
+        <el-table-column
+          v-if="MainStore.selectedRoute !== '/homes/courseteacherhome/dynamicmodel/graphlist'"
+          label="参与评价(达成性)"
+        >
           <template #default="scope">
             <el-switch
               :active-value="1"
@@ -207,8 +213,18 @@
               margin-bottom: 15px;
             "
           >
-            <el-button type="success" @click="handleDynamic">形成性评价</el-button>
-            <el-button type="success" @click="handleEnd">达成行评价</el-button>
+            <el-button
+              v-if="MainStore.selectedRoute !== '/homes/courseteacherhome/evaluation/graphList'"
+              type="success"
+              @click="handleDynamic"
+              >形成性评价</el-button
+            >
+            <el-button
+              v-if="MainStore.selectedRoute !== '/homes/courseteacherhome/dynamicmodel/graphlist'"
+              type="success"
+              @click="handleEnd"
+              >达成行评价</el-button
+            >
           </div>
           <List :titleList="titleList" :listData="attendList" />
           <el-button type="primary" @click="handleBack">返回</el-button>
@@ -226,6 +242,8 @@
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router';
+import useMain from '@/stores/useMain.js';
 import usePortrait from '../../../stores/dynamicEvaluation/portraitStore';
 import request from '../../../utils/request';
 import Header from '@/views/page/components/header/index.vue';
@@ -236,7 +254,7 @@ import parseJWT from '../../../utils/parseJWT';
 import InsertStudent from './StudentsListCpns/InsertStudent.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { getCourseId } from '@/utils/searchCourseId.js';
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { exportTableToCSV } from '../../../utils/exportTableToCSV';
 import useTeacherStuGra from '../../../stores/dynamicEvaluation/TeacherStuGraStore';
 
@@ -262,6 +280,8 @@ const creating = ref(false);
 const TeacherStuGraStore = useTeacherStuGra();
 
 const portraitStore = usePortrait();
+
+const MainStore = useMain();
 
 const titleList = [
   { prop: 'stuno', label: '学号' },
