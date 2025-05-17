@@ -13,7 +13,11 @@
                 <el-table-column type="selection" width="55"></el-table-column>
                 <el-table-column label="代码" width="100">
                     <template v-slot="row">
-                        {{ row.row.code }}
+                        <el-input v-if="row.row.editingCode" autosize type="textarea" style="width: 100%;" v-model="row.row.code"
+                            :ref="el => setInputRef(el, row.row)" @blur="handleBlur(row.row, 'editingCode')"></el-input>
+                        <div v-else style="width: 100%; min-height: 25px;" @dblclick="handleClick(row.row, 'editingCode')">
+                            {{ row.row.code }}
+                        </div>
                     </template>
                 </el-table-column>
                 <el-table-column label="课程目标" width="300">

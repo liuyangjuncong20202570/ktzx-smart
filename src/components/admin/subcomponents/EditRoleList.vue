@@ -121,8 +121,8 @@ const handleCheckChange = (node, data, key) => {
       data.status = '1'; // 两个都勾选
       data.checkedView = true; // 同步勾选查看
     } else {
-      data.status = '3'; // 两个都不勾选
-      data.checkedView = false; // 同步勾选查看
+      data.status = '2'; // 两个都不勾选
+      // data.checkedView = false; // 同步勾选查看
     }
   } else if (key === 'view') {
     if (data.checkedView) {
@@ -130,11 +130,8 @@ const handleCheckChange = (node, data, key) => {
         data.status = '2'; // 只勾选查看
       }
     } else {
-      if (data.checkedEdit) {
-        data.status = '1'; // 两个都勾选
-      } else {
-        data.status = '3'; // 两个都不勾选
-      }
+      data.status = '3';
+      data.checkedEdit = false; // 不勾选查看则也不允许编辑
     }
   }
 

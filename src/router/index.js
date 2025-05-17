@@ -258,6 +258,11 @@ const routes = [
         component: () => import('../components/evaluation/graph.vue')
       },
       {
+        path: 'evasys/formative/coursetarget',  // 形成性评价模型-课程目标
+        name: 'CourseTarget_',
+        component: () => import('../components/evaluation/CourseTarget.vue')
+      },
+      {
         path: 'evasys/accessible/coursetarget', // 达成性评价模型-课程目标
         name: 'CourseTarget',
         component: () => import('../components/evaluation/CourseTarget.vue')
