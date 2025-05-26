@@ -12,7 +12,7 @@
             </el-select>
         </div>
 
-        <el-table class="custom-table" :data="courseData" @selection-change="handleSelectionChange" style="width: 100%">
+        <el-table class="custom-table" :data="courseData" style="width: 100%">
             <template #empty>当前学期无对应历史课程</template>
             <el-table-column type="index" label="" width="55" />
             <el-table-column property="courseChineseName" label="课程名称(中文)" width="200" />

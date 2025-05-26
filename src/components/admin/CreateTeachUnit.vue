@@ -205,6 +205,7 @@ const getTreeData = () => {
     .then(res => {
       if (res.code === 200) {
         treeData.value = res.data;
+        // console.log(treeData.value)
         nullNodeNum.value = 0;
         initialize(treeData.value);
         // console.log("getTreeData 被触发");
@@ -559,6 +560,8 @@ const clickNode = (event, node, dom) => {
     openedPopNode.value.popVisible = false; // 防止多个弹出框一块显示，不好看
     openedPopNode.value = {};
   }
+  // console.log(node)
+  if (node.pid === '0') return;
   node.popVisible = true;
   openedPopNode.value = node;
 };

@@ -374,7 +374,7 @@ const initialize = () => {
         tooltip: {},
         legend: {},
         xAxis: {
-            data: courseTargetData.value.map(ctd => ctd.name)
+            data: courseTargetData.value.map(ctd => ctd.code)
         },
         yAxis: {},
         series: [{
@@ -404,7 +404,19 @@ const initialize = () => {
                     }
                 ],
                 silent: true,
-            }
+            },
+            tooltip: {
+                trigger: 'item',  // 触发项为每一个数据项
+                formatter: function (params) {
+                    // params 是每个数据项的参数，包含了当前点的数据
+                    // formatter 可以是字符串，也可以是函数
+                    // console.log(params);
+                    const info = params.data.extraInfo;
+                    return '代码：' + info.code + '<br>' +
+                        '课程目标：' + info.name + '<br>' +
+                        '达成度：' + params.data.value
+                }
+            },
         }]
 
     })
@@ -414,7 +426,7 @@ const initialize = () => {
         tooltip: {},
         xAxis: {
             type: 'category',
-            data: courseTargetData.value.map(ctd => ctd.name)
+            data: courseTargetData.value.map(ctd => ctd.code)
         },
         yAxis: {
             type: 'value'
@@ -451,6 +463,18 @@ const initialize = () => {
                     position: 'top',
                     color: 'grey',
                 },
+                tooltip: {
+                    trigger: 'item',  // 触发项为每一个数据项
+                    formatter: function (params) {
+                        // params 是每个数据项的参数，包含了当前点的数据
+                        // formatter 可以是字符串，也可以是函数
+                        // console.log(params);
+                        const info = params.data.extraInfo;
+                        return '代码：' + info.code + '<br>' +
+                            '课程目标：' + info.name + '<br>' +
+                            '达成度：' + params.data.value
+                    }
+                },
             }
         ]
     });
@@ -462,7 +486,7 @@ const initialize = () => {
         targetAchievementPersonalDegreeScatterList.value[i].element.setOption({
             title: {
                 show: true,
-                text: courseTargetData.value[i].name,
+                text: courseTargetData.value[i].code,
                 left: 'center',
                 textStyle: {
                     color: '#0f0f0f',
@@ -486,7 +510,7 @@ const initialize = () => {
                 formatter: function (params) {
                     // params 是每个数据项的参数，包含了当前点的数据
                     // formatter 可以是字符串，也可以是函数
-                    // console.log(params);
+                    console.log(params);
                     const info = params.data.extraInfo;
                     return '序号：' + info.rowNo + '<br>' +
                         '姓名：' + info.username + '<br>' +
@@ -580,6 +604,10 @@ const generateSumGraphData = () => {        // 生成有关显示课程目标整
             value: targetSumAchievementDegree.value[ct.id],
             itemStyle: {
                 color: targetSumAchievementDegree.value[ct.id] >= 0.6 ? 'dodgerblue' : '#d00'
+            },
+            extraInfo: {
+                code: ct.code,
+                name: ct.name
             }
         })
     }))
