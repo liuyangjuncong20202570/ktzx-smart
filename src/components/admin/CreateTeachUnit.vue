@@ -404,6 +404,8 @@ const addSiblingNode = async addedNode => {
           message: `新增同级教学单位成功`
         });
         getTreeData();
+      } else {
+        ElMessage.error(res.msg);
       }
     })
     .catch(error => {
