@@ -1,14 +1,16 @@
 <template>
-  <div style="width: 100vw; background-color: #eef7ff">
+  <!-- <div style="width: 100vw; background-color: #eef7ff"> -->
+  <div :style="{ width: '100vw', backgroundColor: 'var(--bg-color)' }">
     <el-container class="layout-container-demo">
+      <History :isOpen="isOpen" @close="handleClose" />
       <el-header
         style="
+          background-color: var(--bg-title-bar);
           position: relative;
           text-align: right;
           font-size: 15px;
           height: 100px;
           width: 100vw;
-          background-color: #fff;
           box-shadow: 0px 0px 15px 0px rgba(0, 30, 56, 0.07);
           z-index: 999;
         "
@@ -128,9 +130,16 @@
                       <el-dropdown-menu>
                         <template v-if="!showRoles">
                           <el-dropdown-item @click="openChangePwdDialog">修改密码</el-dropdown-item>
-                          <el-dropdown-item @click="getRolelist">切换角色</el-dropdown-item>
+                          <el-dropdown-item v-if="!historyStore.nowUsr" @click="getRolelist"
+                            >切换角色</el-dropdown-item
+                          >
                           <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
-                          <el-dropdown-item @click="handleHistory">查看历史学期</el-dropdown-item>
+                          <el-dropdown-item v-if="!historyStore.nowUsr" @click="handleHistory"
+                            >查看历史学期</el-dropdown-item
+                          >
+                          <el-dropdown-item v-else @click="backToNow"
+                            >返回当前学期</el-dropdown-item
+                          >
                         </template>
                         <template v-else>
                           <el-dropdown-item
@@ -163,7 +172,7 @@
 
           <!--页面左侧导航栏-->
 
-          <div style="height: 100%; position: relative">
+          <div style="height: 100%; position: relative; background-color: var(--bg-sidebar)">
             <div v-if="isSHow" class="instrutor"></div>
             <el-scrollbar>
               <el-menu :default-active="defaultActive">
@@ -333,6 +342,7 @@
 </template>
 
 <script lang="ts" setup>
+import History from '../../components/History/History.vue';
 import '@/assets/css/taildwind.css';
 import intro from '@/utils/introConfigure.js';
 import { ref, reactive, computed, onMounted, toRaw, nextTick } from 'vue';
@@ -347,6 +357,32 @@ import useInstructor from '@/stores/InstructorStore.js';
 import { storeToRefs } from 'pinia';
 import useMain from '@/stores/useMain.js';
 import '@/assets/css/taildwind.css';
+import useHistory from '../../stores/useHistory';
+
+// 查看历史数据
+const isOpen = ref(false);
+
+const backToNow = async () => {
+  const { nowUsr } = JSON.parse(sessionStorage.getItem('nowUsr'));
+  const { code, msg } = await historyStore.fetchLogin({
+    ...nowUsr
+  });
+  if (!(code === 200 && msg === 'success')) {
+    ElMessage({ type: 'error', message: msg });
+    return;
+  }
+  setprofile(historyStore.useObj);
+  historyStore.setUsr('');
+  router.push(historyStore.useObj.homeurl).then(() => {
+    window.location.reload(); // 在导航后强制刷新页面
+  });
+};
+
+const historyStore = useHistory();
+
+const handleClose = value => {
+  isOpen.value = value;
+};
 
 // 判断是否已新建学期
 const InstructorStore = useInstructor();
@@ -397,7 +433,7 @@ const currentterm = ref('');
 // const imageUrl = ref('')
 
 const handleHistory = () => {
-  console.log('查看历史数据');
+  isOpen.value = true;
 };
 
 // 定义处理上传成功的函数
@@ -434,6 +470,7 @@ function clearLoginInfo() {
 
 //登出的方法
 const handleLogout = () => {
+  historyStore.setUsr('');
   MainStore.setSelectedRoute('');
   clearLoginInfo();
   router.push({ name: 'Login' }); // 假设您的登录路由的名字是 'Login'
@@ -769,22 +806,25 @@ onMounted(() => {
 :deep(.el-sub-menu__title),
 :deep(.el-menu-item) {
   font-size: 16px;
+  color: var(--text-primary);
+  background-color: var(--bg-card);
 
   &:hover {
-    background-color: #eee;
+    background-color: var(--hover-bg);
   }
 }
 
 :deep(.el-sub-menu.is-opened .el-menu-item) {
-  background-color: #e5e5e5;
+  color: var(--text-primary);
 
   &:hover {
-    background-color: #eee;
+    background-color: var(--hover-bg);
   }
 }
 
 :deep(.el-menu-item.is-active) {
   background-color: rgba(212, 240, 255, 1) !important;
+  color: var(--text-primary);
 }
 
 .header {
