@@ -72,7 +72,7 @@ const loginuserFrom = ref({
   catelog: ''
 });
 
-// const historyList = ref([])
+//  const historyList = ref([])
 const historyList = ref([
   {
     id: '1653708435-3d2a2df2-73d9-423b-afc7-1b7ab4c1dfc3',
@@ -337,7 +337,6 @@ const historyStore = useHistory();
 
 const fetchList = async () => {
   const { code, msg } = await historyStore.fetchHistoryList();
-  console.log(code, msg);
   if (!(code === 200 && msg === 'success')) return;
   historyList.value = historyStore.historyList;
 };
@@ -371,7 +370,7 @@ const handleJump = async scope => {
   const tokenInfo = parseJWT(sessionStorage.getItem('token'));
   historyStore.setUsr({
     id: tokenInfo.id,
-    roleid: '516761049-812a1a24-365d-4697-ab16-b0093b983624',
+    roleid: tokenInfo.roleid,
     obsid: tokenInfo.obsid,
     obsdeep: tokenInfo.obsdeep,
     catelog: usr.catelog

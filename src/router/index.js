@@ -173,7 +173,8 @@ const routes = [
       {
         path: 'coursemangt/instructionalprogram', // 教学大纲
         name: 'InstructionalProgrammangt',
-        component: () => import('../components/course/InstructionalProgrammangt.vue')
+        // component: () => import('../components/course/InstructionalProgrammangt.vue')
+        component: () => import('../components/Idealogy/Idealogy.vue')
       },
       {
         path: 'coursemangt/courseresources', // 课程资源
@@ -258,7 +259,7 @@ const routes = [
         component: () => import('../components/evaluation/graph.vue')
       },
       {
-        path: 'evasys/formative/coursetarget',  // 形成性评价模型-课程目标
+        path: 'evasys/formative/coursetarget', // 形成性评价模型-课程目标
         name: 'CourseTarget_',
         component: () => import('../components/evaluation/CourseTarget.vue')
       },

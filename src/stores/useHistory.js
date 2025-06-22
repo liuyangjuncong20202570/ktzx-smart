@@ -4,9 +4,8 @@ import { getHistoryList, usrLogin } from '../api/history';
 const useHistory = defineStore('History', {
   state: () => ({
     historyList: [],
-    nowToken: '',
     useObj: {},
-    nowUsr: {},
+    nowUsr: '',
     pastTerm: ''
   }),
   actions: {
@@ -17,9 +16,6 @@ const useHistory = defineStore('History', {
         code,
         msg
       };
-    },
-    setToken(payload) {
-      this.nowToken = payload;
     },
     setUsr(payload) {
       this.nowUsr = payload;
@@ -36,11 +32,6 @@ const useHistory = defineStore('History', {
   persist: {
     enabled: true,
     strategies: [
-      {
-        key: 'nowToken',
-        storage: sessionStorage,
-        paths: ['nowToken']
-      },
       {
         key: 'nowUsr',
         storage: sessionStorage,

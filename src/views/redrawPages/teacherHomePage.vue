@@ -27,11 +27,14 @@
                   referrerpolicy="no-referrer"
                   src="@/assets/images/redraw-images/icon.png"
                 />
-                <img
-                  style="width: 184px; height: 28px"
-                  referrerpolicy="no-referrer"
-                  src="@/assets/images/redraw-images/title.png"
-                />
+                <div class="flex items-center justify-center gap-4">
+                  <img
+                    style="width: 184px; height: 28px"
+                    referrerpolicy="no-referrer"
+                    src="@/assets/images/redraw-images/title.png"
+                  />
+                  <span class="text-gray-100" v-if="historyStore.nowUsr">当前为历史学期</span>
+                </div>
                 <span
                   class="term"
                   style="

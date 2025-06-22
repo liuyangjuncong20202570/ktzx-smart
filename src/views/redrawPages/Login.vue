@@ -196,12 +196,14 @@ import router from '@/router/index.js';
 import { useProfileStore } from '@/stores/profileStore.js';
 import useInstructor from '@/stores/InstructorStore.js';
 import { storeToRefs } from 'pinia';
+import useHistory from '../../stores/useHistory';
 
 /* ********************变量定义******************** */
 const isText = ref(false);
 const profileStore = useProfileStore();
 const instrutorStore = useInstructor();
 const { isDefaultTerm } = storeToRefs(instrutorStore);
+const historyStore = useHistory();
 
 // 创建获取当前学期id函数
 const getCurrentTermId = () => {
@@ -395,7 +397,8 @@ const userlogin = () => {
       if (res.code === 200) {
         console.log('userlogin_success');
         setprofile(res.data);
-
+        // sessionStorage.setItem('nowUsr', JSON.stringify({}));
+        // historyStore.setUsr('');
         router.push(res.data.homeurl).then(() => {
           window.location.reload(); // 在导航后强制刷新页面
         });
@@ -432,7 +435,7 @@ const setprofile = data => {
     token: data.token,
     currentterm: data.currentterm
   };
-
+  
   sessionStorage.setItem('users', JSON.stringify(userInfo));
   sessionStorage.setItem('isLoggedIn', 'true');
   sessionStorage.setItem('token', data.token);
