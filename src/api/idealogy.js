@@ -2,15 +2,18 @@ import request from '../utils/request.js';
 import qs from 'qs';
 
 // 查询所有idealogy
-export const getIdea = () => {
-  return request.evaluation.get('/evaluation/ideology');
+export const getIdea = courseId => {
+  return request.evaluation.get('/evaluation/ideology', {
+    courseId
+  });
 };
 
 // 增加idealogy
-export const addIdea = (vname, remark) => {
+export const addIdea = (vname, remark, courseId) => {
   return request.evaluation.post('evaluation/ideology/add', {
     vname,
-    remark
+    remark,
+    courseId
   });
 };
 

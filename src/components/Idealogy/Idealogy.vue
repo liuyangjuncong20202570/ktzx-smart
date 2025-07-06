@@ -84,20 +84,23 @@ import _ from 'lodash';
 import { ref, reactive, computed, onMounted } from 'vue';
 import useIdealogy from '../../stores/useIdealogy';
 import { ElMessage } from 'element-plus';
+import parseJWT from '@/utils/parseJWT.js';
 /* ********************变量定义******************** */
 const search = ref('');
 const loading = ref(false);
 const updateData = reactive({
   id: '',
   vname: '',
-  remark: ''
+  remark: '',
+  courseId: ''
 });
 
 const delList = ref([]);
 
 const addData = reactive({
   vname: '',
-  remark: ''
+  remark: '',
+  courseId: ''
 });
 // props定义
 // 普通变量
@@ -114,7 +117,8 @@ const querySearch = async () => {
     loading.value = true;
     await IdealogyStore.fetchFuzzyQuery({
       fuzzyQuery: true,
-      vname: search.value
+      vname: search.value,
+      courseId: addData.courseId
     });
     loading.value = false;
   }
@@ -186,9 +190,12 @@ const handleHide = async scope => {
 };
 
 onMounted(async () => {
+  const token = parseJWT(sessionStorage.getItem('token'));
   loading.value = true;
-  await IdealogyStore.fetchIdeaList();
+  await IdealogyStore.fetchIdeaList(token.obsid);
   loading.value = false;
+  addData.courseId = token.obsid;
+  updateData.courseId = token.obsid;
 });
 </script>
 

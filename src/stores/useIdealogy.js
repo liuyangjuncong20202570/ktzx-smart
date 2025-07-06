@@ -6,16 +6,16 @@ const useIdealogy = defineStore('Idealogy', {
     ideaList: []
   }),
   actions: {
-    async fetchIdeaList() {
-      const { code, msg, data } = await getIdea();
+    async fetchIdeaList(courseId) {
+      const { code, msg, data } = await getIdea(courseId);
       this.ideaList = data;
       return {
         code,
         msg
       };
     },
-    async fetchAddIdea({ vname, remark }) {
-      const { code, msg } = await addIdea(vname, remark);
+    async fetchAddIdea({ vname, remark, courseId }) {
+      const { code, msg } = await addIdea(vname, remark, courseId);
       return { code, msg };
     },
     async fetchDelIdea(idList) {
