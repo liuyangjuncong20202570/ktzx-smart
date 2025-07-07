@@ -96,8 +96,8 @@
                     </div>
                   </div>
                   <!-- 下拉按钮 -->
-                  <el-dropdown>
-                    <img style="margin-left: 37px; width: 26px; height: 26px" referrerpolicy="no-referrer"
+                  <el-dropdown @visible-change="handleVisibleChange">
+                    <img class="drop-down-icon" style="margin-left: 37px; width: 26px; height: 26px" referrerpolicy="no-referrer"
                       src="@/assets/images/redraw-images/dropdown.png" />
                     <template #dropdown>
                       <el-dropdown-menu>
@@ -461,6 +461,14 @@ const handleCourseSelect = () => {
   router.push('/homes/studenthome');
 };
 
+const handleVisibleChange = (visible) => {
+  const dropDown = document.querySelector('.drop-down-icon');
+  if (visible) dropDown.style.transform = 'rotate(180deg)';
+  else {
+    dropDown.style.transform = 'rotate(0deg)';
+  }
+}
+
 //钩子函数用来刷新后重新获取数据
 
 onMounted(() => {
@@ -513,5 +521,11 @@ onMounted(() => {
 
 .jump-course-select:hover {
   color: #0078cd;
+}
+
+.drop-down-icon {
+  transition: transform 0.2s ease;
+  outline: none;
+  cursor: pointer;
 }
 </style>

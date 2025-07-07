@@ -94,7 +94,7 @@
                   </div>
                   <!-- 下拉按钮 -->
                   <el-dropdown @visible-change="handleVisibleChange">
-                    <img style="margin-left: 37px; width: 26px; height: 26px" referrerpolicy="no-referrer"
+                    <img class="drop-down-icon" style="margin-left: 37px; width: 26px; height: 26px" referrerpolicy="no-referrer"
                       src="@/assets/images/redraw-images/dropdown.png" />
                     <template #dropdown>
                       <el-dropdown-menu>
@@ -462,6 +462,14 @@ const changePwd = (formEl: FormInstance | undefined) => {
 
 }
 
+const handleVisibleChange = (visible) => {
+  const dropDown = document.querySelector('.drop-down-icon');
+  if (visible) dropDown.style.transform = 'rotate(180deg)';
+  else {
+    dropDown.style.transform = 'rotate(0deg)';
+  }
+}
+
 // 钩子函数用来刷新后重新获取数据
 
 onMounted(() => {
@@ -674,5 +682,11 @@ onMounted(() => {
   width: 178px;
   height: 178px;
   text-align: center;
+}
+
+.drop-down-icon {
+  transition: transform 0.2s ease;
+  outline: none;
+  cursor: pointer;
 }
 </style>
