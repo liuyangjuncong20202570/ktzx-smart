@@ -9,23 +9,23 @@
         />
         <div class="absolute block_1 flex flex-row justify-between items-center">
           <div
-            style="width: 11.25vw; color: rgba(39, 165, 255, 1)"
-            @click="() => switchRole(loginForm.catelog)"
+            style="width: 11.25vw; color: rgba(39, 165, 255, 1);"
+            @click="() => switchRole(loginForm.catelog, '1')"
             :class="
               loginForm.catelog === '1'
-                ? 'text-wrapper_1 flex flex-col cursor-pointer justify-center items-center'
-                : 'flex all flex-row cursor-pointer justify-center items-center'
+                ? 'text-wrapper_1 flex flex-col cursor-pointer justify-center items-center h-full'
+                : 'flex all flex-row cursor-pointer justify-center items-center h-full'
             "
           >
             <span class="text_1">学生登录</span>
           </div>
           <div
-            @click="() => switchRole(loginForm.catelog)"
-            style="width: 11.25vw; color: rgba(39, 165, 255, 1)"
+            @click="() => switchRole(loginForm.catelog, '2')"
+            style="width: 11.25vw; color: rgba(39, 165, 255, 1);"
             :class="
               loginForm.catelog === '2'
-                ? 'text-wrapper_1 flex flex-col cursor-pointer justify-center items-center'
-                : 'flex all flex-row cursor-pointer justify-center items-center'
+                ? 'text-wrapper_1 flex flex-col cursor-pointer justify-center items-center h-full'
+                : 'flex all flex-row cursor-pointer justify-center items-center h-full'
             "
           >
             <span class="text_2">教师登录</span>
@@ -244,13 +244,14 @@ const StudentOrTeacher = ref(true);
 //调用getCurrentInstance()方法来获取当前组件实例的代理对象
 const { proxy } = getCurrentInstance();
 
-const switchRole = value => {
+const switchRole = (value, catelog) => {
   // console.log(value);
-  if (value === '1') {
-    loginForm.catelog = '2';
-  } else if (value === '2') {
-    loginForm.catelog = '1';
-  }
+  // if (value === '1') {
+  //   loginForm.catelog = '2';
+  // } else if (value === '2') {
+  //   loginForm.catelog = '1';
+  // }
+  loginForm.catelog = catelog;
 };
 
 //弹窗是否显示
@@ -351,7 +352,7 @@ const login = () => {
               type: 'error',
               message: res.msg
             });
-          }
+          } else ElMessage.error(res.msg);
         })
         .catch(error => {
           // 登录失败

@@ -118,14 +118,14 @@
                     </div>
                   </div>
                   <!-- 下拉按钮 -->
-                  <el-dropdown @visible-change="handleVisibleChange">
-                    <img
+                  <el-dropdown @visible-change="handleVisibleChange" :hide-on-click="false">
+                    <img class="drop-down-icon"
                       style="margin-left: 37px; width: 26px; height: 26px"
                       referrerpolicy="no-referrer"
                       src="@/assets/images/redraw-images/dropdown.png"
                     />
                     <template #dropdown>
-                      <el-dropdown-menu>
+                      <el-dropdown-menu class="max-h-[50vh] overflow-auto">
                         <template v-if="!showRoles">
                           <el-dropdown-item @click="openChangePwdDialog">修改密码</el-dropdown-item>
                           <el-dropdown-item @click="getRolelist">切换角色</el-dropdown-item>
@@ -347,7 +347,10 @@ import useInstructor from '@/stores/InstructorStore.js';
 import { storeToRefs } from 'pinia';
 import useMain from '@/stores/useMain.js';
 import '@/assets/css/taildwind.css';
-
+import { Dropdown } from 'ant-design-vue';
+const aaa = () => {
+  console.log('aaa');
+}
 // 判断是否已新建学期
 const InstructorStore = useInstructor();
 const { isDefaultTerm } = storeToRefs(InstructorStore);
@@ -532,7 +535,7 @@ const switchRole = role => {
   loginuserFrom.value.obsid = role.obsid;
   loginuserFrom.value.obsdeep = role.obsdeep;
   userlogin(loginuserFrom);
-  showRoles.value = false;
+  // showRoles.value = false;
 };
 
 //--------修改密码
@@ -646,8 +649,10 @@ const setprofile = data => {
 };
 
 const handleVisibleChange = visible => {
-  if (!visible && showRoles.value) {
-    // 当下拉菜单关闭时，重置状态
+  const dropDown = document.querySelector('.drop-down-icon');
+  if (visible) dropDown.style.transform = 'rotate(180deg)';
+  else {
+    dropDown.style.transform = 'rotate(0deg)';
     showRoles.value = false;
   }
 };
@@ -888,5 +893,11 @@ onMounted(() => {
   width: 178px;
   height: 178px;
   text-align: center;
+}
+
+.drop-down-icon {
+  transition: transform 0.2s ease;
+  outline: none;
+  cursor: pointer;
 }
 </style>
