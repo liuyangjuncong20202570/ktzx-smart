@@ -173,8 +173,8 @@ const routes = [
       {
         path: 'coursemangt/instructionalprogram', // 教学大纲
         name: 'InstructionalProgrammangt',
-        // component: () => import('../components/course/InstructionalProgrammangt.vue')
-        component: () => import('../components/Idealogy/Idealogy.vue')
+        component: () => import('../components/course/InstructionalProgrammangt.vue')
+        // component: () => import('../components/Idealogy/Idealogy.vue')
       },
       {
         path: 'coursemangt/courseresources', // 课程资源
@@ -237,12 +237,6 @@ const routes = [
         name: 'portraitmangt',
         component: () => import('../components/dynamicEvaluation/PortraitMangt/PortraitMangt.vue')
       },
-      // // 由于前期开发问题，此处courseGraph表示课堂画像，classroomGraph表示课程画像
-      // {
-      //   path: 'evaluation/dynamicEvaluation/courseGraph', // 评估与画像-课堂画像
-      //   name: 'courseGraph',
-      //   component: () => import('../components/dynamicEvaluation/CourseGraph/CourseGraph.vue')
-      // },
       {
         path: 'dynamicmodel/graphlist', // 形成性评价模型-画像名单
         name: 'GraphList',
@@ -262,6 +256,11 @@ const routes = [
         path: 'evasys/formative/coursetarget', // 形成性评价模型-课程目标
         name: 'CourseTarget_',
         component: () => import('../components/evaluation/CourseTarget.vue')
+      },
+      {
+        path: 'evasys/formative/idealogy', // 形成性评价模型-思政价值
+        name: 'Idealogy',
+        component: () => import('../components/Idealogy/Idealogy.vue')
       },
       {
         path: 'evasys/accessible/coursetarget', // 达成性评价模型-课程目标
@@ -476,6 +475,8 @@ router.beforeEach((to, from, next) => {
   // 尝试从 sessionStorage 中获取用户信息
   const storedUserInfo = sessionStorage.getItem('users');
 
+  const token = sessionStorage.getItem('token');
+
   // 检查目标路由是否需要认证（假设需要认证的路由有一个'meta'字段）
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const MainStore = useMain();
@@ -497,6 +498,11 @@ router.beforeEach((to, from, next) => {
   if (requiresAuth && !storedUserInfo) {
     // 如果目标路由需要认证，但没有存储的用户信息，则重定向到登录页面
     next({ name: 'Login' });
+    return;
+  }
+
+  if (!token && !storedUserInfo && to.path !== '/login') {
+    next('login');
     return;
   }
   next();
