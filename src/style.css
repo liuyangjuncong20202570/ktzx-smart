@@ -11,6 +11,22 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --bg-title-bar: #fff;
+  --bg-color: #eef7ff;
+  --bg-sidebar: #fff;
+  --text-primary: #000;
+  --hover-bg: #eee;
+  --bg-card: #fff;
+}
+
+html.dark {
+  --bg-title-bar: #c4c4c4;
+  --bg-color: #e5e5e5;
+  --bg-sidebar: #ebebeb;
+  --bg-card: #ebebeb;
+  --text-primary: #000;
+  --hover-bg: #fff;
 }
 
 a {
@@ -63,8 +79,8 @@ button:focus-visible {
   height: 100vh;
   margin: 0 auto;
   text-align: center;
-  color: #000000;  /*新增*/
-  background-color: #FFFFFF;
+  color: #000000; /*新增*/
+  background-color: #ffffff;
 }
 
 @media (prefers-color-scheme: light) {

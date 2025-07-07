@@ -44,6 +44,7 @@ import {
 } from 'echarts/components';
 // 引入所需组件
 import { RadarChart } from 'echarts/charts';
+import useHistory from './stores/useHistory.js';
 
 use([CanvasRenderer, TooltipComponent, GridComponent, LegendComponent, TitleComponent, RadarChart]);
 
@@ -71,3 +72,7 @@ app
   .directive('blur-on-click', blurOnClick)
   .directive('click-outside', clickOutside)
   .mount('#app');
+
+const historyStore = useHistory();
+
+document.documentElement.classList.toggle('dark', historyStore.nowUsr);

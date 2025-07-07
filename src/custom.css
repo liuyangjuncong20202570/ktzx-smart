@@ -1,9 +1,9 @@
 /* table 自定义样式  start */
 .custom-table {
-  border-radius: 10px 10px 0px 0px; 
+  border-radius: 10px 10px 0px 0px;
 }
 .custom-table .el-table__header-wrapper .el-table__header thead .el-table__cell {
-  background: #F0F9FF;
+  background: #f0f9ff;
   /* border-radius: 10px 10px 0px 0px; */
   font-family: MicrosoftYaHei;
   font-size: 16px;
@@ -20,7 +20,7 @@
   border: 1px solid #27a5ff;
 }
 /* 超过两行显示省略号 数字也折行*/
-.custom-table-ellipsis{
+.custom-table-ellipsis {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2; /* 限制显示的行数为2 */
@@ -31,12 +31,11 @@
   white-space: normal;
   word-wrap: break-word;
   display: -webkit-box;
-  
 }
 /* table 自定义样式  end */
 
 /* table 操作按钮  start */
-.custom-link-button{
+.custom-link-button {
   height: auto !important;
   font-family: MicrosoftYaHei !important;
   font-size: 14px !important;
@@ -47,10 +46,10 @@
   padding: 2px 5px !important;
   margin: 3px 0;
   margin-right: 10px;
-  margin-left: 0px !important; 
+  margin-left: 0px !important;
   cursor: pointer;
 }
-.custom-link-button.is-disabled{
+.custom-link-button.is-disabled {
   color: #d2d2d2 !important;
   border: 1px solid #d2d2d2 !important;
 }
@@ -164,7 +163,7 @@
   border-radius: 10px;
 }
 .custom-dialog .el-dialog__header {
-  border-bottom: 2px solid #93D2FF;
+  border-bottom: 2px solid #93d2ff;
   margin-bottom: 10px;
 }
 .custom-dialog .custom-dialog-footer {
@@ -178,9 +177,9 @@
 
 /* 自定义checkbox  start */
 .custom-checkbox .el-checkbox__input {
-  background: rgba(39,165,255,0.1);
+  background: rgba(39, 165, 255, 0.1);
   border-radius: 5px;
-  border: 1px solid #27A5FF;
+  border: 1px solid #27a5ff;
 }
 .custom-checkbox .el-checkbox__inner {
   background-color: transparent;
@@ -246,18 +245,27 @@
   }
 }
 /* 自定义总分  end */
-.custom-dialog{
-  .el-dialog__header{
+.custom-dialog {
+  .el-dialog__header {
     text-align: center;
     padding: 10px 20px;
-    border-bottom: 2px solid #93D2FF;
+    border-bottom: 2px solid #93d2ff;
   }
 }
-.custom-checkbox{
-  .el-checkbox__input{
+.custom-checkbox {
+  .el-checkbox__input {
     background: rgba(39, 165, 255, 0.1) !important;
     border-radius: 3px !important;
     border: none !important;
     overflow: hidden !important;
   }
+}
+
+.dark {
+  --bg-main: #1e1e2f;
+  --bg-sidebar: #2a2a3c;
+  --bg-card: #2f2f3f;
+  --bg-table-head: #3a3a4a;
+  --text-primary: #e0e0e0;
+  --hover-bg: #444;
 }
