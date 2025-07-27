@@ -317,6 +317,7 @@ import { searchInTable } from '../../utils/searchInTable.js';
 import AddPeopleDialog from './subcomponents/AddPeopleDialog.vue';
 import EditRoleList from './subcomponents/EditRoleList.vue';
 import _ from 'lodash';
+import useTeacherInClass from '../../stores/useTeacherInClass.js';
 
 const unitName = ref('默认班级');
 
@@ -442,6 +443,7 @@ const treeNodeClick = (data, node, event) => {
   getPeopleList();
 };
 
+const teacherStore = useTeacherInClass()
 const getPeopleList = async () => {
   request.admin
     .get(
@@ -450,6 +452,7 @@ const getPeopleList = async () => {
     .then(res => {
       if (res.code === 200) {
         peoplelist.value = res.data;
+        teacherStore.setPeopleList(res.data)
         console.log(peoplelist.value);
         searchKeyword.value = null;
         filteredData.value = peoplelist.value;

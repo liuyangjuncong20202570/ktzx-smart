@@ -14,10 +14,14 @@ const useTeacherInClass = defineStore('TeacherInClass', {
   // 存放数据
   state: () => ({
     stuList: [],
-    organizationList: []
+    organizationList: [],
+    peopleList: []
   }),
   // 存放异步请求函数
   actions: {
+    setPeopleList(payload) {
+      this.peopleList = payload;
+    },
     // 获取学生信息表
     async fetchStudentList(parseToken) {
       const { data } = await getStuList(parseToken.obsid);
