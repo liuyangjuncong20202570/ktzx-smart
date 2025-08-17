@@ -13,7 +13,7 @@
       <el-button type="danger" @click="deleteKWA">删除</el-button>
       <el-button type="primary">保存</el-button>
       <el-button type="warning" @click="exportExcel">导出Excel</el-button>
-      <el-button type="success" @click="changeEl">修改属性</el-button>
+      <!-- <el-button type="success" @click="changeEl">修改属性</el-button> -->
       <el-input
         v-model="tableSearchData"
         style="margin-left: 0.8vw; width: 250px"
@@ -172,7 +172,7 @@
             </el-popover>
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="vStore" label="属性 " min-width="140">
+        <!-- <el-table-column align="center" prop="vStore" label="属性 " min-width="140">
           <template #default="scope">
             <el-popover
               :visible="isShow && currentId === scope.row.id"
@@ -217,8 +217,8 @@
                     <Edit />
                   </el-icon>
                 </div>
-              </template>
-              <!-- <el-header
+              </template> -->
+        <!-- <el-header
                 style="height: auto; padding: 5px 0px; width: 100%; background-color: #eef3f6"
               >
                 <div style="display: flex; justify-content: space-between">
@@ -262,12 +262,12 @@
                 >
               </div>
                -->
-            </el-popover>
-          </template>
-          <!-- <template v-slot="row">
+        <!-- </el-popover> -->
+        <!-- </template> -->
+        <!-- <template v-slot="row">
             
           </template> -->
-        </el-table-column>
+        <!-- </el-table-column> -->
         <el-table-column align="center" prop="datavalue" label="权值">
           <!-- <template v-slot="row">
             <el-input v-if="row.row.editingDatavalue" style="width: 100%; height: 25px"
