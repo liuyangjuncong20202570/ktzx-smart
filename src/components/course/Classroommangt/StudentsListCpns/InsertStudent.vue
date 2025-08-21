@@ -117,7 +117,7 @@ const fetchData = () => {
   //页面进入后，获取左侧的组织机构列表
   request.admin
     // .get('/sysmangt/personnelmangt')
-    .get('/sysmangt/student')
+    .get('/sysmangt/units/student')
     .then(res => {
       // 登录成功
       listData.value = res.data[0].children;

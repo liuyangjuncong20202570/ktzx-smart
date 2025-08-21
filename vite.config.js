@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => {
       tailwindcss()
     ],
     server: {
+      host: '0.0.0.0',
       port: 8081,
       proxy: {
         '/api': {
