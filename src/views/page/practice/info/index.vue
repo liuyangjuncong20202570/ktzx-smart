@@ -149,7 +149,7 @@
     :before-close="beforeCloseDialog"
     class="custom-dialog"
   >
-    <Kwa ref="kwa" :kwaId="kwaId"></Kwa>
+    <Kwa ref="kwa" :kwaId="kwaId" :vid="vid"></Kwa>
     <template #footer>
       <div class="dialog-footer custom-dialog-footer">
         <el-button @click="isOpenDialog = false">取消</el-button>
@@ -400,6 +400,7 @@ const sureSelect = async () => {
         item.fullName = data.fullName;
         item.kwaName = data.name;
         item.kwaId = data.kwaId;
+        item.vid = data.vid;
       }
     });
     tableData.length = 0;
@@ -467,9 +468,12 @@ const resetLabReportData = () => {
     currentId.value = 0;
   }
 };
+const vid = ref<string>('')
 // 打开kwa弹框
 const openKwa = (data: PracticeTemplateVO) => {
+  console.log('data',data)
   kwaId.value = data.kwaId
+  vid.value = data.vid || data.kwas[0].vid
   selectRowKeyData = data;
   isOpenDialog.value = true;
 };
@@ -545,6 +549,7 @@ const saveData = async (formEl: FormInstance | undefined) => {
               itemId: _item.id,
               kwaId: _item.kwaId,
               kwaName: _item.kwaName,
+              vid: _item.vid
             }]
           }
           if (_item.kwas&&_item.kwas.length>0&&isDetail.value) {

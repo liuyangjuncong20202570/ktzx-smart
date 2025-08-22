@@ -33,6 +33,11 @@
           <el-checkbox class="custom-checkbox" v-for="(item, i) in abilityList" :key="i" :label="item">{{ item.name }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
+      <el-form-item label="价值" v-if="valueList && valueList.length">
+        <el-checkbox-group @change="addHandleValueChange" v-model="form.valueItems" :max="1">
+          <el-checkbox class="custom-checkbox" v-for="(item, i) in valueList" :key="i" :label="item">{{ item.name }}</el-checkbox>
+        </el-checkbox-group>
+      </el-form-item>
     </el-form>
 
     <el-form v-if="['taskKwa'].includes(type)" label-position="left" :model="form" label-width="60px">
@@ -178,17 +183,23 @@ const handleChange = (changeValue) => {
     abilityList.value = [];
     form.value.abilityItem = [];
     form.value.abilityItems = [];
+    valueList.value = [];
+    form.value.valueItems = [];
     emit("kwa-event", []);
     form.value.treeIds?.forEach((item) => {
       let list = kwaTree.value.find((kwa) => kwa.keyId === item)?.abilityList || [];
       abilityList.value = [...abilityList.value, ...list];
     });
+    abilityList.value
   }
 
   if (["taskKwa", "courseLibSearch", "classroomLibSearch"].includes(type)) {
     emit("kwa-event", form.value);
   }
 };
+
+const valueList = ref([]);
+const kwaEvent = ref([]);
 const addHandleChange = (arr) => {
   const newArr = arr?.map((arrItem) => {
     if (arrItem) {
@@ -199,9 +210,29 @@ const addHandleChange = (arr) => {
       };
     }
   });
+  //  价值 
+  if(arr[0]?.vlist){
+    arr[0]?.vlist.forEach((item) => {
+      const key = Object.keys(item)[0];
+      const value = item[key];
+      valueList.value.push({
+        name: value,
+        value: key,
+      });
+    });
+  }
+  console.log("valueList", valueList.value);
   console.log("newArr", newArr);
-  emit("kwa-event", newArr);
+  kwaEvent.value = newArr;
+  emit("kwa-event", kwaEvent.value);
 };
+const addHandleValueChange = (arr) => {
+  console.log("arr", arr);
+  kwaEvent.value[0].vid = Number(arr[0].value);
+  console.log("kwaEvent", kwaEvent.value);
+  emit("kwa-event", kwaEvent.value);
+};
+
 
 onMounted(() => {
   getCourseLibKwa();
