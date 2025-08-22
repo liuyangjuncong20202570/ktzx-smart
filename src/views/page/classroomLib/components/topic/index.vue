@@ -30,7 +30,7 @@
       </template>
       
 
-      <Kwa :defaultValue="keaData" type="classroomLibAdd" @kwa-event="handleKwaEvent" />
+      <Kwa :defaultValue="keaData" :item="item" type="classroomLibAdd" @kwa-event="handleKwaEvent" />
 
       <el-input
         v-if="['编程题', '简答题'].includes(headline)"

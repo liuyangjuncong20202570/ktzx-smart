@@ -71,7 +71,6 @@ const props = defineProps({
     defautl: null,
   },
 });
-console.log("kea-props", props);
 const { type, defaultValue } = props;
 const form = ref({});
 const kwaMap = ref(null);
@@ -139,7 +138,6 @@ const getCourseLibKwa = () => {
                 if (obj?.kwas) return obj.kwas;
               })
               ?.flat() || [];
-          console.log("form.value.abilityItems", form.value.abilityItems);
           addHandleChange(form.value.abilityItems);
         }
       }
@@ -223,15 +221,20 @@ const addHandleChange = (arr) => {
       });
     });
   }
-  console.log("valueList", valueList.value);
-  console.log("newArr", newArr);
   kwaEvent.value = newArr;
+  
+  // 复显价值
+  if (defaultValue && defaultValue[0]?.vid && valueList.value.length > 0) {
+    const valueItem = valueList.value.find(item => item.value == defaultValue[0].vid);
+    if (valueItem) {
+      form.value.valueItems = [valueItem];
+    }
+  }
+  
   emit("kwa-event", kwaEvent.value);
 };
 const addHandleValueChange = (arr) => {
-  console.log("arr", arr);
   kwaEvent.value[0].vid = Number(arr[0].value);
-  console.log("kwaEvent", kwaEvent.value);
   emit("kwa-event", kwaEvent.value);
 };
 
@@ -239,6 +242,20 @@ const addHandleValueChange = (arr) => {
 onMounted(() => {
   getCourseLibKwa();
   getCourseLibType();
+  // 复显
+  if(defaultValue[0]?.vid){
+    // 延迟执行，确保数据加载完成后再复显
+    setTimeout(() => {
+      if (defaultValue[0]?.vid && valueList.value.length > 0) {
+        // 根据 vid 找到对应的价值项
+        const valueItem = valueList.value.find(item => item.value == defaultValue[0].vid);
+        if (valueItem) {
+          form.value.valueItems = [valueItem];
+        }
+      }
+    }, 500);
+  }
+ 
 });
 // 导出函数
 defineExpose({
