@@ -473,7 +473,7 @@ const vid = ref<string>('')
 const openKwa = (data: PracticeTemplateVO) => {
   console.log('data',data)
   kwaId.value = data.kwaId
-  vid.value = data.vid || data.kwas[0].vid
+  vid.value = data.vid || (data.kwas && data.kwas.length > 0 ? data.kwas[0].vid : '')
   selectRowKeyData = data;
   isOpenDialog.value = true;
 };

@@ -210,6 +210,8 @@ const addHandleChange = (arr) => {
       };
     }
   });
+  valueList.value = []
+  form.value.valueItems = []
   //  价值 
   if(arr[0]?.vlist){
     arr[0]?.vlist.forEach((item) => {
