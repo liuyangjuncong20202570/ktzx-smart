@@ -254,7 +254,7 @@ const routes = [
       },
       {
         path: 'evasys/formative/coursetarget', // 形成性评价模型-课程目标
-        name: 'CourseTarget_',
+        name: 'CourseTarget',
         component: () => import('../components/evaluation/CourseTarget.vue')
       },
       {
@@ -265,17 +265,21 @@ const routes = [
       {
         path: 'evasys/accessible/coursetarget', // 达成性评价模型-课程目标
         name: 'CourseTarget',
-        component: () => import('../components/evaluation/CourseTarget.vue')
+        // component: () => import('../components/evaluation/CourseTarget.vue')
+        component: () => import('../components/evaluation/evaluationNew/CourseAim.vue')
       },
       {
         path: 'evaluation/AssessmentItems',
         name: 'AssessmentItems',
-        component: () => import('../components/evaluation/AssessmentItems.vue')
+        // component: () => import('../components/evaluation/AssessmentItems.vue')
+        component: () =>
+          import('../components/evaluation/evaluationNew/evaluationItem/EvaluationDesign.vue')
       },
       {
         path: 'evaluation/assessmentPlan', // 达成性评价模型-考核方案
         name: 'AssessmentTable',
-        component: () => import('../components/evaluation/AssessmentTable.vue')
+        // component: () => import('../components/evaluation/AssessmentTable.vue')
+        component: () => import('../components/evaluation/evaluationNew/AsswssmentNew.vue')
       },
       {
         path: 'evaluation/dynamicEvaluation/studentReport', // 评估与画像-学生报告

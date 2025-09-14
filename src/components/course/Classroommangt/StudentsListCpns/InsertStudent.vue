@@ -101,7 +101,8 @@ const nodeClick = (data, node, event) => {
 // *****************搜索框逻辑***********
 const getPeopleList = () => {
   request.admin
-    .get('/sysmangt/personnelmangt/person?obsid=' + currentobsId.value + '&catelog=1')
+    // .get('/sysmangt/personnelmangt/person?obsid=' + currentobsId.value + '&catelog=1')
+    .get('/sysmangt/units/student')
     .then(res => {
       if (res.code === 200) {
         // peoplelist.value = res.data;
