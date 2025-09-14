@@ -106,3 +106,14 @@ export interface StudentParamVO  {
   practiceId:string,
   stuId:string
 }
+
+// 修改校验接口返回类型
+export interface UpdateCheckingResVO {
+  couldUpdate: boolean;
+  level: number;
+  msg: string;
+}
+
+export interface UpdateCheckingVO extends ResVO {
+  data: UpdateCheckingResVO;
+}

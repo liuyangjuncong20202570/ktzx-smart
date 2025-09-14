@@ -57,6 +57,10 @@ export const studentSave = (data) => {
 export const practiceUpdate = (data) => {
     return request.page.post(`/practice/edit/update`,data)
 }
+// 修改校验接口
+export const practiceUpdateChecking = (data) => {
+    return request.page.post(`/practice/edit/updateChecking`,data)
+}
 // 页面权限接口
 export const studentWR = () => {
     return request.page.get('/practice/getWR')

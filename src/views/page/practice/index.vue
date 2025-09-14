@@ -57,8 +57,8 @@
           </template>
           <el-button class="custom-link-button custom-link-active-button" type="primary" :text="true" @click="handleCopy([scope.row])">复制</el-button>
           <el-button
-            :class="!scope.row.status ? 'custom-link-button custom-link-active-button' : 'custom-link-button custom-link-default-button'"
-            :disabled="scope.row.status"
+            :class="!scope.row.status || scope.row.status == 1 || scope.row.status == 3 ? 'custom-link-button custom-link-active-button' : 'custom-link-button custom-link-default-button'"
+            :disabled="scope.row.status != 0 && scope.row.status != 1 && scope.row.status != 3"
             v-if="!(privilege === 'read')"
             type="primary"
             :text="true"
@@ -199,7 +199,7 @@ const getPracticePage = async () => {
 };
 // 编辑数据
 const editPractice = (row: any) => {
-  router.push({ path: "/homes/courseteacherhome/exam/experimental/practiceInfo", query: { id: row.id } });
+  router.push({ path: "/homes/courseteacherhome/exam/experimental/practiceInfo", query: { id: row.id, status: row.status } });
 };
 // 查看
 const toViewPractice = (row: any) => {
