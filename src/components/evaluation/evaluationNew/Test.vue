@@ -13,23 +13,42 @@
       <div class="wrapper">
         <div>
           <el-dropdown>
-            <el-tree-select
-              v-model="treeValue"
-              :props="defaultProps"
-              :data="typeList"
-              :render-after-expand="false"
-              style="width: 240px"
-              :check-on-click-node="true"
-              @node-click="nodeClick"
-              node-key="id"
-              placeholder="请选择考核类别"
-            />
+            <div class="flex items-center justify-between gap-6 mb-4 mt-4">
+              <el-tree-select
+                v-model="treeValue"
+                :props="defaultProps"
+                :data="typeList"
+                :render-after-expand="false"
+                style="width: 240px"
+                :check-on-click-node="true"
+                @node-click="nodeClick"
+                node-key="id"
+                placeholder="请选择考核类别"
+              />
+              <el-tree-select
+                v-model="itemType"
+                :props="typeProps"
+                :data="
+                  _.uniqBy(
+                    [...testList.testPaper, ...testList.practice].map(i => ({ type: i.itemType })),
+                    'type'
+                  )
+                "
+                :render-after-expand="false"
+                style="width: 240px"
+                :check-on-click-node="true"
+                @node-click="data => mapping(data.type)"
+                node-key="type"
+                placeholder="请选择类别"
+              />
+            </div>
           </el-dropdown>
         </div>
         <div class="h-[400px] overflow-auto">
           <el-table
+            ref="tableRef"
             v-loading="loading"
-            :data="[...testList.testPaper, ...testList.practice]"
+            :data="filterData"
             @select="handleSelect"
             @selectAll="handleSelectAll"
             style="width: 100%"
@@ -62,32 +81,59 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onBeforeMount, onBeforeUnmount, onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import useItem from '../../../stores/useItem';
 import useCourseAim from '../../../stores/useCourseAim';
 import useEvaluationNew from '../../../stores/useEvaluationNew';
 import { ElMessage } from 'element-plus';
+import _, { update } from 'lodash';
 
 /* ********************变量定义******************** */
 // props定义
+const props = defineProps({
+  classroomId: {
+    type: String,
+    default: ''
+  }
+});
+
 const defaultProps = {
   children: node => node.children || node.studentDtos, // 子节点字段
   label: node => node.categoryName // 显示文本字段
 };
+
+const typeProps = {
+  children: node => node.children || node.studentDtos, // 子节点字段
+  label: node => node.type
+};
 // 普通变量
 // pinia状态管理
+const filterData = ref([]);
+const tableRef = ref();
 const treeValue = ref();
+const itemType = ref();
 const inputList = ref([]);
 const itemStore = useItem();
 const aimStore = useCourseAim();
 const typeStore = useEvaluationNew();
 const { typeList } = storeToRefs(typeStore);
-const { setShow, setCategoryId, fetchBind } = itemStore;
-const { isShow, testList, categoryId, objectiveId } = storeToRefs(itemStore);
+const { setShow, setCategoryId, fetchBind, fetchTest } = itemStore;
+const { isShow, testList, categoryId, objectiveId, courseId } = storeToRefs(itemStore);
 
 const handleBack = () => {
   setShow(false);
+};
+
+const mapping = type => {
+  switch (type) {
+    case '作业':
+      filterData.value = testList.value.testPaper;
+      break;
+    case '实验':
+      filterData.value = testList.value.practice;
+      break;
+  }
 };
 
 const handleSelectAll = selection => {
@@ -111,12 +157,21 @@ const handleSelect = selection => {
 
 const nodeClick = (data, node, event) => {
   // treeValue.value = data.categoryName;
+  console.log(data.id);
   setCategoryId(data.id);
 };
 
 const submitUpload = async () => {
+  console.log(categoryId.value);
+  if (!categoryId.value) {
+    ElMessage({ type: 'warning', message: '请先选择考核类别' });
+    tableRef.value.clearSelection();
+    return;
+  }
   const { code, msg } = await fetchBind(inputList.value);
-
+  await fetchTest({ classroomId: props.classroomId });
+  filterData.value = mapping(itemType.value);
+  itemType.value = '';
   ElMessage({
     type: code === 200 ? 'success' : 'error',
     message: msg === 'success' ? '绑定成功' : msg
@@ -124,6 +179,10 @@ const submitUpload = async () => {
 };
 
 /* ********************方法定义******************** */
+onBeforeUnmount(() => {
+  itemType.value = '';
+  treeValue.value = '';
+});
 </script>
 
 <style lang="less" scoped></style>

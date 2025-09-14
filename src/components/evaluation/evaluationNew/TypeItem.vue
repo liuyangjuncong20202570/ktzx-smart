@@ -8,6 +8,8 @@
       style="width: 50vw; padding-top: 0; height: 78vh"
       @close="handleBack"
       v-model="isItemShow"
+      @open="handleShow"
+      @opened="handleShow"
     >
       <h2 style="margin-top: 0">已绑定的考核项</h2>
       <div class="wrapper">
@@ -61,21 +63,29 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import useItem from '../../../stores/useItem';
-import useCourseAim from '../../../stores/useCourseAim';
-import useEvaluationNew from '../../../stores/useEvaluationNew';
 import { ElMessage } from 'element-plus';
 
 /* ********************变量定义******************** */
 // props定义
+const props = defineProps({
+  classroomId: {
+    type: String,
+    default: ''
+  }
+});
 // 普通变量
 // pinia状态管理
 const delList = ref([]);
 const itemStore = useItem();
 const { setItemShow, fetchDelBind, fetchGetBind } = itemStore;
 const { isItemShow, bindList, courseId } = storeToRefs(itemStore);
+
+const handleShow = () => {
+  console.log('show');
+};
 
 const handleBack = () => {
   setItemShow(false);
@@ -115,7 +125,6 @@ const handleSelectAll = selection => {
   delList.value = selection.map(i => i.id);
   console.log(delList.value);
 };
-
 /* ********************方法定义******************** */
 </script>
 

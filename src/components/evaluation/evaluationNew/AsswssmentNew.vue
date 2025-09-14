@@ -17,7 +17,7 @@
     >
   </el-header>
 
-  <div v-if="!(testList.testPaper?.length || testList.practice?.length)">暂无数据</div>
+  <div v-if="!aimList.length">暂无数据</div>
   <div v-else>
     <div class="h-[800px] overflow-auto">
       <el-table
@@ -51,7 +51,11 @@
         </el-table-column>
       </el-table>
 
-      <Test :objectiveId="objectiveId" />
+      <Test
+        :classroomId="classroomId"
+        v-show="testList.practice.length || testList.testPaper.length"
+        :objectiveId="objectiveId"
+      />
       <TypeItem v-if="bindList.length" />
     </div>
   </div>
@@ -67,6 +71,7 @@ import useCourseAim from '../../../stores/useCourseAim';
 import useEvaluationNew from '../../../stores/useEvaluationNew';
 import TypeItem from './TypeItem.vue';
 import _, { update } from 'lodash';
+import { ElMessage } from 'element-plus';
 
 /* ********************变量定义******************** */
 // props定义
@@ -111,8 +116,17 @@ onMounted(async () => {
   // await fetchTest({ classroomId: '292104772-1fadaf0b-0b82-4f42-8181-b1621279e074' });
 });
 
-const handleClick = scope => {
+const handleClick = async scope => {
+  await fetchTest({ classroomId });
+  if (!(testList.value.practice.length || testList.value.testPaper.length)) {
+    ElMessage({
+      type: 'warning',
+      message: '暂无数据'
+    });
+    return;
+  }
   setObjectiveId(scope.row.id);
+
   // objectiveId.value = scope.row.objectiveId;
   setShow(true);
 };
