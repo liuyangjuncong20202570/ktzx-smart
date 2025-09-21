@@ -8,22 +8,18 @@
       style="width: 50vw; padding-top: 0; height: 78vh"
       @close="handleBack"
       v-model="isShow"
+      @open="handleShow"
     >
       <h2 style="margin-top: 0">请选择需要绑定的考核项</h2>
       <div class="wrapper">
         <div>
           <el-dropdown>
             <div class="flex items-center justify-between gap-6 mb-4 mt-4">
-              <el-tree-select
-                v-model="treeValue"
-                :props="defaultProps"
-                :data="typeList"
-                :render-after-expand="false"
+              <el-input
+                title="平时作业"
                 style="width: 240px"
-                :check-on-click-node="true"
-                @node-click="nodeClick"
-                node-key="id"
-                placeholder="请选择考核类别"
+                disabled
+                :placeholder="props.categoryName"
               />
               <el-tree-select
                 v-model="itemType"
@@ -95,6 +91,10 @@ const props = defineProps({
   classroomId: {
     type: String,
     default: ''
+  },
+  categoryName: {
+    type: String,
+    default: '考核项'
   }
 });
 
@@ -123,6 +123,10 @@ const { isShow, testList, categoryId, objectiveId, courseId } = storeToRefs(item
 
 const handleBack = () => {
   setShow(false);
+};
+
+const handleShow = async () => {
+  await fetchTest({ classroomId: props.classroomId });
 };
 
 const mapping = type => {
@@ -162,8 +166,7 @@ const nodeClick = (data, node, event) => {
 };
 
 const submitUpload = async () => {
-  console.log(categoryId.value);
-  if (!categoryId.value) {
+  if (!categoryId.value || !objectiveId.value) {
     ElMessage({ type: 'warning', message: '请先选择考核类别' });
     tableRef.value.clearSelection();
     return;

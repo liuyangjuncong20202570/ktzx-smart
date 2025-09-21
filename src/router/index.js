@@ -279,7 +279,8 @@ const routes = [
         path: 'evaluation/assessmentPlan', // 达成性评价模型-考核方案
         name: 'AssessmentTable',
         // component: () => import('../components/evaluation/AssessmentTable.vue')
-        component: () => import('../components/evaluation/evaluationNew/AsswssmentNew.vue')
+        // component: () => import('../components/evaluation/evaluationNew/AsswssmentNew.vue')
+        component: () => import('../components/evaluation/evaluationNew/AssessmentTable.vue')
       },
       {
         path: 'evaluation/dynamicEvaluation/studentReport', // 评估与画像-学生报告

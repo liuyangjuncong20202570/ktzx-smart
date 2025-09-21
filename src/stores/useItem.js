@@ -12,6 +12,10 @@ const useItem = defineStore('item', () => {
   const isItemShow = ref(false);
   const bindList = ref([]);
 
+  const setCourseId = value => {
+    courseId.value = value;
+  };
+
   const setItemShow = value => {
     isItemShow.value = value;
   };
@@ -44,8 +48,8 @@ const useItem = defineStore('item', () => {
     return { code, msg };
   };
 
-  const fetchGetBind = async (courseId, size, current) => {
-    const { data } = await getbindType(courseId, size, current);
+  const fetchGetBind = async (courseId, size, current, categoryId, objectiveId) => {
+    const { data } = await getbindType(courseId, size, current, categoryId, objectiveId);
     bindList.value = data.records;
   };
 
@@ -70,7 +74,8 @@ const useItem = defineStore('item', () => {
     setItemShow,
     fetchGetBind,
     bindList,
-    fetchDelBind
+    fetchDelBind,
+    setCourseId
   };
 });
 

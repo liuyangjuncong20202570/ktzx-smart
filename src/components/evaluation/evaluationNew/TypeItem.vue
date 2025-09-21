@@ -81,10 +81,11 @@ const props = defineProps({
 const delList = ref([]);
 const itemStore = useItem();
 const { setItemShow, fetchDelBind, fetchGetBind } = itemStore;
-const { isItemShow, bindList, courseId } = storeToRefs(itemStore);
+const { isItemShow, bindList, courseId, categoryId, objectiveId } = storeToRefs(itemStore);
 
-const handleShow = () => {
-  console.log('show');
+const handleShow = async () => {
+  // console.log('show');
+  await fetchGetBind(courseId.value, -1, 1, categoryId.value, objectiveId.value);
 };
 
 const handleBack = () => {
@@ -98,7 +99,7 @@ const handleDelAll = async () => {
   }
   const data = await fetchDelBind(delList.value);
   if (data.msg === 'success') {
-    await fetchGetBind(courseId.value, -1, 1);
+    await fetchGetBind(courseId.value, -1, 1, categoryId.value, objectiveId.value);
     ElMessage.success('删除成功');
     return;
   }
@@ -110,7 +111,7 @@ const handleDelete = async scope => {
   let delList = [scope.row.id];
   const data = await fetchDelBind(delList);
   if (data.msg === 'success') {
-    await fetchGetBind(courseId.value, -1, 1);
+    await fetchGetBind(courseId.value, -1, 1, categoryId.value, objectiveId.value);
     return ElMessage.success('删除成功');
   }
   ElMessage.error('删除失败');

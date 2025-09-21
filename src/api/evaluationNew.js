@@ -93,9 +93,9 @@ export const bindTypeAim = inputList => {
 };
 
 // 查看考核项
-export const getbindType = (courseId, size, current) => {
+export const getbindType = (courseId, size, current, categoryId, objectiveId) => {
   return request.evaluation.get(
-    `/fe/assessment-items/list?current=${current}&size=${size}&courseId=${courseId}`
+    `/fe/assessment-items/list?current=${current}&size=${size}&courseId=${courseId}&categoryId=${categoryId}&objectiveId=${objectiveId}`
   );
 };
 

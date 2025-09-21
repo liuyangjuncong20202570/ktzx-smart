@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import legacy from '@vitejs/plugin-legacy';
 import tailwindcss from '@tailwindcss/vite';
+import vueJsx from '@vitejs/plugin-vue-jsx';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
@@ -12,7 +13,8 @@ export default defineConfig(({ mode }) => {
         targets: ['ie>=11'],
         additionalLegacyPolyfills: ['regenerator-runtime/runtime']
       }),
-      tailwindcss()
+      tailwindcss(),
+      vueJsx()
     ],
     server: {
       host: '0.0.0.0',
