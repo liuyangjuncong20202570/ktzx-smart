@@ -1,0 +1,763 @@
+<!-- 使用vxe-table组件开发 -->
+<template>
+  <div style="height: 100%;">
+    <el-header style="
+        height: 40px;
+        padding: 5px 0px;
+        width: 100%;
+        text-align: left;
+        background-color: #deebf7;
+      ">
+      <el-button v-if="isCourseManager" type="success" @click="save()" style="margin-left: 0.8vw">保存</el-button>
+      <el-button v-else type="success" @click="calc()" style="margin-left: 0.8vw">计算</el-button>
+    </el-header>
+    <div v-loading="pageLoading" element-loading-background="rgba(0, 0, 0, 0.2)">
+      <div id="container" style="height: calc(92vh - 130px); width: 100%">
+        <vxe-grid v-if="info && info.head.length" v-bind="gridOptions" v-on="gridEvents"
+          :edit-config="gridOptions.editConfig" class="scroll-container" @edit-closed="handleEditClosed"></vxe-grid>
+        <div v-else style="height: 100%; display: flex; justify-content: center; align-items: center; color: grey;">
+          暂无数据
+        </div>
+      </div>
+      <div v-if="info && info.head.length">
+        <el-table :data="footer1Data" :show-header="false" :row-class-name="tableRowClassName" border>
+          <el-table-column prop="name" width="240" align="center"></el-table-column>
+          <el-table-column :prop="item.id" v-for="(item, index) in info.head" :key="index" show-overflow-tooltip
+            align="center">
+            <template v-slot="scope">
+              <div v-if="calcFooter1Data(scope.row[item.id]) != 100" style="color: red; height: 28px">
+                合计需为100（当前为：{{ scope.row[item.id] }}）
+              </div>
+              <div v-else style="height: 28px; color: black">{{ scope.row[item.id] }}</div>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <el-table :data="footer2Data" :show-header="false" :row-class-name="tableRowClassName" border>
+          <el-table-column prop="name" width="240" align="center"></el-table-column>
+          <el-table-column v-for="(item, index) in info.head" :key="index" show-overflow-tooltip align="center">
+            <template v-slot="scope">
+              <el-input v-if="isCourseManager && scope.row.edit[item.id]" style="height: 28px" :ref="el => setInputRef(el, item.id)"
+                @blur="handleBlur(scope.row, item.id)" v-model="scope.row[item.id]"></el-input>
+              <div v-else @dblclick="handleClick(scope.row, item.id)" :style="{
+                color: calcFooter2Data() !== 100 ? 'red' : 'black',
+                width: '100%',
+                height: '28px'
+              }">
+                {{ scope.row[item.id] }}
+                <span v-if="calcFooter2Data() !== 100" style="color: red"> （总评合计不为100）</span>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+    </div>
+
+    <!----------------------------------编辑弹窗-------------------------------------->
+    <el-dialog v-model="editDialogVisible" width="600" destroy-on-close>
+      <div style="padding: 0 25%; display: flex; justify-content: space-between; margin: -5px 0 15px 0">
+        <el-button @click="uploadDialogVisible = true">上传</el-button>
+        <el-button @click="associate()">关联</el-button>
+      </div>
+      <div style="font-weight: bolder; border: 1px solid #ebebeb; height: 30px; line-height: 30px;
+			color: #969696; user-select: none;">
+        考核项：{{ rightClickItem.title }}
+      </div>
+      <el-table ref="multipleTableRef" :data="filesTableData" style="height: 350px;" v-loading="filesTableLoading"
+        element-loading-background="rgba(0, 0, 0, 0.2)" @selection-change="handleSelectionChange" border>
+        <el-table-column align="center" type="selection" width="40"></el-table-column>
+        <el-table-column align="center" label="名称" width="150" prop="name"></el-table-column>
+        <el-table-column align="center" label="上传时间" width="170" prop="createTime"></el-table-column>
+        <el-table-column align="center" width="60" label="类型">
+          <template #default="{ row }">
+            {{ row.type == 1 ? '作业' : (row.type == 2 ? '测试' : (row.type == 3 ? '实验' : '上传')) }}
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="操作">
+          <template #default="{ row }">
+            <div style="display: flex; justify-content: space-between; padding: 0 10px;">
+              <el-button type="primary" size="small" @click="openPreviewDialog(row)">预览</el-button>
+              <el-button :disabled="row.type !== 4" type="danger" size="small"
+                @click="openDeleteDialog(row)">删除</el-button>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
+
+    <!----------------------------------上传弹窗-------------------------------------->
+    <el-dialog v-model="uploadDialogVisible" width="400" destroy-on-close>
+      <!-- <el-text type="warning" style="margin-bottom: 10px;">仅支持.csv、.xls、.xlsx文件类型</el-text><br> -->
+      <div class="link-text" @click="getUploadTemplate">获取上传模板</div>
+      <el-upload ref="uploadRef" class="upload-demo"
+        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" :limit="1" :on-exceed="handleExceed"
+        :auto-upload="false" accept=".xls,.xlsx" :before-upload="file => storeFileInfo(file, rightClickItem)">
+        <template #trigger>
+          <el-button type="primary" style="margin-top: 10px;">选择文件</el-button>
+        </template>
+      </el-upload>
+      <el-button @click="uploadFile()" style="margin-bottom: 10px;">确定</el-button><br>
+      <el-text type="danger">模板中是最新的本课堂学生列表，<br>不使用模板进行上传可能产生无效数据</el-text>
+    </el-dialog>
+
+    <!----------------------------------预览文件的弹窗-------------------------------------->
+    <el-dialog v-model="previewDialogVisible" width="1200" style="height: 90vh; margin-top: 30px; margin-bottom: 30px;"
+      destroy-on-close>
+      <div v-if="fileType === 4" style="max-height: 82vh; overflow: auto;">
+        <!-- <vue-office-docx v-if="fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'"
+          style="height: 82vh;" :src="blobData" />
+        <vue-office-pdf v-else-if="fileType === 'application/pdf'" style="height: 82vh;" :src="blobData" /> -->
+        <vue-office-excel style="height: 82vh;" :src="blobData" />
+      </div>
+      <div v-else>{{ fileInfo }}</div>
+    </el-dialog>
+    <!------------------------------------------------------------------------------------->
+
+    <!----------------------------------确认删除的弹框-------------------------------------->
+    <el-dialog v-model="deleteDialogVisible" width="350" destroy-on-close>
+      <template #header="{ titleId, titleClass }">
+        <div style="text-align: left; margin-bottom: -15px">
+          <div :id="titleId" :class="titleClass" style="font-size: 15px">
+            <el-button link type="warning">
+              <el-icon size="20" style="padding-bottom: 3px; box-sizing: border-box">
+                <WarningFilled />
+              </el-icon>
+            </el-button>
+            是否要删除选中的文件
+          </div>
+        </div>
+      </template>
+      <div v-if="associateFiles.length" style="
+          max-height: 300px;
+          overflow: auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        ">
+        <div style="margin-bottom: 5px">
+          <el-text type="danger" style="display: flex">
+            <div>将删除的文件与以下考核项关联，请先取消关联</div>
+          </el-text>
+        </div>
+        <el-table :data="associateFiles" style="width: 60%; height: 30vh" stripe border>
+          <el-table-column label="考核项名" prop="itemName" align="center"></el-table-column>
+        </el-table>
+      </div>
+      <template #footer>
+        <div v-if="!associateFiles.length" class="dialog-footer">
+          <el-button @click="deleteDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="deleteFile()"> 确认 </el-button>
+        </div>
+      </template>
+    </el-dialog>
+    <!-------------------------------------------------------------------------------------->
+  </div>
+</template>
+
+<script setup lang="ts">
+import { nextTick, onMounted, ref } from 'vue';
+import request from '../../utils/request';
+import { ElMessage, genFileId } from 'element-plus';
+import type { TableInstance } from 'element-plus';
+import _ from 'lodash';
+import { UploadInstance } from 'element-plus';
+import { UploadProps } from 'element-plus';
+import { UploadRawFile } from 'element-plus';
+import { WarningFilled } from '@element-plus/icons-vue';
+import VueOfficeDocx from '@vue-office/docx';
+import VueOfficeExcel from '@vue-office/excel';
+import '@vue-office/excel/lib/index.css';
+import VueOfficePdf from '@vue-office/pdf';
+
+const calc = async () => {
+  pageLoading.value = true;
+  try {
+    const res = await request.evaluation.get(`/evaluation/attainment/calc`);
+    if (res.code === 200) {
+
+    } else {
+      ElMessage.error(res.msg);
+    }
+  } catch (error) {
+    ElMessage.error('计算失败' + error);
+  };
+  pageLoading.value = false;
+}
+
+const isCourseManager = ref(null);
+
+const container = ref(null);
+
+const pageLoading = ref(false);
+
+const info = ref(null); // 存储后端传来的的数据
+
+const leafIds = ref({}); // 以id为键存储其所有叶节点的id
+
+const footer1Data = ref([{ name: '分数合计' }]);
+const footer2Data = ref([
+  {
+    name: '总评占比(%)',
+    edit: {}
+  }
+]);
+
+const rightClickItem = ref(); // 存储被右键的考核项
+
+// 用于渲染表格的数据
+const gridOptions = ref({
+  size: 'mini',
+  border: true,
+  height: 500, // 表格默认高度，在钩子函数中会修改
+  align: 'center',
+  showOverflow: true,
+  showHeaderOverflow: true,
+  editConfig: {
+    trigger: 'dblclick',
+    mode: 'cell',
+    showIcon: false
+  },
+  columnConfig: {
+    resizable: false
+  },
+  menuConfig: {
+    header: {
+      options: [[{ code: 'edit', name: '编辑', suffixConfig: { icon: 'vxe-icon-edit' } }]]
+    },
+    visibleMethod({ options, column }) {
+      // 处理右键菜单项显示
+      rightClickItem.value = column;
+      let isDisabled = true; // 菜单项是否不可可点击
+      let isVisible = false; // 菜单项是否可见
+      if (info.value.head.some(item => leafIds.value[item.id].includes(column.field)) && !isCourseManager.value) {
+        // 只有子节点才能触发右键菜单，并且角色要是任课老师
+        isDisabled = false;
+        isVisible = true;
+      }
+      options.forEach(list => {
+        list.forEach(item => {
+          if (item.code === 'edit') {
+            item.visible = isVisible;
+            item.disabled = isDisabled;
+          }
+        });
+      });
+      return true;
+    }
+  },
+  columns: [],
+  data: []
+});
+
+onMounted(async () => {
+  container.value = document.getElementById('container');
+  await checkRole();
+  await getData();
+  gridOptions.value.height = container.value.clientHeight;
+});
+
+const checkRole = async () => {
+  try {
+    const res = await request.evaluation.get(`/evaluation/attainment`);
+    if (res.code === 200) {
+      isCourseManager.value = res.data.isCourseManager;
+    } else {
+      ElMessage.error(res.msg);
+    }
+  } catch (error) {
+    ElMessage.error('查询角色失败' + error);
+  }
+}
+
+const getData = async () => {
+  try {
+    const res = await request.evaluation.get(`/evaluation/assessmentPlan/getAssessmentTable`);
+    if (res.code === 200) {
+      info.value = res.data;
+      console.log(info.value);
+      initialize(info.value);
+    } else {
+      ElMessage.error(res.msg);
+    }
+  } catch (error) {
+    ElMessage.error('获取考核方案失败', error);
+  }
+};
+
+const initialize = info => {
+
+  info.head.forEach(item => {
+    leafIds.value[item.id] = getLeafIds(item);
+    footer1Data.value[0][item.id] = calcSumScore(info.items, leafIds.value[item.id]); // 计算每一大项的所有考核项的总分
+
+    footer2Data.value[0][item.id] = Number(info.percent[item.id]); // 存储每一大项的总评占比
+    footer2Data.value[0].edit[item.id] = false; // 设置总评占比每一项是否可编辑
+  });
+
+  creatHeader(info?.head); // 创建表头
+
+  info.items.forEach(item => {
+    // 处理数据单元格
+    item.target = item.name; // 这里新加target是为了对应表格的课程目标列以显示数据，那列的field键值为'target'
+  });
+  gridOptions.value.data = info.items;
+};
+
+// ancextorId存储的是每个最外层节点的id，用于遍历到最深层时能知道其属于哪个最外部节点（考核项大类）
+const creatHeader = (head, floor = 0, ancestorId = '') => {
+  let finish = false;
+  head.forEach((node, idx) => {
+    node.title = node.itemName;
+    node.field = node.id;
+    if (!floor) {
+      ancestorId = node.id; // 处于最外层时记录最外层节点的id
+      if (idx === head.length - 1) finish = true; // 当处于最外层节点且是最外层的最后一个节点时，代表着递归结束
+    }
+
+    if (node.children && node.children.length > 0)
+      creatHeader(node.children, floor + 1, ancestorId);
+    else {
+      // 到达最深层节点（叶节点）
+      if (isCourseManager.value) node.editRender = { name: 'input' }; // 只有叶节点的单元格可编辑，因为表格的每一列的列头实际上对应的是一个个叶节点
+
+      // 设置叶节点宽度，首先根据info.head的长度确定每一个考核项大类（最外部节点）所占宽度，再用它除以这个最外部节点有多少个叶节点来确定每个叶节点的宽度
+      // 这样保证了每个考核项大类都占有相同的宽度（繁琐）
+      node.width = Number(
+        (
+          (container.value.clientWidth - 240) /
+          info.value.head.length /
+          leafIds.value[ancestorId].length
+        ).toFixed(0)
+      );
+    }
+  });
+  if (finish) {
+    gridOptions.value.columns = [
+      {
+        field: 'target',
+        title: '课程目标',
+        width: 240
+      }
+    ];
+    gridOptions.value.columns = gridOptions.value.columns.concat(head);
+  }
+};
+
+const getLeafIds = (node, result = []) => {
+  if (node.children && node.children.length > 0) {
+    node.children.forEach(child => {
+      getLeafIds(child, result);
+    });
+  } else {
+    result.push(node.id);
+  }
+  return result;
+};
+
+const calcSumScore = (array, ids) => {
+  let sum = 0;
+  array.forEach(item => {
+    ids.forEach(id => {
+      if (item[id]) sum += Number(item[id]);
+    });
+  });
+  return sum;
+};
+
+/**********************表格数据单元双击编辑*********************/
+const oldData = ref();
+const postData = ref({}); // 存储批量传到后端的数据
+
+const gridEvents = {
+  cellDblclick({ row, column }) {
+    oldData.value = row[column.field];
+  },
+  async menuClick({ menu }) {
+    if (menu.code === 'edit') {
+      editDialogVisible.value = true;
+      getFileList();
+    }
+  }
+};
+
+const handleEditClosed = async ({ row, column }) => {
+  row[column.field] = row[column.field] ? Number(row[column.field]) : 0; // 清空数值则设为0
+  let num = row[column.field];
+  if (Number.isNaN(num)) {
+    // 判断输入的是不是数字
+    row[column.field] = oldData.value;
+    return;
+  }
+  if (row[column.field] !== oldData.value) {
+    // 当数据变化时再执行
+    if (!postData.value.items) postData.value.items = {}; // 初始化post的数据
+    row[column.field] = Number(Number(row[column.field]).toFixed(0)); // 若输入小数则四舍五入为整数
+    if (num < 0) {
+      // 若输入负数则撤销本次操作
+      row[column.field] = oldData.value;
+      return;
+    }
+
+    if (!postData.value.items) postData.value.items = {};
+    if (!postData.value.items[row.id]) postData.value.items[row.id] = {}; // 以课程目标的id为键存储其内部所有考核项
+    postData.value.items[row.id][column.field] = row[column.field]; // 以考核项的id为键存储其分数
+    if (row[column.field] === 0) row[column.field] = undefined; // 值为0需要传给后端，但是前端表格里值为零就设为不显示
+
+    // 每次改变考核项的分数重新计算
+    info.value.head.forEach(item => {
+      footer1Data.value[0][item.id] = calcSumScore(info.value.items, leafIds.value[item.id]);
+    });
+  }
+};
+
+const tableRowClassName = ({ row, rowIndex }) => {
+  return 'footer-row';
+};
+
+const calcFooter1Data = (score) => {
+  return score;
+}
+
+const calcFooter2Data = () => {
+  let totalFooter2Data = 0; // 存储总评占比之和
+  info.value.head.forEach(item => {
+    totalFooter2Data += footer2Data.value[0][item.id];
+  });
+  return totalFooter2Data;
+};
+
+const save = async () => {
+  if (Object.keys(postData.value).length === 0) return; // 未改变任何值则不执行
+  if (
+    !info.value.head.every(item => footer1Data.value[0][item.id] === 100) ||
+    calcFooter2Data() !== 100
+  ) {
+    ElMessage.error('数据不合法，无法保存');
+    return;
+  }
+  // 数据合法再传给后端
+  try {
+    const res = await request.evaluation.post(
+      `/evaluation/assessmentPlan/updateAssessmentTable`,
+      postData.value
+    );
+    if (res.code === 200) {
+      ElMessage.success('修改成功');
+      await getData();
+      postData.value = {};
+    } else {
+      ElMessage.error(res.msg);
+    }
+  } catch (error) {
+    ElMessage.error('修改失败' + error);
+  }
+};
+
+/**********************双击修改总评占比栏**********************/
+const inputsRefs = ref({});
+const oldPercent = ref('');
+
+const setInputRef = (el, id) => {
+  if (el) {
+    inputsRefs.value[id] = el;
+  }
+};
+
+const handleClick = (row, field) => {
+  nextTick(() => {
+    row.edit[field] = true;
+    oldPercent.value = row[field];
+    setTimeout(() => {
+      if (inputsRefs.value[field] && inputsRefs.value[field].$refs.input) {
+        inputsRefs.value[field].$refs.input.focus();
+      }
+    }, 0);
+  });
+};
+
+const handleBlur = (row, field) => {
+  nextTick(async () => {
+    row.edit[field] = false;
+    if (row[field] !== oldPercent.value) {
+      row[field] = Number(Number(row[field]).toFixed(0));
+      if (row[field] === '') row[field] = 0;
+
+      if (!postData.value.percent) postData.value.percent = {};
+      postData.value.percent[field] = row[field]; // 以id为键存储其总评占比
+    }
+  });
+};
+
+/*************************编辑弹窗*************************/
+const editDialogVisible = ref(false);
+//---------------------------------------------作业实验表格相关
+const filesTableData = ref([]);
+const filesTableLoading = ref(true);
+
+const multipleTableRef = ref<TableInstance>();
+const multipleSelection = ref([]);
+const oldSelection = ref([]); // 存储最初的被勾选的表格行，用于关联时找到哪些是被取消勾选的哪些是新勾选的
+
+/*判定哪些行被选中*/
+const handleSelectionChange = selection => {
+  multipleSelection.value = selection;
+};
+
+const getFileList = async () => {
+  filesTableLoading.value = true;
+  try {
+    const res = await request.evaluation.get(
+      `/evaluation/assessmentPlan/getFileList?checkitemId=${rightClickItem.value.field}`
+    );
+    if (res.code === 200) {
+      filesTableData.value = res.data.files;
+      toggleSelection(res.data.associateFileIds);
+    } else {
+      ElMessage.error(res.msg);
+    }
+  } catch (error) {
+    ElMessage.error('获取文件列表失败' + error);
+  }
+  filesTableLoading.value = false;
+};
+const toggleSelection = associateFileIds => {
+  // 从filesTableData.value中过滤出id和associateFileIds每一个值相同的元素
+  const rows = filesTableData.value.filter(file => associateFileIds.includes(file.id));
+  oldSelection.value = rows;
+  if (rows) {
+    nextTick(() => {
+      rows.forEach(row => {
+        multipleTableRef.value!.toggleRowSelection(row, undefined, false);
+      });
+    });
+  } else {
+    multipleTableRef.value!.clearSelection();
+  }
+};
+
+//---------------------------------------------关联按钮
+const associate = async () => {
+  // 新增的关联文件id
+  const newFiles = multipleSelection.value.filter(item => !oldSelection.value.includes(item));
+  // 取消关联的文件id
+  const deletedFiles = oldSelection.value.filter(item => !multipleSelection.value.includes(item));
+  if (!newFiles.length && !deletedFiles.length) return;
+  console.log(newFiles, deletedFiles);
+
+  // 标志着新增和删除关联是否成功
+  let associate = true;
+  let disassociate = true;
+  filesTableLoading.value = true;
+
+  if (newFiles.length) {
+    const associatePost = {
+      checkitemId: rightClickItem.value.field,
+      files: newFiles
+    };
+    try {
+      const res = await request.evaluation.post(
+        `/evaluation/assessmentPlan/associate`,
+        associatePost
+      );
+      if (res.code === 200) {
+        getFileList();
+      } else {
+        ElMessage.error(res.msg);
+        associate = false;
+      }
+    } catch (error) {
+      ElMessage.error('修改失败' + error);
+      associate = false;
+    }
+  }
+
+  if (deletedFiles.length) {
+    const disassociatePost = {
+      checkitemId: rightClickItem.value.field,
+      files: deletedFiles
+    };
+    try {
+      const res = await request.evaluation.post(
+        `/evaluation/assessmentPlan/disassociate`,
+        disassociatePost
+      );
+      if (res.code === 200) {
+        getFileList();
+      } else {
+        ElMessage.error(res.msg);
+        disassociate = false;
+      }
+    } catch (error) {
+      ElMessage.error('修改失败' + error);
+      disassociate = false;
+    }
+  }
+
+  if (associate && disassociate) ElMessage.success('修改成功');
+};
+
+//---------------------------------------------预览按钮
+const previewDialogVisible = ref(false);
+const fileType = ref(null);
+const blobData = ref(null);
+const fileInfo = ref(null);
+
+const openPreviewDialog = async (row) => {
+  fileType.value = row.type;
+  if (row.type === 4) {
+    try {
+      const res = await request.evaluation.get(`/evaluation/assessmentPlan/showExcel?fileId=${row.id}`)
+      if (res.code === 200) {
+        blobData.value = generateBLOB(res.data);
+      } else {
+        ElMessage.error(res.msg);
+      }
+    } catch (error) {
+      ElMessage.error('生成excel失败' + error);
+    }
+  }
+  previewDialogVisible.value = true;
+  fileInfo.value = row;
+};
+
+//---------------------------------------------删除按钮
+const deleteDialogVisible = ref(false);
+const filesTableRowData = ref(); // 存储文件列表点击了哪一行的数据
+const associateFiles = ref([]);
+
+const openDeleteDialog = async row => {
+  deleteDialogVisible.value = true;
+  filesTableRowData.value = row;
+  try {
+    const res = await request.evaluation.get(
+      `/evaluation/assessmentPlan/getAssociateCheckitems?fileId=${filesTableRowData.value.id}`
+    );
+    if (res.code === 200) {
+      associateFiles.value = res.data;
+    } else ElMessage.error(res.msg);
+  } catch (error) {
+    ElMessage.error('获取关联考核项失败' + error);
+  }
+};
+
+const deleteFile = async () => {
+  const postData = {
+    id: filesTableRowData.value.id,
+    checkitemId: rightClickItem.value.field
+  };
+  try {
+    const res = await request.evaluation.post(`/evaluation/assessmentPlan/deleteFile`, postData);
+    if (res.code === 200) {
+      ElMessage.success('删除成功');
+      getFileList();
+      deleteDialogVisible.value = false;
+    } else {
+      ElMessage.error(res.msg);
+    }
+  } catch (error) {
+    ElMessage.error('删除失败' + error);
+  }
+};
+
+//---------------------------------------------上传
+const uploadDialogVisible = ref(false);
+const uploadingFile = ref({});
+const uploadRef = ref<UploadInstance>();
+
+// upload使用ref定义的类型为UploadInstance的变量，代表el-upload组件的实例。可通过upload.value访问el-upload的实例方法和属性。
+const upload = ref<UploadInstance>();
+// 这是处理文件超过限制的事件钩子，类型为 UploadProps['onExceed']，即它是 el-upload 的 onExceed 事件处理函数。files 是用户在操作时尝试上传的文件列表。
+const handleExceed: UploadProps['onExceed'] = files => {
+  upload.value!.clearFiles();
+  // 从传入的 files 数组中取第一个文件，这个文件即是用户新选择的文件，并将其类型强制转换为 UploadRawFile 类型（即原始的文件对象）。
+  const file = files[0] as UploadRawFile;
+  // 给新选的文件生成一个唯一标识符 uid。Element Plus 内部依赖 uid 来区分不同的文件。如果这个文件对象没有 uid，上传时可能会出错。
+  file.uid = genFileId();
+  // 最后调用 handleStart(file) 方法，将这个文件手动加入到 el-upload 的上传队列中。handleStart() 是 el-upload 组件内部的方法。
+  upload.value!.handleStart(file);
+};
+
+const storeFileInfo = (file, checkitem) => {
+  if (file) {
+    uploadingFile.value = file;
+  }
+  return false; // 阻止默认上传行为
+};
+
+const uploadFile = async () => {
+  uploadRef.value!.submit(); // 触发上传文件
+  const formData = new FormData();
+  formData.append('file', uploadingFile.value);
+  try {
+    const res = await request.evaluation.post('/evaluation/assessmentPlan/uploadFile', formData);
+    if (res.code === 200) {
+      ElMessage.success(res.data);
+      getFileList();
+    } else {
+      ElMessage.error(res.msg);
+    }
+  } catch (error) {
+    ElMessage.error('上传失败' + error);
+  }
+  uploadDialogVisible.value = false;
+};
+
+const getUploadTemplate = async () => {
+  try {
+    const res = await request.evaluation.get(`evaluation/assessmentPlan/getUploadTemplate`);
+    if (res.code === 200) {
+      const blob = generateBLOB(res.data);
+
+      const downloadLink = document.createElement('a');
+      downloadLink.href = URL.createObjectURL(blob);
+      downloadLink.download = 'template.xlsx';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+
+    } else {
+      ElMessage.error(res.msg);
+    }
+  } catch (error) {
+    ElMessage.error('获取模板失败' + error);
+  }
+}
+
+//-------------------------------------------公用函数
+const generateBLOB = (data) => {
+  const base64Data = data;
+  const byteChars = atob(base64Data);
+  const len = byteChars.length;
+  const byteArray = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    byteArray[i] = byteChars.charCodeAt(i);
+  }
+  const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  return blob;
+}
+
+</script>
+
+<style scoped lang="scss">
+.el-table {
+  .footer-row {
+    background-color: #fafafa;
+  }
+}
+
+.scroll-container {
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.link-text {
+  color: dodgerblue;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.link-text:hover {
+  color: rgb(99, 177, 255)
+}
+</style>
