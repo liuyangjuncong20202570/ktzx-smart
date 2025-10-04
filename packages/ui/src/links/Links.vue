@@ -1,17 +1,37 @@
 <template>
   <div class="links-container">
-    <h3>D3 Links Visualization</h3>
-    <div ref="chartContainer" class="chart-container"></div>
+    <h3>{{ title ? title : 'D3 Links Visualization' }}</h3>
+    <div
+      class="h-[100vh] border-[#ddd] radius-[8px] overflow-hidden bg-[#f9f9f9]"
+      ref="chartContainer"
+    ></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import d3 from '../utils/d3';
+import d3 from '../../utils/d3';
 import { onMounted, onUnmounted, ref } from 'vue';
-import { Links, Nodes } from './mock/data';
 import { Link, LinkNode } from './data';
 
-const types = Array.from(new Set(Links.map(d => d.type)));
+const props = defineProps<{
+  title: string;
+  sendlink: Link[];
+  linkNodes: LinkNode[];
+}>();
+
+const { title, sendlink, linkNodes } = toRefs(props);
+
+const emit = defineEmits<{
+  (e: 'nodeClick', node: LinkNode, event?: MouseEvent): void;
+  (e: 'nodeHover', node: LinkNode, event?: MouseEvent): void;
+  (e: 'nodeMove', node: LinkNode, event?: MouseEvent): void;
+  (e: 'nodeOut', node: LinkNode, event?: MouseEvent): void;
+}>();
+
+if (!(sendlink.value && sendlink.value.length && linkNodes.value && linkNodes.value.length)) {
+  throw new Error('sendlink和linkNodes数组不能为空！');
+}
+const types = Array.from(new Set(sendlink.value.map(d => d.value)));
 const chartContainer = ref<HTMLDivElement | null>();
 const width = 1000;
 const height = 1000;
@@ -71,8 +91,8 @@ const drag = (simulation: d3.Simulation<LinkNode, Link>) => {
 const color = d3.scaleOrdinal(types, d3.schemeCategory10);
 
 const initialize = () => {
-  const links = Links.map(d => Object.create(d));
-  const nodes = Nodes.map(d => Object.create(d));
+  const links = sendlink.value.map(d => Object.create(d));
+  const nodes = linkNodes.value.map(d => Object.create(d));
   const simulation = d3
     .forceSimulation(nodes)
     .force(
@@ -113,7 +133,7 @@ const initialize = () => {
     .selectAll('path')
     .data(links)
     .join('path')
-    .attr('stroke', d => color(d.type))
+    .attr('stroke', d => color(d.value))
     .attr('marker-end', d => `url(${new URL(`#arrow-${d.type}`, location)})`);
 
   const node = g
@@ -124,7 +144,19 @@ const initialize = () => {
     .selectAll('g')
     .data(nodes)
     .join('g')
-    .call(drag(simulation));
+    .call(drag(simulation))
+    .on('click', (event: MouseEvent, d: LinkNode) => {
+      emit('nodeClick', d, event);
+    })
+    .on('mouseover', (event: MouseEvent, d: LinkNode) => {
+      emit('nodeHover', d, event);
+    })
+    .on('mousemove', (event: MouseEvent, d: LinkNode) => {
+      emit('nodeMove', d, event);
+    })
+    .on('mouseout', (event: MouseEvent, d: LinkNode) => {
+      emit('nodeOut', d, event);
+    });
 
   node.append('circle').attr('stroke', 'white').attr('stroke-width', 1.5).attr('r', 4);
 
@@ -135,7 +167,7 @@ const initialize = () => {
     .selectAll('text')
     .data(nodes)
     .join('text')
-    .text(d => d.id)
+    .text(d => (d.show ? d.name : null))
     .attr('font-size', 12)
     .attr('font-size', 12)
     .call(drag(simulation));

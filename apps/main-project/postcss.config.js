@@ -8,6 +8,8 @@ export default {
       // minPixelValue: 1, // 小于或等于1px的单位不转换
       mediaQuery: false // 是否允许在媒体查询中转换px，默认为false
       // exclude: /node_modules/ // 排除 node_modules 中的文件
-    }
+    },
+    '@tailwindcss/postcss': {},
+    autoprefixer: {}
   }
 };

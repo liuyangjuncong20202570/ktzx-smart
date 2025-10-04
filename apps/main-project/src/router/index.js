@@ -8,7 +8,6 @@ import {
 import useMain from '../stores/useMain';
 import { storeToRefs } from 'pinia';
 import { Links } from '@ui';
-
 const rolehome = [
   'teacherhomne',
   'adminhome',
@@ -247,7 +246,7 @@ const routes = [
         path: 'evasys/formative/KWAgraph', // 形成性评价模型-知识能力图谱
         name: 'KWAgraph',
         // component: () => import('../components/evaluation/graph.vue')
-        component: Links
+        component: () => import('../components/dynamicEvaluation/Visualize/VisualizeWrapper.vue')
       },
       {
         path: 'evasys/graph', // 形成性评价模型-图谱

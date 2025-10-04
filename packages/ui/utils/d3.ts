@@ -1,5 +1,7 @@
 // D3 工具文件 - 导出常用的 D3 功能
 import * as d3 from 'd3';
+import ForceGraph3D from '3d-force-graph';
+import * as d3Force3d from 'd3-force-3d';
 
 // 导出整个 D3 库
 export { d3 };
@@ -41,8 +43,7 @@ export const {
   min,
   mean,
   median,
-  range,
-  nest
+  range
 } = d3;
 
 // 常用的颜色方案
@@ -98,3 +99,5 @@ export const utils = {
 };
 
 export default d3;
+
+export { ForceGraph3D, d3Force3d };
