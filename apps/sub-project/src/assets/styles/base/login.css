@@ -1,0 +1,31 @@
+.full-background {
+    background-image: url('../../images/login.jpg');
+    background-size: cover; /* 覆盖整个容器 */
+    background-repeat: no-repeat; /* 不重复平铺 */
+    display: flex; /* 使用 Flexbox 布局 */
+    justify-content: space-between; /* 在主轴上分配空间 */
+    width: 100%;
+}
+
+.full-background > .el-aside {
+    flex: 0 0 50%; /* 侧边栏占据 50% 的宽度 */
+
+    background-size: cover; /* 背景图片覆盖整个侧边栏 */
+    background-repeat: no-repeat; /* 不重复平铺 */
+}
+
+.full-background > .el-main {
+    flex: 0 0 50%; /* 主内容区域占据 50% 的宽度 */
+
+    background-size: cover; /* 背景图片覆盖整个主内容区域 */
+    background-repeat: no-repeat; /* 不重复平铺 */
+}
+
+/* 确保 aside 和 main 垂直对齐 */
+.full-background > .el-aside,
+.full-background > .el-main {
+    display: flex; /* 使用 Flexbox 布局 */
+    flex-direction: column; /* 子元素沿交叉轴排列 */
+    justify-content: center; /* 子元素垂直居中 */
+    height: 100%; /* 子元素占据 100% 的容器高度 */
+}

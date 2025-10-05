@@ -1,0 +1,223 @@
+/* table 自定义样式  start */
+.custom-table {
+  border-radius: 10px 10px 0px 0px; 
+}
+.custom-table .el-table__header-wrapper .el-table__header thead .el-table__cell{
+  background: #F0F9FF;
+  /* border-radius: 10px 10px 0px 0px; */
+  font-family: MicrosoftYaHei;
+  font-size: 16px;
+  color: #1B1B1B;
+}
+/* .custom-table .el-table__header-wrapper .el-table__header thead .el-table__cell */
+.custom-table .el-table__header-wrapper .el-table__header {
+  background: rgba(39,165,255,0.07);
+  border-radius: 10px 10px 0px 0px;
+  border-bottom: 2px solid #8CCFFF;
+}
+.custom-table .el-checkbox__inner{
+  background: rgba(39,165,255,0.1);
+  border-radius: 3px;
+  border: 1px solid #27A5FF;
+}
+/* 超过两行显示省略号 数字也折行*/
+.custom-table-ellipsis{
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2; /* 限制显示的行数为2 */
+  overflow: hidden;
+  word-break: break-all;
+  width: 100%;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
+  display: -webkit-box;
+  
+}
+
+/* table 自定义样式  end */
+
+/* table 操作按钮  start */
+.custom-link-button{
+  height: auto !important;
+  font-family: MicrosoftYaHei !important;
+  font-size: 14px !important;
+  font-weight: normal !important;
+  line-height: 19px !important;
+  display: inline-block;
+  border-radius: 5px !important;
+  padding: 2px 5px !important;
+  margin: 3px 0;
+  margin-right: 10px;
+  margin-left: 0px !important; 
+  cursor: pointer;
+}
+.custom-link-active-button{
+  color: #27A5FF !important;
+  border: 1px solid #27A5FF !important;
+}
+.custom-link-default-button{
+  color: #D2D2D2 !important;
+  border: 1px solid #D2D2D2 !important;
+}
+.custom-link-delete-button{
+  color: #FF4C48 !important;
+  border: 1px solid #FF4C48 !important;
+}
+/* table 操作按钮  end */
+
+/* 表头 操作按钮  start */
+.custom-nav-button{
+  border-radius: 10px !important;
+  padding: 0px 10px !important;
+  margin: 0 5px !important;
+  cursor: pointer !important;
+}
+.custom-nav-button-success {
+  background-color: #32B16C !important;
+  border: 1px solid #32B16C !important;
+  color: #fff !important;
+}
+.custom-nav-button-success:hover {
+  opacity: 0.8 !important;
+}
+.custom-nav-button-delete{
+  background-color: #FF4C48 !important;
+  border: 1px solid #FF4C48 !important;
+  color: #fff !important;
+}
+.custom-nav-button-delete:hover {
+  opacity: 0.8 !important;
+}
+.custom-nav-button-primary{
+  background-color: #27A5FF !important;
+  border: 1px solid #27A5FF !important;
+  color: #fff !important;
+}
+.custom-nav-button-primary:hover {
+  opacity: 0.8 !important;
+}
+.custom-nav-button-info{
+  background-color: #4B7FFF !important;
+  border: 1px solid #4B7FFF !important;
+  color: #fff !important;
+}
+.custom-nav-button-info:hover {
+  opacity: 0.8 !important;
+}
+/* 表头 操作按钮  end */
+
+/* 弹框 底部按钮  start */
+.custom-dialog-footer {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+}
+.custom-dialog-footer .el-button {
+  width: 300px;
+}
+/* 弹框 底部按钮  end */
+
+/* 自定义checkbox  start */
+.custom-checkbox .el-checkbox__input{
+  background: rgba(39,165,255,0.1) !important;
+  border-radius: 5px;
+  border: 1px solid #27A5FF;
+}
+/* 自定义checkbox  end */
+
+.item-controls .el-input__wrapper{
+box-shadow: none !important;
+}
+/* 自定义radio  start */
+.radio-class {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background: #27a5ff;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+.default-radio {
+  width: 14px;
+  height: 14px;
+  background: #d2d2d2;
+  border-radius: 50%;
+}
+.error-radio {
+  width: 14px;
+  height: 14px;
+  background: #ff4c48;
+  border-radius: 50%;
+}
+.info-radio {
+  width: 14px;
+  height: 14px;
+  background: #27a5ff;
+  border-radius: 50%;
+}
+/* 自定义radio  end */
+
+.operate-button {
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  border-radius: 5px;
+  padding: 4px 8px;
+  font-size: 20px;
+}
+/* 自定义总分  start */
+
+.grade-total-title {
+  font-family: MicrosoftYaHei;
+  font-size: 16px;
+  color: #0078cd;
+  line-height: 24px;
+  text-align: center;
+  width: 100%;
+  margin: 20px 0;
+  padding: 5px 0;
+  background: #f8fbff;
+  border-radius: 4px;
+  border: 1px solid rgba(39, 165, 255, 0.2);
+
+  span {
+    display: inline-block;
+    position: relative;
+    padding: 0 15px;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 20px;
+      height: 1px;
+      background: #0078cd;
+      opacity: 0.5;
+    }
+
+    &::before {
+      left: -10px;
+    }
+
+    &::after {
+      right: -10px;
+    }
+  }
+}
+/* 自定义总分  end */
+.custom-dialog{
+  .el-dialog__header{
+    text-align: center;
+    padding: 10px 20px;
+    border-bottom: 2px solid #93D2FF;
+  }
+}
+.custom-checkbox{
+  .el-checkbox__input{
+    background: rgba(39, 165, 255, 0.1) !important;
+    border-radius: 3px !important;
+    border: none !important;
+  }
+}

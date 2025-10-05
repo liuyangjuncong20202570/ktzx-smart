@@ -277,7 +277,7 @@ import { UploadRawFile } from 'element-plus';
 import { Aim, WarningFilled } from '@element-plus/icons-vue';
 import VueOfficeDocx from '@vue-office/docx';
 import VueOfficeExcel from '@vue-office/excel';
-import '@vue-office/excel/lib/index.css';
+import '@vue-office/excel/index.css';
 import VueOfficePdf from '@vue-office/pdf';
 import useItem from '../../../stores/useItem';
 import useCourseAim from '../../../stores/useCourseAim';

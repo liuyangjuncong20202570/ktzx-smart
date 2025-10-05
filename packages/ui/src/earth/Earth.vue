@@ -1,9 +1,6 @@
 <template>
   <div class="relative">
     <div ref="graphContainer"></div>
-    <div style="position: absolute; top: 0; right: 0">
-      <button v-if="utilBoxShow" @click="handlePause" class="custom-button">暂停</button>
-    </div>
   </div>
 </template>
 
@@ -22,6 +19,8 @@ const rotating = ref(true);
 const graphContainer = ref<HTMLDivElement | null>(null);
 
 const subsetData = ref<any>();
+
+const galaxy = ref(true);
 
 const props = withDefaults(
   defineProps<{
@@ -68,25 +67,27 @@ const props = withDefaults(
 
 let count = 0;
 
-const {
-  linkNodes,
-  sendlink,
-  nodeColor,
-  nodeRadical,
-  utilBoxShow = true,
-  rotateConfig
-} = toRefs(props);
+const { linkNodes, sendlink, nodeColor, nodeRadical, utilBoxShow, rotateConfig } = toRefs(props);
 
 const emit = defineEmits<{
   (e: 'onNodeClick', node: EarthLinkNode, prevPos: number, currPos: number): void;
+  (e: 'onNodeDrag', node: EarthLinkNode, prevPos: number, currPos: number): void;
 }>();
 
 if (!(linkNodes && linkNodes.value.length && sendlink && sendlink.value.length)) {
   console.info('linkNodes、sendlink数组为空，当前展示默认数据');
 }
 
-const handlePause = () => {
-  rotating.value = false;
+watch(
+  () => utilBoxShow.value,
+  newVal => {
+    handlePause(newVal);
+  }
+);
+
+const handlePause = (value: boolean) => {
+  galaxy.value = value;
+  initialize(linkNodes.value, sendlink.value);
 };
 
 const resizeGraph = () => ({});
@@ -115,9 +116,11 @@ const initialize = (linkNodes: EarthLinkNode[], sendlink: EarthLink[]) => {
     .d3Force('collide', d3Force3d.forceCollide(16))
     .nodeRelSize(8)
     .nodeColor((d: EarthLinkNode) => (nodeColor.value ? nodeColor.value(d) : 'steelblue'))
+    .nodeLabel((as: EarthLinkNode) => `${as.name}`)
     .enableNodeDrag(true);
 
   const scene = forceGraph.scene();
+  const camera = forceGraph.camera();
 
   // ======================== 星星粒子 ========================
   const starCount = 1500; // 粒子数量
@@ -143,7 +146,7 @@ const initialize = (linkNodes: EarthLinkNode[], sendlink: EarthLink[]) => {
 
   const stars = new THREE.Points(starGeometry, starMaterial);
   stars.raycast = () => {};
-  scene.add(stars);
+  stars.layers.set(1);
 
   // ======================== 星系背景 ========================
   const lineMaterial = new THREE.LineBasicMaterial({
@@ -180,7 +183,17 @@ const initialize = (linkNodes: EarthLinkNode[], sendlink: EarthLink[]) => {
 
   const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
   lines.raycast = () => {};
-  scene.add(lines);
+  lines.layers.set(1);
+
+  // Persist raycast overrides in engine tick
+  forceGraph.onEngineTick(() => {
+    stars.raycast = () => {};
+    lines.raycast = () => {};
+  });
+
+  // Configure camera to render only layer 0 for interactions, layer 1 for background
+  camera.layers.enable(0); // Enable layer 0 for force graph nodes
+  camera.layers.enable(1); // Enable layer 1 for stars and lines
 
   // ======================== 漂浮动画 ========================
   const animateStars = () => {
@@ -214,6 +227,11 @@ const initialize = (linkNodes: EarthLinkNode[], sendlink: EarthLink[]) => {
   // 设置图数据
   forceGraph.graphData({ nodes, links: [] });
 
+  if (galaxy.value) {
+    scene.add(lines);
+    scene.add(stars);
+  }
+
   // 设置节点点击事件
   forceGraph.onNodeClick((node: EarthLinkNode, prevPos: number, currPos: number) => {
     emit('onNodeClick', node, prevPos, currPos);
@@ -237,7 +255,9 @@ const initialize = (linkNodes: EarthLinkNode[], sendlink: EarthLink[]) => {
     //   .linkOpacity(0.5);
   });
 
-  forceGraph.onNodeDrag(() => {});
+  forceGraph.onNodeDrag((node: EarthLinkNode, prevPos: number, currPos: number) => {
+    emit('onNodeDrag', node, prevPos, currPos);
+  });
 
   forceGraph.onNodeDragEnd(() => {});
   // animate

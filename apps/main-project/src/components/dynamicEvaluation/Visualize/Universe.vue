@@ -1,11 +1,18 @@
 <template>
-  <Earth
-    v-if="dataReady"
-    :sendlink="links"
-    :linkNodes="nodes"
-    :nodeColor="d => handleNode(d).color"
-    :nodeRadical="d => handleNode(d).radical"
-  />
+  <div style="padding-top: 30px" v-if="dataReady" class="flex flex-col gap-4">
+    <div class="flex items-center justify-center">
+      <ElButton @click="handleSlide">切换</ElButton>
+    </div>
+    <Earth
+      v-if="dataReady"
+      :sendlink="links"
+      :linkNodes="nodes"
+      :nodeColor="d => handleNode(d).color"
+      :nodeRadical="d => handleNode(d).radical"
+      :utilBoxShow="slide"
+      @onNodeClick="handleNodeClick"
+    />
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -15,6 +22,7 @@ import useVisual from '../../../stores/dynamicEvaluation/useVisual';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref } from 'vue';
 import { AtomCategory } from './type';
+import { ElButton } from 'element-plus';
 
 const { fetchCourseTarget, fetchKwaDick } = useVisual();
 const { courseTarget, kwaDick } = storeToRefs(useVisual());
@@ -24,6 +32,15 @@ const dataReady = ref(false);
 const links = ref<Array<{ source: string; target: string; value: number; type: string }>>([]);
 const nodes = ref<any[]>([]);
 const kwaMap = ref<Map<string, any[]>>(new Map());
+const slide = ref(true);
+
+const handleSlide = () => {
+  slide.value = !slide.value;
+};
+
+const handleNodeClick = (node: EarthLinkNode) => {
+  slide.value = !slide.value;
+};
 
 const handleNode = (d: EarthLinkNode): { color: string; radical: number } => {
   switch (d.type) {
