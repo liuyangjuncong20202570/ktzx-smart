@@ -8,7 +8,7 @@
     size="60%"
   >
     <div
-      :style="Reinin.length === 1 ? '' : 'padding-top: 600px'"
+      :style="Reinin.length === 1 ? '' : 'padding-top: 700px'"
       class="h-full flex items-center justify-center flex-col"
     >
       <template v-for="r in Reinin">

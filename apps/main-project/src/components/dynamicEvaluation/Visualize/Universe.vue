@@ -1,5 +1,5 @@
 <template>
-  <div style="padding-top: 30px" v-if="dataReady" class="flex flex-col gap-4">
+  <div style="" v-if="dataReady" class="flex flex-col gap-4">
     <div class="flex items-center justify-center">
       <ElButton @click="handleSlide">切换</ElButton>
     </div>

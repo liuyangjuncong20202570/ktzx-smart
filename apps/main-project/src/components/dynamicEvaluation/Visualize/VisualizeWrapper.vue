@@ -4,12 +4,12 @@
       <Flat />
     </el-tab-pane>
     <el-tab-pane label="成长核心" name="second">
-      <div style="height: 900px" class="w-[100%] overflow-auto flex items-center justify-center">
+      <div style="" class="w-[100%] overflow-auto flex items-center justify-center">
         <Universe />
       </div>
     </el-tab-pane>
     <el-tab-pane label="学习金字塔" name="third">
-      <div style="height: 900px" class="w-[100%] overflow-auto flex items-center justify-center">
+      <div style="" class="w-[100%] overflow-auto flex items-center justify-center">
         <PyramidComp />
       </div>
     </el-tab-pane>
