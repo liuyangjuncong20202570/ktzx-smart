@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import d3 from '../../utils/d3';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, toRefs } from 'vue';
 import { Link, LinkNode } from './data';
 
 const props = defineProps<{

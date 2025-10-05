@@ -27,22 +27,6 @@ const { Reinin, polLength, labelColor } = toRefs(props);
 
 const container = ref<HTMLDivElement | null>(null);
 
-const types = ['aim', 'kwa', 'kw', 'a'];
-
-const selected = ref('aim');
-const referenceFrame = ref('aim');
-
-watch(
-  [selected, referenceFrame],
-  ([newType, newFrame]) => {
-    console.log('当前选择：', newType, newFrame);
-    // 可在此根据选择更新3D图数据
-    selected.value = newType;
-    referenceFrame.value = newFrame;
-  },
-  { deep: true, immediate: true }
-);
-
 onMounted(() => {
   if (!container.value) return;
 

@@ -1,42 +1,31 @@
 <template>
-  <div class="overflow-auto">
-    <!-- 课程目标 -->
-    <template v-for="target in targets">
-      <Pyramid v-if="dataValue" :Reinin="target" :polLength="target.length" />
-    </template>
-
-    <!-- kwa -->
-    <template v-for="kwa in kwas">
-      <Pyramid v-if="dataValue" :Reinin="kwa" :polLength="kwa.length" />
-    </template>
-    <!-- kw -->
-    <template v-for="kw in keywords">
-      <Pyramid v-if="dataValue" :Reinin="kw" :polLength="kw.length" />
-    </template>
-    <!-- a -->
-    <template v-for="a in abilities">
-      <Pyramid v-if="dataValue" :Reinin="a" :polLength="a.length" />
-    </template>
+  <div v-if="dataValue" class="overflow-auto flex flex-col gap-4">
+    <div @click="outerClick" class="flex flex-start">
+      <ElButton :data-name="AtomCategory.AIM">课程目标</ElButton>
+      <ElButton :data-name="AtomCategory.KWA">关键字-能力</ElButton>
+      <ElButton :data-name="AtomCategory.KEYWORD">关键字</ElButton>
+      <ElButton :data-name="AtomCategory.ABILITY">能力</ElButton>
+    </div>
+    <PyramidCombo v-if="dataValue" :Reinin="total" :polLength="total.length" />
+    <CategoryDetail v-model="drawer" @close="handleClose" :show="drawer" v-bind="detailProps" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import '../../../assets/css/taildwind.css';
-import { Pyramid, ReininData } from '@ui';
+import { Pyramid, ReininData, PyramidCombo } from '@ui';
 import { onMounted, reactive, ref } from 'vue';
 import useVisual from '../../../stores/dynamicEvaluation/useVisual';
 import { storeToRefs } from 'pinia';
-import { AtomCategory } from './type';
+import { AtomCategory, DetailProps, PyramidDetail } from './type';
+import { ElButton, ElLoading } from 'element-plus';
+import { useValueEffect } from './sideEffect';
+import CategoryDetail from './CategoryDetail.vue';
 
 const { fetchCourseTarget, fetchKwaDick } = useVisual();
 const { courseTarget, kwaDick } = storeToRefs(useVisual());
 
-const generateRandomBinaryArray = (length = 16) =>
-  Array.from({ length }, () => (Math.random() < 0.5 ? 0 : 1));
-
 const N = 16;
-const types = ref<any[]>([]);
-const reinin = ref<any[]>([]);
 
 const dataValue = ref(false);
 const kwaMap = ref<Map<string, any[]>>(new Map());
@@ -47,12 +36,46 @@ const kwas = ref<Array<ReininData>>([]);
 const keywords = ref<Array<ReininData>>([]);
 const abilities = ref<Array<ReininData>>([]);
 
-const Reinin = [
-  { num: '0', vector: '0000', labelPlus: 'Valid', labelMinus: 'Null', type: 'aim' },
-  { num: '1', vector: '0001', labelPlus: '111', labelMinus: '222', type: 'kwa' },
-  { num: '2', vector: '0010', labelPlus: 'Logical', labelMinus: '333', type: 'kw' },
-  { num: '3', vector: '0011', labelPlus: 'Constructivist', labelMinus: '444', type: 'a' }
-];
+const total = ref<ReininData[]>([]);
+const { setDrawer, drawer } = useValueEffect();
+
+const detailProps = reactive<DetailProps & PyramidDetail>({
+  title: '',
+  Reinin: []
+});
+
+const outerClick = (event: MouseEvent) => {
+  const target = event.target as HTMLElement;
+  // 找到最近的 button 元素
+  const btn = target.closest('button');
+  if (!btn) return; // 不是按钮点击，直接返回
+  // 读取 data-name
+  const name = btn.dataset.name;
+  setDrawer(true);
+  switch (name) {
+    case AtomCategory.AIM:
+      detailProps.title = '课程目标';
+      detailProps.Reinin = targets.value;
+      detailProps.labelColor = () => ({ bgColor: '#070707', labelColor: '#ffffd1' });
+      return;
+    case AtomCategory.KWA:
+      detailProps.title = '关键字 - 能力';
+      detailProps.Reinin = kwas.value;
+      return;
+    case AtomCategory.KEYWORD:
+      detailProps.title = '关键字';
+      detailProps.Reinin = keywords.value;
+      return;
+    case AtomCategory.ABILITY:
+      detailProps.title = '能力';
+      detailProps.Reinin = abilities.value;
+      return;
+  }
+};
+
+const handleClose = (value: boolean) => {
+  setDrawer(value);
+};
 
 const reducer = (arr: any[]) => {
   const result = arr.reduce((acc, curr, idx) => {
@@ -111,11 +134,11 @@ onMounted(async () => {
       type: 3
     });
   });
+  total.value = [...kwas.value, ...targets.value, ...keywords.value, ...abilities.value];
   kwas.value = reducer(kwas.value);
   targets.value = reducer(targets.value);
   keywords.value = reducer(keywords.value);
   abilities.value = reducer(abilities.value);
-
   dataValue.value = true;
 });
 </script>

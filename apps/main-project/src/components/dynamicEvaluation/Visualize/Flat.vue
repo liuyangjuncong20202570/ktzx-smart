@@ -1,7 +1,7 @@
 <template>
   <Links
     v-if="links.length && nodes.length"
-    title="2D"
+    title="2D图谱"
     :sendlink="links"
     :linkNodes="nodes"
     @nodeHover="handleHover"

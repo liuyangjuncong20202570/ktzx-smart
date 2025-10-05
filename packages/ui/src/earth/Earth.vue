@@ -12,9 +12,11 @@ import { ref, onMounted, onBeforeUnmount, watch, toRefs } from 'vue';
 import { ForceGraph3D, d3Force3d } from '../../utils/d3';
 import { EarthLinkNode, EarthLink } from './data';
 import { ForceGraph3DInstance } from '3d-force-graph';
+import * as THREE from 'three';
 
 let angle = 0;
 const N = 700;
+let inactivityTimer: number | null = null; // 离开计时器
 
 const rotating = ref(true);
 const graphContainer = ref<HTMLDivElement | null>(null);
@@ -79,7 +81,6 @@ const emit = defineEmits<{
   (e: 'onNodeClick', node: EarthLinkNode, prevPos: number, currPos: number): void;
 }>();
 
-console.log(linkNodes.value, sendlink.value);
 if (!(linkNodes && linkNodes.value.length && sendlink && sendlink.value.length)) {
   console.info('linkNodes、sendlink数组为空，当前展示默认数据');
 }
@@ -116,6 +117,80 @@ const initialize = (linkNodes: EarthLinkNode[], sendlink: EarthLink[]) => {
     .nodeColor((d: EarthLinkNode) => (nodeColor.value ? nodeColor.value(d) : 'steelblue'))
     .enableNodeDrag(true);
 
+  const scene = forceGraph.scene();
+
+  // ======================== 星星粒子 ========================
+  const starCount = 1500; // 粒子数量
+  const starGeometry = new THREE.BufferGeometry();
+  const starPositions = new Float32Array(starCount * 3);
+
+  for (let i = 0; i < starCount * 3; i++) {
+    starPositions[i] = (Math.random() - 0.5) * 4000; // 空间分布范围
+  }
+
+  starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+
+  // 发光材质
+  const starMaterial = new THREE.PointsMaterial({
+    color: new THREE.Color(0xffffff),
+    size: 3.5, // 粒子大小
+    transparent: true,
+    opacity: 0.95, // 更亮
+    blending: THREE.AdditiveBlending, // 发光效果
+    depthWrite: false,
+    sizeAttenuation: true
+  });
+
+  const stars = new THREE.Points(starGeometry, starMaterial);
+  stars.raycast = () => {};
+  scene.add(stars);
+
+  // ======================== 星系背景 ========================
+  const lineMaterial = new THREE.LineBasicMaterial({
+    color: 0xffffff, // 线条颜色（白色）
+    transparent: true, // 允许透明
+    opacity: 0.07, // 设置透明度
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+
+  const lineGeometry = new THREE.BufferGeometry();
+  const linePositions: number[] = [];
+
+  // 随机挑选部分粒子之间连线（类似星系的能量网）
+  for (let i = 0; i < starCount; i++) {
+    // 每个点随机连 2~3 条线
+    const connectionCount = Math.floor(Math.random() * 3);
+    for (let j = 0; j < connectionCount; j++) {
+      const targetIndex = Math.floor(Math.random() * starCount);
+      const i3 = i * 3;
+      const t3 = targetIndex * 3;
+      linePositions.push(
+        starPositions[i3],
+        starPositions[i3 + 1],
+        starPositions[i3 + 2],
+        starPositions[t3],
+        starPositions[t3 + 1],
+        starPositions[t3 + 2]
+      );
+    }
+  }
+
+  lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+
+  const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+  lines.raycast = () => {};
+  scene.add(lines);
+
+  // ======================== 漂浮动画 ========================
+  const animateStars = () => {
+    stars.rotation.y += 0.0002;
+    stars.rotation.x += 0.0001;
+    lines.rotation.y += 0.00015;
+    requestAnimationFrame(animateStars);
+  };
+  animateStars();
+
   const resizeGraph = () => {
     if (!graphContainer.value || !forceGraph) return;
     const { clientWidth, clientHeight } = graphContainer.value;
@@ -143,23 +218,23 @@ const initialize = (linkNodes: EarthLinkNode[], sendlink: EarthLink[]) => {
   forceGraph.onNodeClick((node: EarthLinkNode, prevPos: number, currPos: number) => {
     emit('onNodeClick', node, prevPos, currPos);
     // TODO：设置形态变换
-    forceGraph
-      .graphData({
-        nodes: linkNodes,
-        links: sendlink
-      })
-      .nodeId('id')
-      .nodeVal('value')
-      .nodeLabel((as: EarthLinkNode) => {
-        return `'当前单位：${as.name} - ${as.type} 权重：${as.value || 0}`;
-      })
-      .linkSource('source')
-      .linkTarget('target')
-      .nodeAutoColorBy('type')
-      .warmupTicks(250)
-      .cooldownTicks(0)
-      .nodeRelSize(8)
-      .linkOpacity(0.5);
+    // forceGraph
+    //   .graphData({
+    //     nodes: linkNodes,
+    //     links: sendlink
+    //   })
+    //   .nodeId('id')
+    //   .nodeVal('value')
+    //   .nodeLabel((as: EarthLinkNode) => {
+    //     return `'当前单位：${as.name} - ${as.type} 权重：${as.value || 0}`;
+    //   })
+    //   .linkSource('source')
+    //   .linkTarget('target')
+    //   .nodeAutoColorBy('type')
+    //   .warmupTicks(250)
+    //   .cooldownTicks(0)
+    //   .nodeRelSize(8)
+    //   .linkOpacity(0.5);
   });
 
   forceGraph.onNodeDrag(() => {});
@@ -172,7 +247,31 @@ const initialize = (linkNodes: EarthLinkNode[], sendlink: EarthLink[]) => {
     }
     requestAnimationFrame(animate);
   };
-  // animate();
+  animate();
+
+  // 鼠标交互
+  const setupMouseEvents = () => {
+    if (!graphContainer.value) return;
+
+    // 鼠标进入立即暂停旋转
+    graphContainer.value.addEventListener('mouseenter', () => {
+      rotating.value = false;
+      if (inactivityTimer) {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = null;
+      }
+    });
+
+    // 鼠标离开5s后旋转
+    graphContainer.value.addEventListener('mouseleave', () => {
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      inactivityTimer = window.setTimeout(() => {
+        rotating.value = true;
+      }, 5000);
+    });
+  };
+
+  setupMouseEvents();
 
   let lastX = 0;
   graphContainer.value.addEventListener('mousedown', e => {
@@ -181,8 +280,6 @@ const initialize = (linkNodes: EarthLinkNode[], sendlink: EarthLink[]) => {
 
   graphContainer.value.addEventListener('mouseup', e => {
     const dx = e.clientX - lastX;
-    rotateConfig.value.rotationSpeed = dx > 0 ? -0.002 : 0.002;
-    rotating.value = true;
   });
 };
 
