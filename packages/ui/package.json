@@ -18,7 +18,10 @@
     "d3-force-3d": "^3.0.6",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.13",
-    "three": "0.171.0",
     "three-render-objects": "^1.40.4"
+  },
+  "devDependencies": {
+    "@types/three": "^0.180.0",
+    "three": "0.171.0"
   }
 }

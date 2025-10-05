@@ -7,13 +7,16 @@
     "strict": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true
   },
   "vueCompilerOptions": {
     "globalTypesPath": ""
   },
   "include": [
     "./**/*",
-    "./vue.d.ts"
+    "./vue.d.ts",
+    "src",
+    "types"
   ]
 }
