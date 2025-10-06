@@ -45,7 +45,10 @@ export default defineConfig({
   base: '/',
   resolve: {
     alias: {
-      '@': '/src'
+      '@': '/src',
+      '@vue-office/docx': '@vue-office/docx/lib/v3',
+      '@vue-office/excel': '@vue-office/docx/lib/v3',
+      '@vue-office/pdf': '@vue-office/pdf/lib/v3'
     }
   },
   build: {
