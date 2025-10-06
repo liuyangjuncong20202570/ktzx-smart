@@ -1,6 +1,6 @@
 {
   "name": "@ncut/visualize-comp",
-  "version": "0.0.1-beta",
+  "version": "0.0.1-beta.0",
   "description": "",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
@@ -11,7 +11,11 @@
   "scripts": {
     "build": "vite build"
   },
-  "keywords": [],
+  "keywords": [
+    "ncut",
+    "liuyangjuncong",
+    "visualize"
+  ],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.15.0",

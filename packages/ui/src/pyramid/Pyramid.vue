@@ -9,12 +9,7 @@ import '../styles/index.css';
 import { onMounted, onBeforeUnmount, ref, watch, toRefs } from 'vue';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-
-interface ReininData {
-  num: number;
-  label: string;
-  type: number;
-}
+import { ReininData } from './data';
 
 const props = defineProps<{
   width?: number;
