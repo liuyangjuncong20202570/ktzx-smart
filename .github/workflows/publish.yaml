@@ -1,0 +1,63 @@
+name: Publish Package
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'packages/ui/**'
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    steps:
+      # 1. 拉取代码
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. 安装 Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+
+        # 3. 安装 pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: |
+          pnpm install --no-frozen-lockfile
+
+      - name: Check if version exists
+        run: |
+          cd packages/ui
+          if npm view @ncut/visualize-comp@$(node -p "require('./package.json').version"); then
+            echo "Version already published"
+            exit 0
+          fi
+
+      - name: Build
+        working-directory: packages/ui
+        run: pnpm exec vite build
+
+      # 3. 登录 npm
+      - name: Setup npm auth
+        run: |
+          npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+        env:
+          NPM_CONFIG_USERCONFIG: ''
+
+      - name: Who am I
+        run: |
+          npm whoami
+          pnpm whoami
+
+      - name: Publish
+        working-directory: packages/ui
+        run: pnpm publish --access public --no-git-checks

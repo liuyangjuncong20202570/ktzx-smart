@@ -1,6 +1,9 @@
 {
   "name": "@ncut/visualize-comp",
-  "version": "0.0.1-beta.0",
+  "version": "0.0.1-beta.1.0",
+   "publishConfig": {
+    "access": "public"
+  },
   "description": "",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
@@ -32,6 +35,7 @@
   "devDependencies": {
     "@types/three": "^0.180.0",
     "postcss-nesting": "^13.0.2",
-    "three": "0.171.0"
+    "three": "0.171.0",
+    "vite": "^5.0.8"
   }
 }
