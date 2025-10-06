@@ -7,7 +7,6 @@ import {
 } from 'vue-router';
 import useMain from '../stores/useMain';
 import { storeToRefs } from 'pinia';
-import { Links } from '@ui';
 const rolehome = [
   'teacherhomne',
   'adminhome',
