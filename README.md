@@ -104,3 +104,13 @@ pnpm run dev
 
 此步骤请参考语雀文档([https://www.yuque.com/kabuer/ohs3ct/nyq5h7yq3yielrlt])
 npm 替换为 pnpm 即可
+
+## ncut可视化组件库
+
+### 使用
+```bash
+npm i @ncut/visualize-comp
+```
+
+### 地址
+https://www.npmjs.com/package/@ncut/visualize-comp
